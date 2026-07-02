@@ -1,0 +1,289 @@
+"""
+Phase 1: Extract residual-stream activations from frozen Llama 3.2 3B.
+
+Writes one memory-mapped .npy per layer, shape (n_tokens, hidden_size), float16,
+plus meta.json. This is the corpus the AE is trained on, so it uses the same
+interpretability hygiene as the max-activating-example collector
+(geoae.interp.closest_tokens):
+
+  * diversified data : round-robins over web / wiki / code / math with the
+                       CURRENT working dataset names (the old names — `wikipedia`,
+                       `bookcorpus`, `cc_news`, `codeparrot/github-code`,
+                       `RedPajama` — silently fail to load and leave you training
+                       on C4 only).
+  * per-doc forward  : one document per forward pass (truncated), so attention
+                       never crosses document boundaries — no packing
+                       contamination, and every row is a clean activation.
+  * domain balance   : each doc is truncated to `max_doc_tokens`, so long
+                       sources (wiki) don't dominate the token budget.
+  * leading skip     : the first `skip_leading` tokens of each doc (BOS /
+                       document-start) are NOT written — they otherwise flood the
+                       boundary clusters.
+
+Usage:
+    python -m geoae.extract --n_tokens 5000000
+    python -m geoae.extract --config configs/base/full_run_v2.yaml
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+import numpy as np
+import torch
+from transformers import AutoTokenizer
+
+
+# ---------------------------------------------------------------------------
+# Diverse corpus (current, working dataset names). Each is probed on open; any
+# that fails (auth / network / schema) is skipped, and the budget is spread over
+# whatever loads — so one broken source can't silently collapse you to C4-only.
+# ---------------------------------------------------------------------------
+
+DEFAULT_SOURCES = [
+    dict(domain="web",  name="allenai/c4",                        config="en",          split="train", field="text"),
+    dict(domain="wiki", name="wikimedia/wikipedia",               config="20231101.en", split="train", field="text"),
+    dict(domain="code", name="codeparrot/codeparrot-clean-valid", config=None,          split="train", field="content"),
+    dict(domain="math", name="open-web-math/open-web-math",       config=None,          split="train", field="text"),
+]
+
+
+def open_sources(sources: list[dict]) -> list[dict]:
+    from datasets import load_dataset
+    live = []
+    for s in sources:
+        try:
+            ds = load_dataset(s["name"], name=s["config"], split=s["split"], streaming=True)
+            it = iter(ds)
+            first = next(it)                       # probe so a bad schema fails here
+            if s["field"] not in first:
+                print(f"[extract]   ! {s['domain']}: no field '{s['field']}' — skipping")
+                continue
+            live.append({**s, "iter": it, "primed": first})
+            print(f"[extract]   + {s['domain']:<5} {s['name']}")
+        except Exception as e:
+            print(f"[extract]   ! {s['domain']:<5} {s['name']}: {type(e).__name__} — skipping")
+    if not live:
+        raise RuntimeError("All data sources failed to load. Cannot proceed.")
+    return live
+
+
+def stream_docs(sources: list[dict], n_tokens: int, tokenizer, min_len: int, max_len: int):
+    """Round-robin over sources, yielding (input_ids[1,T], domain). Each doc is
+    truncated to max_len so domains stay balanced and contexts stay diverse."""
+    seen = 0
+    exhausted = set()
+    while seen < n_tokens and len(exhausted) < len(sources):
+        for si, s in enumerate(sources):
+            if si in exhausted or seen >= n_tokens:
+                continue
+            try:
+                ex = s.pop("primed", None) or next(s["iter"])
+            except StopIteration:
+                exhausted.add(si)
+                continue
+            text = ex.get(s["field"]) or ""
+            if not text:
+                continue
+            ids = tokenizer(text, return_tensors="pt", truncation=True, max_length=max_len)["input_ids"]
+            if ids.shape[1] < min_len:
+                continue
+            yield ids, s["domain"]
+            seen += ids.shape[1]
+
+
+# ---------------------------------------------------------------------------
+# Activation hooks
+# ---------------------------------------------------------------------------
+
+def trim_npy(path: Path, n_rows: int) -> None:
+    """Shrink a preallocated .npy to n_rows in place (edit header + truncate), so
+    a run that exhausts its sources before n_tokens leaves no trailing zero rows
+    (those would otherwise land in the val tail and corrupt validation)."""
+    import numpy.lib.format as npf
+    with open(path, "r+b") as f:
+        npf.read_magic(f)
+        shape, _fortran, dtype = npf.read_array_header_1_0(f)
+        data_off = f.tell()
+        if n_rows >= shape[0]:
+            return
+        f.seek(0)
+        head = bytearray(f.read(data_off))
+    old_shape = b"(%s)" % b", ".join(b"%d" % s for s in shape)
+    new_shape = b"(%s)" % b", ".join(b"%d" % s for s in (n_rows,) + tuple(shape[1:]))
+    k = head.find(old_shape)
+    assert k != -1, f"shape marker not found in {path}"
+    head[k:k + len(old_shape)] = new_shape
+    # Re-pad the header to its original byte length (data offset must not move).
+    body = bytes(head[:10]) + bytes(head[10:]).rstrip(b" \n")
+    head = body + b" " * (data_off - len(body) - 1) + b"\n"
+    assert len(head) == data_off
+    rowbytes = dtype.itemsize
+    for s in shape[1:]:
+        rowbytes *= s
+    with open(path, "r+b") as f:
+        f.seek(0); f.write(head)
+    os.truncate(path, data_off + n_rows * rowbytes)
+
+
+def register_hooks(model, layers: list[int]):
+    captured: dict[int, torch.Tensor | None] = {l: None for l in layers}
+    handles = []
+    for layer_idx in layers:
+        def make_hook(idx):
+            def hook(module, inp, output):
+                hs = output[0] if isinstance(output, tuple) else output
+                captured[idx] = hs.detach().to(torch.float16).cpu()
+            return hook
+        handles.append(model.model.layers[layer_idx].register_forward_hook(make_hook(layer_idx)))
+    return captured, handles
+
+
+# ---------------------------------------------------------------------------
+# Extraction loop
+# ---------------------------------------------------------------------------
+
+def extract(model_name, layers, n_tokens, hidden_size, out_dir: Path,
+            max_doc_tokens, skip_leading, min_doc_len, log_every):
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    print(f"[extract] Loading tokenizer and model: {model_name}")
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
+    from geoae.checkpoint import load_lm
+    model = load_lm(model_name, device_map="auto")
+    device = next(model.parameters()).device
+    print(f"[extract] Model on {device}")
+
+    captured, handles = register_hooks(model, layers)
+
+    mmaps = {l: np.lib.format.open_memmap(str(out_dir / f"layer_{l}.npy"), mode="w+",
+                                          dtype=np.float16, shape=(n_tokens, hidden_size))
+             for l in layers}
+
+    print("[extract] Opening data sources:")
+    sources = open_sources(DEFAULT_SOURCES)
+
+    skip = max(0, skip_leading)
+    write_ptr = 0
+    n_docs = 0
+    dom_tokens: dict[str, int] = {}
+    t0 = time.time()
+
+    with torch.no_grad():
+        for ids, domain in stream_docs(sources, n_tokens, tokenizer, min_doc_len, max_doc_tokens):
+            T = ids.shape[1]
+            if T <= skip:
+                continue
+            model(input_ids=ids.to(device))
+
+            n_eff = T - skip
+            if write_ptr + n_eff > n_tokens:
+                n_eff = n_tokens - write_ptr
+            if n_eff <= 0:
+                break
+            for l in layers:
+                acts = captured[l][0]                       # (T, H)
+                mmaps[l][write_ptr:write_ptr + n_eff] = acts[skip:skip + n_eff].numpy()
+
+            write_ptr += n_eff
+            n_docs += 1
+            dom_tokens[domain] = dom_tokens.get(domain, 0) + n_eff
+
+            if n_docs % log_every == 0:
+                rate = write_ptr / max(time.time() - t0, 1e-6)
+                eta = (n_tokens - write_ptr) / max(rate, 1)
+                print(f"[extract] {write_ptr:>9,}/{n_tokens:,} ({100*write_ptr/n_tokens:.1f}%) "
+                      f"| {rate:.0f} tok/s | ETA {eta/60:.1f} min | "
+                      f"domains={ {d: f'{100*c/write_ptr:.0f}%' for d, c in dom_tokens.items()} }")
+            if write_ptr >= n_tokens:
+                break
+
+    for l in layers:
+        mmaps[l].flush()
+        del mmaps[l]   # release the mmap so the file can be trimmed
+    for h in handles:
+        h.remove()
+
+    # If sources ran out before n_tokens, the preallocated tail is zeros — and the
+    # val split is the contiguous tail, so those zeros would corrupt validation.
+    # Trim every layer file down to what was actually written.
+    if write_ptr < n_tokens:
+        print(f"[extract] Sources exhausted at {write_ptr:,}/{n_tokens:,}; "
+              f"trimming .npy files to drop trailing zero rows.")
+        for l in layers:
+            trim_npy(out_dir / f"layer_{l}.npy", write_ptr)
+
+    # The activations just changed, so any cached normalisation stats are stale.
+    # Training recomputes train mean/std but the val buffer trusts this cache —
+    # leaving it would normalise val with the OLD corpus's stats. Delete it.
+    for stale in out_dir.glob("norm_params_layer*.npz"):
+        stale.unlink()
+        print(f"[extract] Removed stale norm cache: {stale.name}")
+
+    meta = {
+        "model": model_name, "layers": layers, "n_tokens": write_ptr,
+        "hidden_size": hidden_size, "n_docs": n_docs,
+        "max_doc_tokens": max_doc_tokens, "skip_leading": skip, "min_doc_len": min_doc_len,
+        "data_sources": [{"domain": s["domain"], "name": s["name"]} for s in sources],
+        "domain_tokens": dom_tokens, "dtype": "float16", "per_doc_forward": True,
+        "extraction_timestamp": datetime.now(timezone.utc).isoformat(),
+        "elapsed_seconds": round(time.time() - t0, 1),
+    }
+    with open(out_dir / "meta.json", "w") as f:
+        json.dump(meta, f, indent=2)
+    print(f"[extract] Done. {write_ptr:,} tokens / {n_docs:,} docs -> {out_dir}/")
+    print(f"[extract] Domain mix: { {d: f'{100*c/max(write_ptr,1):.0f}%' for d, c in dom_tokens.items()} }")
+
+    # Sanity check
+    sample = mmaps[layers[-1]][:min(10_000, write_ptr)].astype(np.float32)
+    print(f"[extract] layer {layers[-1]} sanity: |mean|={abs(sample.mean()):.4f} std={sample.std():.4f}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Extract Llama residual-stream activations")
+    parser.add_argument("--config", default=None)
+    parser.add_argument("--n_tokens", type=int, default=None)
+    parser.add_argument("--out_dir", default=None)
+    parser.add_argument("--max_doc_tokens", type=int, default=256,
+                        help="Truncate each doc (balances domains, diversifies contexts)")
+    parser.add_argument("--skip_leading", type=int, default=4,
+                        help="Skip first N tokens of each doc (BOS / document-start flood)")
+    parser.add_argument("--min_doc_len", type=int, default=10)
+    parser.add_argument("--seed", type=int, default=42)
+    args = parser.parse_args()
+
+    from geoae.seeding import seed_everything
+    seed_everything(args.seed)
+    from geoae.config import Config
+    from geoae.paths import default_config, resolve_path
+    if args.config:
+        cfg = Config.from_yaml(args.config)
+    else:
+        d = default_config()
+        cfg = Config.from_yaml(d) if d.exists() else Config()
+    ex = cfg.extraction
+    if args.n_tokens is not None:
+        ex.n_tokens = args.n_tokens
+
+    out_dir = resolve_path(args.out_dir if args.out_dir else ex.activations_dir)
+
+    extract(
+        model_name=ex.model_name, layers=ex.layers, n_tokens=ex.n_tokens,
+        hidden_size=ex.hidden_size, out_dir=out_dir,
+        max_doc_tokens=getattr(ex, "max_doc_tokens", args.max_doc_tokens),
+        skip_leading=getattr(ex, "skip_leading", args.skip_leading),
+        min_doc_len=args.min_doc_len, log_every=getattr(ex, "log_every", 200),
+    )
+
+
+if __name__ == "__main__":
+    main()
+    sys.stdout.flush(); sys.stderr.flush()
+    os._exit(0)   # HF streaming threads don't join cleanly; all work is saved above

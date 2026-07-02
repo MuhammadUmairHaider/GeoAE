@@ -1,0 +1,46 @@
+# End-to-end KL variant — Llama-3.2-3B, layer 27 (FINAL decoder layer), unprompted,
+# MEAN-pooled (avg-token) document reps, centroids initialised from the EXACT
+# per-class dataset means (class_means: full train split, uncapped).
+#
+# Faithfulness = forward KL on the lm_head∘norm path. Because layer 27 is the last
+# layer, teacher = head(norm(mean_vec)) and student = head(norm(recon)). Cluster/sep
+# terms unchanged. Only the centroid init differs from unprompted_mean_gelu.yaml.
+#
+# Prereq 1: mean activations extracted via
+#   python geosep/dbpedia/extract_dbpedia.py --mode unprompted --pooling mean --layer 27
+# Prereq 2: teacher logits cached (reuses the same file as unprompted_mean_gelu) via
+#   python geosep/e2e/extract_e2e.py --config geosep/e2e/configs/llama3.2-3B/layer27/unprompted_mean_class_means.yaml
+
+extraction:
+  model_name: "meta-llama/Llama-3.2-3B"   # REQUIRED for e2e — the LLM is in the loop
+
+data:
+  activations_dir: "dbpedia/activations/llama3.2-3B/mean/unprompted"
+  target_layer: 27
+  batch_size: 512
+  val_frac: 0.05
+
+model:
+  hidden_size: 3072
+  latent_dim: 3072
+  n_clusters: 14
+  nonlinearity: gelu
+
+loss:
+  lambda_cluster: 0.01
+  lambda_sep: 0.005
+  lambda_usage: 0.05     # unused by e2e loss; kept for config parity
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 40
+  recon_only_epochs: 10     # "KL-only" warmup (cluster/sep phase in after)
+  clustering_start_epoch: 11
+  full_loss_start_epoch: 15
+  centroid_init: "class_means"   # exact per-class mean latent over full train split
+  checkpoints_dir: "e2e/checkpoints/llama3.2-3B/layer27/unprompted_mean_class_means_kl"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-dbpedia-e2e"

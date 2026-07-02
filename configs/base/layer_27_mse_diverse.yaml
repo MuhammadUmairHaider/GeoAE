@@ -1,0 +1,46 @@
+# MSE-mode (reconstruction) AE — Llama-3.2-3B, layer 27, K=1000, GeLU, latent 3072.
+#
+# Trains the ORIGINAL objective (total_loss = MSE recon + cluster + sep) via
+# geosep/train.py, but at the SAME capacity/corpus as the deployed e2e KL model
+# (K=1000, GeLU, no bottleneck, the diverse activation corpus), so MSE-mode and
+# KL-mode at layer 27 are directly comparable (same closest-token / DLA tooling).
+#
+# Prereq: geosep/activations_diverse/layer_27.npy (already extracted).
+# Run (from repo root):
+#   uv run python geosep/train.py --config geosep/configs/layer_27_mse_diverse.yaml --no_wandb
+# Paths (activations_dir, checkpoints_dir) resolve relative to geosep/.
+
+extraction:
+  model_name: "meta-llama/Llama-3.2-3B"
+
+data:
+  activations_dir: "activations_diverse"   # -> geosep/activations_diverse (4.9M tok, web+wiki+code+math)
+  target_layer: 27
+  batch_size: 4096
+  val_frac: 0.05
+
+model:
+  hidden_size: 3072
+  latent_dim: 3072            # no bottleneck — matches the deployed KL model
+  n_clusters: 1000
+  nonlinearity: gelu
+  metric: euclidean
+
+loss:
+  lambda_cluster: 0.01
+  lambda_sep: 0.005
+  lambda_usage: 0.05
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  recon_only_epochs: 10        # pure-reconstruction warmup
+  clustering_start_epoch: 11   # add cluster loss
+  full_loss_start_epoch: 16    # add sep (+usage) losses
+  centroid_init: "kmeans++"    # unsupervised
+  checkpoints_dir: "checkpoints/general/llama3.2-3B/layer27/mse_gelu"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-ae"

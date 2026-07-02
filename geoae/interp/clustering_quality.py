@@ -1,0 +1,505 @@
+"""
+Comprehensive clustering quality analysis.
+
+Compares clustering quality across:
+  - Raw k-means baseline (no AE, clusters directly in residual stream space)
+  - Any number of AE checkpoints (linear/nonlinear, any latent dim)
+
+Metrics computed:
+  Geometric (latent space):
+    silhouette          intra vs inter cluster similarity [-1,1] — higher better
+    davies_bouldin      within/between cluster ratio — lower better
+    calinski_harabasz   between/within variance ratio — higher better
+    dunn_index          min inter / max intra cluster diameter — higher better
+    separability_ratio  mean inter-centroid dist / mean intra-cluster std — higher better
+    intra_var           mean within-cluster variance — lower = tighter clusters
+    inter_centroid_dist mean pairwise centroid distance — higher = more spread
+    cluster_balance     entropy of cluster size distribution — higher = more uniform
+    assignment_entropy  softness of cluster assignments (0=hard, log(K)=uniform)
+    effective_k         clusters with usage > 0.1/K
+    effective_rank      effective rank of centroid matrix (exp of singular value entropy)
+
+  Functional (from ablation results, if results.json available):
+    gini_mean           mean Gini of per-token CE changes — higher = more selective
+    gini_gt_06          fraction of clusters with Gini > 0.6
+    mean_ce_change      mean CE change when a cluster is ablated — higher = more informative
+
+Usage:
+    python -m geoae.interp.clustering_quality \\
+        --baseline   checkpoints/baseline_layer27_k128.npz \\
+        --checkpoints \\
+            checkpoints/layer_27/best_val.pt \\
+            checkpoints/layer27_k128_d3072_linear/best_val.pt \\
+            checkpoints/layer27_k128_d3072_gelu/best_val.pt \\
+        --results \\
+            results_baseline_layer27_k128.json \\
+            results_layer27_k128_d2048_linear.json \\
+            results_layer27_k128_d3072_linear.json \\
+            results_layer27_k128_d3072_gelu.json \\
+        --layer 27 --n_sample 50000
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import math
+from pathlib import Path
+
+import numpy as np
+import torch
+
+
+
+# ---------------------------------------------------------------------------
+# Metric helpers
+# ---------------------------------------------------------------------------
+
+def silhouette(z: np.ndarray, labels: np.ndarray, max_samples: int = 10_000) -> float:
+    from sklearn.metrics import silhouette_score
+    if len(z) > max_samples:
+        idx = np.random.choice(len(z), max_samples, replace=False)
+        z, labels = z[idx], labels[idx]
+    if len(set(labels)) < 2:
+        return float("nan")
+    return float(silhouette_score(z, labels, metric="euclidean", sample_size=min(5000, len(z))))
+
+
+def davies_bouldin(z: np.ndarray, labels: np.ndarray) -> float:
+    from sklearn.metrics import davies_bouldin_score
+    if len(set(labels)) < 2:
+        return float("nan")
+    return float(davies_bouldin_score(z, labels))
+
+
+def calinski_harabasz(z: np.ndarray, labels: np.ndarray) -> float:
+    from sklearn.metrics import calinski_harabasz_score
+    if len(set(labels)) < 2:
+        return float("nan")
+    return float(calinski_harabasz_score(z, labels))
+
+
+def dunn_index(z: np.ndarray, labels: np.ndarray, max_samples: int = 5_000) -> float:
+    """
+    Dunn index = min inter-cluster distance / max intra-cluster diameter.
+    Approximated on a subsample for speed.
+    """
+    if len(z) > max_samples:
+        idx = np.random.choice(len(z), max_samples, replace=False)
+        z, labels = z[idx], labels[idx]
+    unique = np.unique(labels)
+    if len(unique) < 2:
+        return float("nan")
+
+    # Per-cluster means and diameters
+    centroids = {k: z[labels == k].mean(axis=0) for k in unique if (labels == k).sum() > 0}
+    diameters = {}
+    for k in unique:
+        pts = z[labels == k]
+        if len(pts) < 2:
+            diameters[k] = 0.0
+        else:
+            # Approximate diameter as 2 * mean distance to centroid
+            dists = np.linalg.norm(pts - centroids[k], axis=1)
+            diameters[k] = float(2 * dists.mean())
+
+    max_diam = max(diameters.values()) if diameters else 1e-8
+
+    # Min inter-cluster centroid distance
+    keys = list(centroids.keys())
+    min_inter = float("inf")
+    for i in range(len(keys)):
+        for j in range(i + 1, len(keys)):
+            d = np.linalg.norm(centroids[keys[i]] - centroids[keys[j]])
+            if d < min_inter:
+                min_inter = d
+
+    return float(min_inter / max(max_diam, 1e-8))
+
+
+def separability_ratio(z: np.ndarray, labels: np.ndarray) -> float:
+    """Mean inter-centroid distance / mean intra-cluster std."""
+    unique = np.unique(labels)
+    if len(unique) < 2:
+        return float("nan")
+
+    centroids = np.stack([z[labels == k].mean(axis=0) for k in unique if (labels == k).sum() > 0])
+    # inter: mean pairwise centroid distance
+    from sklearn.metrics import pairwise_distances
+    pdist = pairwise_distances(centroids, metric="euclidean")
+    n = len(centroids)
+    inter = pdist[np.triu_indices(n, k=1)].mean()
+
+    # intra: mean within-cluster std
+    stds = []
+    for k in unique:
+        pts = z[labels == k]
+        if len(pts) > 1:
+            stds.append(pts.std(axis=0).mean())
+    intra_std = np.mean(stds) if stds else 1e-8
+
+    return float(inter / max(intra_std, 1e-8))
+
+
+def inter_centroid_dist(centroids: np.ndarray) -> tuple[float, float, float]:
+    """Returns (mean, min, max) of pairwise centroid distances."""
+    from sklearn.metrics import pairwise_distances
+    pd = pairwise_distances(centroids, metric="euclidean")
+    n = len(centroids)
+    vals = pd[np.triu_indices(n, k=1)]
+    return float(vals.mean()), float(vals.min()), float(vals.max())
+
+
+def intra_cluster_variance(z: np.ndarray, labels: np.ndarray) -> float:
+    """Mean within-cluster variance (per dimension, then averaged)."""
+    unique = np.unique(labels)
+    vars_ = []
+    for k in unique:
+        pts = z[labels == k]
+        if len(pts) > 1:
+            vars_.append(pts.var(axis=0).mean())
+    return float(np.mean(vars_)) if vars_ else float("nan")
+
+
+def cluster_balance_entropy(labels: np.ndarray) -> tuple[float, float]:
+    """
+    Entropy of cluster size distribution, normalised by log(K).
+    1.0 = perfectly balanced, 0.0 = all mass in one cluster.
+    Also returns n_empty clusters.
+    """
+    unique, counts = np.unique(labels, return_counts=True)
+    K_total = int(labels.max()) + 1
+    n_empty = K_total - len(unique)
+    probs = counts / counts.sum()
+    H = -np.sum(probs * np.log(probs + 1e-10))
+    H_max = math.log(len(unique))
+    return float(H / max(H_max, 1e-10)), n_empty
+
+
+def assignment_entropy(Q: np.ndarray) -> float:
+    """Mean row entropy of soft assignment matrix Q (B, K)."""
+    eps = 1e-10
+    H = -(Q * np.log(Q + eps)).sum(axis=1).mean()
+    return float(H)
+
+
+def effective_rank(centroids: np.ndarray) -> float:
+    """
+    Effective rank of the centroid matrix = exp(entropy of squared singular values).
+    Measures how many independent directions the centroids span.
+    Range: 1 (all in one direction) to min(K, L) (fully spread).
+    """
+    _, s, _ = np.linalg.svd(centroids, full_matrices=False)
+    s2 = s ** 2
+    s2 = s2 / s2.sum()
+    H = -np.sum(s2 * np.log(s2 + 1e-12))
+    return float(math.exp(H))
+
+
+def effective_k(labels: np.ndarray, K: int, threshold: float = 0.1) -> int:
+    """Number of clusters with usage > threshold/K."""
+    counts = np.bincount(labels, minlength=K)
+    usage = counts / counts.sum()
+    return int((usage > threshold / K).sum())
+
+
+# ---------------------------------------------------------------------------
+# Load latents for each mode
+# ---------------------------------------------------------------------------
+
+def load_raw_baseline(
+    baseline_npz: Path,
+    act_dir: Path,
+    layer: int,
+    n_sample: int,
+    seed: int,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, str]:
+    """Returns (latents, hard_labels, centroids, label_str)."""
+    data = np.load(str(baseline_npz))
+    centroids = data["centroids"]     # (K, D) normalised
+    norm_mean = data["norm_mean"]
+    norm_std  = data["norm_std"]
+    K = len(centroids)
+
+    # Sample activations
+    mmap = np.load(str(act_dir / f"layer_{layer}.npy"), mmap_mode="r")
+    N = mmap.shape[0]
+    rng = np.random.RandomState(seed)
+    idx = np.sort(rng.choice(N, min(n_sample, N), replace=False))
+    sample = mmap[idx].astype(np.float32)
+    sample = (sample - norm_mean) / norm_std   # normalise
+
+    # Hard k-means assignment (nearest centroid)
+    from sklearn.metrics import pairwise_distances_argmin
+    labels = pairwise_distances_argmin(sample, centroids, metric="euclidean")
+
+    label = f"Raw k-means  (D={centroids.shape[1]}, K={K})"
+    return sample, labels, centroids, label
+
+
+def load_ae_latents(
+    ckpt_path: Path,
+    act_dir: Path,
+    layer: int,
+    n_sample: int,
+    seed: int,
+    device: torch.device,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str]:
+    """Returns (latents, hard_labels, soft_Q, centroids, label_str)."""
+    from geoae.checkpoint import load_ae_checkpoint
+    ae, _, _, ckpt = load_ae_checkpoint(ckpt_path, device)
+    mc = ckpt["config"]["model"]
+    nl = mc.get("nonlinearity", "linear")
+
+    norm_mean = ckpt["norm_mean"]
+    norm_std  = ckpt["norm_std"]
+    layer_from_cfg = ckpt["config"]["data"]["target_layer"]
+    K = mc["n_clusters"]
+
+    # Sample activations
+    mmap = np.load(str(act_dir / f"layer_{layer_from_cfg}.npy"), mmap_mode="r")
+    N = mmap.shape[0]
+    rng = np.random.RandomState(seed)
+    idx = np.sort(rng.choice(N, min(n_sample, N), replace=False))
+    sample_np = mmap[idx].astype(np.float32)
+    sample_np = (sample_np - norm_mean) / norm_std
+
+    # Encode in batches
+    batch = 4096
+    z_list, Q_list = [], []
+    with torch.no_grad():
+        for s in range(0, len(sample_np), batch):
+            x = torch.from_numpy(sample_np[s:s+batch]).to(device)
+            out = ae(x)
+            z_list.append(out.z.cpu().numpy())
+            Q_list.append(out.Q.cpu().numpy())
+
+    z = np.concatenate(z_list, axis=0)
+    Q = np.concatenate(Q_list, axis=0)
+    labels = Q.argmax(axis=1)
+    centroids = ae.centroids.cpu().numpy()
+
+    label = (f"AE {mc['hidden_size']}→{mc['latent_dim']}→{mc['hidden_size']} "
+             f"({nl}, K={K})")
+    return z, labels, Q, centroids, label
+
+
+# ---------------------------------------------------------------------------
+# Load functional metrics from results.json
+# ---------------------------------------------------------------------------
+
+def load_functional_metrics(results_path: Path | None) -> dict:
+    if results_path is None or not results_path.exists():
+        return {}
+    with open(results_path) as f:
+        data = json.load(f)
+    clusters = data.get("per_cluster", {})
+    if not clusters:
+        return {}
+    ginis = [v["gini"] for v in clusters.values()]
+    changes = [v["mean_ce_change"] for v in clusters.values()]
+    return {
+        "gini_mean":    np.mean(ginis),
+        "gini_gt_06":   np.mean([g > 0.6 for g in ginis]),
+        "mean_ce_change": np.mean(changes),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Compute all metrics for one variant
+# ---------------------------------------------------------------------------
+
+def compute_metrics(
+    z: np.ndarray,
+    labels: np.ndarray,
+    centroids: np.ndarray,
+    Q: np.ndarray | None = None,
+    functional: dict | None = None,
+) -> dict:
+    K = centroids.shape[0]
+    print("    silhouette …", end=" ", flush=True)
+    sil = silhouette(z, labels)
+    print(f"{sil:.4f}")
+
+    print("    davies-bouldin …", end=" ", flush=True)
+    db = davies_bouldin(z, labels)
+    print(f"{db:.4f}")
+
+    print("    calinski-harabasz …", end=" ", flush=True)
+    ch = calinski_harabasz(z, labels)
+    print(f"{ch:.1f}")
+
+    print("    dunn index …", end=" ", flush=True)
+    di = dunn_index(z, labels)
+    print(f"{di:.6f}")
+
+    print("    separability ratio …", end=" ", flush=True)
+    sr = separability_ratio(z, labels)
+    print(f"{sr:.4f}")
+
+    icd_mean, icd_min, icd_max = inter_centroid_dist(centroids)
+    intra_var = intra_cluster_variance(z, labels)
+    bal_H, n_empty = cluster_balance_entropy(labels)
+    eff_k = effective_k(labels, K)
+    eff_r = effective_rank(centroids)
+
+    metrics = {
+        "silhouette":        sil,
+        "davies_bouldin":    db,
+        "calinski_harabasz": ch,
+        "dunn_index":        di,
+        "separability_ratio": sr,
+        "inter_centroid_dist_mean": icd_mean,
+        "inter_centroid_dist_min":  icd_min,
+        "intra_cluster_var": intra_var,
+        "cluster_balance":   bal_H,
+        "n_empty_clusters":  n_empty,
+        "effective_k":       eff_k,
+        "effective_rank":    eff_r,
+    }
+    if Q is not None:
+        metrics["assignment_entropy"] = assignment_entropy(Q)
+    if functional:
+        metrics.update(functional)
+    return metrics
+
+
+# ---------------------------------------------------------------------------
+# Print comparison table
+# ---------------------------------------------------------------------------
+
+METRIC_ROWS = [
+    # (key, display name, direction, format)
+    ("silhouette",              "Silhouette ↑",          "up",   ".4f"),
+    ("davies_bouldin",          "Davies-Bouldin ↓",      "down", ".4f"),
+    ("calinski_harabasz",       "Calinski-Harabasz ↑",   "up",   ".1f"),
+    ("dunn_index",              "Dunn Index ↑",          "up",   ".6f"),
+    ("separability_ratio",      "Separability Ratio ↑",  "up",   ".4f"),
+    ("inter_centroid_dist_mean","Inter-centroid Dist ↑", "up",   ".4f"),
+    ("inter_centroid_dist_min", "Min Centroid Dist ↑",   "up",   ".4f"),
+    ("intra_cluster_var",       "Intra-cluster Var ↓",   "down", ".4f"),
+    ("cluster_balance",         "Cluster Balance H ↑",   "up",   ".4f"),
+    ("n_empty_clusters",        "Empty Clusters ↓",      "down", "d"),
+    ("effective_k",             "Effective K ↑",         "up",   "d"),
+    ("effective_rank",          "Effective Rank ↑",      "up",   ".2f"),
+    ("assignment_entropy",      "Assignment Entropy",     None,   ".4f"),
+    ("gini_mean",               "Gini Mean ↑",           "up",   ".4f"),
+    ("gini_gt_06",              "Gini>0.6 Frac ↑",       "up",   ".3f"),
+    ("mean_ce_change",          "Mean CE Change ↑",      "up",   ".4f"),
+]
+
+
+def print_table(labels: list[str], all_metrics: list[dict]) -> None:
+    col_w = max(30, max(len(l) for l in labels) + 2)
+    row_w = 28
+
+    header = f"  {'Metric':<{row_w}}" + "".join(f"  {l[:col_w-2]:>{col_w}}" for l in labels)
+    print("\n" + "="*(row_w + 4 + len(labels)*(col_w+2)))
+    print(header)
+    print("-"*(row_w + 4 + len(labels)*(col_w+2)))
+
+    for key, name, direction, fmt in METRIC_ROWS:
+        vals = [m.get(key, None) for m in all_metrics]
+        if all(v is None for v in vals):
+            continue
+
+        # Find best value for highlighting
+        numeric = [v for v in vals if v is not None and not math.isnan(v)]
+        if numeric and direction == "up":
+            best = max(numeric)
+        elif numeric and direction == "down":
+            best = min(numeric)
+        else:
+            best = None
+
+        row = f"  {name:<{row_w}}"
+        for v in vals:
+            if v is None or (isinstance(v, float) and math.isnan(v)):
+                cell = "N/A"
+            elif fmt == "d":
+                cell = f"{int(v):{fmt}}"
+            else:
+                cell = f"{v:{fmt}}"
+            marker = " *" if (best is not None and v is not None and
+                              not (isinstance(v, float) and math.isnan(v)) and
+                              abs(v - best) < 1e-9 * max(abs(best), 1)) else "  "
+            row += f"  {cell+marker:>{col_w}}"
+        print(row)
+
+    print("="*(row_w + 4 + len(labels)*(col_w+2)))
+    print("  * = best value for that metric")
+
+
+# ---------------------------------------------------------------------------
+# CLI
+# ---------------------------------------------------------------------------
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--baseline",    default=None,
+                        help="Path to baseline k-means .npz (from cluster_baseline.py fit)")
+    parser.add_argument("--checkpoints", nargs="*", default=[],
+                        help="AE checkpoint .pt files")
+    parser.add_argument("--results",     nargs="*", default=[],
+                        help="results.json files (same order: baseline first, then AEs)")
+    parser.add_argument("--layer",       type=int, default=27)
+    parser.add_argument("--n_sample",    type=int, default=50_000)
+    parser.add_argument("--seed",        type=int, default=0)
+    parser.add_argument("--activations_dir", default="activations")
+    args = parser.parse_args()
+
+    from geoae.seeding import seed_everything
+    seed_everything(args.seed)
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    act_dir = Path(args.activations_dir)
+
+    # Parse results files into a list aligned with (baseline, *checkpoints)
+    results_paths = [Path(r) if r else None for r in args.results]
+    n_variants = (1 if args.baseline else 0) + len(args.checkpoints)
+    while len(results_paths) < n_variants:
+        results_paths.append(None)
+
+    all_labels, all_metrics = [], []
+    ri = 0   # results index
+
+    # --- Baseline ---
+    if args.baseline:
+        print(f"\n[quality] Loading raw k-means baseline: {args.baseline}")
+        z, labels, centroids, label = load_raw_baseline(
+            Path(args.baseline), act_dir, args.layer, args.n_sample, args.seed
+        )
+        print(f"[quality] Computing metrics for: {label}")
+        func = load_functional_metrics(results_paths[ri])
+        metrics = compute_metrics(z, labels, centroids, Q=None, functional=func)
+        all_labels.append(label)
+        all_metrics.append(metrics)
+        ri += 1
+
+    # --- AE variants ---
+    for ckpt_path in args.checkpoints:
+        print(f"\n[quality] Loading AE: {ckpt_path}")
+        z, labels, Q, centroids, label = load_ae_latents(
+            Path(ckpt_path), act_dir, args.layer, args.n_sample, args.seed, device
+        )
+        print(f"[quality] Computing metrics for: {label}")
+        func = load_functional_metrics(results_paths[ri])
+        metrics = compute_metrics(z, labels, centroids, Q=Q, functional=func)
+        all_labels.append(label)
+        all_metrics.append(metrics)
+        ri += 1
+
+    # --- Print table ---
+    print_table(all_labels, all_metrics)
+
+    # Save
+    out = {}
+    for lbl, m in zip(all_labels, all_metrics):
+        out[lbl] = {k: (v if not (isinstance(v, float) and math.isnan(v)) else None)
+                    for k, v in m.items()}
+    out_path = Path("clustering_quality_comparison.json")
+    with open(out_path, "w") as f:
+        json.dump(out, f, indent=2)
+    print(f"\n[quality] Full results saved → {out_path}")
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,21 @@
+data:
+  target_layer: 16
+
+train:
+  n_epochs: 20
+  recon_only_epochs: 5
+  clustering_start_epoch: 6
+  full_loss_start_epoch: 9
+  checkpoints_dir: "checkpoints/layer_16"
+  seed: 42
+  wandb_project: "geosep-ae"
+
+loss:
+  lambda_cluster: 0.01
+  lambda_sep: 0.005
+  lambda_usage: 0.05
+  tau_start: 1.0
+  tau_end: 0.1
+
+model:
+  n_clusters: 128

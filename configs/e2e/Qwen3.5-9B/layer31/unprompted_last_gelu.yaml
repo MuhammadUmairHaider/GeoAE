@@ -1,0 +1,39 @@
+# End-to-end KL variant — Qwen3.5-9B, layer 31 (FINAL decoder layer), unprompted.
+# Faithfulness = forward KL on last-token logits (lm_head ∘ norm path; no full
+# forward needed for the last layer). Cluster/sep terms unchanged.
+#
+# Prereq: teacher logits cached via
+#   python geosep/e2e/extract_e2e.py --config geosep/e2e/configs/Qwen3.5-9B/layer31/unprompted_last_gelu.yaml
+
+extraction:
+  model_name: "Qwen/Qwen3.5-9B"   # REQUIRED for e2e — the LLM is in the loop
+
+data:
+  activations_dir: "dbpedia/activations/Qwen3.5-9B/last/unprompted"
+  target_layer: 31
+  batch_size: 256        # (B, vocab) logits + backward through lm_head — keep modest
+  val_frac: 0.05
+
+model:
+  hidden_size: 4096
+  latent_dim: 4096
+  n_clusters: 14
+  nonlinearity: gelu
+
+loss:
+  lambda_cluster: 0.01
+  lambda_sep: 0.005
+  lambda_usage: 0.05     # unused by e2e loss; kept for config parity
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 40
+  recon_only_epochs: 10     # now "KL-only" warmup (cluster/sep phase in after)
+  clustering_start_epoch: 11
+  full_loss_start_epoch: 15
+  checkpoints_dir: "e2e/checkpoints/Qwen3.5-9B/layer31/unprompted_last_gelu_kl"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-dbpedia-e2e"
