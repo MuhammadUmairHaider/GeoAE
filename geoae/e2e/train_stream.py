@@ -82,6 +82,32 @@ class StreamLogits:
         self.hook.deactivate()
         return cap[0][0].float(), out.logits[0].float()
 
+    @torch.no_grad()
+    def teacher_and_residual_batch(self, ids_list, pad_id):
+        """One padded LM forward for several docs. A (1, ~256)-token forward can't
+        saturate the GPU; right-padding B docs into one (B, Tmax) call can. Returns
+        a list of per-doc (residual (T, D) fp32, teacher_logits (T, V) fp32) —
+        identical shapes to per-doc calls, so the training loop is unchanged.
+        Right padding is safe under causal attention: pad tokens sit after every
+        real position and their rows are sliced away here."""
+        if len(ids_list) == 1:
+            return [self.teacher_and_residual(ids_list[0])]
+        lens = [x.shape[1] for x in ids_list]
+        B, Tm = len(ids_list), max(lens)
+        dev = ids_list[0].device
+        batch = torch.full((B, Tm), pad_id, dtype=torch.long, device=dev)
+        mask = torch.zeros((B, Tm), dtype=torch.long, device=dev)
+        for i, x in enumerate(ids_list):
+            batch[i, : lens[i]] = x[0]
+            mask[i, : lens[i]] = 1
+        cap = []
+        self.hook.activate(lambda hs: (cap.append(hs) or hs))
+        out = self.lm(input_ids=batch, attention_mask=mask)
+        self.hook.deactivate()
+        res = cap[0]
+        return [(res[i, : lens[i]].float(), out.logits[i, : lens[i]].float())
+                for i in range(B)]
+
     def student(self, input_ids, recon_raw):
         """recon_raw (T, D) carries grad. Returns student logits (T, V) with grad."""
         if self.is_last:
@@ -198,8 +224,11 @@ def train(cfg, args):
     # ---- model ----
     model = build_model(cfg, device, no_sinkhorn=args.no_sinkhorn)
     print(f"[stream] AE enc={cfg.model.nonlinearity} L={cfg.model.latent_dim} "
-          f"K={cfg.model.n_clusters} sinkhorn={'on' if model.use_sinkhorn else 'off'} "
-          f"λ_mse={cfg.loss.lambda_mse}")
+          f"K={cfg.model.n_clusters} metric={model.metric} "
+          f"sinkhorn={'on' if model.use_sinkhorn else 'off'} "
+          f"ema={'hard' if model.ema_hard else 'soft'}/{cfg.train.ema_decay} "
+          f"λ_mse={cfg.loss.lambda_mse} λ_var={cfg.loss.lambda_var} "
+          f"λ_cov={cfg.loss.lambda_cov} λ_unif={cfg.loss.lambda_unif}")
 
     # ---- sanity: splicing the TRUE residual must reproduce the teacher logits ----
     val_docs = pull_val_docs(tokenizer, args.n_val_docs, args.max_doc_tokens, args.min_doc_len)
@@ -267,7 +296,9 @@ def train(cfg, args):
                 x=x[v], x_hat=out.x_hat[v], z=out.z[v],
                 centroids=model.centroids.detach(), Q=out.Q[v],
                 lambda_cluster=lam_c, lambda_sep=lam_s,
-                lambda_mse=cfg.loss.lambda_mse, metric=model.metric,
+                lambda_mse=cfg.loss.lambda_mse,
+                lambda_var=cfg.loss.lambda_var, lambda_cov=cfg.loss.lambda_cov,
+                lambda_unif=cfg.loss.lambda_unif, metric=model.metric,
             )
             (losses["loss"] / args.accum).backward()
             ema_z.append(out.z[v].detach()); ema_Q.append(out.Q[v].detach())
@@ -303,10 +334,12 @@ def train(cfg, args):
                 if global_step % cfg.train.diag_every == 0:
                     val_kl, val_mse = run_validation(model, sl, val_docs, mean_t, std_t, device, skip)
                     eff_k = int((model.ema_cluster_size > 0.1 * model.ema_cluster_size.mean()).sum())
+                    extra = "".join(f" | {k} {losses[k].item():.4f}"
+                                    for k in ("var", "cov", "unif") if k in losses)
                     print(f"  step {global_step:6d} | loss {losses['loss'].item():.4f} | "
                           f"kl {losses['kl'].item():.4f} | val_kl {val_kl:.4f} | "
                           f"clus {losses['cluster'].item():.4f} | sep {losses['sep'].item():.4f} | "
-                          f"fve {losses['fve'].item():.3f} | eff_K {eff_k}/{model.n_clusters}")
+                          f"fve {losses['fve'].item():.3f}{extra} | eff_K {eff_k}/{model.n_clusters}")
                     if tracker.is_better(val_kl):
                         save_checkpoint(tracker.best_target, model, opt, epoch, global_step,
                                         tau, mean_np, std_np, val_kl, val_mse, cfg)

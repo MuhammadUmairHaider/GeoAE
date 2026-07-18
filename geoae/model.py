@@ -57,6 +57,7 @@ class GeoAE(nn.Module):
         tau: float = 1.0,
         nonlinearity: str | None = None,
         metric: str = "euclidean",
+        ema_hard: bool = False,
     ):
         super().__init__()
         self.hidden_size = hidden_size
@@ -67,6 +68,7 @@ class GeoAE(nn.Module):
         self.tau = tau
         self.nonlinearity = nonlinearity
         self.use_sinkhorn = True
+        self.ema_hard = ema_hard
 
         if metric not in VALID_METRICS:
             raise ValueError(f"metric must be one of {VALID_METRICS}, got {metric!r}")
@@ -216,7 +218,18 @@ class GeoAE(nn.Module):
 
         z: (B, L)   latents (from the forward pass — pre-step values are fine)
         Q: (B, K)   soft assignment (detached)
+
+        With ema_hard=True the soft Q is replaced by a one-hot of its argmax, so
+        each centroid averages only the latents it actually wins. This breaks
+        the soft-EMA "chase" where every centroid mixes broadly similar
+        Sinkhorn-weighted batch means and the whole configuration drifts into a
+        low-rank slice around the data mean.
         """
+        if self.ema_hard:
+            Q = torch.nn.functional.one_hot(
+                Q.argmax(dim=1), num_classes=self.n_clusters
+            ).to(z.dtype)
+
         # Directional metric: accumulate unit-vector latents so the running mean
         # is a mean direction (spherical k-means update = mean then renormalise).
         if self.metric == "cosine":
@@ -234,8 +247,16 @@ class GeoAE(nn.Module):
         # switching to the EMA-smoothed count would change training dynamics.
         new_centroids = cluster_sum / cluster_count.unsqueeze(1).clamp(min=1e-6)
 
-        # EMA update of centroid positions
-        self.centroids.mul_(self.ema_decay).add_(new_centroids * (1 - self.ema_decay))
+        # EMA update of centroid positions. Under hard assignment a centroid can
+        # win zero points in a batch (its new_centroids row is 0); it must keep
+        # its position rather than decay toward the origin, so only visited rows
+        # are updated. Under soft Sinkhorn every column has mass — no-op there.
+        if self.ema_hard:
+            visited = (cluster_count > 0).unsqueeze(1).to(self.centroids.dtype)  # (K, 1)
+            step = (1 - self.ema_decay) * visited
+            self.centroids.mul_(1 - step).add_(new_centroids * step)
+        else:
+            self.centroids.mul_(self.ema_decay).add_(new_centroids * (1 - self.ema_decay))
 
         # Re-project onto the unit sphere for cosine clustering (no-op otherwise)
         self._renorm_centroids()

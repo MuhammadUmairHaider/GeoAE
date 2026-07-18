@@ -109,7 +109,7 @@ def cluster_loss(
     return (Q * dist2).sum(dim=1).mean()
 
 
-
+#need further attention. infonce might be better
 def sep_loss(z: Tensor, Q: Tensor, metric: str = "euclidean") -> Tensor:
     """
     L_sep = mean_{i≠j} exp(-||m_i - m_j||^2 / sigma^2)
@@ -141,6 +141,57 @@ def sep_loss(z: Tensor, Q: Tensor, metric: str = "euclidean") -> Tensor:
         sigma2 = pair_d2.median().clamp(min=1e-8)
 
     return torch.exp(-pair_d2 / sigma2).mean()
+
+
+def variance_loss(z: Tensor, gamma: float = 1.0) -> Tensor:
+    """
+    VICReg variance term: mean_j relu(gamma - std_j(z)).
+
+    A hinge that charges for any latent dimension whose batch std falls below
+    gamma. This is the anti-contraction term: a uniform shrink of the latent
+    (which cluster_loss rewards and the adaptive-sigma sep_loss ignores) drives
+    every std down and is paid for immediately. Zero once all dims have
+    std >= gamma, so it never fights expansion.
+    """
+    std = z.var(dim=0, unbiased=False).add(1e-6).sqrt()   # (L,)
+    return F.relu(gamma - std).mean()
+
+
+def covariance_loss(z: Tensor) -> Tensor:
+    """
+    VICReg covariance term: sum of squared off-diagonal entries of Cov(z), / L.
+
+    Decorrelates latent dimensions, spreading variance across many independent
+    directions instead of a low-rank slice — the direct counter to centroid/
+    latent subspace collapse. Acts on feature dims, not cluster positions, so it
+    does not impose any particular arrangement on the clusters themselves.
+    """
+    B, L = z.shape
+    zc = z - z.mean(dim=0, keepdim=True)
+    cov = (zc.T @ zc) / max(B - 1, 1)                      # (L, L)
+    off_diag = cov.pow(2).sum() - cov.diagonal().pow(2).sum()
+    return off_diag / L
+
+
+def uniformity_loss(z: Tensor, t: float = 2.0, max_samples: int = 2048) -> Tensor:
+    """
+    Wang–Isola uniformity on the unit sphere:
+        log mean_{i<j} exp(-t * ||ẑ_i - ẑ_j||²),  ẑ = z / ||z||.
+
+    Non-saturating spread pressure for the cosine/directional geometry: unlike
+    sep_loss (adaptive sigma -> scale-invariant, plateaus once distances are
+    comparable) the fixed t keeps rewarding angular spread all the way to a
+    uniform distribution on the sphere. Subsampled to max_samples rows to keep
+    the pairwise term O(max_samples^2).
+    """
+    if z.shape[0] > max_samples:
+        idx = torch.randperm(z.shape[0], device=z.device)[:max_samples]
+        z = z[idx]
+    zn = l2_normalize(z)
+    d2 = torch.pdist(zn, p=2).pow(2)                       # (B*(B-1)/2,)
+    return torch.logsumexp(-t * d2, dim=0) - torch.log(
+        torch.tensor(float(d2.numel()), device=z.device)
+    )
 
 
 def usage_loss(Q: Tensor) -> Tensor:

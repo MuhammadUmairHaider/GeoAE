@@ -19,7 +19,10 @@ import torch
 import torch.nn.functional as F
 from torch import Tensor
 
-from geoae.losses import cluster_loss, sep_loss, recon_loss
+from geoae.losses import (
+    cluster_loss, sep_loss, recon_loss,
+    variance_loss, covariance_loss, uniformity_loss,
+)
 
 
 def kl_loss(teacher_logits: Tensor, student_logits: Tensor) -> Tensor:
@@ -49,16 +52,28 @@ def total_loss_e2e(
     lambda_cluster: float,
     lambda_sep: float,
     lambda_mse: float = 0.0,
+    lambda_var: float = 0.0,
+    lambda_cov: float = 0.0,
+    lambda_unif: float = 0.0,
     metric: str = "euclidean",
 ) -> dict[str, Tensor]:
     """
     L = KL + lambda_cluster · L_cluster + lambda_sep · L_sep + lambda_mse · MSE
+           + lambda_var · L_var + lambda_cov · L_cov + lambda_unif · L_unif
 
     With lambda_mse == 0 (default) the MSE / FVE are computed without grad and
     returned as diagnostics only, so the run matches the pure-KL pipeline. A
     small lambda_mse adds a weak reconstruction anchor to the gradient, keeping
     the AE faithful to the residual geometry instead of drifting to a KL-only
     solution that ignores it.
+
+    The optional geometry regularisers act on the latents, not the centroids:
+      L_var  (VICReg variance)   — anti-contraction hinge on per-dim std.
+      L_cov  (VICReg covariance) — decorrelates latent dims (anti low-rank).
+      L_unif (Wang–Isola)        — angular spread on the unit sphere; intended
+                                   for metric="cosine" runs.
+    All three default to 0.0 and are skipped entirely when off, so existing
+    configs reproduce the previous loss exactly.
     """
     l_kl = kl_loss(teacher_logits, student_logits)
     l_cluster = cluster_loss(z, centroids, Q, metric=metric)
@@ -73,7 +88,7 @@ def total_loss_e2e(
         with torch.no_grad():
             l_recon, fve = recon_loss(x, x_hat)
 
-    return {
+    out = {
         "loss": loss,
         "kl": l_kl,
         "recon": l_recon,   # in the gradient only when lambda_mse > 0
@@ -81,3 +96,18 @@ def total_loss_e2e(
         "cluster": l_cluster,
         "sep": l_sep,
     }
+
+    if lambda_var > 0:
+        l_var = variance_loss(z)
+        out["loss"] = out["loss"] + lambda_var * l_var
+        out["var"] = l_var
+    if lambda_cov > 0:
+        l_cov = covariance_loss(z)
+        out["loss"] = out["loss"] + lambda_cov * l_cov
+        out["cov"] = l_cov
+    if lambda_unif > 0:
+        l_unif = uniformity_loss(z)
+        out["loss"] = out["loss"] + lambda_unif * l_unif
+        out["unif"] = l_unif
+
+    return out

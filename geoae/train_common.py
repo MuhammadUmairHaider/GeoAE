@@ -74,6 +74,7 @@ def build_model(cfg: Config, device: torch.device, no_sinkhorn: bool = False) ->
         tau=cfg.loss.tau_start,
         nonlinearity=cfg.model.nonlinearity,
         metric=cfg.model.metric,
+        ema_hard=cfg.train.ema_hard,
     ).to(device)
     if no_sinkhorn:
         model.use_sinkhorn = False

@@ -1,0 +1,56 @@
+# PRIMARY geometry run — Euclidean + VICReg(var, cov) + hard-EMA.
+#
+# Lesson from kl_gelu_k2000_geo: raising lambda_cluster alone contracts the
+# latent (centroid norms 34->14, separability worse) because cluster loss
+# rewards shrinkage and the adaptive-sigma sep loss is scale-invariant. This
+# run blocks that failure mode by shape, not weight:
+#   lambda_var  — VICReg variance hinge: contraction below unit std is charged.
+#   lambda_cov  — VICReg covariance: decorrelates latent dims (anti rank-37).
+#   ema_hard    — centroids average only points they win; breaks the soft-EMA
+#                 chase that re-collapsed rank 57->38 late in the geo run.
+#   lambda_cluster back to 0.05 (~1.4% grad share/doc) — tightness was never
+#                 the problem; protects KL.
+# Lambdas calibrated by gradient audit at the kl_gelu_2000 checkpoint
+# (per-doc batch ~252 tokens): var ~5%, cov ~6% of the KL gradient norm.
+
+extraction:
+  model_name: "meta-llama/Llama-3.2-3B"
+
+data:
+  activations_dir: "activations_diverse"
+  target_layer: 27
+  batch_size: 2048
+  val_frac: 0.05
+
+model:
+  hidden_size: 3072
+  latent_dim: 3072
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
+
+loss:
+  lambda_cluster: 0.05
+  lambda_sep: 0.005
+  lambda_mse: 0.05
+  lambda_var: 0.3
+  lambda_cov: 0.001
+  lambda_unif: 0.0
+  lambda_usage: 0.05               # unused by e2e loss; config parity
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  recon_only_epochs: 5
+  clustering_start_epoch: 6
+  full_loss_start_epoch: 9
+  ema_decay: 0.9
+  ema_hard: true
+  teacher_mode: "onfly"
+  centroid_init: "kmeans++"
+  checkpoints_dir: "e2e/checkpoints/general/llama3.2-3B/layer27/kl_gelu_k2000_vicreg"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

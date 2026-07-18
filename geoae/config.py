@@ -56,6 +56,9 @@ class LossConfig:
     lambda_sep: float = 0.01
     lambda_usage: float = 0.1
     lambda_mse: float = 0.0   # weak MSE recon anchor for e2e KL training (0 = off)
+    lambda_var: float = 0.0   # VICReg variance hinge on latents (anti-contraction, 0 = off)
+    lambda_cov: float = 0.0   # VICReg covariance on latents (anti low-rank collapse, 0 = off)
+    lambda_unif: float = 0.0  # Wang–Isola uniformity on unit-sphere latents (cosine runs, 0 = off)
     sinkhorn_iters: int = 3
     tau_start: float = 1.0
     tau_end: float = 0.1
@@ -69,6 +72,7 @@ class TrainConfig:
     weight_decay: float = 0.0
     grad_clip: float = 1.0
     ema_decay: float = 0.99
+    ema_hard: bool = False   # centroid EMA from hard (argmax) assignments instead of soft Q
 
     # Training schedule phase boundaries (inclusive epoch numbers, 1-indexed)
     recon_only_epochs: int = 2       # epochs 1..recon_only_epochs: pure reconstruction

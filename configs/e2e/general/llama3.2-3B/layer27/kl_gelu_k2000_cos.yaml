@@ -1,0 +1,58 @@
+# COMPARISON geometry run — cosine (directional) metric + weak uniformity + hard-EMA.
+#
+# Deletes the scale degree of freedom entirely: assignment/cluster/sep operate
+# on the unit sphere (spherical k-means), so the contraction pathology of the
+# euclidean geo run is impossible by construction. Uniformity (Wang–Isola,
+# fixed t=2) replaces the saturating adaptive-sigma pressure with one that
+# rewards angular spread all the way to uniform.
+#
+# Known trade-off (why this is the comparison, not the primary): with GELU's
+# near-non-negative latents, maximal angular separation pushes toward disjoint
+# supports / near-orthogonal cluster directions — SAE-like structure — at the
+# cost of inter-cluster semantic topology. If this run wins the scorecard
+# anyway, that is evidence layer-27 concepts are direction-coded.
+#
+# lambda_cluster 0.2 ~ 5.5% grad share/doc (cosine cluster loss is O(1) scale,
+# no /L); lambda_unif 0.1 ~ 4.3%. Calibrated at the kl_gelu_2000 checkpoint.
+
+extraction:
+  model_name: "meta-llama/Llama-3.2-3B"
+
+data:
+  activations_dir: "activations_diverse"
+  target_layer: 27
+  batch_size: 2048
+  val_frac: 0.05
+
+model:
+  hidden_size: 3072
+  latent_dim: 3072
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: cosine
+
+loss:
+  lambda_cluster: 0.2
+  lambda_sep: 0.005
+  lambda_mse: 0.05
+  lambda_var: 0.0
+  lambda_cov: 0.0
+  lambda_unif: 0.1
+  lambda_usage: 0.05               # unused by e2e loss; config parity
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  recon_only_epochs: 5
+  clustering_start_epoch: 6
+  full_loss_start_epoch: 9
+  ema_decay: 0.9
+  ema_hard: true
+  teacher_mode: "onfly"
+  centroid_init: "kmeans++"
+  checkpoints_dir: "e2e/checkpoints/general/llama3.2-3B/layer27/kl_gelu_k2000_cos"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

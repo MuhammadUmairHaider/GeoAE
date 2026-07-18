@@ -184,11 +184,13 @@ def assignment_entropy(Q: np.ndarray) -> float:
 
 def effective_rank(centroids: np.ndarray) -> float:
     """
-    Effective rank of the centroid matrix = exp(entropy of squared singular values).
-    Measures how many independent directions the centroids span.
+    Effective rank of the CENTERED centroid matrix = exp(entropy of squared
+    singular values). Measures how many independent directions the centroids
+    span around their mean. Centering matters: non-negative latents (GELU/ReLU)
+    share a large mean offset that would otherwise dominate the spectrum.
     Range: 1 (all in one direction) to min(K, L) (fully spread).
     """
-    _, s, _ = np.linalg.svd(centroids, full_matrices=False)
+    _, s, _ = np.linalg.svd(centroids - centroids.mean(axis=0), full_matrices=False)
     s2 = s ** 2
     s2 = s2 / s2.sum()
     H = -np.sum(s2 * np.log(s2 + 1e-12))
@@ -263,19 +265,23 @@ def load_ae_latents(
     sample_np = mmap[idx].astype(np.float32)
     sample_np = (sample_np - norm_mean) / norm_std
 
-    # Encode in batches
+    # Encode in batches. Labels use nearest-centroid (dist2.argmin), matching the
+    # k-means baseline's hard assignment — Sinkhorn Q.argmax would batch-balance
+    # the labels by construction and depend on batch composition. Q is still
+    # collected for the assignment-entropy diagnostic.
     batch = 4096
-    z_list, Q_list = [], []
+    z_list, Q_list, lab_list = [], [], []
     with torch.no_grad():
         for s in range(0, len(sample_np), batch):
             x = torch.from_numpy(sample_np[s:s+batch]).to(device)
             out = ae(x)
             z_list.append(out.z.cpu().numpy())
             Q_list.append(out.Q.cpu().numpy())
+            lab_list.append(out.dist2.argmin(dim=1).cpu().numpy())
 
     z = np.concatenate(z_list, axis=0)
     Q = np.concatenate(Q_list, axis=0)
-    labels = Q.argmax(axis=1)
+    labels = np.concatenate(lab_list, axis=0)
     centroids = ae.centroids.cpu().numpy()
 
     label = (f"AE {mc['hidden_size']}→{mc['latent_dim']}→{mc['hidden_size']} "

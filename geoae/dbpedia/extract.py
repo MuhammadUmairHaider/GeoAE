@@ -186,7 +186,7 @@ def main():
 
     print("[extract] Loading dataset: dbpedia_14 …")
     from datasets import load_dataset
-    ds     = load_dataset("dbpedia_14")
+    ds     = load_dataset("fancyzhx/dbpedia_14")
     train  = list(ds["train"].shuffle(seed=42).select(range(min(args.n_train,  len(ds["train"])))))
     test   = list(ds["test"].shuffle(seed=42).select( range(min(args.n_test,   len(ds["test"])))))
     print(f"[extract] Train: {len(train):,}  Test: {len(test):,}")

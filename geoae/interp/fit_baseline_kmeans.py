@@ -37,6 +37,7 @@ def main():
     ap.add_argument("--batch_size", type=int, default=65536, help="MiniBatchKMeans batch (>= 64*K enforced)")
     ap.add_argument("--max_iter", type=int, default=300)
     ap.add_argument("--n_init", type=int, default=3)
+    ap.add_argument("--verbose", type=int, default=1, help="MiniBatchKMeans verbosity (0=silent)")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
@@ -55,7 +56,13 @@ def main():
     rng = np.random.RandomState(args.seed)
     idx = np.sort(rng.choice(N, size=min(args.n_sample, N), replace=False))
     print(f"[baseline-fit] Sampling {len(idx):,}/{N:,} activations and normalising …")
-    sample = (mmap[idx].astype(np.float32) - mean) / std
+    from tqdm import tqdm
+    D = mmap.shape[1]
+    sample = np.empty((len(idx), D), dtype=np.float32)
+    read_chunk = 100_000
+    for s in tqdm(range(0, len(idx), read_chunk), desc="reading", unit="chunk"):
+        blk = idx[s : s + read_chunk]
+        sample[s : s + len(blk)] = (mmap[blk].astype(np.float32) - mean) / std
 
     from sklearn.cluster import MiniBatchKMeans
     # Large batch relative to K matters: with K=1000 a small batch starves most
@@ -67,7 +74,7 @@ def main():
           f"(batch={batch_size}, max_iter={args.max_iter}) …")
     km = MiniBatchKMeans(n_clusters=args.n_clusters, random_state=args.seed,
                          batch_size=batch_size, n_init=args.n_init, max_iter=args.max_iter,
-                         reassignment_ratio=0.05, verbose=0)
+                         reassignment_ratio=0.05, verbose=args.verbose)
     km.fit(sample)
     centroids = km.cluster_centers_.astype(np.float32)
     # Fit-time probe only (undercounts vs the full collector run): how many
