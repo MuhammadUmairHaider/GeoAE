@@ -129,6 +129,8 @@ def add_override_args(ap) -> None:
                     help="Disable Sinkhorn balanced assignment (use softmax instead)")
     ap.add_argument("--no_renorm", action="store_true",
                     help="Disable decoder unit-norm renormalisation (diagnostic)")
+    ap.add_argument("--semisup_cap", type=int, default=None,
+                    help="semisup init: max labeled samples/class for class-mean centroids")
 
 
 def apply_overrides(cfg: Config, args) -> None:
@@ -148,6 +150,8 @@ def apply_overrides(cfg: Config, args) -> None:
         cfg.data.batch_size = args.batch_size
     if opt("centroid_init") is not None:
         cfg.train.centroid_init = args.centroid_init
+    if opt("semisup_cap") is not None:
+        cfg.train.semisup_cap = args.semisup_cap
     if opt("teacher_mode") is not None:
         cfg.train.teacher_mode = args.teacher_mode
     if opt("checkpoints_dir") is not None:

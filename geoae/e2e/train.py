@@ -164,13 +164,13 @@ def init_centroids(model, cfg, train_buf, train_loader, act_dir, device, init_mo
     if init_mode in ("semisup", "class_means"):
         # Supervised: centroid = per-class mean of encoded latents (shared with
         # the MSE pipeline). semisup caps at 500/class; class_means uses ALL.
-        cap = 500 if init_mode == "semisup" else None
+        cap = getattr(cfg.train, "semisup_cap", 500) if init_mode == "semisup" else None
         means = per_class_latent_means(
             model, act_dir, cfg.data.target_layer, cfg.data.val_frac,
             train_buf.mean, train_buf.std, device, max_per_class=cap,
         )
         model.init_centroids_from_class_means(means)
-        detail = "≤500/class" if cap else "full train split"
+        detail = f"≤{cap}/class" if cap else "full train split"
         print(f"[train-e2e] {init_mode} init of {model.n_clusters} centroids "
               f"(per-class mean latent, {detail})")
     else:

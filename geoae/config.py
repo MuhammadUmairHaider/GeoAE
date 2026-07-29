@@ -85,6 +85,7 @@ class TrainConfig:
     keep_checkpoints: int = 3        # keep last N + best-by-val-recon
 
     centroid_init: str = "kmeans++"   # "kmeans++" | "semisup" | "class_means"
+    semisup_cap: int = 500            # semisup init: max labeled samples/class for class-mean centroids
     teacher_mode: str = "cached"      # e2e only: "cached" (precomputed logits) |
                                       # "onfly" (teacher = head(norm(x)) in-loop, no cache)
     checkpoints_dir: str = "checkpoints"
