@@ -48,7 +48,7 @@ from geoae.interp import _shared as shared
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--checkpoint", required=True)
-    ap.add_argument("--dataset", default="db14", choices=["db14", "emotions", "ag_news"], help="Dataset to evaluate on")
+    ap.add_argument("--dataset", default="db14", choices=["db14", "emotions", "emotions_train", "ag_news"], help="Dataset to evaluate on")
     ap.add_argument("--layer", type=int, default=None,
                     help="Splice layer; defaults to the AE checkpoint's target_layer. "
                          "Must equal the AE's training layer (the AE is layer-specific).")
@@ -75,6 +75,9 @@ def main():
     ap.add_argument("--correct_json", default="dbpedia/joint_correct_predictions_DB_14.json")
     ap.add_argument("--out", default="results_causal_concept_compare.json")
     ap.add_argument("--seed", type=int, default=42)
+    ap.add_argument("--jc_batch_size", type=int, default=16,
+                    help="Batch size for the joint-correct build. Peak memory is "
+                         "bs*seq*mlp_intermediate; lower it if the LM OOMs.")
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--replace_wiki_avg", action="store_true",
                     help="Replace gated dims with wiki-mean activation (reference MaskLayer uses 0)")
@@ -92,7 +95,7 @@ def main():
         if args.concepts == "all":
             if args.dataset == "db14":
                 args.concepts = "9,11"
-            elif args.dataset == "emotions":
+            elif args.dataset in ("emotions", "emotions_train"):
                 args.concepts = "1,3"
             elif args.dataset == "ag_news":
                 args.concepts = "0,2"
@@ -243,78 +246,13 @@ def main():
         print(f"\n[ccc] base={ob:.3f}  AE-recon={orr:.3f}  delta={orr - ob:+.3f}  -> {outp}")
         return
 
-    from collections import Counter
-    import hashlib
-    # The joint-correct set is only valid for the prompt it was selected under.
-    # Tag the cache with a hash of the prompt so a prompt change auto-rebuilds it.
-    prompt_sha = hashlib.sha1(shared.PROMPT_HEAD.encode("utf-8")).hexdigest()[:12]
     corr_path = Path(args.correct_json)
     need = args.n_fit + args.n_eval
-    correct = None
-    if corr_path.exists():
-        cached = json.load(open(corr_path))
-        if isinstance(cached, dict) and cached.get("prompt_sha") == prompt_sha:
-            correct = cached["docs"]
-            cnt = Counter(d["label"] for d in correct)
-            min_c = min(cnt.get(c, 0) for c in range(len(shared.CLASSES)))
-            print(f"[ccc] Loaded joint-correct set: {len(correct)} docs (min/class={min_c}, "
-                  f"prompt_sha={prompt_sha}). To force a rebuild, delete {corr_path}")
-            if min_c < need:
-                print(f"[ccc] WARNING: cache min/class={min_c} < n_fit+n_eval={need} "
-                      f"(looks like a --smoke cache); fit/eval slices will auto-shrink and be noisy. "
-                      f"Delete {corr_path} to rebuild at full size.")
-        else:
-            why = "built under a DIFFERENT prompt" if isinstance(cached, dict) else "legacy format (no prompt hash)"
-            print(f"[ccc] Cache {corr_path} is stale ({why}); rebuilding under the current "
-                  f"prompt (sha={prompt_sha}).")
-
-    if correct is None:
-        print("[ccc] Building joint base+recon correct set …")
-        by_class = {c: [] for c in range(len(shared.CLASSES))}
-        for ex in ds:
-            by_class[int(ex["label"])].append(ex[dataset_cfg["text_column"]].strip())
-
-        correct = []
-        for c in range(len(shared.CLASSES)):
-            print(f"[ccc] Finding joint-correct predictions for class {c} ({shared.CLASSES[c]}) ...")
-            class_correct = []
-            batch_texts = []
-            for text in by_class[c]:
-                batch_texts.append(text)
-                if len(batch_texts) == 64:
-                    # 1. Base model prediction
-                    r_base = shared.predict(lm, tokenizer, batch_texts, [c] * len(batch_texts), device, batch_size=64)
-                    # 2. Spliced reconstruction model prediction
-                    hook.activate(z_recon)
-                    r_recon = shared.predict(lm, tokenizer, batch_texts, [c] * len(batch_texts), device, batch_size=64)
-                    hook.deactivate()
-                    
-                    for i, t in enumerate(batch_texts):
-                        if r_base["correct"][i] and r_recon["correct"][i]:
-                            class_correct.append({"text": t, "label": c})
-                    batch_texts = []
-                    if len(class_correct) >= need:
-                        break
-            if len(class_correct) < need and len(batch_texts) > 0:
-                r_base = shared.predict(lm, tokenizer, batch_texts, [c] * len(batch_texts), device, batch_size=len(batch_texts))
-                hook.activate(z_recon)
-                r_recon = shared.predict(lm, tokenizer, batch_texts, [c] * len(batch_texts), device, batch_size=len(batch_texts))
-                hook.deactivate()
-                for i, t in enumerate(batch_texts):
-                    if r_base["correct"][i] and r_recon["correct"][i]:
-                        class_correct.append({"text": t, "label": c})
-                        if len(class_correct) >= need:
-                            break
-            class_correct = class_correct[:need]
-            print(f"  Found {len(class_correct)} joint-correct docs for class {c}")
-            correct += class_correct
-
-        corr_path.parent.mkdir(parents=True, exist_ok=True)
-        json.dump({"prompt_sha": prompt_sha, "dataset": args.dataset, "classes": shared.CLASSES, "docs": correct},
-                  open(corr_path, "w"))
-        cnt = Counter(d["label"] for d in correct)
-        print(f"[ccc] base-correct: {len(correct)} docs (min/class={min(cnt.get(c,0) for c in range(len(shared.CLASSES)))}, "
-              f"prompt_sha={prompt_sha}) -> {corr_path}")
+    correct = shared.build_joint_correct_set(
+        ds, dataset_cfg, tokenizer, lm, device, hook, z_recon, corr_path, need,
+        args.dataset, model_name=model_name,
+        ae_sha=shared.ae_fingerprint(ae), batch_size=args.jc_batch_size, tag="ccc",
+    )
 
     pool = {c: [d["text"] for d in correct if d["label"] == c] for c in range(len(shared.CLASSES))}
     fit_txt, fit_lab, eval_txt, eval_lab = [], [], [], []

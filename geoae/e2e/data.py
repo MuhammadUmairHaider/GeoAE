@@ -60,6 +60,7 @@ class E2EBuffer(Dataset):
         needs_input_ids: bool = False,
         norm_cache: str | Path | None = None,
         load_teacher: bool = True,
+        max_train_rows: int | None = None,
     ):
         self.activations_dir = Path(activations_dir)
         self.layer = layer
@@ -71,7 +72,7 @@ class E2EBuffer(Dataset):
         # Base buffer: normalised AE input + mean/std + split indices.
         self.act = ActivationBuffer(
             activations_dir, layer, val_frac=val_frac, split=split,
-            norm_cache=norm_cache,
+            norm_cache=norm_cache, max_train_rows=max_train_rows,
         )
         self._indices = self.act._indices  # global row indices for this split
         self.mean = self.act.mean

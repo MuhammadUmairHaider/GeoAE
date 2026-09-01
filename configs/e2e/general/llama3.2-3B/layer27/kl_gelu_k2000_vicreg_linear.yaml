@@ -26,13 +26,12 @@ model:
   hidden_size: 3072
   latent_dim: 3072
   n_clusters: 2000
-  nonlinearity: gelu
   metric: euclidean
 
 loss:
   lambda_cluster: 0.05
   lambda_sep: 0.005
-  lambda_mse: 0.05
+  lambda_mse: 0.1
   lambda_var: 0.3
   lambda_cov: 0.001
   lambda_unif: 0.0
@@ -49,7 +48,7 @@ train:
   ema_hard: true
   teacher_mode: "onfly"
   centroid_init: "kmeans++"
-  checkpoints_dir: "e2e/checkpoints/general/llama3.2-3B/layer27/kl_gelu_k2000_vicreg"
+  checkpoints_dir: "e2e/checkpoints/general/llama3.2-3B/layer27/kl_gelu_k2000_vicreg_linear"
   diag_every: 100
   reinit_every: 1000
   seed: 42

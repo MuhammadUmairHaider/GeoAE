@@ -47,11 +47,12 @@ from geoae.hooks import SplicingHook
 from geoae.e2e.logits import locate_lm_parts
 from geoae.e2e.losses import total_loss_e2e, kl_loss
 from geoae.train_common import (
-    tau_schedule, lambda_schedule, reinit_dead_clusters,
+    tau_schedule, lambda_schedule, geometry_schedule, zipf_alpha_schedule,
+    reinit_dead_clusters,
     build_model, make_optimizer, add_override_args, apply_overrides,
     CheckpointTracker,
 )
-from geoae.e2e.train import save_checkpoint, load_frozen_lm
+from geoae.e2e.train import save_checkpoint, load_frozen_lm, load_resume
 from geoae.extract import open_sources, stream_docs, DEFAULT_SOURCES
 
 
@@ -167,6 +168,32 @@ def open_train_stream(tokenizer, args, total_tokens):
     return gen
 
 
+def fast_forward_stream(doc_iter, n_tokens: int) -> int:
+    """
+    Discard the first `n_tokens` of the training stream after a resume.
+
+    The stream is persistent by design: each epoch consumes a FRESH slice, so a
+    full run covers n_epochs x tokens_per_epoch UNIQUE tokens. A resumed run
+    re-opens the stream at the corpus beginning, so without this it would refeed
+    exactly the tokens the completed epochs already trained on — silently turning
+    a fresh-data run into a replay. Only tokenisation and streaming happen here;
+    no LM forwards, so it is cheap relative to an epoch.
+    """
+    seen = docs = 0
+    t0 = time.time()
+    while seen < n_tokens:
+        item = next(doc_iter, None)
+        if item is None:
+            print(f"[resume] ! stream exhausted while skipping "
+                  f"({seen:,}/{n_tokens:,}) — later epochs will repeat data")
+            break
+        seen += item[0].shape[1]
+        docs += 1
+    print(f"[resume] skipped {seen:,} tokens / {docs:,} docs already consumed by "
+          f"completed epochs ({time.time() - t0:.0f}s)")
+    return seen
+
+
 @torch.no_grad()
 def run_validation(model, sl, val_docs, mean_t, std_t, device, skip):
     model.eval()
@@ -248,7 +275,25 @@ def train(cfg, args):
     ckpt_dir.mkdir(parents=True, exist_ok=True)
     tracker = CheckpointTracker(ckpt_dir, cfg.train.keep_checkpoints)
 
+    start_epoch = 1
     global_step = 0
+    if args.resume:
+        start_epoch, global_step = load_resume(args.resume, model, opt, mean_t, std_t, device)
+        if start_epoch > cfg.train.n_epochs:
+            raise ValueError(
+                f"[resume] checkpoint is at epoch {start_epoch - 1} but "
+                f"train.n_epochs={cfg.train.n_epochs} — nothing left to run."
+            )
+        # Seed the best-val score from the existing best_val.pt, or the first epoch
+        # after resume overwrites it with a worse checkpoint (tau steps down at
+        # resume and val_kl typically rises for a while).
+        best_path = ckpt_dir / "best_val.pt"
+        if best_path.exists():
+            prev = torch.load(str(best_path), map_location="cpu", weights_only=False)
+            tracker.record_best(float(prev["val_kl"]))
+            print(f"[resume] best_val.pt guarded at val_kl={tracker.best_score:.5f} "
+                  f"(epoch {prev.get('epoch', '?')}) — only a better score replaces it")
+
     z_buffer: list[torch.Tensor] = []     # latents gathered during warmup for k-means++
     z_buffer_rows = 0                     # running row count (rolling cap below)
 
@@ -259,10 +304,14 @@ def train(cfg, args):
     # docs (which the AE memorises while held-out val_kl plateaus).
     total_budget = args.tokens_per_epoch * cfg.train.n_epochs + args.n_val_docs * args.max_doc_tokens
     doc_iter = open_train_stream(tokenizer, args, total_budget)
+    if start_epoch > 1 and not args.resume_replay_data:
+        fast_forward_stream(doc_iter, args.tokens_per_epoch * (start_epoch - 1))
 
-    for epoch in range(1, cfg.train.n_epochs + 1):
+    for epoch in range(start_epoch, cfg.train.n_epochs + 1):
         tau = tau_schedule(epoch, cfg); model.tau = tau
         lam_c, lam_s = lambda_schedule(epoch, cfg)
+        lam_v, lam_cv, lam_u = geometry_schedule(epoch, cfg)
+        model.zipf_alpha = zipf_alpha_schedule(epoch, cfg)
         print(f"\n[stream] Epoch {epoch}/{cfg.train.n_epochs} | tau={tau:.3f} "
               f"| λ_c={lam_c:.3f} λ_s={lam_s:.4f} | "
               f"centroids_init={bool(model.centroids_initialized.item())}")
@@ -297,8 +346,8 @@ def train(cfg, args):
                 centroids=model.centroids.detach(), Q=out.Q[v],
                 lambda_cluster=lam_c, lambda_sep=lam_s,
                 lambda_mse=cfg.loss.lambda_mse,
-                lambda_var=cfg.loss.lambda_var, lambda_cov=cfg.loss.lambda_cov,
-                lambda_unif=cfg.loss.lambda_unif, metric=model.metric,
+                lambda_var=lam_v, lambda_cov=lam_cv,
+                lambda_unif=lam_u, metric=model.metric,
             )
             (losses["loss"] / args.accum).backward()
             ema_z.append(out.z[v].detach()); ema_Q.append(out.Q[v].detach())
@@ -378,6 +427,12 @@ def main():
     ap.add_argument("--min_doc_len", type=int, default=10)
     ap.add_argument("--n_val_docs", type=int, default=150)
     ap.add_argument("--norm_sample", type=int, default=500_000)
+    ap.add_argument("--resume", default=None,
+                    help="Checkpoint to resume from (e.g. .../step_0012345.pt). Restores "
+                         "model, optimizer, epoch and step; asserts the norm stats match.")
+    ap.add_argument("--resume_replay_data", action="store_true",
+                    help="On resume, do NOT skip the stream forward past tokens the "
+                         "completed epochs already consumed (faster start, replays data).")
     args = ap.parse_args()
 
     cfg = Config.from_yaml(args.config)

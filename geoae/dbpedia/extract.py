@@ -47,6 +47,8 @@ import numpy as np
 import torch
 from transformers import AutoTokenizer
 
+from geoae.lm_arch import decoder_layers, hidden_size as lm_hidden_size
+
 CLASSES = [
     "Company", "EducationalInstitution", "Artist", "Athlete",
     "OfficeHolder", "MeanOfTransportation", "Building", "NaturalPlace",
@@ -72,7 +74,7 @@ def register_hook(model, layer: int) -> tuple[list, object]:
     def hook(module, input, output):
         hs = output[0] if isinstance(output, tuple) else output
         captured.append(hs.detach().cpu())   # (1, T, D)
-    handle = model.model.layers[layer].register_forward_hook(hook)
+    handle = decoder_layers(model)[layer].register_forward_hook(hook)
     return captured, handle
 
 
@@ -104,7 +106,7 @@ def extract_split(
     log_every: int = 100,
 ) -> None:
     N = len(examples)
-    D = model.config.hidden_size
+    D = lm_hidden_size(model)   # text decoder width (model.config is multimodal on Gemma 3)
     # One activation buffer per requested pooling; filled from the SAME forward.
     acts = {p: np.zeros((N, D), dtype=np.float16) for p in poolings}
     labels = np.zeros(N, dtype=np.int32)

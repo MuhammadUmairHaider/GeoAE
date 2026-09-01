@@ -28,7 +28,10 @@ import torch
 import torch.nn as nn
 from torch import Tensor
 
-from geoae.losses import sinkhorn_log, pairwise_sq_dist, l2_normalize, VALID_METRICS
+from geoae.losses import (sinkhorn_log, sinkhorn_log_dual, cluster_log_prior,
+                          pairwise_sq_dist, l2_normalize, VALID_METRICS)
+
+VALID_BALANCES = ("uniform", "zipf")
 
 
 class AEOutput(NamedTuple):
@@ -54,10 +57,15 @@ class GeoAE(nn.Module):
         n_clusters: int = 128,
         ema_decay: float = 0.99,
         sinkhorn_iters: int = 3,
+        balance: str = "uniform",
+        balance_rho: float = 1.0,
+        balance_eta: float = 1.0,
+        zipf_alpha: float = 0.0,
         tau: float = 1.0,
         nonlinearity: str | None = None,
         metric: str = "euclidean",
         ema_hard: bool = False,
+        latent_norm: str = "none",
     ):
         super().__init__()
         self.hidden_size = hidden_size
@@ -65,6 +73,12 @@ class GeoAE(nn.Module):
         self.n_clusters = n_clusters
         self.ema_decay = ema_decay
         self.sinkhorn_iters = sinkhorn_iters
+        if balance not in VALID_BALANCES:
+            raise ValueError(f"balance must be one of {VALID_BALANCES}, got {balance!r}")
+        self.balance = balance
+        self.balance_rho = balance_rho
+        self.balance_eta = balance_eta
+        self.zipf_alpha = zipf_alpha
         self.tau = tau
         self.nonlinearity = nonlinearity
         self.use_sinkhorn = True
@@ -77,14 +91,43 @@ class GeoAE(nn.Module):
         if nonlinearity not in _NONLINEARITIES:
             raise ValueError(f"nonlinearity must be one of {list(_NONLINEARITIES)}, got {nonlinearity!r}")
 
+        if latent_norm not in ("none", "batch"):
+            raise ValueError(f"latent_norm must be 'none' or 'batch', got {latent_norm!r}")
+        self.latent_norm = latent_norm
+
+        # latent_norm="batch" inserts BatchNorm1d BETWEEN the linear map and the
+        # activation (the standard Linear->BN->act placement). Two reasons it is
+        # placed there rather than on the post-activation latent:
+        #
+        #   1. Nothing else constrains the latent's scale. There is no norm layer
+        #      anywhere in this model and z is unnormalised, while cluster_loss
+        #      actively rewards CONTRACTION (pulling points to centroids is cheap
+        #      in a small space). lambda_var is currently the sole counter-
+        #      pressure; BN makes it structural instead of a soft penalty.
+        #   2. It keeps the pre-activations centred and unit-scaled THROUGHOUT
+        #      training, which is what stops the encoder from drifting to a
+        #      degenerate scale. (It does NOT buy sparsity — measured at init,
+        #      pre-activations are already 50% negative with and without BN, and
+        #      GELU leaves only ~2% of the latent below |z|<0.01 either way.
+        #      An overcomplete latent still has no sparsity pressure.)
+        #
+        # Placing BN AFTER the activation would instead recentre the (mostly
+        # non-negative) GELU output, which would break the shared mean offset
+        # that effective_rank already has to correct for.
+        #
+        # affine=True is the standard choice and is kept, but note the learnable
+        # gamma can itself shrink — BN bounds the contraction, it does not forbid
+        # it. affine=False would be the hard version.
+        #
+        # Default "none" constructs no module at all, so every existing
+        # checkpoint's state_dict is unchanged and loads exactly as before.
         act = _NONLINEARITIES[nonlinearity]
-        if act is None:
-            self.encoder = nn.Linear(hidden_size, latent_dim, bias=True)
-        else:
-            self.encoder = nn.Sequential(
-                nn.Linear(hidden_size, latent_dim, bias=True),
-                act,
-            )
+        layers: list[nn.Module] = [nn.Linear(hidden_size, latent_dim, bias=True)]
+        if latent_norm == "batch":
+            layers.append(nn.BatchNorm1d(latent_dim))
+        if act is not None:
+            layers.append(act)
+        self.encoder = layers[0] if len(layers) == 1 else nn.Sequential(*layers)
 
         # Decoder: no bias; columns renormalised to unit norm after each step
         self.decoder = nn.Linear(latent_dim, hidden_size, bias=False)
@@ -95,6 +138,8 @@ class GeoAE(nn.Module):
 
         # EMA running counts (used to stabilise early EMA updates)
         self.register_buffer("ema_cluster_size", torch.ones(n_clusters))
+        # Persistent column dual for online (balance_eta < 1) Sinkhorn. Zero unless used.
+        self.register_buffer("sinkhorn_g", torch.zeros(n_clusters))
 
         self._init_weights()
 
@@ -196,6 +241,39 @@ class GeoAE(nn.Module):
         self._renorm_centroids()
         self.centroids_initialized.fill_(True)
 
+    def _default_balancing(self) -> bool:
+        """True when the knobs reduce exactly to the original sinkhorn_log call."""
+        return (self.balance == "uniform" and self.balance_rho == 1.0
+                and self.balance_eta == 1.0)
+
+    @torch.no_grad()
+    def _column_log_prior(self) -> Tensor | None:
+        """(K,) log target marginal indexed by CLUSTER id, or None for uniform.
+
+        A power law is only defined up to a permutation of clusters, so the
+        masses are matched to clusters by descending `ema_cluster_size`: the
+        constraint then fixes the SHAPE of the usage histogram without dictating
+        which cluster must be frequent.
+        """
+        if self.balance != "zipf" or self.zipf_alpha == 0.0:
+            return None
+        ranked = cluster_log_prior(self.n_clusters, self.zipf_alpha,
+                                   device=self.centroids.device,
+                                   dtype=self.centroids.dtype)
+        order = torch.argsort(self.ema_cluster_size, descending=True)
+        out = torch.empty_like(ranked)
+        out[order] = ranked
+        return out
+
+    @torch.no_grad()
+    def target_usage(self) -> Tensor:
+        """(K,) target usage share per cluster id — uniform, or the ranked Zipf prior."""
+        lp = self._column_log_prior()
+        if lp is None:
+            return torch.full((self.n_clusters,), 1.0 / self.n_clusters,
+                              device=self.centroids.device, dtype=self.centroids.dtype)
+        return lp.exp()
+
     def forward(self, x: Tensor) -> AEOutput:
         """
         x: (B, D)  normalised activation
@@ -204,7 +282,18 @@ class GeoAE(nn.Module):
         z = self.encoder(x)                              # (B, L)
         dist2 = pairwise_sq_dist(z, self.centroids, metric=self.metric)  # (B, K)
         if self.use_sinkhorn:
-            Q = sinkhorn_log(dist2, tau=self.tau, n_iter=self.sinkhorn_iters)  # (B, K)
+            if self._default_balancing():
+                # Untouched legacy path — bit-identical to every shipped checkpoint.
+                Q = sinkhorn_log(dist2, tau=self.tau, n_iter=self.sinkhorn_iters)  # (B, K)
+            else:
+                Q, g = sinkhorn_log_dual(
+                    dist2, tau=self.tau, n_iter=self.sinkhorn_iters,
+                    log_prior=self._column_log_prior(),
+                    rho=self.balance_rho, eta=self.balance_eta,
+                    g=self.sinkhorn_g if self.balance_eta < 1.0 else None,
+                )
+                if self.training and self.balance_eta < 1.0:
+                    self.sinkhorn_g.copy_(g.detach())
         else:
             Q = torch.softmax(-dist2 / self.tau, dim=1)  # (B, K) unbalanced
         x_hat = self.decoder(z)                          # (B, D)

@@ -29,6 +29,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import sys
 import time
 from datetime import datetime, timezone
@@ -37,6 +38,8 @@ from pathlib import Path
 import numpy as np
 import torch
 from transformers import AutoTokenizer
+
+from geoae.lm_arch import decoder_layers, describe, hidden_size as lm_hidden_size
 
 
 # ---------------------------------------------------------------------------
@@ -50,6 +53,7 @@ DEFAULT_SOURCES = [
     dict(domain="wiki", name="wikimedia/wikipedia",               config="20231101.en", split="train", field="text"),
     dict(domain="code", name="codeparrot/codeparrot-clean-valid", config=None,          split="train", field="content"),
     dict(domain="math", name="open-web-math/open-web-math",       config=None,          split="train", field="text"),
+    dict(domain="pile", name="monology/pile-uncopyrighted",       config=None,          split="train", field="text"),
 ]
 
 
@@ -131,17 +135,35 @@ def trim_npy(path: Path, n_rows: int) -> None:
     os.truncate(path, data_off + n_rows * rowbytes)
 
 
-def register_hooks(model, layers: list[int]):
+def register_hooks(model, layers: list[int], store_dtype=torch.float16):
+    """Capture the residual stream after each requested decoder block.
+
+    `nonfinite` counts elements lost to overflow when storing in float16 — a
+    real risk on Gemma-family models, whose residual stream is far larger than
+    Llama's (embeddings scaled by sqrt(d)) and can exceed the fp16 max of 65504.
+    Counting happens on-device (no per-doc sync); read it after the run.
+    """
     captured: dict[int, torch.Tensor | None] = {l: None for l in layers}
+    nonfinite: dict[int, torch.Tensor | int] = {l: 0 for l in layers}
+    blocks = decoder_layers(model)
+    bad = [l for l in layers if not 0 <= l < len(blocks)]
+    if bad:
+        raise ValueError(
+            f"Layer(s) {bad} out of range: {type(model).__name__} has "
+            f"{len(blocks)} decoder layers (valid 0..{len(blocks) - 1})."
+        )
     handles = []
     for layer_idx in layers:
         def make_hook(idx):
             def hook(module, inp, output):
                 hs = output[0] if isinstance(output, tuple) else output
-                captured[idx] = hs.detach().to(torch.float16).cpu()
+                h = hs.detach().to(store_dtype)
+                if store_dtype == torch.float16:
+                    nonfinite[idx] = nonfinite[idx] + (~torch.isfinite(h)).sum()
+                captured[idx] = h.cpu()
             return hook
-        handles.append(model.model.layers[layer_idx].register_forward_hook(make_hook(layer_idx)))
-    return captured, handles
+        handles.append(blocks[layer_idx].register_forward_hook(make_hook(layer_idx)))
+    return captured, handles, nonfinite
 
 
 # ---------------------------------------------------------------------------
@@ -149,8 +171,33 @@ def register_hooks(model, layers: list[int]):
 # ---------------------------------------------------------------------------
 
 def extract(model_name, layers, n_tokens, hidden_size, out_dir: Path,
-            max_doc_tokens, skip_leading, min_doc_len, log_every):
+            max_doc_tokens, skip_leading, min_doc_len, log_every, dtype="float16"):
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    if dtype not in ("float16", "float32"):
+        raise ValueError(f"extraction.dtype must be float16 or float32, got {dtype!r} "
+                         "(numpy memmaps cannot hold bfloat16).")
+    np_dtype = np.dtype(dtype)
+    store_dtype = getattr(torch, dtype)
+
+    # Preflight disk check. open_memmap creates SPARSE files, so an oversized
+    # request allocates instantly and then dies with ENOSPC deep into the run,
+    # after the GPU time is already spent. Fail here instead, before the model
+    # is even loaded.
+    need = n_tokens * hidden_size * np_dtype.itemsize * len(layers)
+    free = shutil.disk_usage(out_dir).free
+    if need > free * 0.98:
+        per_layer_m = hidden_size * np_dtype.itemsize * 1e6 / 1e9   # GB per 1M tokens
+        fits = int(free * 0.98 / (hidden_size * np_dtype.itemsize * len(layers)))
+        raise RuntimeError(
+            f"Need {need/1e9:.0f} GB for {len(layers)} layers x {n_tokens:,} tokens "
+            f"({dtype}, d={hidden_size}) but only {free/1e9:.0f} GB is free in {out_dir}.\n"
+            f"  One layer costs {per_layer_m:.1f} GB per 1M tokens.\n"
+            f"  Fits as-is: n_tokens <= {fits:,} across these {len(layers)} layers, "
+            f"or {int(free * 0.98 / (hidden_size * np_dtype.itemsize)):,} tokens for a "
+            f"single layer (--layers L).\n"
+            f"  Or free space / point --out_dir at another volume."
+        )
 
     print(f"[extract] Loading tokenizer and model: {model_name}")
     tokenizer = AutoTokenizer.from_pretrained(model_name)
@@ -159,12 +206,25 @@ def extract(model_name, layers, n_tokens, hidden_size, out_dir: Path,
     from geoae.checkpoint import load_lm
     model = load_lm(model_name, device_map="auto")
     device = next(model.parameters()).device
+    print(f"[extract] {describe(model)}")
     print(f"[extract] Model on {device}")
 
-    captured, handles = register_hooks(model, layers)
+    # The memmaps are preallocated at `hidden_size`; a config that disagrees with
+    # the checkpoint would write a silently misshaped multi-GB file. Fail here.
+    true_d = lm_hidden_size(model)
+    if hidden_size != true_d:
+        raise ValueError(
+            f"Config hidden_size={hidden_size} but {model_name} has d={true_d}. "
+            "Fix `extraction.hidden_size` (and `model.hidden_size`) in the config."
+        )
 
+    captured, handles, nonfinite = register_hooks(model, layers, store_dtype)
+
+    gb = n_tokens * hidden_size * np_dtype.itemsize * len(layers) / 1e9
+    print(f"[extract] Allocating {len(layers)} × ({n_tokens:,}, {hidden_size}) "
+          f"{dtype} = {gb:.1f} GB in {out_dir}")
     mmaps = {l: np.lib.format.open_memmap(str(out_dir / f"layer_{l}.npy"), mode="w+",
-                                          dtype=np.float16, shape=(n_tokens, hidden_size))
+                                          dtype=np_dtype, shape=(n_tokens, hidden_size))
              for l in layers}
 
     print("[extract] Opening data sources:")
@@ -195,6 +255,29 @@ def extract(model_name, layers, n_tokens, hidden_size, out_dir: Path,
             write_ptr += n_eff
             n_docs += 1
             dom_tokens[domain] = dom_tokens.get(domain, 0) + n_eff
+
+            # Abort on the FIRST sign of float16 overflow. An overflowing model
+            # (Gemma 3 12B: dim 2339 exceeds 65504 on ~98% of tokens at late
+            # layers) writes inf, which makes mean/std inf/nan and silently
+            # poisons every downstream consumer. Reporting this only at the end
+            # costs hours of GPU and hundreds of GB, so check each log interval
+            # — a per-token overflow trips within the first few docs.
+            if store_dtype == torch.float16 and n_docs % log_every == 0:
+                hit = {l: int(v.item()) for l, v in nonfinite.items()
+                       if torch.is_tensor(v) and int(v.item()) > 0}
+                if hit:
+                    for h in handles:
+                        h.remove()
+                    raise RuntimeError(
+                        f"float16 OVERFLOW after {n_docs} docs / {write_ptr:,} tokens: "
+                        f"non-finite elements per layer {hit}.\n"
+                        f"  This model's residual stream exceeds the float16 max of "
+                        f"65504, so the dump would be poisoned with inf.\n"
+                        f"  Fix: set `extraction.dtype: float32` in the config (2x "
+                        f"disk — reduce n_tokens to match) and re-run.\n"
+                        f"  Partial files in {out_dir} are sparse and will be "
+                        f"overwritten by the next run."
+                    )
 
             if n_docs % log_every == 0:
                 rate = write_ptr / max(time.time() - t0, 1e-6)
@@ -227,12 +310,21 @@ def extract(model_name, layers, n_tokens, hidden_size, out_dir: Path,
         stale.unlink()
         print(f"[extract] Removed stale norm cache: {stale.name}")
 
+    # fp16 overflow report: any non-finite element means the residual exceeded
+    # 65504 and was stored as inf, which would poison norm stats and training.
+    overflow = {l: int(v.item()) if torch.is_tensor(v) else int(v)
+                for l, v in nonfinite.items()}
+    if any(overflow.values()):
+        print(f"[extract] !! float16 OVERFLOW — non-finite elements per layer: {overflow}")
+        print("[extract] !! Re-run with extraction.dtype: float32 (2x disk) for these layers.")
+
     meta = {
         "model": model_name, "layers": layers, "n_tokens": write_ptr,
         "hidden_size": hidden_size, "n_docs": n_docs,
         "max_doc_tokens": max_doc_tokens, "skip_leading": skip, "min_doc_len": min_doc_len,
         "data_sources": [{"domain": s["domain"], "name": s["name"]} for s in sources],
-        "domain_tokens": dom_tokens, "dtype": "float16", "per_doc_forward": True,
+        "domain_tokens": dom_tokens, "dtype": dtype, "per_doc_forward": True,
+        "nonfinite_elements": overflow,
         "extraction_timestamp": datetime.now(timezone.utc).isoformat(),
         "elapsed_seconds": round(time.time() - t0, 1),
     }
@@ -241,9 +333,13 @@ def extract(model_name, layers, n_tokens, hidden_size, out_dir: Path,
     print(f"[extract] Done. {write_ptr:,} tokens / {n_docs:,} docs -> {out_dir}/")
     print(f"[extract] Domain mix: { {d: f'{100*c/max(write_ptr,1):.0f}%' for d, c in dom_tokens.items()} }")
 
-    # Sanity check
-    sample = mmaps[layers[-1]][:min(10_000, write_ptr)].astype(np.float32)
-    print(f"[extract] layer {layers[-1]} sanity: |mean|={abs(sample.mean()):.4f} std={sample.std():.4f}")
+    # Sanity check. |max| matters as much as mean/std here: it is the headroom
+    # left before float16 storage overflows.
+    for l in layers:
+        sample = np.load(str(out_dir / f"layer_{l}.npy"), mmap_mode="r")[:min(10_000, write_ptr)].astype(np.float32)
+        print(f"[extract] layer {l} sanity: |mean|={abs(sample.mean()):.4f} "
+              f"std={sample.std():.4f} |max|={np.abs(sample).max():.1f} "
+              f"median_token_norm={np.median(np.linalg.norm(sample, axis=1)):.1f}")
 
 
 def main():
@@ -255,6 +351,8 @@ def main():
                         help="Truncate each doc (balances domains, diversifies contexts)")
     parser.add_argument("--skip_leading", type=int, default=4,
                         help="Skip first N tokens of each doc (BOS / document-start flood)")
+    parser.add_argument("--layers", type=int, nargs="+", default=None,
+                        help="Override which layers to extract (e.g. --layers 27)")
     parser.add_argument("--min_doc_len", type=int, default=10)
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
@@ -271,6 +369,8 @@ def main():
     ex = cfg.extraction
     if args.n_tokens is not None:
         ex.n_tokens = args.n_tokens
+    if args.layers is not None:
+        ex.layers = args.layers
 
     out_dir = resolve_path(args.out_dir if args.out_dir else ex.activations_dir)
 
@@ -280,6 +380,7 @@ def main():
         max_doc_tokens=getattr(ex, "max_doc_tokens", args.max_doc_tokens),
         skip_leading=getattr(ex, "skip_leading", args.skip_leading),
         min_doc_len=args.min_doc_len, log_every=getattr(ex, "log_every", 200),
+        dtype=getattr(ex, "dtype", "float16"),
     )
 
 

@@ -222,6 +222,72 @@ def test_total_loss_backward():
     assert z.grad is not None
 
 
+# ---------------------------------------------------------------------------
+# VICReg terms in the MSE pipeline (mirrors total_loss_e2e)
+# ---------------------------------------------------------------------------
+
+def _fixture(seed=0):
+    torch.manual_seed(seed)
+    B, D, L, K = 16, 32, 24, 8
+    x, x_hat = torch.randn(B, D), torch.randn(B, D)
+    z = torch.randn(B, L)
+    centroids = torch.randn(K, L)
+    Q = sinkhorn_log(torch.cdist(z, centroids).pow(2), tau=1.0)
+    return x, x_hat, z, centroids.detach(), Q
+
+
+def test_geometry_lambdas_default_off_reproduce_old_loss():
+    """Configs written before the terms existed must be bit-identical."""
+    x, x_hat, z, c, Q = _fixture()
+    base = total_loss(x, x_hat, z, c, Q, lambda_cluster=0.1, lambda_sep=0.01)
+    explicit = total_loss(x, x_hat, z, c, Q, lambda_cluster=0.1, lambda_sep=0.01,
+                          lambda_var=0.0, lambda_cov=0.0, lambda_unif=0.0)
+    assert torch.equal(base["loss"], explicit["loss"])
+    for key in ("var", "cov", "unif"):
+        assert key not in base, f"{key} must be absent when its lambda is 0"
+
+
+def test_var_and_cov_add_to_loss_and_report():
+    x, x_hat, z, c, Q = _fixture()
+    base = total_loss(x, x_hat, z, c, Q, lambda_cluster=0.1, lambda_sep=0.01)
+    geo = total_loss(x, x_hat, z, c, Q, lambda_cluster=0.1, lambda_sep=0.01,
+                     lambda_var=0.3, lambda_cov=0.001)
+
+    assert "var" in geo and "cov" in geo
+    assert geo["loss"].item() > base["loss"].item(), "geometry terms must add cost"
+    expected = (base["loss"] + 0.3 * geo["var"] + 0.001 * geo["cov"])
+    assert torch.allclose(geo["loss"], expected, atol=1e-6)
+    # the faithfulness/cluster components are untouched
+    for key in ("recon", "cluster", "sep"):
+        assert torch.equal(base[key], geo[key])
+
+
+def test_var_term_matches_e2e_definition():
+    """MSE and KL runs must share geometry, so the terms must be the same fns."""
+    from geoae.e2e.losses import total_loss_e2e
+
+    x, x_hat, z, c, Q = _fixture()
+    mse = total_loss(x, x_hat, z, c, Q, lambda_cluster=0.1, lambda_sep=0.01,
+                     lambda_var=0.3, lambda_cov=0.001)
+    logits_t = torch.randn(z.shape[0], 12)
+    kl = total_loss_e2e(teacher_logits=logits_t, student_logits=logits_t.clone(),
+                        x=x, x_hat=x_hat, z=z, centroids=c, Q=Q,
+                        lambda_cluster=0.1, lambda_sep=0.01,
+                        lambda_var=0.3, lambda_cov=0.001)
+    assert torch.allclose(mse["var"], kl["var"])
+    assert torch.allclose(mse["cov"], kl["cov"])
+
+
+def test_geometry_terms_reach_the_latent():
+    x, x_hat, z, c, Q = _fixture()
+    z = z.clone().requires_grad_(True)
+    out = total_loss(x, x_hat.clone().requires_grad_(True), z, c, Q,
+                     lambda_cluster=0.0, lambda_sep=0.0,
+                     lambda_var=0.3, lambda_cov=0.001)
+    out["loss"].backward()
+    assert z.grad is not None and z.grad.abs().sum() > 0
+
+
 if __name__ == "__main__":
     # Run all test_ functions manually when pytest isn't available
     import traceback

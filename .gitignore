@@ -5,21 +5,28 @@ __pycache__/
 dist/
 build/
 
-# Experiment artifacts
+# Experiment artifacts and caches
 phase_a/
 *.log
 activations/
-activations_diverse
-activations_qwen_diverse
+activations_*
 checkpoints/
 runs/
 results/
+plots/
+figures/
+sweeps/
 *.pt
 *.npy
 *.npz
 results_*.json
 results.txt
+clustering_quality_*.json
 clustering_quality_comparison.json
+concept_probe_*.json
+lambda_balance_*.json
+dbpedia/joint_correct_*.json
+dbpedia/steering_*.json
 
 wandb/
 .pytest_cache/
@@ -27,3 +34,8 @@ wandb/
 
 _migrate.py
 _fix_imports.py
+
+# Secrets — never commit credentials
+hf_tokken.txt
+hf_token.txt
+.env

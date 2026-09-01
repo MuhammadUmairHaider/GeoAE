@@ -64,6 +64,7 @@ DEFAULT_SOURCES = [
     dict(domain="wiki", name="wikimedia/wikipedia",               config="20231101.en", split="train",      field="text"),
     dict(domain="code", name="codeparrot/codeparrot-clean-valid", config=None,          split="train",      field="content"),
     dict(domain="math", name="open-web-math/open-web-math",       config=None,          split="train",      field="text"),
+    dict(domain="pile", name="monology/pile-uncopyrighted",       config=None,          split="train",      field="text"),
 ]
 
 

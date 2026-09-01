@@ -342,11 +342,19 @@ def compute_metrics(
     sr = separability_ratio(z, labels)
     print(f"{sr:.4f}")
 
-    icd_mean, icd_min, icd_max = inter_centroid_dist(centroids)
+    # Centroid-matrix metrics must see only centroids that actually won points.
+    # Every (z, labels) metric above is already restricted to surviving clusters
+    # via np.unique(labels), but these two read the stored K x D matrix directly.
+    # A collapsed baseline (raw k-means at K=2000 keeps ~270 live centroids) would
+    # otherwise report the distance between two DEAD centroids as its minimum, and
+    # inflate effective rank with centroids no token maps to.
+    live_mask = np.bincount(labels, minlength=K) > 0
+    live_centroids = centroids[live_mask]
+    icd_mean, icd_min, icd_max = inter_centroid_dist(live_centroids)
     intra_var = intra_cluster_variance(z, labels)
     bal_H, n_empty = cluster_balance_entropy(labels)
     eff_k = effective_k(labels, K)
-    eff_r = effective_rank(centroids)
+    eff_r = effective_rank(live_centroids)
 
     metrics = {
         "silhouette":        sil,
@@ -395,7 +403,7 @@ METRIC_ROWS = [
 
 
 def print_table(labels: list[str], all_metrics: list[dict]) -> None:
-    col_w = max(30, max(len(l) for l in labels) + 2)
+    col_w = max(18, max(len(l) for l in labels) + 2)
     row_w = 28
 
     header = f"  {'Metric':<{row_w}}" + "".join(f"  {l[:col_w-2]:>{col_w}}" for l in labels)
@@ -451,6 +459,11 @@ def main():
     parser.add_argument("--n_sample",    type=int, default=50_000)
     parser.add_argument("--seed",        type=int, default=0)
     parser.add_argument("--activations_dir", default="activations")
+    parser.add_argument("--names", nargs="*", default=[],
+                        help="Short column labels, in order (baseline first, then "
+                             "checkpoints). Architecture strings are identical across "
+                             "sibling runs, so pass run names to keep the table readable.")
+    parser.add_argument("--out", default="clustering_quality_comparison.json")
     args = parser.parse_args()
 
     from geoae.seeding import seed_everything
@@ -473,6 +486,8 @@ def main():
         z, labels, centroids, label = load_raw_baseline(
             Path(args.baseline), act_dir, args.layer, args.n_sample, args.seed
         )
+        if ri < len(args.names):
+            label = args.names[ri]
         print(f"[quality] Computing metrics for: {label}")
         func = load_functional_metrics(results_paths[ri])
         metrics = compute_metrics(z, labels, centroids, Q=None, functional=func)
@@ -486,6 +501,8 @@ def main():
         z, labels, Q, centroids, label = load_ae_latents(
             Path(ckpt_path), act_dir, args.layer, args.n_sample, args.seed, device
         )
+        if ri < len(args.names):
+            label = args.names[ri]
         print(f"[quality] Computing metrics for: {label}")
         func = load_functional_metrics(results_paths[ri])
         metrics = compute_metrics(z, labels, centroids, Q=Q, functional=func)
@@ -501,7 +518,7 @@ def main():
     for lbl, m in zip(all_labels, all_metrics):
         out[lbl] = {k: (v if not (isinstance(v, float) and math.isnan(v)) else None)
                     for k, v in m.items()}
-    out_path = Path("clustering_quality_comparison.json")
+    out_path = Path(args.out)
     with open(out_path, "w") as f:
         json.dump(out, f, indent=2)
     print(f"\n[quality] Full results saved → {out_path}")

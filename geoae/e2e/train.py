@@ -35,7 +35,8 @@ from geoae.e2e.data import E2EBuffer, make_loader
 from geoae.seeding import seed_everything
 from geoae.train import per_class_latent_means
 from geoae.train_common import (
-    tau_schedule, lambda_schedule, reinit_dead_clusters,
+    tau_schedule, lambda_schedule, geometry_schedule, zipf_alpha_schedule,
+    reinit_dead_clusters,
     build_model, make_optimizer, init_wandb, add_override_args, apply_overrides,
     CheckpointTracker,
 )
@@ -200,8 +201,52 @@ def init_centroids(model, cfg, train_buf, train_loader, act_dir, device, init_mo
 # Train
 # --------------------------------------------------------------------------- #
 
+def load_resume(path, model, opt, norm_mean, norm_std, device) -> int:
+    """
+    Restore model + optimizer from a checkpoint and return the epoch to start at.
+
+    The checkpoint carries everything needed (model_state, opt_state, epoch,
+    step, tau, norm stats), so a stopped run continues instead of restarting
+    from scratch. The centroids and the `centroids_initialized` flag live in
+    model_state, so k-means++ init is correctly skipped on resume.
+
+    Normalisation is asserted to match: the encoder was trained against these
+    exact mean/std, so silently resuming under different stats would corrupt
+    the model without any visible error.
+    """
+    ckpt = torch.load(str(path), map_location=device, weights_only=False)
+    model.load_state_dict(ckpt["model_state"])
+    if "opt_state" in ckpt:
+        opt.load_state_dict(ckpt["opt_state"])
+    else:
+        print("[resume] ! checkpoint has no opt_state — Adam moments restart cold")
+
+    for name, saved, cur in (("mean", ckpt["norm_mean"], norm_mean),
+                             ("std", ckpt["norm_std"], norm_std)):
+        s = torch.as_tensor(saved, dtype=torch.float32, device=device)
+        if not torch.allclose(s, cur.float(), rtol=1e-4, atol=1e-6):
+            raise ValueError(
+                f"[resume] norm {name} in {path} does not match the current "
+                f"activations (max diff {(s - cur.float()).abs().max():.3e}). "
+                "The checkpoint was trained on a different dump — refusing to resume."
+            )
+
+    start_epoch = int(ckpt["epoch"]) + 1
+    # Continue the global step counter too: it names checkpoints
+    # (step_<n>.pt) and is the wandb x-axis, which rejects steps that go
+    # backwards. Restarting it at 0 would interleave new files among the old.
+    step = int(ckpt.get("step", 0))
+    print(f"[resume] {path}")
+    print(f"[resume] epoch {ckpt['epoch']} step {step} "
+          f"tau {ckpt.get('tau', float('nan')):.3f} val_kl {ckpt.get('val_kl', float('nan')):.5f} "
+          f"| centroids_initialized={bool(model.centroids_initialized.item())}")
+    print(f"[resume] resuming at epoch {start_epoch}, step counter continues from {step}")
+    return start_epoch, step
+
+
 def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
-          no_sinkhorn: bool = False) -> None:
+          no_sinkhorn: bool = False, resume: str | None = None,
+          max_train_rows: int | None = None) -> None:
     seed_everything(cfg.train.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"[train-e2e] Device: {device}")
@@ -232,7 +277,7 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
 
     train_buf = E2EBuffer(act_dir, cfg.data.target_layer, val_frac=cfg.data.val_frac,
                           split="train", needs_input_ids=lc.needs_input_ids,
-                          load_teacher=not onfly)
+                          load_teacher=not onfly, max_train_rows=max_train_rows)
     val_buf = E2EBuffer(act_dir, cfg.data.target_layer, val_frac=cfg.data.val_frac,
                         split="val", needs_input_ids=lc.needs_input_ids,
                         load_teacher=not onfly,
@@ -268,7 +313,28 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
     global_step = 0
     Q_history: list[torch.Tensor] = []
 
-    for epoch in range(1, cfg.train.n_epochs + 1):
+    start_epoch = 1
+    if resume:
+        start_epoch, global_step = load_resume(resume, model, opt, mean_t, std_t, device)
+        if start_epoch > cfg.train.n_epochs:
+            raise ValueError(
+                f"[resume] checkpoint is at epoch {start_epoch - 1} but "
+                f"train.n_epochs={cfg.train.n_epochs} — nothing left to run. "
+                "Raise n_epochs (or lower it to compress the tau anneal)."
+            )
+        # Seed the best-val score from the existing best_val.pt. Without this the
+        # tracker starts at +inf, so the FIRST epoch after resume always counts as
+        # "best" and overwrites best_val.pt — with a worse checkpoint, since tau
+        # steps down at resume and val_kl typically rises for a while. Rotation
+        # would then age out the older step_*.pt files and the good state is gone.
+        best_path = ckpt_dir / "best_val.pt"
+        if best_path.exists():
+            prev = torch.load(str(best_path), map_location="cpu", weights_only=False)
+            tracker.record_best(float(prev["val_kl"]))
+            print(f"[resume] best_val.pt guarded at val_kl={tracker.best_score:.5f} "
+                  f"(epoch {prev.get('epoch', '?')}) — only a better score replaces it")
+
+    for epoch in range(start_epoch, cfg.train.n_epochs + 1):
         if (not bool(model.centroids_initialized.item())
                 and epoch >= cfg.train.clustering_start_epoch):
             init_centroids(model, cfg, train_buf, train_loader, act_dir, device, init_mode)
@@ -276,8 +342,11 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
         tau = tau_schedule(epoch, cfg)
         model.tau = tau
         lam_c, lam_s = lambda_schedule(epoch, cfg)
+        lam_v, lam_cv, lam_u = geometry_schedule(epoch, cfg)
+        model.zipf_alpha = zipf_alpha_schedule(epoch, cfg)
         print(f"\n[train-e2e] Epoch {epoch}/{cfg.train.n_epochs} | tau={tau:.3f} "
-              f"| λ_c={lam_c:.3f} λ_s={lam_s:.4f}")
+              f"| λ_c={lam_c:.3f} λ_s={lam_s:.4f} "
+              f"| λ_var={lam_v:.3f} λ_cov={lam_cv:.4f}")
         epoch_start = time.time()
 
         for batch in train_loader:
@@ -299,7 +368,11 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
                 x=x, x_hat=out.x_hat, z=out.z,
                 centroids=model.centroids.detach(), Q=out.Q,
                 lambda_cluster=lam_c, lambda_sep=lam_s,
-                lambda_mse=cfg.loss.lambda_mse, metric=model.metric,
+                lambda_mse=cfg.loss.lambda_mse,
+                # These were previously never passed, so lambda_var/cov/unif silently
+                # defaulted to 0.0 and VICReg never ran under this trainer.
+                lambda_var=lam_v, lambda_cov=lam_cv, lambda_unif=lam_u,
+                metric=model.metric,
             )
 
             opt.zero_grad()
@@ -389,6 +462,15 @@ def main():
     ap.add_argument("--lambda_mse", type=float, default=None,
                     help="Weak normalised-space MSE recon anchor (0 = off, KL-only)")
     ap.add_argument("--lr", type=float, default=None, help="Override learning rate")
+    ap.add_argument("--resume", default=None,
+                    help="Checkpoint to resume from (e.g. .../best_val.pt). Restores "
+                         "model + optimizer + centroids and continues at epoch+1.")
+    ap.add_argument("--max_train_rows", type=int, default=None,
+                    help="Escape hatch: cap the train split to the first N rows so the "
+                         "working set stays in page cache. Normally unnecessary — the "
+                         "buffer sets MADV_RANDOM, which is what actually fixes slow "
+                         "random reads. Costs training data; prefer leaving it unset. "
+                         "Norm stats are still computed over the full split.")
     add_override_args(ap)
     args = ap.parse_args()
 
@@ -396,7 +478,8 @@ def main():
     apply_overrides(cfg, args)
 
     train(cfg, use_wandb=not args.no_wandb, no_renorm=args.no_renorm,
-          no_sinkhorn=args.no_sinkhorn)
+          no_sinkhorn=args.no_sinkhorn, resume=args.resume,
+          max_train_rows=args.max_train_rows)
 
 
 if __name__ == "__main__":

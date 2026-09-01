@@ -56,6 +56,8 @@ def total_loss_e2e(
     lambda_cov: float = 0.0,
     lambda_unif: float = 0.0,
     metric: str = "euclidean",
+    sep_mode: str = "median",
+    sep_margin: float = 2.0,
 ) -> dict[str, Tensor]:
     """
     L = KL + lambda_cluster · L_cluster + lambda_sep · L_sep + lambda_mse · MSE
@@ -77,7 +79,7 @@ def total_loss_e2e(
     """
     l_kl = kl_loss(teacher_logits, student_logits)
     l_cluster = cluster_loss(z, centroids, Q, metric=metric)
-    l_sep = sep_loss(z, Q, metric=metric)
+    l_sep = sep_loss(z, Q, metric=metric, mode=sep_mode, margin=sep_margin)
 
     loss = l_kl + lambda_cluster * l_cluster + lambda_sep * l_sep
 

@@ -29,11 +29,12 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 from pathlib import Path
 
 import numpy as np
 import torch
+
+from geoae.lm_arch import decoder_layers
 
 LAYERS = [16, 20, 24, 27]
 
@@ -43,7 +44,7 @@ LAYERS = [16, 20, 24, 27]
 # ---------------------------------------------------------------------------
 
 class MultiLayerCapture:
-    """Forward hooks on model.model.layers[L] capturing output[0] per layer.
+    """Forward hooks on the decoder's layers[L], capturing output[0] per layer.
 
     Matches the geoae.extract / SplicingHook convention (residual AFTER block L,
     pre-final-norm) — do NOT swap for output_hidden_states, whose last entry is
@@ -53,9 +54,9 @@ class MultiLayerCapture:
     def __init__(self, lm, layers: list[int]):
         self.store: dict[int, torch.Tensor] = {}
         self.handles = []
+        blocks = decoder_layers(lm)
         for L in layers:
-            mod = lm.model.layers[L]
-            self.handles.append(mod.register_forward_hook(self._make(L)))
+            self.handles.append(blocks[L].register_forward_hook(self._make(L)))
 
     def _make(self, L):
         def fn(_mod, _inp, out):

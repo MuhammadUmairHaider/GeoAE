@@ -23,7 +23,8 @@ from geoae.losses import total_loss
 from geoae.seeding import seed_everything
 from geoae import diagnostics as diag
 from geoae.train_common import (   # noqa: F401 — re-exported for compatibility
-    tau_schedule, lambda_schedule, rotate_checkpoints, reinit_dead_clusters,
+    tau_schedule, lambda_schedule, geometry_schedule, zipf_alpha_schedule,
+    rotate_checkpoints, reinit_dead_clusters,
     build_model, make_optimizer, init_wandb, add_override_args, apply_overrides,
     CheckpointTracker,
 )
@@ -144,6 +145,7 @@ def per_class_latent_means(
 # ---------------------------------------------------------------------------
 
 def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
+          max_train_rows: int | None = None,
           no_sinkhorn: bool = False) -> None:
     seed_everything(cfg.train.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -157,7 +159,8 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
     act_dir = resolve_path(cfg.data.activations_dir)
 
     train_buf = ActivationBuffer(act_dir, cfg.data.target_layer,
-                                 val_frac=cfg.data.val_frac, split="train")
+                                 val_frac=cfg.data.val_frac, split="train",
+                                 max_train_rows=max_train_rows)
     val_buf   = ActivationBuffer(act_dir, cfg.data.target_layer,
                                  val_frac=cfg.data.val_frac, split="val",
                                  norm_cache=act_dir / f"norm_params_layer{cfg.data.target_layer}.npz")
@@ -223,9 +226,12 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
         tau = tau_schedule(epoch, cfg)
         model.tau = tau
         lam_c, lam_s = lambda_schedule(epoch, cfg)
+        lam_v, lam_cv, lam_u = geometry_schedule(epoch, cfg)
+        model.zipf_alpha = zipf_alpha_schedule(epoch, cfg)
 
         print(f"\n[train] Epoch {epoch}/{cfg.train.n_epochs} | tau={tau:.3f} "
-              f"| λ_c={lam_c:.3f} λ_s={lam_s:.4f}")
+              f"| λ_c={lam_c:.3f} λ_s={lam_s:.4f} "
+              f"| λ_var={lam_v:.3f} λ_cov={lam_cv:.4f}")
 
         epoch_start = time.time()
 
@@ -245,6 +251,11 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
                 lambda_cluster=lam_c,
                 lambda_sep=lam_s,
                 metric=model.metric,
+                lambda_var=lam_v,
+                lambda_cov=lam_cv,
+                lambda_unif=lam_u,
+                sep_mode=getattr(cfg.loss, "sep_mode", "median"),
+                sep_margin=getattr(cfg.loss, "sep_margin", 2.0),
             )
 
             # Backward
@@ -288,13 +299,19 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
                 metrics["train/sep_loss"] = losses["sep"].item()
                 metrics["train/tau"] = tau
                 metrics["step"] = global_step
+                # Only present when the corresponding lambda is > 0.
+                extra = ""
+                for key in ("var", "cov", "unif"):
+                    if key in losses:
+                        metrics[f"train/{key}_loss"] = losses[key].item()
+                        extra += f" | {key} {losses[key].item():.4f}"
 
                 print(
                     f"  step {global_step:6d} | "
                     f"loss {metrics['train/loss']:.4f} | "
                     f"recon {metrics['train/mse']:.4f} | "
                     f"clus {metrics['train/cluster_loss']:.4f} | "
-                    f"sep {metrics['train/sep_loss']:.4f} | "
+                    f"sep {metrics['train/sep_loss']:.4f}{extra} | "
                     f"val_mse {val_mse:.4f} | "
                     f"fve {metrics['train/fve']:.3f} | "
                     f"eff_K {metrics['cluster/effective_k']}/{model.n_clusters} | "
@@ -350,6 +367,11 @@ def main():
     parser.add_argument("--metric", default=None, choices=["euclidean", "cosine"],
                         help="Clustering geometry: euclidean (magnitude) or cosine (directional)")
     parser.add_argument("--batch_size", type=int, default=None, help="Override batch_size")
+    parser.add_argument("--max_train_rows", type=int, default=None,
+                        help="Cap the train split to the first N rows. Costs training "
+                             "data, but shrinks the working set so it stays resident in "
+                             "page cache: cold random reads on a >RAM dump run ~300 "
+                             "rows/s vs ~108k warm, so an over-RAM split is I/O bound.")
     parser.add_argument("--centroid_init", default=None,
                         choices=["kmeans++", "semisup", "class_means"],
                         help="Centroid init: kmeans++ (unsup), semisup (per-class mean "
@@ -367,7 +389,7 @@ def main():
     apply_overrides(cfg, args)
 
     train(cfg, use_wandb=not args.no_wandb, no_renorm=args.no_renorm,
-          no_sinkhorn=args.no_sinkhorn)
+          no_sinkhorn=args.no_sinkhorn, max_train_rows=args.max_train_rows)
 
 
 if __name__ == "__main__":

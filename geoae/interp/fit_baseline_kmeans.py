@@ -37,6 +37,11 @@ def main():
     ap.add_argument("--batch_size", type=int, default=65536, help="MiniBatchKMeans batch (>= 64*K enforced)")
     ap.add_argument("--max_iter", type=int, default=300)
     ap.add_argument("--n_init", type=int, default=3)
+    ap.add_argument("--max_no_improvement", type=int, default=10,
+                    help="MiniBatchKMeans early-stop patience on EWA inertia. The "
+                         "sklearn default of 10 can stop a K=2000 fit after ~15 of "
+                         "1171 steps while centroids are still thrashing; raise it "
+                         "(or pass 0 for None) to let the fit actually converge.")
     ap.add_argument("--verbose", type=int, default=1, help="MiniBatchKMeans verbosity (0=silent)")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--out", required=True)
@@ -74,6 +79,8 @@ def main():
           f"(batch={batch_size}, max_iter={args.max_iter}) …")
     km = MiniBatchKMeans(n_clusters=args.n_clusters, random_state=args.seed,
                          batch_size=batch_size, n_init=args.n_init, max_iter=args.max_iter,
+                         max_no_improvement=(None if args.max_no_improvement == 0
+                                             else args.max_no_improvement),
                          reassignment_ratio=0.05, verbose=args.verbose)
     km.fit(sample)
     centroids = km.cluster_centers_.astype(np.float32)

@@ -5,6 +5,8 @@ from typing import Callable
 
 from torch import Tensor
 
+from geoae.lm_arch import decoder_layers
+
 
 class SplicingHook:
     """
@@ -28,9 +30,8 @@ class SplicingHook:
 
     def activate(self, fn: Callable[[Tensor], Tensor]) -> None:
         self._fn = fn
-        self._handle = self._model.model.layers[self._layer_idx].register_forward_hook(
-            self._hook_fn
-        )
+        layers = decoder_layers(self._model)
+        self._handle = layers[self._layer_idx].register_forward_hook(self._hook_fn)
 
     def deactivate(self) -> None:
         if self._handle is not None:

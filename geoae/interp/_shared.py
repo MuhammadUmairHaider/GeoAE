@@ -77,7 +77,45 @@ DATASET_CONFIGS = {
             '            {{ Researchers develop a new algorithm to speed up quantum error correction:Sci/Tech}}\n\n'
             '            {{"{}":'
         )
-    }
+    },
+    "biasbios": {
+        "classes": [
+            "accountant", "architect", "attorney", "chiropractor", "comedian",
+            "composer", "dentist", "dietitian", "dj", "filmmaker",
+            "interior_designer", "journalist", "model", "nurse", "painter",
+            "paralegal", "pastor", "personal_trainer", "photographer", "physician",
+            "poet", "professor", "psychologist", "rapper", "software_engineer",
+            "surgeon", "teacher", "yoga_teacher",
+        ],
+        "dataset_name": "LabHC/bias_in_bios",
+        "dataset_split": "test",
+        "text_column": "hard_text",
+        "prompt_head": (
+            "Choose the profession of the person described in this biography from: "
+            "accountant, architect, attorney, chiropractor, comedian, composer, "
+            "dentist, dietitian, dj, filmmaker, interior_designer, journalist, "
+            "model, nurse, painter, paralegal, pastor, personal_trainer, "
+            "photographer, physician, poet, professor, psychologist, rapper, "
+            "software_engineer, surgeon, teacher, yoga_teacher.\n\n"
+            '{{ He is also the project lead of and major contributor to the open '
+            'source assembler/simulator "EASy68K.":professor}}\n\n'
+            '{{ She is able to assess, diagnose and treat minor illness conditions:nurse}}\n\n'
+            '{{ Born in Long Beach, CA he began his musical studies at an early age:composer}}\n\n'
+            '{{"{}":'
+        ),
+    },
+}
+
+
+# Same prompt, classes and text column as `emotions`, but drawn from the TRAIN
+# split. The test split holds only 66 `surprise` documents — below the default
+# need = n_fit + n_eval = 130, and the joint-correct filter cuts that further —
+# so a full-size run is impossible on test. Train has 572. The AE is trained on
+# general web text (C4/wiki/code/math/pile) and never on this dataset, so
+# evaluating against its train split leaks nothing.
+DATASET_CONFIGS["emotions_train"] = {
+    **DATASET_CONFIGS["emotions"],
+    "dataset_split": "train",
 }
 
 
@@ -131,3 +169,153 @@ def perplexity(lm, tokenizer, texts, device):
         n = enc["input_ids"].shape[1]
         tot_loss += loss.item() * n; tot_tok += n
     return float(np.exp(tot_loss / max(tot_tok, 1)))
+
+
+# ---------------------------------------------------------------------------
+# Joint-correct document set (shared by steering / causal / probe tools)
+# ---------------------------------------------------------------------------
+
+def ae_fingerprint(ae) -> str:
+    """Short content hash of an AE's weights.
+
+    The joint-correct set is filtered by THIS AE's reconstruction, so it is
+    checkpoint-specific: a later epoch of the same run, at the same path, is a
+    different filter. Hashing the weights (rather than the path, which gets
+    overwritten in place by best_val.pt) makes that detectable.
+    """
+    import hashlib
+    h = hashlib.sha1()
+    for k, v in sorted(ae.state_dict().items()):
+        h.update(k.encode())
+        h.update(v.detach().float().cpu().numpy().tobytes())
+    return h.hexdigest()[:12]
+
+
+def build_joint_correct_set(
+    ds,
+    dataset_cfg,
+    tokenizer,
+    lm,
+    device,
+    hook,
+    z_recon,
+    corr_path,
+    need: int,
+    dataset_name: str,
+    model_name: str | None = None,
+    ae_sha: str | None = None,
+    batch_size: int = 16,
+    tag: str = "jc",
+):
+    """
+    Documents that BOTH the base LM and the AE-recon splice classify correctly.
+
+    This is the evaluation population for the steering / causal-concept
+    comparisons, so it is specific to (prompt, dataset, MODEL, AE checkpoint) —
+    not just the prompt. The on-disk cache therefore records `model_name`, and a
+    cache written by a different model (or by a version that predates the field,
+    which reads back as None) is rebuilt rather than trusted. Reusing another
+    model's set silently swaps the evaluation population and skips this
+    checkpoint's reconstruction filter entirely.
+
+    `hook` must be an activated-on-demand SplicingHook and `z_recon` the
+    replacement fn; both are toggled around the recon pass.
+
+    `batch_size` drives peak memory, which is set by the MLP intermediate, not
+    the vocab head: bs x seq x intermediate x 2 B. On Gemma 3 12B
+    (intermediate=15360, prompts truncated to 1024) batch 64 needs ~830 MB per
+    MLP tensor with several live at once, which OOMs a 40 GB card already
+    holding 24.4 GB of weights. 16 is the same default predict/capture_h use.
+    """
+    import hashlib
+    import json
+    from collections import Counter
+    from pathlib import Path
+
+    corr_path = Path(corr_path)
+    prompt_sha = hashlib.sha1(PROMPT_HEAD.encode("utf-8")).hexdigest()[:12]
+    n_classes = len(CLASSES)
+    correct = None
+
+    if corr_path.exists():
+        cached = json.load(open(corr_path))
+        cached_model = cached.get("model_name") if isinstance(cached, dict) else None
+        cached_ae = cached.get("ae_sha") if isinstance(cached, dict) else None
+        cached_ds = cached.get("dataset") if isinstance(cached, dict) else None
+        # `dataset` must match too: variants that share a prompt_head (emotions vs
+        # emotions_train) produce the SAME prompt_sha, so without this check a set
+        # built on one split would be silently reused for the other.
+        if (isinstance(cached, dict) and cached.get("prompt_sha") == prompt_sha
+                and cached_model is not None and cached_model == model_name
+                and cached_ae is not None and cached_ae == ae_sha
+                and cached_ds == dataset_name
+                and cached.get("docs")):
+            correct = cached["docs"]
+            cnt = Counter(d["label"] for d in correct)
+            min_c = min(cnt.get(c, 0) for c in range(n_classes))
+            print(f"[{tag}] Loaded joint-correct set: {len(correct)} docs "
+                  f"(min/class={min_c}, prompt_sha={prompt_sha}, model={cached_model}). "
+                  f"To force a rebuild, delete {corr_path}")
+            if min_c < need:
+                print(f"[{tag}] WARNING: cache min/class={min_c} < n_fit+n_eval={need} "
+                      f"(looks like a --smoke cache); fit/eval slices will auto-shrink "
+                      f"and be noisy. Delete {corr_path} to rebuild at full size.")
+        else:
+            if not isinstance(cached, dict):
+                why = "legacy format (no prompt hash)"
+            elif cached.get("prompt_sha") != prompt_sha:
+                why = "built under a DIFFERENT prompt"
+            elif cached_model != model_name:
+                why = f"built on a DIFFERENT model ({cached_model!r} != {model_name!r})"
+            elif cached_ae != ae_sha:
+                why = f"built on a DIFFERENT AE checkpoint ({cached_ae!r} != {ae_sha!r})"
+            elif cached_ds != dataset_name:
+                why = f"built on a DIFFERENT dataset ({cached_ds!r} != {dataset_name!r})"
+            else:
+                why = "empty docs list"
+            print(f"[{tag}] Cache {corr_path} is stale ({why}); rebuilding (sha={prompt_sha}).")
+
+    if correct is not None:
+        return correct
+
+    print(f"[{tag}] Building joint base+recon correct set …")
+    by_class = {c: [] for c in range(n_classes)}
+    for ex in ds:
+        by_class[int(ex["label"])].append(ex[dataset_cfg["text_column"]].strip())
+
+    def _both_correct(texts, c):
+        bs = len(texts)
+        r_base = predict(lm, tokenizer, texts, [c] * bs, device=device, batch_size=bs)
+        hook.activate(z_recon)
+        r_recon = predict(lm, tokenizer, texts, [c] * bs, device=device, batch_size=bs)
+        hook.deactivate()
+        return [t for i, t in enumerate(texts)
+                if r_base["correct"][i] and r_recon["correct"][i]]
+
+    correct = []
+    for c in range(n_classes):
+        print(f"[{tag}] Finding joint-correct predictions for class {c} ({CLASSES[c]}) ...")
+        class_correct, batch_texts = [], []
+        for text in by_class[c]:
+            batch_texts.append(text)
+            if len(batch_texts) == batch_size:
+                class_correct += [{"text": t, "label": c} for t in _both_correct(batch_texts, c)]
+                batch_texts = []
+                if len(class_correct) >= need:
+                    break
+        if len(class_correct) < need and batch_texts:
+            class_correct += [{"text": t, "label": c} for t in _both_correct(batch_texts, c)]
+        class_correct = class_correct[:need]
+        print(f"  Found {len(class_correct)} joint-correct docs for class {c}")
+        correct += class_correct
+
+    corr_path.parent.mkdir(parents=True, exist_ok=True)
+    json.dump({"prompt_sha": prompt_sha, "dataset": dataset_name,
+               "model_name": model_name, "ae_sha": ae_sha,
+               "classes": CLASSES, "docs": correct},
+              open(corr_path, "w"))
+    cnt = Counter(d["label"] for d in correct)
+    print(f"[{tag}] joint-correct: {len(correct)} docs "
+          f"(min/class={min(cnt.get(c, 0) for c in range(n_classes))}, "
+          f"prompt_sha={prompt_sha}, model={model_name}, ae={ae_sha}) -> {corr_path}")
+    return correct

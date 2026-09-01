@@ -30,6 +30,8 @@ import numpy as np
 import torch
 from torch import Tensor
 
+from geoae.lm_arch import decoder_layers
+
 
 # ---------------------------------------------------------------------------
 # Activation capture at the same point as reference model.mask_layer (post-layer,
@@ -46,7 +48,7 @@ def capture_post_layer(lm, enc, layer: int) -> np.ndarray:
         hs = output[0] if isinstance(output, tuple) else output
         captured.append(hs)
 
-    handle = lm.model.layers[layer].register_forward_hook(_hook)
+    handle = decoder_layers(lm)[layer].register_forward_hook(_hook)
     lm(**enc, use_cache=False)
     handle.remove()
 

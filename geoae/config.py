@@ -48,18 +48,27 @@ class ModelConfig:
     n_clusters: int = 128
     nonlinearity: str = "linear"   # "linear" | "relu" | "gelu"
     metric: str = "euclidean"      # "euclidean" (magnitude) | "cosine" (directional)
+    latent_norm: str = "none"      # "none" | "batch" (BatchNorm1d between linear and act)
 
 
 @dataclass
 class LossConfig:
     lambda_cluster: float = 0.1
     lambda_sep: float = 0.01
+    sep_mode: str = "median"       # "median" (legacy, scale-free) | "intra" | "hinge"
+    sep_margin: float = 2.0        # hinge only: target d_min >= margin * intra radius
     lambda_usage: float = 0.1
     lambda_mse: float = 0.0   # weak MSE recon anchor for e2e KL training (0 = off)
     lambda_var: float = 0.0   # VICReg variance hinge on latents (anti-contraction, 0 = off)
     lambda_cov: float = 0.0   # VICReg covariance on latents (anti low-rank collapse, 0 = off)
     lambda_unif: float = 0.0  # Wang–Isola uniformity on unit-sphere latents (cosine runs, 0 = off)
     sinkhorn_iters: int = 3
+    # --- generalised cluster-marginal balancing (all defaults = today's behaviour) ---
+    balance: str = "uniform"       # "uniform" | "zipf"  — shape of the column target
+    balance_rho: float = 1.0       # column-constraint strength: 1 = hard Sinkhorn, 0 = softmax
+    balance_eta: float = 1.0       # cross-batch EMA on the column dual: 1 = per-batch
+    zipf_alpha_start: float = 0.0  # annealed 0 -> zipf_alpha_end over the tau window
+    zipf_alpha_end: float = 0.0
     tau_start: float = 1.0
     tau_end: float = 0.1
 
@@ -78,6 +87,9 @@ class TrainConfig:
     recon_only_epochs: int = 2       # epochs 1..recon_only_epochs: pure reconstruction
     clustering_start_epoch: int = 3  # epoch where clustering loss is added
     full_loss_start_epoch: int = 6   # epoch where sep+usage losses are added
+    geometry_start_epoch: int = 0    # epoch where var/cov/unif switch on.
+                                     # 0 = on from step 1 (previous behaviour, unchanged).
+                                     # Set >1 for an explicit recon-only warmup before VICReg.
 
     diag_every: int = 100            # steps between diagnostics
     reinit_every: int = 1000         # steps between dead-cluster reinitialization

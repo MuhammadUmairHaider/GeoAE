@@ -1,0 +1,89 @@
+# Activation extraction — Gemma 3 4B PT, layer 22 (65% depth).
+#
+# WHY LAYER 22, not 33: the layer-47 steering results at 12B showed h and z
+# agreeing to within 0.005 selectivity at EVERY alpha, across three result files
+# (db14 mse-only, db14 vicreg, agnews mse045). At the final layer only one
+# decoder block + norm + lm_head remain downstream, so a splice is close to a
+# logit-space edit and any near-invertible AE reproduces the raw residual. The
+# steering comparison cannot discriminate there. Layer 22 leaves 11 decoder
+# blocks to actually process the edit.
+#
+# SAE BASELINES: layer 22 is in the FULL Gemma Scope 2 suite (verified against
+# the hub 2026-08-23), unlike layer 33 which only has resid_post_all:
+#     resid_post   16k / 65k / 262k / 1m   x  l0 small / medium / big
+#     attn_out     16k / 65k / 262k        x  l0 small / medium / big
+#     mlp_out      16k / 65k / 262k        x  l0 small / medium / big
+#     transcoder   16k / 65k / 262k        x  l0 {small,medium,big} x {plain,_affine}
+#     crosscoder   spans layers 9_17_22_29, widths 65k/262k/524k/1m
+# resid_post and transcoder at this layer also ship examples.safetensors.
+#
+# COST vs LAYER 33: e2e KL loses the cheap head-only path (student =
+# lm_head(norm(recon))). At layer 22 a KL run needs a spliced second forward
+# through the remaining 11 blocks. This does NOT affect an MSE-only run, which
+# is what to train here first.
+#
+# PAIRED WITH THE LAYER 33 DUMP: same sources, same caps, same seed, and
+# geoae.extract streams each source round-robin with no shuffle, so the document
+# ORDER is deterministic. Rows 0..7,860,950 of this dump should therefore be the
+# same tokens as the whole layer 33 dump, making layer 22 vs 33 a token-for-token
+# paired comparison over that prefix, with any extra rows as a bonus for layer 22.
+# Verify from meta.json: n_docs should be >= 34,785 and the domain mix should
+# still read ~17/21/22/21/19 (web/wiki/code/math/pile).
+#
+# EXHAUSTION — 10M MAY NOT BE REACHABLE. The layer 33 run requested 8M and
+# stopped at 7,860,951 with "Sources exhausted", and it did so ABRUPTLY: the
+# domain mix held steady at 17/21/22/21/19 right up to the final log line, so no
+# single source dried up gradually. stream_docs() only ends early when ALL five
+# iterators have raised StopIteration (geoae/extract.py:84), which for c4 +
+# wikipedia + pile simultaneously points at the HF streaming session dropping,
+# not at a real end of data. So this run may stop near ~7.9M again, or may run
+# further if that was transient. Either outcome is safe: the .npy is preallocated
+# at the full 10M rows and trim_npy() shrinks it in place on early stop, so the
+# unused space is returned and no trailing zero rows reach validation.
+#
+# STORAGE DTYPE — float32 is MANDATORY, same as at layer 33. Gemma 3 has
+# massive-activation channels that blow past the fp16 ceiling of 65,504 (dim 443
+# at layer 33 on 85% of tokens; 12B had dim 2339). The offending channel index
+# may differ at layer 22, but the family trait does not, and geoae.extract
+# rejects bfloat16 outright. No probe run is needed since fp32 cannot overflow.
+#
+# DISK: d=2560 x float32 = 10.24 GB per 1M tokens per layer.
+#  10M -> 102 GB.  179 GB free on 2026-08-23, so ~77 GB remains after this run.
+# The full 102 GB is preallocated up front, before any tokens are seen; if the
+# sources exhaust early the file is trimmed and the difference comes back.
+# geoae.extract preflights free space and aborts BEFORE loading the model.
+#
+# meta.json IS OVERWRITTEN per extraction run. Back up the layer 33 one first:
+#   cp activations_gemma3_4b/meta.json activations_gemma3_4b/meta_layer33.json
+# (this mirrors the meta_layer47.json convention used for the 12B dump).
+#
+# ARCHITECTURE: loads as Gemma3ForConditionalGeneration; the text decoder is at
+# lm.model.language_model, NOT lm.model.layers, and hidden_size must come from
+# lm_arch.hidden_size(model) — see the layer 33 config for the full trap.
+#
+#   python -u -m geoae.extract --config configs/base/gemma3-4b_l22_extract.yaml
+
+extraction:
+  model_name: "google/gemma-3-4b-pt"
+  layers: [22]
+  target_layer: 22              # never read by any code; kept consistent with data.target_layer
+  hidden_size: 2560             # checked against the loaded model; mismatch = hard fail
+  n_tokens: 10000000            # 10M requested; see the EXHAUSTION note in the header
+  dtype: "float32"              # MANDATORY — see header
+  max_doc_tokens: 256
+  skip_leading: 4
+  activations_dir: "activations_gemma3_4b"
+  log_every: 200
+
+data:
+  activations_dir: "activations_gemma3_4b"
+  target_layer: 22
+  batch_size: 2048
+  val_frac: 0.05
+
+model:
+  hidden_size: 2560
+  latent_dim: 2560
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean

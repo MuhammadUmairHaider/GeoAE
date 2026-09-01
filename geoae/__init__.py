@@ -13,7 +13,15 @@ from geoae.config import (
     ModelConfig,
     TrainConfig,
 )
+from geoae.hf_auth import ensure_hf_login
 from geoae.model import AEOutput, GeoAE
+
+# Resolve an HF token once, at import, so gated checkpoints (Gemma 3, Llama)
+# work from every entry point — including the many that build an AutoTokenizer
+# before touching load_lm. Quiet and offline: it only exports HF_TOKEN from an
+# already-present env var, a git-ignored token file, or an `hf auth login`
+# credential. No token found is a no-op; load_lm still raises its GATED_HINT.
+ensure_hf_login(verbose=False)
 
 __version__ = "0.1.0"
 
@@ -27,6 +35,7 @@ __all__ = [
     "ModelConfig",
     "TrainConfig",
     "__version__",
+    "ensure_hf_login",
 ]
 
 # Backward-compatible alias (GeoSepAE was the research codebase name)

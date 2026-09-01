@@ -38,6 +38,45 @@ def tau_schedule(epoch: int, cfg: Config) -> float:
     return tc.tau_start + (tc.tau_end - tc.tau_start) * min(progress, 1.0)
 
 
+def zipf_alpha_schedule(epoch: int, cfg: Config) -> float:
+    """
+    Zipf exponent for the current epoch, annealed 0 -> zipf_alpha_end over the
+    same window as `tau_schedule`.
+
+    Returns 0.0 for balance="uniform", which makes the prior exactly uniform, so
+    a run with the defaults is unaffected. Starting at 0 matters: the Zipf masses
+    are matched to clusters by current usage, and applying a heavy tail from
+    step 1 would just amplify whichever cluster happened to win at init.
+    """
+    tc, tr = cfg.loss, cfg.train
+    if tc.balance != "zipf":
+        return 0.0
+    if epoch < tr.full_loss_start_epoch:
+        return tc.zipf_alpha_start
+    progress = (epoch - tr.full_loss_start_epoch) / max(
+        tr.n_epochs - tr.full_loss_start_epoch, 1
+    )
+    return tc.zipf_alpha_start + (tc.zipf_alpha_end - tc.zipf_alpha_start) * min(progress, 1.0)
+
+
+def geometry_schedule(epoch: int, cfg: Config) -> tuple[float, float, float]:
+    """
+    Returns (lambda_var, lambda_cov, lambda_unif) for the current epoch.
+
+    Gated by `train.geometry_start_epoch`, which defaults to 0 — meaning the
+    geometry terms are live from the first step, exactly as before. Set it above
+    1 to get an explicit reconstruction-only warmup before VICReg engages, e.g.
+    epochs 1-5 recon only, 6-10 recon + VICReg, 11+ everything.
+
+    Note this is a separate gate from `lambda_schedule`: cluster/sep and the
+    geometry terms are phased independently.
+    """
+    lc, tr = cfg.loss, cfg.train
+    if epoch < getattr(tr, "geometry_start_epoch", 0):
+        return 0.0, 0.0, 0.0
+    return lc.lambda_var, lc.lambda_cov, lc.lambda_unif
+
+
 def lambda_schedule(epoch: int, cfg: Config) -> tuple[float, float]:
     """
     Returns (lambda_cluster, lambda_sep) for the current epoch.
@@ -71,10 +110,15 @@ def build_model(cfg: Config, device: torch.device, no_sinkhorn: bool = False) ->
         n_clusters=cfg.model.n_clusters,
         ema_decay=cfg.train.ema_decay,
         sinkhorn_iters=cfg.loss.sinkhorn_iters,
+        balance=cfg.loss.balance,
+        balance_rho=cfg.loss.balance_rho,
+        balance_eta=cfg.loss.balance_eta,
+        zipf_alpha=cfg.loss.zipf_alpha_start,
         tau=cfg.loss.tau_start,
         nonlinearity=cfg.model.nonlinearity,
         metric=cfg.model.metric,
         ema_hard=cfg.train.ema_hard,
+        latent_norm=getattr(cfg.model, "latent_norm", "none"),
     ).to(device)
     if no_sinkhorn:
         model.use_sinkhorn = False
@@ -125,12 +169,27 @@ def add_override_args(ap) -> None:
     ap.add_argument("--no_sep", action="store_true",
                     help="Disable separation loss (set lambda_sep=0)")
     ap.add_argument("--lambda_sep", type=float, default=None, help="Override lambda_sep")
+    ap.add_argument("--balance", default=None, choices=["uniform", "zipf"],
+                    help="Override loss.balance (column-marginal target shape)")
+    ap.add_argument("--balance_rho", type=float, default=None,
+                    help="Override loss.balance_rho (1=hard Sinkhorn, 0=softmax)")
+    ap.add_argument("--balance_eta", type=float, default=None,
+                    help="Override loss.balance_eta (<1 carries the column dual across batches)")
+    ap.add_argument("--zipf_alpha", type=float, default=None,
+                    help="Override loss.zipf_alpha_end")
+    ap.add_argument("--geometry_start_epoch", type=int, default=None,
+                    help="Epoch at which var/cov/unif switch on (0 = from step 1)")
     ap.add_argument("--no_sinkhorn", action="store_true",
                     help="Disable Sinkhorn balanced assignment (use softmax instead)")
     ap.add_argument("--no_renorm", action="store_true",
                     help="Disable decoder unit-norm renormalisation (diagnostic)")
     ap.add_argument("--semisup_cap", type=int, default=None,
                     help="semisup init: max labeled samples/class for class-mean centroids")
+    ap.add_argument("--activations_dir", default=None, help="Override data.activations_dir")
+    ap.add_argument("--n_epochs", type=int, default=None,
+                    help="Override train.n_epochs. Also rescales the tau anneal, which "
+                         "runs full_loss_start_epoch..n_epochs — lowering it reaches "
+                         "tau_end sooner.")
 
 
 def apply_overrides(cfg: Config, args) -> None:
@@ -166,6 +225,20 @@ def apply_overrides(cfg: Config, args) -> None:
         cfg.loss.lambda_sep = 0.0
     if opt("lambda_mse") is not None:
         cfg.loss.lambda_mse = args.lambda_mse
+    if opt("balance") is not None:
+        cfg.loss.balance = args.balance
+    if opt("balance_rho") is not None:
+        cfg.loss.balance_rho = args.balance_rho
+    if opt("balance_eta") is not None:
+        cfg.loss.balance_eta = args.balance_eta
+    if opt("zipf_alpha") is not None:
+        cfg.loss.zipf_alpha_end = args.zipf_alpha
+    if opt("geometry_start_epoch") is not None:
+        cfg.train.geometry_start_epoch = args.geometry_start_epoch
+    if opt("activations_dir") is not None:
+        cfg.data.activations_dir = args.activations_dir
+    if opt("n_epochs") is not None:
+        cfg.train.n_epochs = args.n_epochs
 
 
 # ---------------------------------------------------------------------------
@@ -238,9 +311,11 @@ def reinit_dead_clusters(
     their centroids to latents from high-reconstruction-loss samples.
     Returns number of clusters reinitialised.
     """
-    K = model.n_clusters
     u = model.ema_cluster_size / model.ema_cluster_size.sum()
-    dead_mask = u < (threshold_factor / K)
+    # Threshold is relative to each cluster's TARGET share, not a flat 1/K, so it
+    # stays correct under a non-uniform (Zipf) prior. Reduces to threshold/K when
+    # the target is uniform, i.e. unchanged for every existing config.
+    dead_mask = u < (threshold_factor * model.target_usage())
     n_dead = int(dead_mask.sum().item())
     if n_dead == 0:
         return 0

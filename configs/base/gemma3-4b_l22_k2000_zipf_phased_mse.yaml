@@ -1,0 +1,67 @@
+# Gemma-3-4B-pt layer 22, K=2000, GELU — MSE-only, ZIPF BALANCING + EXPLICIT PHASES.
+#
+# Derived from gemma3-4b_l22_mse_only.yaml by changing only:
+#   loss.balance / balance_rho / balance_eta / zipf_alpha_*   (balancing)
+#   train.recon_only_epochs / geometry_start_epoch /
+#   train.clustering_start_epoch / full_loss_start_epoch      (phases)
+#   train.checkpoints_dir
+# Everything else — lambdas, lr, batch size, latent dim, ema, seed — is identical,
+# so a diff against the parent run isolates the two changes.
+#
+# PHASES
+#   epochs  1-5   reconstruction only       (MSE alone)
+#   epochs  6-10  reconstruction + VICReg   (var/cov on, clustering still off)
+#   epochs 11+    everything                (cluster on; sep, tau and alpha ramp)
+#
+#   uv run python -u -m geoae.train \
+#     --config configs/base/gemma3-4b_l22_k2000_zipf_phased_mse.yaml \
+#     2>&1 | tee logs/gemma3_4b_l22_k2000_zipf_phased_mse.log
+
+extraction:
+  model_name: "google/gemma-3-4b-pt"
+
+data:
+  activations_dir: "activations_gemma3_4b"
+  target_layer: 22
+  batch_size: 4096          # no LM in the loop, so this can be large
+  val_frac: 0.05
+
+model:
+  hidden_size: 2560
+  latent_dim: 2560
+  n_clusters: 2000
+  nonlinearity: gelu        # as at 12B/L47 and 4B/L33
+  metric: euclidean
+
+loss:
+  lambda_cluster: 0.02378
+  lambda_sep: 0.000503
+  lambda_var: 0.09873
+  lambda_cov: 0.001008
+  lambda_unif: 0.0          # cosine/uniformity geometry is a documented dead end
+  lambda_usage: 0.05        # unused (Sinkhorn balances Q by construction)
+  # --- generalised balancing (opt-in; rho=1/eta=1/uniform reproduce sinkhorn_log) ---
+  balance: "zipf"            # power-law column target instead of a flat one
+  balance_rho: 0.6           # apply 60% of the column correction, not all of it
+  balance_eta: 0.05          # carry the column dual across ~20 batches
+  zipf_alpha_start: 0.0      # annealed from 0 so the ranking reflects learned usage
+  zipf_alpha_end: 0.5        # measured fit on Llama L27 latents was alpha = 0.46
+
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  lr: 1.0e-4
+  recon_only_epochs: 10        # no cluster loss until epoch 11
+  geometry_start_epoch: 6      # epochs 6-10: + VICReg, clustering still off
+  clustering_start_epoch: 11   # epochs 11+: + cluster loss, kmeans++ seed
+  full_loss_start_epoch: 11    # sep ramps from 0; tau and alpha anneal from here
+  ema_decay: 0.9
+  ema_hard: true
+  centroid_init: "kmeans++"
+  checkpoints_dir: "checkpoints/gemma3-4B/layer22/k2000_zipf_phased_mse"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

@@ -35,20 +35,7 @@ from __future__ import annotations
 from torch import Tensor
 
 from geoae.hooks import SplicingHook
-
-
-def locate_lm_parts(lm):
-    """Return (base, layers, final_norm, lm_head) for Llama/Qwen-style models."""
-    base = getattr(lm, "model", None)
-    if base is None or not hasattr(base, "layers"):
-        raise AttributeError(
-            "Expected `lm.model.layers`; unsupported architecture for e2e logits."
-        )
-    final_norm = getattr(base, "norm", None)
-    lm_head = getattr(lm, "lm_head", None)
-    if final_norm is None or lm_head is None:
-        raise AttributeError("Expected `lm.model.norm` and `lm.lm_head`.")
-    return base, base.layers, final_norm, lm_head
+from geoae.lm_arch import locate_lm_parts  # noqa: F401  (re-exported for callers)
 
 
 class LogitsComputer:

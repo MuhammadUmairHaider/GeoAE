@@ -1,0 +1,79 @@
+# MSE-ONLY control run — Gemma 3 12B PT, layer 47. The question this answers:
+# does reconstruction alone produce a usable latent, or does it drift toward the
+# trivial solution?
+#
+# WHY IT MIGHT NOT: this architecture has NEITHER of the two things that make an
+# SAE's reconstruction task hard.
+#   * No bottleneck — latent_dim 3840 == hidden_size 3840.
+#   * No sparsity  — there is no L0/L1/TopK term anywhere in geoae.losses; the
+#                    only L1 is usage_loss on cluster occupancy, unused here.
+# Gemma Scope's JumpReLU SAEs get their structure from `||x-x_hat||^2 + λ·L0` on
+# an OVERCOMPLETE dictionary. Strip the sparsity and widen to square, and
+# near-identity is an excellent MSE solution with a structureless latent. So a
+# high FVE here is NOT success — it is the expected failure mode. Watch whether
+# the clusters carry anything, not whether the MSE is low.
+#
+# CONTROLLED AGAINST e2e/checkpoints/general/gemma3-12B/layer47/
+# kl_k2000_vicreg_10M_mse030 (val_mse 0.0809, val_kl 0.0268 @ ep50). Same layer,
+# same dump, same 9.33M train rows, same architecture, same geometry lambdas,
+# same 50 epochs. The ONLY difference is the faithfulness term: MSE vs KL.
+#
+# GEOMETRY WEIGHTS BITE ~4x HARDER HERE than in the e2e run, at identical lambda
+# values. From the gradient audit at the e2e checkpoint (||grad|| unweighted):
+#   kl 0.678 | mse 0.135 | cluster 0.175 | sep 0.334 | var 0.032 | cov 17.95
+# The faithfulness term carries weight 1 in both pipelines, but MSE's gradient is
+# 5x weaker than KL's — so with lambda_cluster 0.05 / sep 0.005 / var 0.3 /
+# cov 0.001 the geometry goes from ~5% of the update under KL to ~22% under MSE.
+# That is kept deliberately: this run tests "the same recipe with MSE swapped
+# in". To isolate the faithfulness term with geometry pressure held equal
+# instead, divide the four geometry lambdas by ~5.
+#
+# DATA: reads the FULL 141 GB dump directly — no subset copy. ActivationBuffer
+# applies MADV_RANDOM to the mapping, which removes the kernel readahead
+# amplification on 15 KB rows: measured on this exact file, cold unsorted random
+# reads go from 83 rows/s (default) to 75,232 rows/s. An epoch of 9.33M rows is
+# ~2 min of I/O, not hours. Do NOT cap max_train_rows for speed.
+#
+#   python -u -m geoae.train --config configs/base/gemma3-12b_l47_mse_only.yaml \
+#     --no_sinkhorn
+
+extraction:
+  model_name: "google/gemma-3-12b-pt"
+
+data:
+  activations_dir: "activations_gemma3_12b"   # same dump the e2e run used
+  target_layer: 47
+  batch_size: 4096          # no LM in the loop, so this can be large
+  val_frac: 0.05            # -> 9.33M train / 491k val, identical to the e2e run
+
+model:
+  hidden_size: 3840
+  latent_dim: 3840          # square, as in the e2e run — the point of the control
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
+
+loss:
+  lambda_cluster: 0.05      # identical to the e2e run
+  lambda_sep: 0.005
+  lambda_var: 0.3           # VICReg variance hinge — the anti-identity pressure
+  lambda_cov: 0.001         # VICReg covariance — anti low-rank collapse
+  lambda_unif: 0.0
+  lambda_usage: 0.05        # unused (Sinkhorn balances Q by construction)
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50              # matches the e2e run's epoch count
+  lr: 1.0e-4                # base default; MSE in z-space is well scaled
+  recon_only_epochs: 2
+  clustering_start_epoch: 3
+  full_loss_start_epoch: 6
+  ema_decay: 0.9
+  ema_hard: true
+  centroid_init: "kmeans++"
+  checkpoints_dir: "checkpoints/gemma3-12B/layer47/mse_only_k2000"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

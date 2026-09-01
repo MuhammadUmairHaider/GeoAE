@@ -1,0 +1,85 @@
+# Llama-3.2-3B layer 27 (final block), K=2000, GELU.
+#
+# Two changes against kl_gelu_k2000_vicreg_linear, both opt-in and both leaving
+# every previous code path untouched:
+#
+# 1. GENERALISED BALANCING.  sinkhorn_log enforces a UNIFORM column marginal.
+#    Measured on this checkpoint's own latents over 1M tokens, natural usage
+#    follows a mild power law (alpha = 0.46, R^2 0.77); KL(actual || prior) is
+#    0.295 against uniform but 0.033 against alpha=0.5. The uniform target also
+#    costs 43% of tokens their nearest centroid at B=2048 and drops the rank
+#    correlation between trained and populated clusters from 0.66 to 0.17.
+#      balance_rho 0.6  — apply 60% of the column correction, not all of it
+#      balance_eta 0.05 — carry the column dual across ~20 batches
+#      zipf_alpha  0.5  — annealed from 0 so the ranking reflects learned usage
+#    balance_rho=1 / balance_eta=1 / balance="uniform" reproduce sinkhorn_log
+#    bit-for-bit, so this file is the only thing that changes behaviour.
+#
+# 2. EXPLICIT PHASES.  geometry_start_epoch gates var/cov/unif independently of
+#    lambda_schedule's cluster/sep gate:
+#      epochs  1-5   reconstruction only        (KL + MSE anchor)
+#      epochs  6-10  reconstruction + VICReg    (var/cov on, no clustering)
+#      epochs 11+    everything                 (cluster, then sep ramps in)
+#
+# NOTE ON A BUG THIS DEPENDS ON: before this change, geoae/e2e/train.py never
+# passed lambda_var/lambda_cov/lambda_unif to total_loss_e2e, which defaults
+# them to 0.0 — so every checkpoint trained by that file ran with VICReg OFF
+# regardless of what its config said. That call site is now fixed. Runs from
+# this config are therefore NOT comparable to earlier "vicreg" checkpoints.
+#
+#   python -u -m geoae.e2e.train \
+#     --config configs/e2e/general/llama3.2-3B/layer27/kl_gelu_k2000_balance_phased.yaml \
+#     2>&1 | tee logs/l27_k2000_balance_phased.log
+
+extraction:
+  model_name: "meta-llama/Llama-3.2-3B"
+
+data:
+  activations_dir: "activations_diverse_10M"
+  target_layer: 27
+  batch_size: 2048
+  val_frac: 0.05
+
+model:
+  hidden_size: 3072
+  latent_dim: 3072
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
+
+loss:
+  lambda_cluster: 0.05
+  lambda_sep: 0.005
+  lambda_mse: 0.1
+  lambda_var: 0.3              # now actually applied — see note above
+  lambda_cov: 0.001
+  lambda_unif: 0.0             # euclidean run: uniformity is for the cosine geometry
+  lambda_usage: 0.05           # unused by the e2e loss; config parity
+
+  balance: "zipf"
+  balance_rho: 0.6
+  balance_eta: 0.05
+  zipf_alpha_start: 0.0
+  zipf_alpha_end: 0.5
+
+  sinkhorn_iters: 3
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  lr: 1.0e-4
+  recon_only_epochs: 10        # no cluster loss until epoch 11 (lambda_schedule gate)
+  geometry_start_epoch: 6      # epochs 6-10 : + VICReg (var/cov), clustering still off
+  clustering_start_epoch: 11   # epochs 11+   : + cluster loss, centroids kmeans++ seeded
+  full_loss_start_epoch: 11    # sep ramps from 0; tau and zipf_alpha anneal from here
+  ema_decay: 0.9
+  ema_hard: true
+  teacher_mode: "onfly"        # layer 27 is the last block: teacher = lm_head(norm(x)) in-loop.
+                               # Caching is not an option here — 9.8M tokens x 128k vocab = 3 TB.
+  centroid_init: "kmeans++"
+  checkpoints_dir: "e2e/checkpoints/general/llama3.2-3B/layer27/kl_gelu_k2000_balance_phased"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

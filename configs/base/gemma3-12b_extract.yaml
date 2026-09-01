@@ -1,0 +1,94 @@
+# Activation extraction — Gemma 3 12B PT, FINAL layer only, deep token budget.
+#
+# WHY LAYER 47 ONLY: float32 is mandatory here (see DTYPE below), which doubles
+# the per-token cost to 15.4 GB per 1M tokens per layer. That forces a trade
+# between depth coverage and token count; this file takes tokens. One layer at
+# 10M = 154 GB, mirroring the existing activations_diverse_10M Llama dump, and
+# 10M rows is enough to train the MSE base pipeline (geoae.train) directly on
+# these activations rather than only computing norm stats from them.
+#
+# Layer 47 is the final decoder layer, the only one where e2e KL keeps the cheap
+# head-only path (student = lm_head(norm(recon)), no spliced second forward)
+# that every Llama and Qwen run in this repo used — the like-for-like
+# continuation of those results.
+#
+# WHAT THIS COSTS: the Gemma Scope 2 SAE suite trains its `resid_post` subsets
+# at only four depths — 25/50/65/85% = layers 12, 24, 31, 41 of 48 — each with
+# 13 SAEs (16k/65k/262k/1m x L0 small/medium/big, plus a 262k-medium second seed
+# for run-to-run variance). Layer 47 is NOT one of them: it has no `resid_post`
+# SAEs at all, only the four in `resid_post_all` (16k/262k x small/big). So this
+# dump buys tokens and cheap training at the price of SAE-comparison breadth.
+#
+# To get the subset layers later, extract them separately, e.g.
+#   python -u -m geoae.extract --config configs/base/gemma3-12b_extract.yaml \
+#     --layers 24 41 --n_tokens 3000000        # 92 GB
+# That REWRITES meta.json to describe only that pass — copy the old one aside
+# first if you want to keep this run's provenance. Training configs for layers
+# 12/24/31/41 already exist under configs/e2e/general/gemma3-12B/ and each
+# carries a PREREQ banner saying it needs its own extraction.
+#
+# MODEL: google/gemma-3-12b-pt is GATED — accept the licence on the model page
+# and `hf auth login` (or export HF_TOKEN) first, else load_lm raises with
+# instructions. It loads as Gemma3ForConditionalGeneration (multimodal); the
+# vision tower is dropped at load and the text decoder is found via
+# geoae.lm_arch, so `lm.model.layers` is never assumed.
+#
+# DTYPE — float32 is MANDATORY for Gemma 3, do not "optimise" this back to
+# float16. Measured on the 2026-08-11 fp16 run (9.83M tokens, layers 24/41/47):
+# dimension 2339 is a massive-activation channel with median |x| ~ 53,760, and
+# it exceeds the float16 ceiling of 65,504 on 15.7% of tokens at layer 24 and
+# ~98% at layers 41/47. Stored as fp16 those became inf, so mean/std came back
+# inf/nan and the whole 226 GB dump was unusable. Every OTHER dim peaks at
+# ~10,560 and would have been fine — it is one channel that forces fp32.
+# bfloat16 would have the range and half the size, but numpy's .npy format
+# cannot round-trip a third-party bfloat16 dtype (it serialises as opaque |V2|),
+# so fp32 is the only safe option here.
+# geoae.extract now aborts within seconds of the first overflow rather than at
+# the end of the run.
+#
+# DISK: 3840 dims x float32 = 15.4 GB per 1M tokens per layer. Against ~277 GB
+# available (66 GB free + 211 GB reclaimed by deleting the poisoned fp16 dump):
+#   1 layer  fp32: 10M -> 154 GB (123 GB spare)   18M -> 277 GB (ceiling)
+#   3 layers fp32:  3M -> 138 GB    5M -> 230 GB    10M -> 461 GB (does NOT fit)
+# geoae.extract preflights free space and aborts BEFORE loading the model,
+# printing the largest budget that fits.
+#
+# TIME: the failed fp16 run measured 2,263 tok/s (per-doc forward, 3 layers
+# hooked), so 10M tokens is roughly 70-75 min. Hooking fewer layers barely
+# changes this — the cost is the forward pass, not the capture.
+#
+# Sizing note: this dump is NOT the training corpus for the e2e runs.
+#   * geoae.e2e.train_stream reads it ONLY for per-dim norm mean/std
+#     (--norm_sample 500k default) — the corpus itself is re-streamed in-loop.
+#   * fit_baseline_kmeans / clustering_quality sample ~1M rows.
+# So a few M tokens is ample for the KL runs, and 10M only earns its disk if you
+# intend to run the MSE base pipeline (geoae.train), which trains on these rows
+# directly. For that, cut `layers` to the single layer you are training on
+# (10M x 1 layer = 77 GB, matching the existing activations_diverse_10M).
+#
+#   python -u -m geoae.extract --config configs/base/gemma3-12b_extract.yaml
+
+extraction:
+  model_name: "google/gemma-3-12b-pt"
+  layers: [47]          # final decoder layer only — see WHY LAYER 47 ONLY above
+  target_layer: 47      # never read by any code; kept consistent with data.target_layer
+  hidden_size: 3840             # checked against the loaded model; mismatch = hard fail
+  n_tokens: 10000000
+  dtype: "float32"              # REQUIRED: dim 2339 overflows fp16 — see header
+  max_doc_tokens: 256
+  skip_leading: 4
+  activations_dir: "activations_gemma3_12b"
+  log_every: 200
+
+data:
+  activations_dir: "activations_gemma3_12b"
+  target_layer: 47    # read by geoae.train — must name a layer in `layers` above
+  batch_size: 2048
+  val_frac: 0.05
+
+model:
+  hidden_size: 3840
+  latent_dim: 3840
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
