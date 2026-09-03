@@ -1,0 +1,91 @@
+# Llama-3.2-3B L27 KL — K=8000 ARM.  Parent: kl_gelu_k2000_balance_phased.
+#
+# WHY LARGER K.  Judged over 1867 clusters (2026-09-02), quality is worst exactly
+# where the tokens are: the parent KL run\x27s top 10% of clusters hold 26.6% of all
+# tokens and score word-intrusion 0.349, while its bottom 50% hold 28.7% and score
+# 0.420. The oversized head clusters are grab-bags — the largest holds 2.80% of
+# tokens and is explained as "prepositions or conjunctions" over tokens that are
+# nothing of the sort. Smaller clusters score better, so splitting the head is the
+# targeted fix. Headroom is real here: 0.35 against a 1.0 ceiling, unlike semantic
+# coherence where 96% of clusters already sit at 4-5 on a 1-5 scale.
+#
+# WHY B AND K SCALE TOGETHER.  Sinkhorn\x27s column marginal is B/K; at the parent\x27s
+# batch_size 2048 a K of 8000 would target 0.26 points per cluster per batch, which
+# is degenerate. B and K are both multiplied by 4, so B/K stays at 1.02 — IDENTICAL
+# to the parent — and K is the only variable that moves. lr scales by sqrt(4).
+# reinit_every and diag_every are divided by 4 to hold the TOKEN interval fixed
+# (1139 steps/epoch here vs 4556 in the parent).
+#
+# WHY NOT A BIGGER BATCH.  The e2e path holds a frozen LM and materialises
+# (B, 128256) logits for BOTH teacher and student: 3.9 GB fp32 each at B=8192,
+# 15.7 GB each at B=32768. The MSE track\x27s 32768 does not fit here.
+#
+# WHY THE KL TRACK AND NOT MSE.  On the only metric with headroom, KL beats the
+# encoder-free control (word intrusion 0.397 vs 0.371, +2.3 SE) while the MSE
+# b32k run LOSES to it (0.344, -2.4 SE). Token-weighted the gap widens: KL 0.400
+# vs MSE 0.314.
+#
+# HOW TO READ THE RESULT — this is the point of the design:
+#   token-weighted intrusion RISES  -> the head genuinely split into coherent pieces
+#   only the CLUSTER-AVERAGE rises  -> just feature-split tail debris, no real gain
+# Judge with: python -m geoae.interp.llm_judge <closest_tokens.json> and read the
+# "token-weighted" block. Run balanced k-means at K=8000 as the matched control.
+#
+#   uv run python -u -m geoae.e2e.train \\
+#     --config configs/e2e/general/llama3.2-3B/layer27/kl_k8000_balance_phased.yaml \\
+#     | tee logs/kl_k8000_balance_phased.log
+
+extraction:
+  model_name: "meta-llama/Llama-3.2-3B"
+
+data:
+  activations_dir: "activations_diverse_10M"
+  target_layer: 27
+  batch_size: 8192
+  val_frac: 0.05
+
+model:
+  hidden_size: 3072
+  latent_dim: 3072
+  n_clusters: 8000
+  nonlinearity: gelu
+  metric: euclidean
+
+loss:
+  lambda_cluster: 0.05
+  lambda_sep: 0.005
+  lambda_mse: 0.1
+  lambda_var: 0.3              # now actually applied — see note above
+  lambda_cov: 0.001
+  lambda_unif: 0.0             # euclidean run: uniformity is for the cosine geometry
+  lambda_usage: 0.05           # unused by the e2e loss; config parity
+
+  balance: "zipf"
+  balance_rho: 0.6
+  balance_eta: 0.05
+  zipf_alpha_start: 0.0
+  zipf_alpha_end: 0.5
+
+  sinkhorn_iters: 3
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  lr: 2.0e-4
+  recon_only_epochs: 10        # no cluster loss until epoch 11 (lambda_schedule gate)
+  geometry_start_epoch: 6      # epochs 6-10 : + VICReg (var/cov), clustering still off
+  clustering_start_epoch: 11   # epochs 11+   : + cluster loss, centroids kmeans++ seeded
+  full_loss_start_epoch: 11    # sep ramps from 0; tau and zipf_alpha anneal from here
+  ema_decay: 0.9
+  ema_hard: true
+  teacher_mode: "onfly"        # layer 27 is the last block: teacher = lm_head(norm(x)) in-loop.
+                               # Caching is not an option here — 9.8M tokens x 128k vocab = 3 TB.
+  centroid_init: "kmeans++"
+  checkpoints_dir: "e2e/checkpoints/general/llama3.2-3B/layer27/kl_k8000_balance_phased"
+  save_every: 1
+  keep_checkpoints: 40
+  diag_every: 25
+  reinit_every: 250
+  seed: 42
+  wandb_project: "geosep-general-e2e"

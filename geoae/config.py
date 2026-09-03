@@ -96,8 +96,16 @@ class TrainConfig:
     save_every: int = 1              # save checkpoint every N epochs
     keep_checkpoints: int = 3        # keep last N + best-by-val-recon
 
-    centroid_init: str = "kmeans++"   # "kmeans++" | "semisup" | "class_means"
+    centroid_init: str = "kmeans++"   # "kmeans++" | "semisup" | "class_means" | "seeded"
     semisup_cap: int = 500            # semisup init: max labeled samples/class for class-mean centroids
+    # --- "seeded" init: labelled anchors + density x coverage fill -----------
+    anchor_cache: str = "cache"       # concept-cache dir; MUST match target_layer
+    anchor_per_class: int = 25        # labelled examples averaged per anchor (5-100)
+    anchor_min_examples: int = 5      # skip classes with fewer than this
+    anchor_rungs: str = ""            # comma list; empty = every rung in the cache
+    density_power: float = 1.0        # 0 = pure coverage (k-means++), 1 = balanced
+    reinit_mode: str = "loss"         # "loss" (highest-recon-error) | "anchor" | "density"
+                                      #   anchor: unused LABELLED points first, then D^2
     teacher_mode: str = "cached"      # e2e only: "cached" (precomputed logits) |
                                       # "onfly" (teacher = head(norm(x)) in-loop, no cache)
     checkpoints_dir: str = "checkpoints"

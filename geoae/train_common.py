@@ -305,6 +305,8 @@ def reinit_dead_clusters(
     x_batch: torch.Tensor,
     x_hat_batch: torch.Tensor,
     threshold_factor: float = 0.1,
+    mode: str = "loss",
+    anchor_pool=None,
 ) -> int:
     """
     Identify dead clusters (usage < threshold_factor/K) and reinitialise
@@ -318,11 +320,49 @@ def reinit_dead_clusters(
     dead_mask = u < (threshold_factor * model.target_usage())
     n_dead = int(dead_mask.sum().item())
     if n_dead == 0:
-        return 0
+        return (0, 0) if mode == "anchor" else 0
 
-    # Rank batch samples by reconstruction loss (highest = most informative)
-    per_sample_loss = (x_hat_batch - x_batch).pow(2).mean(dim=1)  # (B,)
-    _, top_idx = per_sample_loss.topk(min(n_dead, len(per_sample_loss)))
+    if mode == "anchor" and anchor_pool is not None:
+        # PRIORITY 1: unused LABELLED points. Exhaust the supervised signal
+        # before falling back to any heuristic — a labelled example is a known
+        # mode, whereas both D^2 sampling and highest-reconstruction-loss pick
+        # whatever is furthest out, i.e. outliers.
+        live = (~dead_mask).nonzero(as_tuple=True)[0]
+        z_a, keys = anchor_pool.take(model, n_dead, model.centroids[live])
+        n_from_anchor = 0 if z_a is None else len(z_a)
+        if n_from_anchor < n_dead:
+            # PRIORITY 2: pool exhausted -> D^2 sampling over the batch, the
+            # k-means++ rule, applied probabilistically rather than greedily.
+            need = n_dead - n_from_anchor
+            d2 = torch.cdist(z_batch, model.centroids[live]).min(1).values.pow(2)
+            p = d2 / d2.sum().clamp_min(1e-12)
+            extra = z_batch[torch.multinomial(p, min(need, len(z_batch)))]
+            replacement_latents = extra if z_a is None else torch.cat([z_a, extra])
+        else:
+            replacement_latents = z_a
+        dead_indices = dead_mask.nonzero(as_tuple=True)[0]
+        for i, k in enumerate(dead_indices[:len(replacement_latents)]):
+            model.centroids[k].copy_(replacement_latents[i])
+            model.ema_cluster_size[k] = 1.0
+        return n_dead, n_from_anchor
+
+    if mode == "density":
+        # Highest-reconstruction-loss samples are close to a DEFINITION of an
+        # outlier, so the default rule reseeds dead clusters onto exactly the
+        # points least likely to anchor a mode -- which is why churn never
+        # settles. Score by local density x distance-to-nearest-live-centroid
+        # instead: dense enough to be a real mode, far enough to be a new one.
+        from geoae.seeded_init import local_density
+        with torch.no_grad():
+            dens = local_density(z_batch, seed=0)
+            dens = dens / dens.median().clamp_min(1e-9)
+            live = (~dead_mask).nonzero(as_tuple=True)[0]
+            d2 = torch.cdist(z_batch, model.centroids[live]).min(1).values.pow(2)
+            _, top_idx = (dens * d2).topk(min(n_dead, len(z_batch)))
+    else:
+        # Rank batch samples by reconstruction loss (highest = most informative)
+        per_sample_loss = (x_hat_batch - x_batch).pow(2).mean(dim=1)  # (B,)
+        _, top_idx = per_sample_loss.topk(min(n_dead, len(per_sample_loss)))
     replacement_latents = z_batch[top_idx]  # (n_dead, L)
 
     dead_indices = dead_mask.nonzero(as_tuple=True)[0]

@@ -56,6 +56,18 @@ LADDER = [
     ("topic4",        "topic4.npz",         "label",       "sequence", "AG News"),
     ("topic14",       "topic14.npz",        "label",       "sequence", "DBpedia-14"),
     ("topic20",       "topic20.npz",        "label",       "sequence", "20 Newsgroups"),
+    # --- MIB benchmark rungs (geoae.interp.benchmark_cache) ------------------
+    # RAVEL: one entity token, three INDEPENDENT attributes. Scoring high on one
+    # while low on another is disentanglement, which single-label purity cannot see.
+    ("ravel_country",   "ravel.npz", "Country",   "token", "RAVEL entity attribute"),
+    ("ravel_continent", "ravel.npz", "Continent", "token", "RAVEL entity attribute"),
+    ("ravel_language",  "ravel.npz", "Language",  "token", "RAVEL entity attribute"),
+    # IOI: role is positional, and every NAME appears in every role, so token
+    # identity carries no information about it. ioi_name is the paired control —
+    # it IS token identity, so a merely lexical clustering scores high there and
+    # low on ioi_role. Read the two together, never ioi_role alone.
+    ("ioi_role",        "ioi.npz",   "role",      "token", "IOI S1/IO/S2 position"),
+    ("ioi_name",        "ioi.npz",   "name",      "token", "IOI name identity (lexical control)"),
 ]
 
 POS_COARSE = {
@@ -146,6 +158,18 @@ def main():
         cands = [("balanced kmeans (no enc)", "e2e/checkpoints/general/llama3.2-3B/layer27/balanced_kmeans_k2000.npz"),
                  ("plain kmeans", "e2e/checkpoints/general/llama3.2-3B/layer27/baseline_kmeans_k2000_refit.npz")]
         specs += [(n, p, "km") for n, p in cands if os.path.exists(p)]
+    elif args.baselines:
+        # Explicit name=path.npz list. Without this branch a non-"auto" value
+        # silently added NO baseline and the run reported the AE alone — which
+        # is the one comparison that cannot answer anything, since the whole
+        # question is AE vs encoder-free control.
+        for s in args.baselines.split(","):
+            if not s:
+                continue
+            n, pth = s.split("=", 1)
+            if not os.path.exists(pth):
+                raise SystemExit(f"[probe] baseline not found: {pth}")
+            specs.append((n, pth, "km"))
 
     models = {}
     for name, path, kind in specs:
@@ -181,6 +205,21 @@ def main():
                 continue
             row = "".join(f"{res[rung][n][metric]:>14.4f}" for n in names)
             print(f"{rung:<16}{grain:<10}{row}")
+
+        # TOKEN vs SEQUENCE aggregate. These two groups move independently and
+        # often in OPPOSITE directions -- the AE is fit on token activations, so
+        # token rungs are where the training signal lives and sequence rungs are
+        # extrapolation. A single grand mean over the ladder hides that entirely,
+        # so it is never reported on its own.
+        print(f"{'-' * (26 + 14 * len(names))}")
+        for grp in ("token", "sequence"):
+            vals = [[res[r][n][metric] for r in res
+                     if dict((x[0], x[3]) for x in LADDER).get(r) == grp] for n in names]
+            if not vals[0]:
+                continue
+            row = "".join(f"{sum(v) / len(v):>14.4f}" for v in vals)
+            print(f"{'MEAN ' + grp.upper():<16}{'(' + str(len(vals[0])) + ' rungs)':<10}{row}")
+
     if args.out:
         json.dump(res, open(args.out, "w"), indent=2)
         print(f"\n[probe] wrote {args.out}")

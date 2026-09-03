@@ -14,9 +14,21 @@ from torch import Tensor
 @torch.no_grad()
 def cluster_usage(Q_history: list[Tensor], n_clusters: int) -> Tensor:
     """
-    u_k = mean over all batches in Q_history of Q[:, k].
-    Returns (K,) tensor.
+    u_k = mean over all batches in Q_history of Q[:, k].  Returns (K,).
+
+    Accepts EITHER form of history entry:
+      (B, K) full soft-assignment matrices, or
+      (K,)   that batch's column means.
+
+    The second is what the training loops now store, and it is exact rather than
+    an approximation: with equal-sized batches (drop_last=True) the mean of the
+    per-batch column means equals the mean over all rows. It matters because the
+    full form scales with BATCH SIZE — at batch 32768, K=2000, a 200-entry
+    history is 52 GB of host RAM and OOM-kills the run, while the means form is
+    1.6 MB.
     """
+    if Q_history and Q_history[0].dim() == 1:
+        return torch.stack(Q_history, dim=0).mean(dim=0)   # (K,)
     stacked = torch.cat(Q_history, dim=0)   # (N_total, K)
     return stacked.mean(dim=0)              # (K,)
 

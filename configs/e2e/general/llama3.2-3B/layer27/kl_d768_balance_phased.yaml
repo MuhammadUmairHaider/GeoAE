@@ -1,0 +1,81 @@
+# Llama-3.2-3B L27 KL — BOTTLENECK ARM, latent 768 vs hidden 3072 (ratio 0.25).
+# Parent: kl_gelu_k2000_balance_phased.  SOLE CHANGE: latent_dim 3072 -> 768.
+#
+# WHY.  EVERY llama L27 run in this repo has had latent_dim >= hidden_size (3072/3072
+# or 6144/3072); the only sub-1.0 ratio in configs/ is default.yaml, which nothing was
+# trained from. There is no sparsity term either — losses.py\x27s l1_loss is on cluster
+# USAGE, not the latent. The code says so itself at losses.py:358: "with latent_dim ==
+# hidden_size and no sparsity term, reconstruction alone is minimised by drifting
+# toward identity". The b32k MSE run duly landed at FVE 0.969 with effective rank
+# 165/6144 — a near-invertible reparameterisation.
+#
+# So every "the encoder adds nothing over balanced k-means" result so far has been
+# measured on an encoder that was never required to discard anything. This arm forces
+# it to: 768 dims cannot carry 3072, so the encoder must choose what to keep.
+#
+# NOT AN SAE. No TopK, no JumpReLU, no L1 on the latent — a plain dense bottleneck,
+# deliberately, so the change is one variable against the parent.
+#
+# WHAT TO WATCH.  FVE should fall well below 0.9 (if it does not, the bottleneck is
+# not binding and 768 is still too wide — try 384). Then judge on TOKEN-WEIGHTED word
+# intrusion against balanced k-means, NOT on semantic coherence: 96% of clusters score
+# 4-5 on that 1-5 scale in every arm measured, so it cannot show an improvement.
+#
+#   uv run python -u -m geoae.e2e.train \\
+#     --config configs/e2e/general/llama3.2-3B/layer27/kl_d768_balance_phased.yaml \\
+#     | tee logs/kl_d768_balance_phased.log
+
+extraction:
+  model_name: "meta-llama/Llama-3.2-3B"
+
+data:
+  activations_dir: "activations_diverse_10M"
+  target_layer: 27
+  batch_size: 2048
+  val_frac: 0.05
+
+model:
+  hidden_size: 3072
+  latent_dim: 768
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
+
+loss:
+  lambda_cluster: 0.05
+  lambda_sep: 0.005
+  lambda_mse: 0.1
+  lambda_var: 0.3              # now actually applied — see note above
+  lambda_cov: 0.001
+  lambda_unif: 0.0             # euclidean run: uniformity is for the cosine geometry
+  lambda_usage: 0.05           # unused by the e2e loss; config parity
+
+  balance: "zipf"
+  balance_rho: 0.6
+  balance_eta: 0.05
+  zipf_alpha_start: 0.0
+  zipf_alpha_end: 0.5
+
+  sinkhorn_iters: 3
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  lr: 1.0e-4
+  recon_only_epochs: 10        # no cluster loss until epoch 11 (lambda_schedule gate)
+  geometry_start_epoch: 6      # epochs 6-10 : + VICReg (var/cov), clustering still off
+  clustering_start_epoch: 11   # epochs 11+   : + cluster loss, centroids kmeans++ seeded
+  full_loss_start_epoch: 11    # sep ramps from 0; tau and zipf_alpha anneal from here
+  ema_decay: 0.9
+  ema_hard: true
+  teacher_mode: "onfly"        # layer 27 is the last block: teacher = lm_head(norm(x)) in-loop.
+                               # Caching is not an option here — 9.8M tokens x 128k vocab = 3 TB.
+  centroid_init: "kmeans++"
+  checkpoints_dir: "e2e/checkpoints/general/llama3.2-3B/layer27/kl_d768_balance_phased"
+  save_every: 1
+  keep_checkpoints: 40
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

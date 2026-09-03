@@ -1,0 +1,108 @@
+# Llama-3.2-3B L27, K=2000 — BN + hinge sep, batch 32768, latent 6144.
+# SOLE CHANGE FROM llama3.2-3b_l27_k2000_bnh_b32k_lam1_d6144: lambda_cov 0.01 -> 0.1.
+#
+# WHY. The parent run finished 2026-09-02 (50 epochs, val_mse 0.03215, FVE 0.969)
+# with the best geometry this project has recorded — silhouette +0.0303 against a
+# previous best of +0.0118, Dunn 0.1178, separability 194.0, 0 empty clusters —
+# but with EFFECTIVE RANK 165.0 of a possible 1999 on the centroids, WORSE than
+# both the B=4096 parent (337.1) and raw k-means (567.8), on a latent twice as wide.
+#
+# THE COVARIANCE TERM IS 52x ABOVE ITS FLOOR. Measured on the final checkpoint
+# over 32768 real tokens:
+#
+#     cov on real z                                  9.84   (training logged 10.10)
+#     cov, independent noise, std 1.0, same shape    0.19   <- achievable floor
+#     cov, independent noise at the actual std 0.81  0.08
+#
+# So cov ~10 is NOT what the term simply reads at d=6144 summing 6144^2 off-diagonal
+# entries; matched for dimension, batch and per-dim scale, decorrelated data scores
+# 0.19. lambda_cov 0.01 is not touching the redundancy.
+#
+# IT IS A COVARIANCE FAILURE, NOT A VARIANCE FAILURE — do not raise lambda_var.
+# Per-dim std on the final model: p1 0.7606, p50 0.8091, p99 0.9556, and ZERO dims
+# below 0.1. Nothing is dead. The logged var 0.181 is every dimension sitting
+# uniformly at ~0.81 against the target 1.0, so raising lambda_var would rescale
+# the latent and change no structure. The redundancy is in the correlation tail:
+#
+#     mean |r| 0.0314    p99 |r| 0.2508    max |r| 0.9953
+#
+# Some dimension pairs are 99.5% correlated. That is exactly how a per-dim variance
+# hinge is satisfiable without spending dimensions: duplicate a few directions across
+# many. Effective rank (squared-SV, clustering_quality's definition) is 545.9/6144
+# on z and 165.0/1999 on centroids — both ~9%.
+#
+# SIZING. At 0.01 the term is 0.098 of the 0.596 total loss (16%). The 0.001 -> 0.01
+# step pulled cov 76.6 -> ~10, about a decade per decade of lambda, so 0.1 targets
+# cov ~1-2 and a term worth 0.1-0.2 — comparable to cluster loss at 0.26, influential
+# without dominating. If recon degrades badly, 0.05 is the conservative fallback.
+#
+# WHAT TO WATCH, and what NOT to read:
+#   - cov should fall below ~3 by epoch 20. If it is still ~10, 0.1 is also too weak.
+#   - effective rank is NOT logged during training; check it from a checkpoint with
+#     geoae.interp.clustering_quality, or SVD the centroids with SQUARED singular
+#     values (unsquared gives a much more permissive number: 605.8 vs 165.0).
+#   - the W&B cluster/dying and eff_K panels come from Sinkhorn Q and showed none of
+#     the parent's real mid-training collapse. For true usage read ema_cluster_size
+#     out of a checkpoint.
+#   - do NOT judge cluster health before epoch ~40: the parent oscillated between
+#     healthy and 83%-in-one-cluster over epochs 15-30 and self-resolved by 31.
+#
+#   uv run python -u -m geoae.train \
+#     --config configs/base/llama3.2-3b_l27_k2000_bnh_b32k_lam1_d6144_cov01.yaml \
+#     | tee logs/llama_l27_bnh_b32k_lam1_d6144_cov01.log
+
+extraction:
+  model_name: "meta-llama/Llama-3.2-3B"   # metadata only — no LM is loaded here
+
+data:
+  activations_dir: "activations_diverse_10M"
+  target_layer: 27
+  batch_size: 32768         # B/K = 16.4
+  val_frac: 0.05            # -> 9.33M train / 491k val, same split as the parent
+
+model:
+  hidden_size: 3072
+  latent_dim: 6144
+  latent_norm: "batch"      # BatchNorm1d between encoder linear and GELU
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
+
+loss:
+  lambda_cluster: 1.0
+  lambda_sep: 0.3           # live under sep_mode: hinge; ramps 0 -> 0.3 across 11..50
+  sep_mode: "hinge"         # relu(margin*r_intra - d)^2; median mode is scale-free/inert
+  sep_margin: 2.0
+  lambda_var: 1.0           # NOT raised — see header, no dims are dead
+  lambda_cov: 0.1           # <<< THE CHANGE: 0.01 -> 0.1, cov measured 52x above floor
+  lambda_unif: 0.0
+  lambda_usage: 0.05        # unused by total_loss; config parity
+  lambda_mse: 0.0           # unused here — total_loss carries MSE at weight 1.0
+
+  balance: "zipf"
+  balance_rho: 0.6
+  balance_eta: 0.05
+  zipf_alpha_start: 0.0
+  zipf_alpha_end: 0.5
+
+  sinkhorn_iters: 3
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  lr: 2.8e-4
+  recon_only_epochs: 10
+  geometry_start_epoch: 6
+  clustering_start_epoch: 11
+  full_loss_start_epoch: 11
+  ema_decay: 0.9
+  ema_hard: true
+  centroid_init: "kmeans++"
+  checkpoints_dir: "checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_cov01"
+  diag_every: 12
+  reinit_every: 125
+  save_every: 1
+  keep_checkpoints: 40      # keeps epochs 11-50, the whole post-clustering trajectory
+  seed: 42
+  wandb_project: "geosep-general-e2e"

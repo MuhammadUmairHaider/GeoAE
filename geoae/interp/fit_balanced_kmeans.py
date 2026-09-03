@@ -57,13 +57,24 @@ def kmeanspp_init(X: torch.Tensor, K: int, seed: int, chunk: int = 4096) -> torc
     N = X.shape[0]
     first = int(torch.randint(N, (1,), generator=g).item())
     cent = [X[first]]
-    d2 = ((X - cent[0]) ** 2).sum(1)
+    # ||x - c||^2 = ||x||^2 - 2 x.c + ||c||^2. The naive ((X - c)**2).sum(1)
+    # materialises an (N, D) temporary EVERY iteration -- 2.4 GB at N=200k,
+    # D=3072 -- and there are K-1 = 1999 iterations. Expanding it turns each
+    # step into a matvec over the precomputed squared norms, which is ~2 orders
+    # of magnitude less memory traffic and leaves the result mathematically
+    # identical (float rounding aside; this is a seeding step).
+    Xsq = (X * X).sum(1)
+
+    def _d2_to(c):
+        return (Xsq - 2.0 * (X @ c) + (c * c).sum()).clamp_min_(0)
+
+    d2 = _d2_to(cent[0])
     for _ in tqdm(range(1, K), desc="kmeans++ init", leave=False):
         p = (d2 / d2.sum().clamp_min(1e-12)).cpu()
         nxt = int(torch.multinomial(p, 1, generator=g).item())
         c = X[nxt]
         cent.append(c)
-        d2 = torch.minimum(d2, ((X - c) ** 2).sum(1))
+        d2 = torch.minimum(d2, _d2_to(c))
     return torch.stack(cent)
 
 

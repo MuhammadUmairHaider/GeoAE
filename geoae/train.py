@@ -192,6 +192,7 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
 
     global_step = 0
     Q_history: list[torch.Tensor] = []
+    anchor_pool = None          # populated by the "seeded" init; drives reinit_mode "anchor"
 
     # ------------------------------------------------------------------
     # Training loop
@@ -213,6 +214,29 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
                 detail = "≤500/class" if cap else "full train split"
                 print(f"[train] Epoch {epoch}: {init_mode} init of {model.n_clusters} "
                       f"centroids (per-class mean latent, {detail})")
+            elif init_mode == "seeded":
+                # Labelled anchors + density x coverage fill. k-means++ samples
+                # proportional to D^2, which chases OUTLIERS; on DBpedia-14 that
+                # cost ~38 points of purity against a few-shot labelled seeding.
+                from geoae.seeded_init import seeded_init
+                init_batch = next(iter(train_loader)).to(device)
+                with torch.no_grad():
+                    z_pool = model.encoder(init_batch)
+                rungs = [r for r in cfg.train.anchor_rungs.split(",") if r] or None
+                C, names, anchor_pool = seeded_init(
+                    model, cfg.train.anchor_cache, train_buf.mean, train_buf.std,
+                    device, z_pool, per_class=cfg.train.anchor_per_class,
+                    min_examples=cfg.train.anchor_min_examples, rungs=rungs,
+                    density_power=cfg.train.density_power, seed=cfg.train.seed,
+                )
+                model.init_centroids_from_class_means(C)
+                n_anchor = sum(1 for n in names if not n.startswith("fill::"))
+                print(f"[train]   anchor pool: {len(anchor_pool):,} unused labelled "
+                      f"examples held for reinit")
+                print(f"[train] Epoch {epoch}: seeded init — {n_anchor} labelled anchors "
+                      f"(<={cfg.train.anchor_per_class}/class from {cfg.train.anchor_cache}) "
+                      f"+ {model.n_clusters - n_anchor} density x coverage fill "
+                      f"(density_power={cfg.train.density_power})")
             else:
                 # Default: k-means++ from unlabeled batch
                 init_batch = next(iter(train_loader)).to(device)
@@ -271,7 +295,11 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
                 model.update_centroids_ema(out.z.detach(), out.Q.detach())
 
             # Track Q history for usage diagnostics
-            Q_history.append(out.Q.detach().cpu())
+            # Store only this batch's column MEANS (K,), not the full
+            # (B, K) matrix: cluster_usage needs nothing else, and the
+            # full form costs 262 MB/entry at batch 32768 -> 52 GB for the
+            # 200-entry window, which OOM-killed a run.
+            Q_history.append(out.Q.detach().mean(dim=0).cpu())
             if len(Q_history) > 200:
                 Q_history = Q_history[-200:]
 
@@ -325,11 +353,16 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
             # Dead cluster reinit
             # ----------------------------------------------------------
             if global_step % cfg.train.reinit_every == 0:
-                n_reinit = reinit_dead_clusters(
-                    model, out.z.detach(), x.detach(), out.x_hat.detach()
+                r = reinit_dead_clusters(
+                    model, out.z.detach(), x.detach(), out.x_hat.detach(),
+                    mode=cfg.train.reinit_mode, anchor_pool=anchor_pool,
                 )
+                n_reinit, n_anch = r if isinstance(r, tuple) else (r, 0)
                 if n_reinit > 0:
-                    print(f"  [reinit] step {global_step}: reinitialised {n_reinit} dead clusters")
+                    src = (f" ({n_anch} from labelled anchors, {n_reinit - n_anch} from D^2; "
+                           f"{len(anchor_pool):,} anchors left)"
+                           if cfg.train.reinit_mode == "anchor" and anchor_pool is not None else "")
+                    print(f"  [reinit] step {global_step}: reinitialised {n_reinit} dead clusters{src}")
                     if logger is not None:
                         logger.log({"cluster/reinit_count": n_reinit}, step=global_step)
 
@@ -373,7 +406,7 @@ def main():
                              "page cache: cold random reads on a >RAM dump run ~300 "
                              "rows/s vs ~108k warm, so an over-RAM split is I/O bound.")
     parser.add_argument("--centroid_init", default=None,
-                        choices=["kmeans++", "semisup", "class_means"],
+                        choices=["kmeans++", "semisup", "class_means", "seeded"],
                         help="Centroid init: kmeans++ (unsup), semisup (per-class mean "
                              "latent, ≤500/class), class_means (exact per-class mean, full split)")
     add_override_args(parser)

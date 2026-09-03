@@ -385,7 +385,11 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
             if bool(model.centroids_initialized.item()):
                 model.update_centroids_ema(out.z.detach(), out.Q.detach())
 
-            Q_history.append(out.Q.detach().cpu())
+            # Store only this batch's column MEANS (K,), not the full
+            # (B, K) matrix: cluster_usage needs nothing else, and the
+            # full form costs 262 MB/entry at batch 32768 -> 52 GB for the
+            # 200-entry window, which OOM-killed a run.
+            Q_history.append(out.Q.detach().mean(dim=0).cpu())
             if len(Q_history) > 200:
                 Q_history = Q_history[-200:]
             global_step += 1

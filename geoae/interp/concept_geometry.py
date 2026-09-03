@@ -46,6 +46,8 @@ import numpy as np
 import torch
 from matplotlib.lines import Line2D
 from sklearn.decomposition import PCA
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.manifold import TSNE
 
 from geoae.checkpoint import load_ae_checkpoint
@@ -132,6 +134,23 @@ def do_rung(rung, cache, models, dev, outdir, n_points, perplexity, max_classes,
     print(f"[geo] {rung}: {len(H):,} points, {len(classes)} classes ({grain})")
 
     reps = [(nm, repr_of(H, k, o, dev)) for nm, (k, o) in models.items()]
+
+    # kNN label agreement, computed in the REPRESENTATION (not the 2-D embedding).
+    # t-SNE panels cannot be compared to each other by eye — each has its own
+    # arbitrary rotation, scale and layout — so every panel is labelled with a
+    # number that IS comparable. PCA-50 first so the score is measured in the same
+    # way for a 3072-d baseline and a 6144-d latent.
+    knn = {}
+    for nm, R in reps:
+        Rp = PCA(n_components=min(50, R.shape[1]), random_state=0).fit_transform(R)
+        tr, te = train_test_split(np.arange(len(Rp)), test_size=0.4,
+                                  random_state=0, stratify=y)
+        km_ = KNeighborsClassifier(n_neighbors=10).fit(Rp[tr], y[tr])
+        knn[nm] = float(km_.score(Rp[te], y[te]))
+    order = sorted(knn, key=lambda k: -knn[k])
+    print("[geo]   kNN-10 label agreement: " +
+          "  ".join(f"{k} {knn[k]:.3f}" for k in order))
+    reps = [(f"{nm}\nkNN {knn[nm]:.3f}", R) for nm, R in reps]
 
     # ---- PCA -------------------------------------------------------------
     pcas, varexp = [], {}
@@ -236,13 +255,30 @@ def main():
     ap.add_argument("--perplexity", type=int, default=30)
     ap.add_argument("--max_classes", type=int, default=8)
     ap.add_argument("--projections", default="tsne,pca,umap,variance,centroids")
+    ap.add_argument("--models", default="auto",
+                    help="'auto', or name=path.pt,name2=path2.pt — AE checkpoints, "
+                         "in the order you want the panels drawn")
+    ap.add_argument("--baselines", default="auto",
+                    help="'auto', or name=path.npz,... — encoder-free controls")
     args = ap.parse_args()
 
     style()
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     out = Path(args.outdir); out.mkdir(parents=True, exist_ok=True)
+    spec = []
+    if args.models == "auto" and args.baselines == "auto":
+        spec = list(MODELS)
+    else:
+        if args.models != "auto":
+            spec += [(s.split("=", 1)[0], "ae", s.split("=", 1)[1])
+                     for s in args.models.split(",") if s]
+        if args.baselines == "auto":
+            spec += [(n, k, pth) for n, k, pth in MODELS if k == "km"]
+        else:
+            spec += [(s.split("=", 1)[0], "km", s.split("=", 1)[1])
+                     for s in args.baselines.split(",") if s]
     models = {}
-    for nm, kind, path in MODELS:
+    for nm, kind, path in spec:
         if not Path(path).exists():
             print(f"[geo] skip {nm} (missing)"); continue
         if kind == "ae":
