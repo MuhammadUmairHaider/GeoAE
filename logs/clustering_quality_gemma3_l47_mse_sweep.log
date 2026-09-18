@@ -1,0 +1,46 @@
+[seed] seed=0 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+
+[quality] Loading AE: e2e/checkpoints/general/gemma3-12B/layer47/kl_k2000_vicreg_10M/best_val.pt
+[quality] Computing metrics for: AE 3840→3840→3840 (gelu, K=2000)
+    silhouette … -0.0495
+    davies-bouldin … 5.4980
+    calinski-harabasz … 48.5
+    dunn index … 0.103141
+    separability ratio … 63.6261
+
+[quality] Loading AE: e2e/checkpoints/general/gemma3-12B/layer47/kl_k2000_vicreg_10M_mse015/best_val.pt
+[quality] Computing metrics for: AE 3840→3840→3840 (gelu, K=2000)
+    silhouette … -0.0452
+    davies-bouldin … 5.3974
+    calinski-harabasz … 40.4
+    dunn index … 0.118455
+    separability ratio … 59.1564
+
+[quality] Loading AE: e2e/checkpoints/general/gemma3-12B/layer47/kl_k2000_vicreg_10M_mse030/best_val.pt
+[quality] Computing metrics for: AE 3840→3840→3840 (gelu, K=2000)
+    silhouette … -0.0490
+    davies-bouldin … 5.4820
+    calinski-harabasz … 34.9
+    dunn index … 0.128419
+    separability ratio … 55.7362
+
+============================================================================================================================================
+  Metric                          AE 3840→3840→3840 (gelu, K=2000)    AE 3840→3840→3840 (gelu, K=2000)    AE 3840→3840→3840 (gelu, K=2000)
+--------------------------------------------------------------------------------------------------------------------------------------------
+  Silhouette ↑                                           -0.0495                             -0.0452 *                           -0.0490  
+  Davies-Bouldin ↓                                        5.4980                              5.3974 *                            5.4820  
+  Calinski-Harabasz ↑                                       48.5 *                              40.4                                34.9  
+  Dunn Index ↑                                          0.103141                            0.118455                            0.128419 *
+  Separability Ratio ↑                                   63.6261 *                           59.1564                             55.7362  
+  Inter-centroid Dist ↑                                  32.5377                             34.7767                             38.8496 *
+  Min Centroid Dist ↑                                     4.6751                              6.6378 *                            6.4242  
+  Intra-cluster Var ↓                                     0.2858 *                            0.3703                              0.5145  
+  Cluster Balance H ↑                                     0.9839 *                            0.9797                              0.9797  
+  Empty Clusters ↓                                             1 *                                27                                  18  
+  Effective K ↑                                             1985 *                              1920                                1929  
+  Effective Rank ↑                                         58.86                              130.34                              163.66 *
+  Assignment Entropy                                      0.0783                              0.0704                              0.0611  
+============================================================================================================================================
+  * = best value for that metric
+
+[quality] Full results saved → clustering_quality_comparison.json

@@ -1,0 +1,48 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[data] train split capped 9,334,729 -> 500,000 rows (5 GB working set)
+[lambda] layer 22  latent_dim=2560  K=2000  nonlinearity=gelu  metric=euclidean
+
+=== phase: init (random encoder, var/cov live from step 1) ===
+term             value   |grad_enc|    /recon  cos(recon)
+recon           1.4409     0.063144         1      +1.000
+var            0.40594     0.027761    0.4396      -0.675
+cov            0.31491      0.21366     3.383      +0.422
+latent std: min=0.544 med=0.593 max=0.666 | dims below the gamma=1.0 hinge: 2560/2560 (100.0%)
+effective rank of z: 1595.4 / 2560
+
+[lambda] recon-only warmup: 400 steps @ batch 4096 …
+/home/exouser/RepresentationAE/GeoAE/geoae/lambda_balance.py:257: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /__w/pytorch/pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:822.)
+  print(f"  step {step+1:>5}  mse {float(l):.5f}")
+  step   100  mse 0.79623
+  step   200  mse 0.55692
+  step   300  mse 0.42782
+  step   400  mse 0.35153
+[lambda] k-means++ init of 2000 centroids from 4096 warmed latents
+
+=== phase: warm (post-warmup, centroids live — where cluster/sep switch on) ===
+term             value   |grad_enc|    /recon  cos(recon)
+recon          0.35004     0.012086         1      +1.000
+cluster        0.54105      0.12706     10.51      -0.054
+sep             0.3859        1.201     99.35      +0.001
+var            0.33161     0.030602     2.532      +0.148
+cov             1.6192       1.1991      99.2      -0.068
+latent std: min=0.615 med=0.667 max=0.746 | dims below the gamma=1.0 hinge: 2560/2560 (100.0%)
+effective rank of z: 1560.9 / 2560
+
+=== suggested lambdas  (lambda_T = share_T * |grad_recon| / |grad_T|) ===
+term        share  measured at       lambda
+cluster      0.25         warm      0.02378
+sep          0.05         warm    0.0005033
+var          0.25         init       0.5686
+cov          0.10         init      0.02956
+unif         0.00            -            0
+
+--- paste into the loss block ---
+  lambda_cluster: 0.02378
+  lambda_sep: 0.0005033
+  lambda_var: 0.5686
+  lambda_cov: 0.02956
+  lambda_unif: 0
+
+[lambda] wrote lambda_balance_gemma3_4b_l22.json

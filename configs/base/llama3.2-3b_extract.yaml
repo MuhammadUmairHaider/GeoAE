@@ -1,0 +1,29 @@
+# Llama-3.2-3B residual-stream extraction — reproduces activations_diverse_10M.
+#
+# Written 2026-09-18 from that dump's meta.json so it can be regenerated on NCSA
+# Delta instead of transferred. The 5-domain mix (c4 / wikipedia / codeparrot /
+# open-web-math / pile, ~2M tokens each) is hardcoded in geoae/extract.py, not
+# read from here, and the seed defaults to 42 — so these settings plus the same
+# code give the same dump. Original: 9,825,178 tokens from 43,722 docs, 1661 s
+# on one A100 40 GB.
+#
+#   L27 (every current run):
+#     python -u -m geoae.extract --config configs/base/llama3.2-3b_extract.yaml \
+#       --out_dir activations_diverse_10M
+#   L14 (the layer-14 track):
+#     python -u -m geoae.extract --config configs/base/llama3.2-3b_extract.yaml \
+#       --layers 14 --out_dir activations_diverse_10M_l14
+#
+# fp16 is safe for Llama at these layers (Gemma needs float32 — see its config).
+
+extraction:
+  model_name: "meta-llama/Llama-3.2-3B"
+  layers: [27]
+  target_layer: 27
+  hidden_size: 3072
+  n_tokens: 10000000
+  dtype: "float16"
+  max_doc_tokens: 256
+  skip_leading: 4
+  activations_dir: "activations_diverse_10M"
+  log_every: 200

@@ -1,0 +1,21 @@
+[judge] hard negatives from centroids of best_val.pt
+[judge] closest_tokens.json: 1976 clusters, provider=openrouter model=google/gemini-2.5-flash-lite
+
+=== closest_tokens.json ===
+
+  clusters scored      : 1867
+  monosemanticity 1-5  : mean 3.84  median 4.0
+  SEMANTIC coherence   : mean 4.36 ± 0.014   <- primary
+  GENERALITY 1-5       : mean 3.24 ± 0.016   <- breadth of the concept
+  coherence x generality: mean 14.24   (useful clusters need BOTH; narrow clusters are trivially coherent)
+  surface coherence    : mean 1.62   (repetition of the same string)
+  WORD INTRUSION acc   : 0.397 ± 0.008  (chance 0.167, lift +0.230)   <- behavioural
+  detection bal-acc    : mean 0.672
+  judge picked         : 6.4 of 12 items (TPR 0.70 / TNR 0.64)
+  DEGENERATE answers   : 127/1867 (picked all or none)
+  NULL floor           : mean 0.511
+  LIFT over null       : +0.161   <- the number that matters
+  concept level mix    : syntax 44%  semantics 28%  entity 15%  morphology 5%  mixed 4%  surface 2%  topic 1%  discourse 1%
+
+[judge] api calls 12368, cache hits 660
+[judge] wrote results/llm_judge_kl_balance_phased.json

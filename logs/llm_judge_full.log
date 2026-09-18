@@ -1,0 +1,35 @@
+[judge] hard negatives from centroids of step_0014200.pt
+[judge] closest_tokens_b32k_lam1_d6144.json: 1888 clusters, provider=openrouter model=google/gemini-2.5-flash-lite
+
+=== closest_tokens_b32k_lam1_d6144.json ===
+
+  clusters scored      : 1887
+  monosemanticity 1-5  : mean 4.10  median 4.0
+  SEMANTIC coherence   : mean 4.39 ± 0.015   <- primary
+  surface coherence    : mean 1.58   (repetition of the same string)
+  WORD INTRUSION acc   : 0.344 ± 0.008  (chance 0.167, lift +0.178)   <- behavioural
+  detection bal-acc    : mean 0.646
+  judge picked         : 7.0 of 12 items (TPR 0.73 / TNR 0.56)
+  DEGENERATE answers   : 135/1887 (picked all or none)
+  NULL floor           : mean 0.502
+  LIFT over null       : +0.144   <- the number that matters
+  concept level mix    : syntax 47%  semantics 22%  entity 19%  surface 4%  morphology 3%  mixed 2%  discourse 2%  topic 1%
+[judge] hard negatives from centroids of balanced_kmeans_k2000.npz
+[judge] ct_balanced_kmeans.json: 1983 clusters, provider=openrouter model=google/gemini-2.5-flash-lite
+
+=== ct_balanced_kmeans.json ===
+
+  clusters scored      : 1982
+  monosemanticity 1-5  : mean 3.90  median 4.0
+  SEMANTIC coherence   : mean 4.27 ± 0.014   <- primary
+  surface coherence    : mean 1.51   (repetition of the same string)
+  WORD INTRUSION acc   : 0.371 ± 0.008  (chance 0.167, lift +0.204)   <- behavioural
+  detection bal-acc    : mean 0.654
+  judge picked         : 6.4 of 12 items (TPR 0.69 / TNR 0.62)
+  DEGENERATE answers   : 86/1982 (picked all or none)
+  NULL floor           : mean 0.509
+  LIFT over null       : +0.145   <- the number that matters
+  concept level mix    : syntax 50%  semantics 23%  entity 16%  surface 3%  morphology 3%  mixed 3%  discourse 2%  topic 1%
+
+[judge] api calls 23432, cache hits 3647
+[judge] wrote results/llm_judge_full_ae_vs_balanced.json

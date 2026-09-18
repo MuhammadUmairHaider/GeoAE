@@ -42,11 +42,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import math
 from pathlib import Path
 
 import numpy as np
 import torch
+
 
 
 
@@ -175,11 +177,15 @@ def cluster_balance_entropy(labels: np.ndarray) -> tuple[float, float]:
     return float(H / max(H_max, 1e-10)), n_empty
 
 
+def row_entropy(Q: np.ndarray) -> np.ndarray:
+    """(B,) entropy of each row of a soft assignment matrix Q (B, K)."""
+    eps = 1e-10
+    return -(Q * np.log(Q + eps)).sum(axis=1)
+
+
 def assignment_entropy(Q: np.ndarray) -> float:
     """Mean row entropy of soft assignment matrix Q (B, K)."""
-    eps = 1e-10
-    H = -(Q * np.log(Q + eps)).sum(axis=1).mean()
-    return float(H)
+    return float(row_entropy(Q).mean())
 
 
 def effective_rank(centroids: np.ndarray) -> float:
@@ -208,6 +214,38 @@ def effective_k(labels: np.ndarray, K: int, threshold: float = 0.1) -> int:
 # Load latents for each mode
 # ---------------------------------------------------------------------------
 
+def read_rows(npy_path: Path, idx: np.ndarray) -> np.ndarray:
+    """
+    Rows `idx` of a 2-D .npy dump, read with preadv rather than through an mmap.
+
+    Indexing an np.load(mmap_mode="r") array maps page-cache pages into this
+    process, and on this kernel a fault maps whole cached folios around the
+    touched row — MADV_RANDOM does not stop it. Gathering 1M scattered rows from
+    the 60 GB L27 dump left 42.5 GB of the file mapped here at peak, on top of the
+    latents, which is the memory pressure that got the eval's tmux scope killed
+    by systemd-oomd. preadv copies exactly the bytes asked for; the page cache is
+    still used but never mapped. Values are byte-identical to mmap indexing.
+    """
+    mm = np.load(str(npy_path), mmap_mode="r")
+    if mm.ndim != 2 or not mm.flags.c_contiguous:
+        raise ValueError(f"{npy_path}: expected a C-ordered 2-D array")
+    dtype, D, offset = mm.dtype, mm.shape[1], int(mm.offset)
+    del mm
+    row = dtype.itemsize * D
+    out = np.empty((len(idx), D), dtype=dtype)
+    if len(idx) == 0:
+        return out                      # memoryview.cast rejects zero-size buffers
+    buf = memoryview(out).cast("B")
+    fd = os.open(str(npy_path), os.O_RDONLY)
+    try:
+        for j, i in enumerate(idx):
+            if os.preadv(fd, [buf[j * row:(j + 1) * row]], offset + int(i) * row) != row:
+                raise IOError(f"{npy_path}: short read at row {int(i)}")
+    finally:
+        os.close(fd)
+    return out
+
+
 def load_raw_baseline(
     baseline_npz: Path,
     act_dir: Path,
@@ -223,11 +261,11 @@ def load_raw_baseline(
     K = len(centroids)
 
     # Sample activations
-    mmap = np.load(str(act_dir / f"layer_{layer}.npy"), mmap_mode="r")
-    N = mmap.shape[0]
+    npy = act_dir / f"layer_{layer}.npy"
+    N = np.load(str(npy), mmap_mode="r").shape[0]
     rng = np.random.RandomState(seed)
     idx = np.sort(rng.choice(N, min(n_sample, N), replace=False))
-    sample = mmap[idx].astype(np.float32)
+    sample = read_rows(npy, idx).astype(np.float32)
     sample = (sample - norm_mean) / norm_std   # normalise
 
     # Hard k-means assignment (nearest centroid)
@@ -246,7 +284,18 @@ def load_ae_latents(
     seed: int,
     device: torch.device,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, str]:
-    """Returns (latents, hard_labels, soft_Q, centroids, label_str)."""
+    """Returns (latents, hard_labels, per_row_assignment_entropy, centroids, label_str).
+
+    Streams the sample: each batch is read from the mmap, normalised and encoded,
+    and written into preallocated outputs. The earlier version held the full
+    normalised input (11 GB at n=1M), a list of latent batches plus its
+    concatenated copy (2 x 23 GB at latent_dim 6144) and the full soft Q (7.5 GB)
+    at once — ~70 GB, which got the whole tmux scope killed by systemd-oomd once
+    the dump's page cache was also mapped in (see `read_rows`). Q was only ever used
+    for a mean row entropy, which is additive, so per-row entropies are kept
+    instead. Batches are the same 4096 sorted rows as before, so BatchNorm and
+    Sinkhorn see identical inputs and every metric is unchanged.
+    """
     from geoae.checkpoint import load_ae_checkpoint
     ae, _, _, ckpt = load_ae_checkpoint(ckpt_path, device)
     mc = ckpt["config"]["model"]
@@ -258,35 +307,34 @@ def load_ae_latents(
     K = mc["n_clusters"]
 
     # Sample activations
-    mmap = np.load(str(act_dir / f"layer_{layer_from_cfg}.npy"), mmap_mode="r")
-    N = mmap.shape[0]
+    npy = act_dir / f"layer_{layer_from_cfg}.npy"
+    N = np.load(str(npy), mmap_mode="r").shape[0]
     rng = np.random.RandomState(seed)
     idx = np.sort(rng.choice(N, min(n_sample, N), replace=False))
-    sample_np = mmap[idx].astype(np.float32)
-    sample_np = (sample_np - norm_mean) / norm_std
 
     # Encode in batches. Labels use nearest-centroid (dist2.argmin), matching the
     # k-means baseline's hard assignment — Sinkhorn Q.argmax would batch-balance
     # the labels by construction and depend on batch composition. Q is still
-    # collected for the assignment-entropy diagnostic.
+    # used for the assignment-entropy diagnostic.
     batch = 4096
-    z_list, Q_list, lab_list = [], [], []
+    n = len(idx)
+    z = np.empty((n, mc["latent_dim"]), dtype=np.float32)
+    labels = np.empty(n, dtype=np.int64)
+    H = np.empty(n, dtype=np.float32)
     with torch.no_grad():
-        for s in range(0, len(sample_np), batch):
-            x = torch.from_numpy(sample_np[s:s+batch]).to(device)
-            out = ae(x)
-            z_list.append(out.z.cpu().numpy())
-            Q_list.append(out.Q.cpu().numpy())
-            lab_list.append(out.dist2.argmin(dim=1).cpu().numpy())
+        for s in range(0, n, batch):
+            x_np = (read_rows(npy, idx[s:s+batch]).astype(np.float32) - norm_mean) / norm_std
+            out = ae(torch.from_numpy(x_np).to(device))
+            e = s + len(x_np)
+            z[s:e] = out.z.cpu().numpy()
+            H[s:e] = row_entropy(out.Q.cpu().numpy())
+            labels[s:e] = out.dist2.argmin(dim=1).cpu().numpy()
 
-    z = np.concatenate(z_list, axis=0)
-    Q = np.concatenate(Q_list, axis=0)
-    labels = np.concatenate(lab_list, axis=0)
     centroids = ae.centroids.cpu().numpy()
 
     label = (f"AE {mc['hidden_size']}→{mc['latent_dim']}→{mc['hidden_size']} "
              f"({nl}, K={K})")
-    return z, labels, Q, centroids, label
+    return z, labels, H, centroids, label
 
 
 # ---------------------------------------------------------------------------
@@ -320,6 +368,7 @@ def compute_metrics(
     centroids: np.ndarray,
     Q: np.ndarray | None = None,
     functional: dict | None = None,
+    assign_entropy: float | None = None,
 ) -> dict:
     K = centroids.shape[0]
     print("    silhouette …", end=" ", flush=True)
@@ -372,6 +421,8 @@ def compute_metrics(
     }
     if Q is not None:
         metrics["assignment_entropy"] = assignment_entropy(Q)
+    elif assign_entropy is not None:
+        metrics["assignment_entropy"] = assign_entropy
     if functional:
         metrics.update(functional)
     return metrics
@@ -498,14 +549,18 @@ def main():
     # --- AE variants ---
     for ckpt_path in args.checkpoints:
         print(f"\n[quality] Loading AE: {ckpt_path}")
-        z, labels, Q, centroids, label = load_ae_latents(
+        z, labels, H, centroids, label = load_ae_latents(
             Path(ckpt_path), act_dir, args.layer, args.n_sample, args.seed, device
         )
         if ri < len(args.names):
             label = args.names[ri]
         print(f"[quality] Computing metrics for: {label}")
         func = load_functional_metrics(results_paths[ri])
-        metrics = compute_metrics(z, labels, centroids, Q=Q, functional=func)
+        metrics = compute_metrics(z, labels, centroids, functional=func,
+                                  assign_entropy=float(H.mean()))
+        # Free this model's 23 GB of latents BEFORE the next one is encoded;
+        # rebinding `z` only releases it after the next load has finished.
+        del z, labels, H
         all_labels.append(label)
         all_metrics.append(metrics)
         ri += 1

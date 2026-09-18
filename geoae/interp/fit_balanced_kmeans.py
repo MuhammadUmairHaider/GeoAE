@@ -23,9 +23,19 @@ contributing nothing and the balancing is the whole story. If the AE still wins,
 the learned representation is doing real work. Either way it is decidable, which
 the plain baseline alone could not make it.
 
-The algorithm mirrors training (geoae/model.py + losses.sinkhorn_log): k-means++
-init, then minibatch steps of Sinkhorn assignment with an annealed temperature
-and a hard-EMA centroid update, plus reinit of starved centroids.
+The algorithm mirrors training (geoae/model.py + losses.sinkhorn_log): an init,
+then minibatch steps of Sinkhorn assignment with an annealed temperature and a
+hard-EMA centroid update, plus reinit of starved centroids.
+
+INIT AND REINIT MUST MATCH THE AE ARM BEING CONTROLLED FOR. The defaults
+(--init kmeans++ --reinit farthest) reproduce the original balanced baseline and
+are the control for every k-means++-initialised AE. Against a density-peaks AE
+(centroid_init: dpc, reinit_mode: peaks) that control is confounded a second
+time, now by init: if the dpc AE beats it, the init alone may be the cause. Use
+--init dpc --reinit peaks with the AE config's density settings, so the ONLY
+remaining difference is the encoder. Note the old reinit is farthest-first (the
+batch points furthest from every centroid), i.e. the outlier-seeking rule the
+peaks reinit replaces.
 
 Output .npz is byte-compatible with fit_baseline_kmeans, so closest_tokens
 --baseline_kmeans, clustering_quality and load_baseline_kmeans all accept it
@@ -37,6 +47,13 @@ Usage:
       --activations activations_diverse_10M/layer_27.npy \
       --n_clusters 2000 --n_sample 1500000 \
       --out e2e/checkpoints/general/llama3.2-3B/layer27/balanced_kmeans_k2000.npz
+
+    # density-peaks control for a centroid_init: dpc / reinit_mode: peaks AE
+    python -m geoae.interp.fit_balanced_kmeans \
+      --checkpoint checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_dpc/best_val.pt \
+      --activations activations_diverse_10M/layer_27.npy \
+      --n_clusters 2000 --n_sample 1500000 --init dpc --reinit peaks \
+      --out e2e/checkpoints/general/llama3.2-3B/layer27/balanced_kmeans_k2000_dpc.npz
 """
 from __future__ import annotations
 
@@ -48,6 +65,7 @@ import torch
 from tqdm import tqdm
 
 from geoae.losses import sinkhorn_log
+from geoae.seeded_init import density_peaks_select, format_peak_diag
 from geoae.seeding import seed_everything
 
 
@@ -107,6 +125,20 @@ def main():
                     help="Steps between reinit of starved centroids (0 disables).")
     ap.add_argument("--init_sample", type=int, default=200_000,
                     help="Points used for k-means++ init (full sample is too slow).")
+    ap.add_argument("--init", default="kmeans++", choices=["kmeans++", "dpc"],
+                    help="Centroid init. dpc = density peaks, matching centroid_init: dpc.")
+    ap.add_argument("--reinit", default="farthest", choices=["farthest", "peaks"],
+                    help="Starved-centroid reinit. farthest = batch points furthest from "
+                         "every centroid (original); peaks = matching reinit_mode: peaks.")
+    # Density-peaks settings. Names and defaults mirror TrainConfig, so a dpc AE
+    # config's values can be passed straight across.
+    ap.add_argument("--density_pool", type=int, default=32768,
+                    help="Points the dpc init selects from; delta is O(N^2) in this.")
+    ap.add_argument("--density_knn", type=int, default=32)
+    ap.add_argument("--density_power", type=float, default=1.0)
+    ap.add_argument("--peak_min_sep_frac", type=float, default=0.25)
+    ap.add_argument("--peak_refine_k", type=int, default=8)
+    ap.add_argument("--peak_reinit_pool", type=int, default=8192)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
@@ -138,9 +170,23 @@ def main():
                          "activation dump's dtype (fp16 overflows on large-magnitude layers).")
 
     X = torch.from_numpy(sample).to(dev)
-    init_n = min(args.init_sample, len(X))
-    print(f"[balanced-fit] k-means++ init on {init_n:,} points …")
-    C = kmeanspp_init(X[torch.randperm(len(X), device=dev)[:init_n]], args.n_clusters, args.seed)
+    if args.init == "dpc":
+        pool_n = min(args.density_pool, len(X))
+        print(f"[balanced-fit] density-peaks init on {pool_n:,} points "
+              f"(density_power={args.density_power}, knn={args.density_knn}) …")
+        pool = X[torch.randperm(len(X), device=dev)[:pool_n]]
+        C, diag = density_peaks_select(
+            pool, args.n_clusters, seed=args.seed, density_power=args.density_power,
+            min_sep_frac=args.peak_min_sep_frac, knn_k=args.density_knn,
+            refine_k=args.peak_refine_k,
+        )
+        C = C.clone()
+        print(f"[balanced-fit]   {format_peak_diag(diag)}")
+        del pool
+    else:
+        init_n = min(args.init_sample, len(X))
+        print(f"[balanced-fit] k-means++ init on {init_n:,} points …")
+        C = kmeanspp_init(X[torch.randperm(len(X), device=dev)[:init_n]], args.n_clusters, args.seed)
 
     ema_size = torch.zeros(args.n_clusters, device=dev)
     ema_sum = C.clone()
@@ -148,6 +194,7 @@ def main():
     total = args.epochs * steps_per_epoch
     print(f"[balanced-fit] {args.epochs} epochs x {steps_per_epoch} steps, batch {args.batch_size}")
     step = 0
+    n_reinit = 0
     for ep in range(args.epochs):
         perm = torch.randperm(len(X), device=dev)
         for s in tqdm(range(steps_per_epoch), desc=f"epoch {ep+1}/{args.epochs}", leave=False):
@@ -165,13 +212,27 @@ def main():
             if args.reinit_every and step and step % args.reinit_every == 0:
                 dead = ema_size < (0.1 * ema_size.mean())
                 if int(dead.sum()):
-                    far = b[torch.cdist(b, C).min(1).values.topk(int(dead.sum())).indices]
-                    C[dead] = far
+                    if args.reinit == "peaks":
+                        # Same rule as reinit_mode "peaks": batch density peaks,
+                        # with the live centroids as suppression centres.
+                        pool = b[:args.peak_reinit_pool]
+                        new, _ = density_peaks_select(
+                            pool, min(int(dead.sum()), len(pool)), C_init=C[~dead],
+                            seed=0, density_power=args.density_power,
+                            min_sep_frac=args.peak_min_sep_frac,
+                            knn_k=args.density_knn, refine_k=args.peak_refine_k,
+                        )
+                        dead = dead.nonzero(as_tuple=True)[0][:len(new)]
+                    else:
+                        new = b[torch.cdist(b, C).min(1).values.topk(int(dead.sum())).indices]
+                    n_reinit += len(new)
+                    C[dead] = new
                     ema_size[dead] = ema_size.mean()
-                    ema_sum[dead] = far * ema_size.mean()
+                    ema_sum[dead] = new * ema_size.mean()
             step += 1
         live, top10 = occupancy(X[:400_000], C)
-        print(f"  epoch {ep+1}: tau {tau:.3f} | live {live}/{args.n_clusters} | top-10 share {top10:.1%}")
+        print(f"  epoch {ep+1}: tau {tau:.3f} | live {live}/{args.n_clusters} | "
+              f"top-10 share {top10:.1%} | reinit so far {n_reinit}")
 
     live, top10 = occupancy(X[:1_000_000], C)
     print(f"[balanced-fit] Final on a {min(len(X),1_000_000):,}-token probe: "
@@ -181,7 +242,8 @@ def main():
     out.parent.mkdir(parents=True, exist_ok=True)
     np.savez(str(out), centroids=C.cpu().numpy().astype(np.float32),
              norm_mean=mean, norm_std=std, layer=layer,
-             n_clusters=args.n_clusters, model_name=model_name)
+             n_clusters=args.n_clusters, model_name=model_name,
+             init=args.init, reinit=args.reinit)
     print(f"[balanced-fit] Saved -> {out}")
 
 

@@ -1,0 +1,51 @@
+[judge] hard negatives from centroids of step_0014200.pt
+[judge] ct_ae_fullseq.json: 200 clusters, provider=openrouter model=google/gemini-2.5-flash-lite
+
+=== ct_ae_fullseq.json ===
+
+  clusters scored      : 200
+  monosemanticity 1-5  : mean 4.29  median 4.0
+  SEMANTIC coherence   : mean 4.48 ± 0.046   <- primary
+  surface coherence    : mean 1.39   (repetition of the same string)
+  WORD INTRUSION acc   : 0.318 ± 0.023  (chance 0.167, lift +0.152)   <- behavioural
+  detection bal-acc    : mean 0.630
+  judge picked         : 7.0 of 12 items (TPR 0.71 / TNR 0.55)
+  DEGENERATE answers   : 18/200 (picked all or none)
+  NULL floor           : mean 0.527
+  LIFT over null       : +0.103   <- the number that matters
+  concept level mix    : syntax 44%  semantics 25%  entity 12%  discourse 6%  topic 5%  surface 4%  mixed 2%  morphology 0%
+[judge] hard negatives from centroids of balanced_kmeans_k2000.npz
+[judge] ct_balanced_fullseq.json: 200 clusters, provider=openrouter model=google/gemini-2.5-flash-lite
+
+=== ct_balanced_fullseq.json ===
+
+  clusters scored      : 200
+  monosemanticity 1-5  : mean 4.04  median 4.0
+  SEMANTIC coherence   : mean 4.38 ± 0.046   <- primary
+  surface coherence    : mean 1.29   (repetition of the same string)
+  WORD INTRUSION acc   : 0.332 ± 0.024  (chance 0.167, lift +0.165)   <- behavioural
+  detection bal-acc    : mean 0.635
+  judge picked         : 6.3 of 12 items (TPR 0.66 / TNR 0.61)
+  DEGENERATE answers   : 15/200 (picked all or none)
+  NULL floor           : mean 0.519
+  LIFT over null       : +0.116   <- the number that matters
+  concept level mix    : syntax 48%  semantics 22%  entity 14%  mixed 6%  topic 4%  discourse 4%  morphology 1%  surface 1%
+[judge] hard negatives from centroids of baseline_kmeans_k2000_refit.npz
+[judge] ct_plain_fullseq.json: 168 clusters, provider=openrouter model=google/gemini-2.5-flash-lite
+
+=== ct_plain_fullseq.json ===
+
+  clusters scored      : 168
+  monosemanticity 1-5  : mean 4.40  median 5.0
+  SEMANTIC coherence   : mean 4.61 ± 0.045   <- primary
+  surface coherence    : mean 1.58   (repetition of the same string)
+  WORD INTRUSION acc   : 0.512 ± 0.031  (chance 0.167, lift +0.345)   <- behavioural
+  detection bal-acc    : mean 0.741
+  judge picked         : 6.4 of 12 items (TPR 0.78 / TNR 0.71)
+  DEGENERATE answers   : 16/168 (picked all or none)
+  NULL floor           : mean 0.530
+  LIFT over null       : +0.211   <- the number that matters
+  concept level mix    : syntax 52%  semantics 18%  entity 10%  discourse 7%  topic 6%  surface 4%  mixed 2%
+
+[judge] api calls 3769, cache hits 207
+[judge] wrote results/llm_judge_fullseq_3arm.json

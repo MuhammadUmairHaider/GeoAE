@@ -342,6 +342,7 @@ def total_loss(
     lambda_unif: float = 0.0,
     sep_mode: str = "median",
     sep_margin: float = 2.0,
+    var_gamma: float = 1.0,
 ) -> dict[str, Tensor]:
     """
     L = MSE + lambda_cluster · L_cluster + lambda_sep · L_sep
@@ -375,7 +376,7 @@ def total_loss(
     }
 
     if lambda_var > 0:
-        l_var = variance_loss(z)
+        l_var = variance_loss(z, gamma=var_gamma)
         out["loss"] = out["loss"] + lambda_var * l_var
         out["var"] = l_var
     if lambda_cov > 0:

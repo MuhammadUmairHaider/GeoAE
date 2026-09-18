@@ -1,0 +1,107 @@
+[probe] excluding anchor rows from 22 rungs (per_class=25, seed=42)
+[probe] loaded tanh28
+[probe] loaded gelu28
+[probe] surface         excluded 175 anchor rows (0.1% of the rung)
+[probe] surface         token     n= 80,000 classes=  7
+[probe] pos_coarse      excluded 341 anchor rows (0.2% of the rung)
+[probe] pos_coarse      token     n= 80,000 classes= 13
+[probe] pos_fine        excluded 1,066 anchor rows (0.6% of the rung)
+[probe] pos_fine        token     n= 80,000 classes= 40
+[probe] ner_coarse      excluded 225 anchor rows (0.1% of the rung)
+[probe] ner_coarse      token     n= 80,000 classes=  9
+[probe] ner_fine        excluded 1,675 anchor rows (0.9% of the rung)
+[probe] ner_fine        token     n= 80,000 classes= 67
+[probe] sentiment       excluded 50 anchor rows (1.7% of the rung)
+[probe] sentiment       sequence  n=  2,950 classes=  2
+[probe] sentiment_long  excluded 50 anchor rows (2.5% of the rung)
+[probe] sentiment_long  sequence  n=  1,950 classes=  2
+[probe] subjectivity    excluded 50 anchor rows (1.7% of the rung)
+[probe] subjectivity    sequence  n=  2,950 classes=  2
+[probe] formality       excluded 75 anchor rows (1.2% of the rung)
+[probe] formality       sequence  n=  5,925 classes=  3
+[probe] atlas_doc       excluded 2,831 anchor rows (78.6% of the rung)
+[probe] atlas_doc       sequence  n=    773 classes= 18
+[probe] atlas_tone      excluded 5,002 anchor rows (76.8% of the rung)
+[probe] atlas_tone      sequence  n=  1,508 classes= 67
+[probe] atlas_content   excluded 4,788 anchor rows (79.6% of the rung)
+[probe] atlas_content   sequence  n=  1,224 classes= 65
+[probe] language        excluded 500 anchor rows (16.7% of the rung)
+[probe] language        sequence  n=  2,500 classes= 20
+[probe] domain          excluded 75 anchor rows (2.1% of the rung)
+[probe] domain          sequence  n=  3,525 classes=  3
+[probe] topic4          excluded 100 anchor rows (3.3% of the rung)
+[probe] topic4          sequence  n=  2,900 classes=  4
+[probe] topic14         excluded 350 anchor rows (5.8% of the rung)
+[probe] topic14         sequence  n=  5,650 classes= 14
+[probe] topic20         excluded 500 anchor rows (16.7% of the rung)
+[probe] topic20         sequence  n=  2,500 classes= 20
+[probe] ravel_country   excluded 2,520 anchor rows (31.5% of the rung)
+[probe] ravel_country   token     n=  5,480 classes= 73
+[probe] ravel_continent excluded 150 anchor rows (1.9% of the rung)
+[probe] ravel_continent token     n=  7,850 classes=  6
+[probe] ravel_language  excluded 1,976 anchor rows (24.7% of the rung)
+[probe] ravel_language  token     n=  6,024 classes= 53
+[probe] ioi_role        excluded 75 anchor rows (0.3% of the rung)
+[probe] ioi_role        token     n= 23,925 classes=  3
+[probe] ioi_name        excluded 1,100 anchor rows (4.6% of the rung)
+[probe] ioi_name        token     n= 22,900 classes= 44
+
+======================================================
+NMI  (higher = better)
+rung            grain             tanh28        gelu28
+surface         token             0.2795        0.2622
+pos_coarse      token             0.4379        0.4062
+pos_fine        token             0.4841        0.4532
+ner_coarse      token             0.1553        0.1505
+ner_fine        token             0.1773        0.1797
+sentiment       sequence          0.0009        0.0031
+sentiment_long  sequence          0.0548        0.0535
+subjectivity    sequence          0.0223        0.0619
+formality       sequence          0.1153        0.1200
+atlas_doc       sequence          0.3074        0.3077
+atlas_tone      sequence          0.2461        0.2505
+atlas_content   sequence          0.2770        0.2803
+language        sequence          0.6123        0.6903
+domain          sequence          0.3321        0.3196
+topic4          sequence          0.0587        0.0988
+topic14         sequence          0.3565        0.4366
+topic20         sequence          0.2660        0.2738
+ravel_country   token             0.1878        0.2155
+ravel_continent token             0.0911        0.1034
+ravel_language  token             0.1461        0.1795
+ioi_role        token             0.3527        0.3288
+ioi_name        token             0.2075        0.1935
+------------------------------------------------------
+MEAN TOKEN      (10 rungs)        0.2519        0.2473
+MEAN SEQUENCE   (12 rungs)        0.2208        0.2413
+
+======================================================
+F1  (higher = better)
+rung            grain             tanh28        gelu28
+surface         token             0.2762        0.2663
+pos_coarse      token             0.1572        0.1702
+pos_fine        token             0.2823        0.2567
+ner_coarse      token             0.1047        0.1073
+ner_fine        token             0.1068        0.1309
+sentiment       sequence          0.5789        0.6307
+sentiment_long  sequence          0.3162        0.3016
+subjectivity    sequence          0.5079        0.5820
+formality       sequence          0.4332        0.3963
+atlas_doc       sequence          0.2570        0.2215
+atlas_tone      sequence          0.1250        0.1116
+atlas_content   sequence          0.1199        0.1148
+language        sequence          0.5004        0.5392
+domain          sequence          0.3034        0.2543
+topic4          sequence          0.3096        0.3113
+topic14         sequence          0.3290        0.3879
+topic20         sequence          0.1072        0.1034
+ravel_country   token             0.1011        0.1127
+ravel_continent token             0.3201        0.2925
+ravel_language  token             0.1112        0.1402
+ioi_role        token             0.4868        0.5504
+ioi_name        token             0.1776        0.1580
+------------------------------------------------------
+MEAN TOKEN      (10 rungs)        0.2124        0.2185
+MEAN SEQUENCE   (12 rungs)        0.3240        0.3296
+
+[probe] wrote eval_out/probe_tanh28.json

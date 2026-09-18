@@ -1,0 +1,46 @@
+[seed] seed=0 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+
+[quality] Loading raw k-means baseline: e2e/checkpoints/general/llama3.2-3B/layer27/kl_gelu/baseline_kmeans_k2000.npz
+[quality] Computing metrics for: raw_kmeans
+    silhouette … -0.0938
+    davies-bouldin … 2.0643
+    calinski-harabasz … 132.6
+    dunn index … 0.034981
+    separability ratio … 120.9969
+
+[quality] Loading AE: checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144/step_0014200.pt
+[quality] Computing metrics for: b32k_lam1_d6144
+    silhouette … 0.0303
+    davies-bouldin … 2.8182
+    calinski-harabasz … 804.9
+    dunn index … 0.117811
+    separability ratio … 194.0145
+
+[quality] Loading AE: e2e/checkpoints/general/llama3.2-3B/layer27/kl_gelu_k2000_balance_phased/step_0227850.pt
+[quality] Computing metrics for: old_balance_phased
+    silhouette … -0.0057
+    davies-bouldin … 4.4801
+    calinski-harabasz … 243.2
+    dunn index … 0.095857
+    separability ratio … 55.1627
+
+==================================================================================================
+  Metric                                  raw_kmeans       b32k_lam1_d6144    old_balance_phased
+--------------------------------------------------------------------------------------------------
+  Silhouette ↑                             -0.0938                0.0303 *             -0.0057  
+  Davies-Bouldin ↓                          2.0643 *              2.8182                4.4801  
+  Calinski-Harabasz ↑                        132.6                 804.9 *               243.2  
+  Dunn Index ↑                            0.034981              0.117811 *            0.095857  
+  Separability Ratio ↑                    120.9969              194.0145 *             55.1627  
+  Inter-centroid Dist ↑                    77.3686               90.4303 *             46.5799  
+  Min Centroid Dist ↑                       6.6586                9.6096 *              9.5908  
+  Intra-cluster Var ↓                       0.4111                0.2693 *              0.7061  
+  Cluster Balance H ↑                       0.5284                0.9432                0.9760 *
+  Empty Clusters ↓                             377                     0 *                   0 *
+  Effective K ↑                                270                  1973                  2000 *
+  Effective Rank ↑                          567.76 *              165.01                337.07  
+  Assignment Entropy                           N/A                0.0685                0.0501  
+==================================================================================================
+  * = best value for that metric
+
+[quality] Full results saved → clustering_quality_comparison.json

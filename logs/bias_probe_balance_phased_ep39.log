@@ -1,0 +1,83 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[bias] Loading activations from biasbios/activations/llama3.2-3B/last
+[bias] Train: (50000, 3072)  Test: (20000, 3072)  Professions: 28  Genders: 2
+[bias] Gender balance (train): male=27104 female=22896
+
+============================================================
+  Space: raw  (3072 dims)
+============================================================
+
+[bias] Training GENDER probe (2-class, L1=0.1, L2=0.01, bias=False) ...
+[bias] Gender probe accuracy: 0.9875  (11 epochs)
+[bias] Training PROFESSION probe (28-class, L1=0.1, L2=0.01, bias=False) ...
+[bias] Profession probe accuracy: 0.5689  (11 epochs)
+[bias] Gender active dims: 3045 / 3072
+[bias] Prof active dims:   3072 / 3072
+
+[bias] Cross-perturbation: zeroing GENDER-ranked dims ...
+  gender k@chance=3025 (98.5%)  k@50%=3025  prof Δ@kch=-0.2048
+[bias] Reverse cross: zeroing PROFESSION-ranked dims ...
+  prof k@50%: gender drops to 0.539 when all prof dims zeroed
+[bias] Random control sweep ...
+
+[bias] Per-profession delta at k=3025 (gender k@chance) ...
+  Profession                  N  Before   After   Delta
+  -------------------------------------------------------
+  chiropractor              131   0.000   0.092  +0.092
+  poet                      356   0.003   0.090  +0.087
+  painter                   390   0.005   0.062  +0.056
+  dj                         85   0.000   0.047  +0.047
+  comedian                  152   0.013   0.053  +0.039
+  ...
+  software_engineer         332   0.271   0.015  -0.256
+  journalist                964   0.479   0.052  -0.427
+  nurse                     921   0.515   0.009  -0.506
+  attorney                 1624   0.797   0.220  -0.576
+  photographer             1154   0.905   0.120  -0.785
+
+[bias] Dim overlap (gender ∩ prof):  @50=0.02  @100=0.03  @200=0.03  @500=0.14
+
+============================================================
+  Space: geoae  (3072 dims)
+============================================================
+
+[bias] Training GENDER probe (2-class, L1=0.1, L2=0.01, bias=False) ...
+[bias] Gender probe accuracy: 0.9844  (12 epochs)
+[bias] Training PROFESSION probe (28-class, L1=0.1, L2=0.01, bias=False) ...
+[bias] Profession probe accuracy: 0.5760  (11 epochs)
+[bias] Gender active dims: 2877 / 3072
+[bias] Prof active dims:   3072 / 3072
+
+[bias] Cross-perturbation: zeroing GENDER-ranked dims ...
+  gender k@chance=2918 (95.0%)  k@50%=2918  prof Δ@kch=-0.1010
+[bias] Reverse cross: zeroing PROFESSION-ranked dims ...
+  prof k@50%: gender drops to 0.539 when all prof dims zeroed
+[bias] Random control sweep ...
+
+[bias] Per-profession delta at k=2918 (gender k@chance) ...
+  Profession                  N  Before   After   Delta
+  -------------------------------------------------------
+  architect                 513   0.018   0.088  +0.070
+  poet                      356   0.031   0.076  +0.045
+  interior_designer          78   0.000   0.038  +0.038
+  painter                   390   0.003   0.033  +0.031
+  accountant                287   0.003   0.024  +0.021
+  ...
+  psychologist              946   0.227   0.072  -0.155
+  teacher                   828   0.284   0.089  -0.194
+  software_engineer         332   0.244   0.027  -0.217
+  model                     364   0.511   0.047  -0.464
+  photographer             1154   0.879   0.354  -0.525
+
+[bias] Dim overlap (gender ∩ prof):  @50=0.00  @100=0.00  @200=0.01  @500=0.13
+[bias] Plots saved to plots/bias_probe_balance_phased_ep39/
+
+[bias] Results saved to results/bias_probe_balance_phased_ep39.json
+
+==========================================================================================
+  SUMMARY   gender_l1=0.1 gender_l2=0.01  prof_l1=0.1 prof_l2=0.01
+==========================================================================================
+Space        Dims  GendAcc  ProfAcc  G_k@ch G_k@ch%   P@kch  P_Δ@kch   Effic  Ovlp@100
+------------------------------------------------------------------------------------------
+raw          3072   0.9875   0.5689    3025   98.5%  0.3641  -0.2048     2.4     0.030
+geoae        3072   0.9844   0.5760    2918   95.0%  0.4750  -0.1010     4.8     0.000

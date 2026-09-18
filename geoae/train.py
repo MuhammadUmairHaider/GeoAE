@@ -22,11 +22,12 @@ from geoae.model import GeoAE
 from geoae.losses import total_loss
 from geoae.seeding import seed_everything
 from geoae import diagnostics as diag
+from geoae.seeded_init import format_peak_diag
 from geoae.train_common import (   # noqa: F401 — re-exported for compatibility
     tau_schedule, lambda_schedule, geometry_schedule, zipf_alpha_schedule,
-    rotate_checkpoints, reinit_dead_clusters,
+    rotate_checkpoints, reinit_dead_clusters, encode_init_pool,
     build_model, make_optimizer, init_wandb, add_override_args, apply_overrides,
-    CheckpointTracker,
+    CheckpointTracker, load_resume, resolve_resume, atomic_torch_save, ensure_free_space,
 )
 
 
@@ -46,7 +47,10 @@ def save_checkpoint(
     val_mse: float,
     cfg: Config,
 ) -> None:
-    torch.save({
+    prev = sorted(Path(path).parent.glob("step_*.pt"))
+    need = 2 * (prev[-1].stat().st_size if prev else 0)   # the file + its temp headroom
+    ensure_free_space(Path(path).parent, need, Path(path).name)
+    atomic_torch_save({
         "model_state": model.state_dict(),
         "opt_state": opt.state_dict(),
         "epoch": epoch,
@@ -146,7 +150,7 @@ def per_class_latent_means(
 
 def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
           max_train_rows: int | None = None,
-          no_sinkhorn: bool = False) -> None:
+          no_sinkhorn: bool = False, resume: str | None = None) -> None:
     seed_everything(cfg.train.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"[train] Device: {device}")
@@ -194,10 +198,34 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
     Q_history: list[torch.Tensor] = []
     anchor_pool = None          # populated by the "seeded" init; drives reinit_mode "anchor"
 
+    start_epoch = 1
+    if resume:
+        path = resolve_resume(resume, ckpt_dir)
+        start_epoch, global_step = load_resume(path, model, opt, train_buf.mean, train_buf.std, device)
+        if start_epoch > cfg.train.n_epochs:
+            raise ValueError(
+                f"[resume] checkpoint is at epoch {start_epoch - 1} but "
+                f"train.n_epochs={cfg.train.n_epochs} — nothing left to run."
+            )
+        tracker.restore_best("val_mse")
+        if (init_mode == "seeded" and cfg.train.reinit_mode == "anchor"
+                and bool(model.centroids_initialized.item())):
+            # The anchor pool is not checkpointed, and reinit_dead_clusters falls
+            # back to highest-loss reinit when it is None — silently changing the
+            # arm. Rebuild it; only its record of which classes were spent is lost.
+            from geoae.seeded_init import load_anchor_pool, AnchorPool
+            rungs = [r for r in cfg.train.anchor_rungs.split(",") if r] or None
+            H, keys = load_anchor_pool(cfg.train.anchor_cache, rungs, cfg.train.anchor_per_class,
+                                       cfg.train.anchor_min_examples, cfg.train.seed,
+                                       cfg.train.atlas_last, cfg.train.atlas_min_examples)
+            anchor_pool = AnchorPool(H, keys, train_buf.mean, train_buf.std, device)
+            print(f"[resume] ! anchor pool rebuilt ({len(anchor_pool):,} examples) with every "
+                  f"class marked unused — classes spent before the stop can be reseeded once more")
+
     # ------------------------------------------------------------------
     # Training loop
     # ------------------------------------------------------------------
-    for epoch in range(1, cfg.train.n_epochs + 1):
+    for epoch in range(start_epoch, cfg.train.n_epochs + 1):
         # Centroid init at the start of the clustering phase
         if (not bool(model.centroids_initialized.item())
                 and epoch >= cfg.train.clustering_start_epoch):
@@ -223,20 +251,48 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
                 with torch.no_grad():
                     z_pool = model.encoder(init_batch)
                 rungs = [r for r in cfg.train.anchor_rungs.split(",") if r] or None
-                C, names, anchor_pool = seeded_init(
+                C, names, anchor_pool, pk_diag = seeded_init(
                     model, cfg.train.anchor_cache, train_buf.mean, train_buf.std,
                     device, z_pool, per_class=cfg.train.anchor_per_class,
                     min_examples=cfg.train.anchor_min_examples, rungs=rungs,
                     density_power=cfg.train.density_power, seed=cfg.train.seed,
+                    atlas_last=cfg.train.atlas_last,
+                    atlas_min_examples=cfg.train.atlas_min_examples,
+                    fill_mode=cfg.train.fill_mode, knn_k=cfg.train.density_knn,
+                    refine_k=cfg.train.peak_refine_k,
                 )
                 model.init_centroids_from_class_means(C)
                 n_anchor = sum(1 for n in names if not n.startswith("fill::"))
+                fill_desc = ("density peaks" if cfg.train.fill_mode == "peaks"
+                             else "density x coverage")
                 print(f"[train]   anchor pool: {len(anchor_pool):,} unused labelled "
                       f"examples held for reinit")
                 print(f"[train] Epoch {epoch}: seeded init — {n_anchor} labelled anchors "
                       f"(<={cfg.train.anchor_per_class}/class from {cfg.train.anchor_cache}) "
-                      f"+ {model.n_clusters - n_anchor} density x coverage fill "
+                      f"+ {model.n_clusters - n_anchor} {fill_desc} fill "
                       f"(density_power={cfg.train.density_power})")
+                if pk_diag is not None:
+                    print(f"[train]   {format_peak_diag(pk_diag)}")
+            elif init_mode == "dpc":
+                # Density peaks (Rodriguez & Laio 2014), unsupervised. k-means++
+                # samples proportional to D^2 and the seeded fill maximises
+                # density x D^2 — both measure distance to the SELECTED set, so
+                # they chase outliers. Here distance is measured to the nearest
+                # DENSER point instead, which only a mode centre can make large.
+                from geoae.seeded_init import density_peaks_select
+                z_pool = encode_init_pool(model, train_loader, device,
+                                          cfg.train.density_pool)
+                C, pk_diag = density_peaks_select(
+                    z_pool, model.n_clusters, seed=cfg.train.seed,
+                    density_power=cfg.train.density_power,
+                    min_sep_frac=cfg.train.peak_min_sep_frac,
+                    knn_k=cfg.train.density_knn, refine_k=cfg.train.peak_refine_k,
+                )
+                model.init_centroids_from_class_means(C)
+                print(f"[train] Epoch {epoch}: dpc init of {model.n_clusters} centroids "
+                      f"from {len(z_pool):,} latents "
+                      f"(density_power={cfg.train.density_power})")
+                print(f"[train]   {format_peak_diag(pk_diag)}")
             else:
                 # Default: k-means++ from unlabeled batch
                 init_batch = next(iter(train_loader)).to(device)
@@ -280,6 +336,7 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
                 lambda_unif=lam_u,
                 sep_mode=getattr(cfg.loss, "sep_mode", "median"),
                 sep_margin=getattr(cfg.loss, "sep_margin", 2.0),
+                var_gamma=getattr(cfg.loss, "var_gamma", 1.0),
             )
 
             # Backward
@@ -356,6 +413,10 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
                 r = reinit_dead_clusters(
                     model, out.z.detach(), x.detach(), out.x_hat.detach(),
                     mode=cfg.train.reinit_mode, anchor_pool=anchor_pool,
+                    mean_k=cfg.train.anchor_mean_k,
+                    peak_pool=cfg.train.peak_reinit_pool,
+                    peak_refine_k=cfg.train.peak_refine_k,
+                    peak_min_sep_frac=cfg.train.peak_min_sep_frac,
                 )
                 n_reinit, n_anch = r if isinstance(r, tuple) else (r, 0)
                 if n_reinit > 0:
@@ -406,9 +467,17 @@ def main():
                              "page cache: cold random reads on a >RAM dump run ~300 "
                              "rows/s vs ~108k warm, so an over-RAM split is I/O bound.")
     parser.add_argument("--centroid_init", default=None,
-                        choices=["kmeans++", "semisup", "class_means", "seeded"],
+                        choices=["kmeans++", "semisup", "class_means", "seeded", "dpc"],
                         help="Centroid init: kmeans++ (unsup), semisup (per-class mean "
-                             "latent, ≤500/class), class_means (exact per-class mean, full split)")
+                             "latent, ≤500/class), class_means (exact per-class mean, full "
+                             "split), seeded (labelled anchors + density fill), dpc (density "
+                             "peaks, unsupervised, no anchor cache)")
+    parser.add_argument("--resume", default=None,
+                        help="Continue a stopped run: 'latest' (newest step_*.pt in "
+                             "checkpoints_dir) or a checkpoint path. Restores model, "
+                             "optimizer, centroids and step counter; continues at epoch+1. "
+                             "Refuses a checkpoint older than the newest one in the same "
+                             "directory, since that would overwrite later epochs.")
     add_override_args(parser)
     args = parser.parse_args()
 
@@ -420,9 +489,11 @@ def main():
         cfg = Config.from_yaml(default) if default.exists() else Config()
 
     apply_overrides(cfg, args)
+    cfg.validate()
 
     train(cfg, use_wandb=not args.no_wandb, no_renorm=args.no_renorm,
-          no_sinkhorn=args.no_sinkhorn, max_train_rows=args.max_train_rows)
+          no_sinkhorn=args.no_sinkhorn, max_train_rows=args.max_train_rows,
+          resume=args.resume)
 
 
 if __name__ == "__main__":

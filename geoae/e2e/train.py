@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import time
+from pathlib import Path
 
 
 
@@ -38,7 +39,7 @@ from geoae.train_common import (
     tau_schedule, lambda_schedule, geometry_schedule, zipf_alpha_schedule,
     reinit_dead_clusters,
     build_model, make_optimizer, init_wandb, add_override_args, apply_overrides,
-    CheckpointTracker,
+    CheckpointTracker, load_resume, atomic_torch_save, ensure_free_space,
 )
 
 
@@ -48,7 +49,10 @@ from geoae.train_common import (
 
 def save_checkpoint(path, model, opt, epoch, step, tau,
                     norm_mean, norm_std, val_kl, val_mse, cfg) -> None:
-    torch.save({
+    prev = sorted(Path(path).parent.glob("step_*.pt"))
+    need = 2 * (prev[-1].stat().st_size if prev else 0)   # the file + its temp headroom
+    ensure_free_space(Path(path).parent, need, Path(path).name)
+    atomic_torch_save({
         "model_state": model.state_dict(),
         "opt_state": opt.state_dict(),
         "epoch": epoch,
@@ -174,6 +178,14 @@ def init_centroids(model, cfg, train_buf, train_loader, act_dir, device, init_mo
         detail = f"≤{cap}/class" if cap else "full train split"
         print(f"[train-e2e] {init_mode} init of {model.n_clusters} centroids "
               f"(per-class mean latent, {detail})")
+    elif init_mode != "kmeans++":
+        # "seeded" and "dpc" are implemented in geoae/train.py only. Falling
+        # through to k-means++ here would run a 50-epoch job with the wrong init
+        # and no sign of it anywhere in the log.
+        raise ValueError(
+            f"centroid_init={init_mode!r} is not implemented in the e2e trainer; "
+            f"use geoae.train, or one of: kmeans++, semisup, class_means"
+        )
     else:
         # k-means++ needs ≥ K samples. A single batch can be smaller than
         # n_clusters, so accumulate batches until we have enough latents.
@@ -201,47 +213,6 @@ def init_centroids(model, cfg, train_buf, train_loader, act_dir, device, init_mo
 # Train
 # --------------------------------------------------------------------------- #
 
-def load_resume(path, model, opt, norm_mean, norm_std, device) -> int:
-    """
-    Restore model + optimizer from a checkpoint and return the epoch to start at.
-
-    The checkpoint carries everything needed (model_state, opt_state, epoch,
-    step, tau, norm stats), so a stopped run continues instead of restarting
-    from scratch. The centroids and the `centroids_initialized` flag live in
-    model_state, so k-means++ init is correctly skipped on resume.
-
-    Normalisation is asserted to match: the encoder was trained against these
-    exact mean/std, so silently resuming under different stats would corrupt
-    the model without any visible error.
-    """
-    ckpt = torch.load(str(path), map_location=device, weights_only=False)
-    model.load_state_dict(ckpt["model_state"])
-    if "opt_state" in ckpt:
-        opt.load_state_dict(ckpt["opt_state"])
-    else:
-        print("[resume] ! checkpoint has no opt_state — Adam moments restart cold")
-
-    for name, saved, cur in (("mean", ckpt["norm_mean"], norm_mean),
-                             ("std", ckpt["norm_std"], norm_std)):
-        s = torch.as_tensor(saved, dtype=torch.float32, device=device)
-        if not torch.allclose(s, cur.float(), rtol=1e-4, atol=1e-6):
-            raise ValueError(
-                f"[resume] norm {name} in {path} does not match the current "
-                f"activations (max diff {(s - cur.float()).abs().max():.3e}). "
-                "The checkpoint was trained on a different dump — refusing to resume."
-            )
-
-    start_epoch = int(ckpt["epoch"]) + 1
-    # Continue the global step counter too: it names checkpoints
-    # (step_<n>.pt) and is the wandb x-axis, which rejects steps that go
-    # backwards. Restarting it at 0 would interleave new files among the old.
-    step = int(ckpt.get("step", 0))
-    print(f"[resume] {path}")
-    print(f"[resume] epoch {ckpt['epoch']} step {step} "
-          f"tau {ckpt.get('tau', float('nan')):.3f} val_kl {ckpt.get('val_kl', float('nan')):.5f} "
-          f"| centroids_initialized={bool(model.centroids_initialized.item())}")
-    print(f"[resume] resuming at epoch {start_epoch}, step counter continues from {step}")
-    return start_epoch, step
 
 
 def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
@@ -322,17 +293,7 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
                 f"train.n_epochs={cfg.train.n_epochs} — nothing left to run. "
                 "Raise n_epochs (or lower it to compress the tau anneal)."
             )
-        # Seed the best-val score from the existing best_val.pt. Without this the
-        # tracker starts at +inf, so the FIRST epoch after resume always counts as
-        # "best" and overwrites best_val.pt — with a worse checkpoint, since tau
-        # steps down at resume and val_kl typically rises for a while. Rotation
-        # would then age out the older step_*.pt files and the good state is gone.
-        best_path = ckpt_dir / "best_val.pt"
-        if best_path.exists():
-            prev = torch.load(str(best_path), map_location="cpu", weights_only=False)
-            tracker.record_best(float(prev["val_kl"]))
-            print(f"[resume] best_val.pt guarded at val_kl={tracker.best_score:.5f} "
-                  f"(epoch {prev.get('epoch', '?')}) — only a better score replaces it")
+        tracker.restore_best("val_kl")
 
     for epoch in range(start_epoch, cfg.train.n_epochs + 1):
         if (not bool(model.centroids_initialized.item())

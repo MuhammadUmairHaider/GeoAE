@@ -36,6 +36,40 @@ from geoae.interp.logit_attribution import load_ae_and_norm, get_unembedding, co
 # Hard nearest-centroid usage from extracted activations (no LM needed)
 # ---------------------------------------------------------------------------
 
+
+class KMeansShim(torch.nn.Module):
+    """
+    Duck-types GeoAE for a k-means baseline so DLA and usage counting work
+    unchanged. The baseline has NO encoder and NO decoder: its centroids already
+    live in normalised activation space, so both maps are the identity and
+    `decoder(centroid)` is just the centroid. That is exactly the direction the
+    baseline injects, which is what compute_dla wants.
+    """
+
+    def __init__(self, npz_path, device):
+        super().__init__()
+        d = np.load(str(npz_path))
+        # registered as a Parameter, not a bare tensor: compute_dla calls
+        # next(ae.parameters()) to find the model's device.
+        self.centroids = torch.nn.Parameter(
+            torch.tensor(d["centroids"]).float().to(device), requires_grad=False)
+        self.n_clusters = self.centroids.shape[0]
+        self._mean = torch.tensor(d["norm_mean"]).float().to(device)
+        self._std = torch.tensor(d["norm_std"]).float().to(device)
+
+    def decoder(self, z):
+        return z
+
+    def encoder(self, x):
+        return x
+
+    def forward(self, x):
+        # nearest_centroid_usage reads `.dist2`; identity encoder means the
+        # distance is computed directly in normalised activation space.
+        from types import SimpleNamespace
+        return SimpleNamespace(dist2=torch.cdist(x, self.centroids).pow(2))
+
+
 @torch.no_grad()
 def nearest_centroid_usage(ae, norm_mean, norm_std, act_path: Path,
                            n_sample: int, device, batch: int = 16384,
@@ -82,6 +116,9 @@ def categorize(promoted_tokens: list[str]) -> str:
 @torch.no_grad()
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--baseline_kmeans", default=None,
+                    help="score an encoder-free k-means baseline (.npz) instead of an AE. "
+                         "Still needs --checkpoint for model_name/layer.")
     ap.add_argument("--checkpoint", required=True)
     ap.add_argument("--activations", default="activations/layer_27.npy")
     ap.add_argument("--n_sample", type=int, default=1_000_000)
@@ -98,6 +135,10 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     ckpt = Path(args.checkpoint)
     ae, norm_mean, norm_std, cfg = load_ae_and_norm(ckpt, device)
+    if args.baseline_kmeans:
+        ae = KMeansShim(args.baseline_kmeans, device)
+        norm_mean, norm_std = ae._mean, ae._std
+        print(f"[inv] encoder-free baseline: {args.baseline_kmeans}")
     K = ae.n_clusters
     model_name = cfg["extraction"]["model_name"]
 

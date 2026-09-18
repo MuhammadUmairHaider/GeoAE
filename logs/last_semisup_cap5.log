@@ -1,0 +1,241 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[train-e2e] Device: cuda
+[train-e2e] Loading frozen LLM: meta-llama/Llama-3.2-3B
+[train-e2e] target layer 27 of 28 (is_last=True); head-only (lm_head∘norm)
+[train-e2e] teacher_mode=onfly — head(norm(x)) computed in-loop, no cache
+[train-e2e] Train docs: 47,500  Val docs: 2,500
+[train-e2e] Encoder=gelu latent_dim=3072 K=14 metric=euclidean sinkhorn=on
+[train-e2e] lr=0.0001 grad_clip=1 lambda_mse=0 (KL-only, no recon anchor)
+[train-e2e] logits sanity (onfly): head path OK, logits shape=(512, 128256) (teacher = same path, no cache)
+
+[train-e2e] Epoch 1/40 | tau=1.000 | λ_c=0.000 λ_s=0.0000
+[train-e2e] Saved step_0000092.pt  val_kl=0.73143  val_mse=1.30700
+[train-e2e] New best val_kl=0.73143 -> best_val.pt
+[train-e2e] Epoch 1 done in 0.1 min
+
+[train-e2e] Epoch 2/40 | tau=1.000 | λ_c=0.000 λ_s=0.0000
+  step    100 | loss 0.5970 | kl 0.5970 | val_kl 0.7119 | clus 0.5022 | sep 1.0000 | mse(diag) 1.3138 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0000184.pt  val_kl=0.54492  val_mse=1.12190
+[train-e2e] New best val_kl=0.54492 -> best_val.pt
+[train-e2e] Epoch 2 done in 0.1 min
+
+[train-e2e] Epoch 3/40 | tau=1.000 | λ_c=0.000 λ_s=0.0000
+  step    200 | loss 0.3801 | kl 0.3801 | val_kl 0.5222 | clus 0.4860 | sep 1.0000 | mse(diag) 1.1338 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0000276.pt  val_kl=0.43600  val_mse=1.08330
+[train-e2e] New best val_kl=0.43600 -> best_val.pt
+[train-e2e] Epoch 3 done in 0.1 min
+
+[train-e2e] Epoch 4/40 | tau=1.000 | λ_c=0.000 λ_s=0.0000
+  step    300 | loss 0.2534 | kl 0.2534 | val_kl 0.4194 | clus 0.4578 | sep 1.0000 | mse(diag) 1.0626 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0000368.pt  val_kl=0.37463  val_mse=1.04498
+[train-e2e] New best val_kl=0.37463 -> best_val.pt
+[train-e2e] Epoch 4 done in 0.1 min
+
+[train-e2e] Epoch 5/40 | tau=1.000 | λ_c=0.000 λ_s=0.0000
+  step    400 | loss 0.2074 | kl 0.2074 | val_kl 0.3674 | clus 0.4598 | sep 1.0000 | mse(diag) 1.0385 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0000460.pt  val_kl=0.34184  val_mse=1.01668
+[train-e2e] New best val_kl=0.34184 -> best_val.pt
+[train-e2e] Epoch 5 done in 0.1 min
+
+[train-e2e] Epoch 6/40 | tau=1.000 | λ_c=0.000 λ_s=0.0000
+  step    500 | loss 0.1672 | kl 0.1672 | val_kl 0.3345 | clus 0.4551 | sep 1.0000 | mse(diag) 1.0109 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0000552.pt  val_kl=0.31564  val_mse=0.99126
+[train-e2e] New best val_kl=0.31564 -> best_val.pt
+[train-e2e] Epoch 6 done in 0.1 min
+
+[train-e2e] Epoch 7/40 | tau=1.000 | λ_c=0.000 λ_s=0.0000
+  step    600 | loss 0.1443 | kl 0.1443 | val_kl 0.3049 | clus 0.4487 | sep 1.0000 | mse(diag) 0.9849 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0000644.pt  val_kl=0.29949  val_mse=0.96912
+[train-e2e] New best val_kl=0.29949 -> best_val.pt
+[train-e2e] Epoch 7 done in 0.1 min
+
+[train-e2e] Epoch 8/40 | tau=1.000 | λ_c=0.000 λ_s=0.0000
+  step    700 | loss 0.1341 | kl 0.1341 | val_kl 0.2916 | clus 0.4514 | sep 1.0000 | mse(diag) 0.9714 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0000736.pt  val_kl=0.28400  val_mse=0.94936
+[train-e2e] New best val_kl=0.28400 -> best_val.pt
+[train-e2e] Epoch 8 done in 0.1 min
+
+[train-e2e] Epoch 9/40 | tau=1.000 | λ_c=0.000 λ_s=0.0000
+  step    800 | loss 0.1260 | kl 0.1260 | val_kl 0.2718 | clus 0.4372 | sep 1.0000 | mse(diag) 0.9132 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0000828.pt  val_kl=0.26622  val_mse=0.92871
+[train-e2e] New best val_kl=0.26622 -> best_val.pt
+[train-e2e] Epoch 9 done in 0.1 min
+
+[train-e2e] Epoch 10/40 | tau=1.000 | λ_c=0.000 λ_s=0.0000
+  step    900 | loss 0.1045 | kl 0.1045 | val_kl 0.2640 | clus 0.4425 | sep 1.0000 | mse(diag) 0.9088 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0000920.pt  val_kl=0.25840  val_mse=0.91106
+[train-e2e] New best val_kl=0.25840 -> best_val.pt
+[train-e2e] Epoch 10 done in 0.1 min
+[train-e2e] semisup init of 14 centroids (per-class mean latent, ≤5/class)
+
+[train-e2e] Epoch 11/40 | tau=1.000 | λ_c=0.010 λ_s=0.0000
+  step   1000 | loss 0.1088 | kl 0.1057 | val_kl 0.2506 | clus 0.3086 | sep 0.3983 | mse(diag) 0.8968 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0001012.pt  val_kl=0.24941  val_mse=0.89560
+[train-e2e] New best val_kl=0.24941 -> best_val.pt
+[train-e2e] Epoch 11 done in 0.1 min
+
+[train-e2e] Epoch 12/40 | tau=1.000 | λ_c=0.010 λ_s=0.0000
+  step   1100 | loss 0.1091 | kl 0.1061 | val_kl 0.2400 | clus 0.2997 | sep 0.3896 | mse(diag) 0.8858 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0001104.pt  val_kl=0.24227  val_mse=0.88052
+[train-e2e] New best val_kl=0.24227 -> best_val.pt
+[train-e2e] Epoch 12 done in 0.1 min
+
+[train-e2e] Epoch 13/40 | tau=1.000 | λ_c=0.010 λ_s=0.0000
+[train-e2e] Saved step_0001196.pt  val_kl=0.23241  val_mse=0.86672
+[train-e2e] New best val_kl=0.23241 -> best_val.pt
+[train-e2e] Epoch 13 done in 0.1 min
+
+[train-e2e] Epoch 14/40 | tau=1.000 | λ_c=0.010 λ_s=0.0000
+  step   1200 | loss 0.0932 | kl 0.0902 | val_kl 0.2334 | clus 0.2954 | sep 0.3922 | mse(diag) 0.8720 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0001288.pt  val_kl=0.22416  val_mse=0.85316
+[train-e2e] New best val_kl=0.22416 -> best_val.pt
+[train-e2e] Epoch 14 done in 0.1 min
+
+[train-e2e] Epoch 15/40 | tau=1.000 | λ_c=0.010 λ_s=0.0000
+  step   1300 | loss 0.0851 | kl 0.0822 | val_kl 0.2265 | clus 0.2902 | sep 0.3901 | mse(diag) 0.8458 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0001380.pt  val_kl=0.22224  val_mse=0.83840
+[train-e2e] New best val_kl=0.22224 -> best_val.pt
+[train-e2e] Epoch 15 done in 0.1 min
+
+[train-e2e] Epoch 16/40 | tau=0.964 | λ_c=0.010 λ_s=0.0002
+  step   1400 | loss 0.0812 | kl 0.0782 | val_kl 0.2276 | clus 0.2896 | sep 0.3897 | mse(diag) 0.8268 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0001472.pt  val_kl=0.21804  val_mse=0.82769
+[train-e2e] New best val_kl=0.21804 -> best_val.pt
+[train-e2e] Epoch 16 done in 0.1 min
+
+[train-e2e] Epoch 17/40 | tau=0.928 | λ_c=0.010 λ_s=0.0004
+  step   1500 | loss 0.0779 | kl 0.0749 | val_kl 0.2150 | clus 0.2864 | sep 0.3935 | mse(diag) 0.8181 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0001564.pt  val_kl=0.21028  val_mse=0.81714
+[train-e2e] New best val_kl=0.21028 -> best_val.pt
+[train-e2e] Epoch 17 done in 0.1 min
+
+[train-e2e] Epoch 18/40 | tau=0.892 | λ_c=0.010 λ_s=0.0006
+  step   1600 | loss 0.0828 | kl 0.0796 | val_kl 0.2099 | clus 0.2977 | sep 0.3834 | mse(diag) 0.8217 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0001656.pt  val_kl=0.20905  val_mse=0.80790
+[train-e2e] New best val_kl=0.20905 -> best_val.pt
+[train-e2e] Epoch 18 done in 0.1 min
+
+[train-e2e] Epoch 19/40 | tau=0.856 | λ_c=0.010 λ_s=0.0008
+  step   1700 | loss 0.0820 | kl 0.0788 | val_kl 0.2090 | clus 0.2899 | sep 0.3895 | mse(diag) 0.7982 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0001748.pt  val_kl=0.20503  val_mse=0.79858
+[train-e2e] New best val_kl=0.20503 -> best_val.pt
+[train-e2e] Epoch 19 done in 0.1 min
+
+[train-e2e] Epoch 20/40 | tau=0.820 | λ_c=0.010 λ_s=0.0010
+  step   1800 | loss 0.0800 | kl 0.0767 | val_kl 0.2026 | clus 0.2887 | sep 0.3934 | mse(diag) 0.7738 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0001840.pt  val_kl=0.20165  val_mse=0.78726
+[train-e2e] New best val_kl=0.20165 -> best_val.pt
+[train-e2e] Epoch 20 done in 0.1 min
+
+[train-e2e] Epoch 21/40 | tau=0.784 | λ_c=0.010 λ_s=0.0012
+  step   1900 | loss 0.0759 | kl 0.0725 | val_kl 0.1993 | clus 0.2933 | sep 0.3862 | mse(diag) 0.7835 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0001932.pt  val_kl=0.19927  val_mse=0.77881
+[train-e2e] New best val_kl=0.19927 -> best_val.pt
+[train-e2e] Epoch 21 done in 0.1 min
+
+[train-e2e] Epoch 22/40 | tau=0.748 | λ_c=0.010 λ_s=0.0014
+  step   2000 | loss 0.0669 | kl 0.0633 | val_kl 0.1965 | clus 0.3025 | sep 0.3904 | mse(diag) 0.7846 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0002024.pt  val_kl=0.19639  val_mse=0.76866
+[train-e2e] New best val_kl=0.19639 -> best_val.pt
+[train-e2e] Epoch 22 done in 0.1 min
+
+[train-e2e] Epoch 23/40 | tau=0.712 | λ_c=0.010 λ_s=0.0016
+  step   2100 | loss 0.0704 | kl 0.0668 | val_kl 0.1921 | clus 0.2938 | sep 0.3974 | mse(diag) 0.7621 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0002116.pt  val_kl=0.19142  val_mse=0.76064
+[train-e2e] New best val_kl=0.19142 -> best_val.pt
+[train-e2e] Epoch 23 done in 0.1 min
+
+[train-e2e] Epoch 24/40 | tau=0.676 | λ_c=0.010 λ_s=0.0018
+  step   2200 | loss 0.0647 | kl 0.0611 | val_kl 0.1874 | clus 0.2951 | sep 0.3897 | mse(diag) 0.7485 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0002208.pt  val_kl=0.18511  val_mse=0.75259
+[train-e2e] New best val_kl=0.18511 -> best_val.pt
+[train-e2e] Epoch 24 done in 0.1 min
+
+[train-e2e] Epoch 25/40 | tau=0.640 | λ_c=0.010 λ_s=0.0020
+  step   2300 | loss 0.0600 | kl 0.0564 | val_kl 0.1836 | clus 0.2887 | sep 0.3884 | mse(diag) 0.7331 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0002300.pt  val_kl=0.18349  val_mse=0.74471
+[train-e2e] New best val_kl=0.18349 -> best_val.pt
+[train-e2e] Epoch 25 done in 0.1 min
+
+[train-e2e] Epoch 26/40 | tau=0.604 | λ_c=0.010 λ_s=0.0022
+[train-e2e] Saved step_0002392.pt  val_kl=0.18439  val_mse=0.73604
+[train-e2e] Epoch 26 done in 0.1 min
+
+[train-e2e] Epoch 27/40 | tau=0.568 | λ_c=0.010 λ_s=0.0024
+  step   2400 | loss 0.0667 | kl 0.0629 | val_kl 0.1907 | clus 0.2884 | sep 0.3930 | mse(diag) 0.7248 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0002484.pt  val_kl=0.18896  val_mse=0.72961
+[train-e2e] Epoch 27 done in 0.1 min
+
+[train-e2e] Epoch 28/40 | tau=0.532 | λ_c=0.010 λ_s=0.0026
+  step   2500 | loss 0.0637 | kl 0.0597 | val_kl 0.1892 | clus 0.2975 | sep 0.3885 | mse(diag) 0.7327 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0002576.pt  val_kl=0.18040  val_mse=0.72245
+[train-e2e] New best val_kl=0.18040 -> best_val.pt
+[train-e2e] Epoch 28 done in 0.1 min
+
+[train-e2e] Epoch 29/40 | tau=0.496 | λ_c=0.010 λ_s=0.0028
+  step   2600 | loss 0.0648 | kl 0.0607 | val_kl 0.1828 | clus 0.2947 | sep 0.3909 | mse(diag) 0.7144 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0002668.pt  val_kl=0.17461  val_mse=0.71491
+[train-e2e] New best val_kl=0.17461 -> best_val.pt
+[train-e2e] Epoch 29 done in 0.1 min
+
+[train-e2e] Epoch 30/40 | tau=0.460 | λ_c=0.010 λ_s=0.0030
+  step   2700 | loss 0.0573 | kl 0.0531 | val_kl 0.1789 | clus 0.2974 | sep 0.3945 | mse(diag) 0.7119 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0002760.pt  val_kl=0.17639  val_mse=0.70993
+[train-e2e] Epoch 30 done in 0.1 min
+
+[train-e2e] Epoch 31/40 | tau=0.424 | λ_c=0.010 λ_s=0.0032
+  step   2800 | loss 0.0605 | kl 0.0562 | val_kl 0.1771 | clus 0.2987 | sep 0.3951 | mse(diag) 0.7097 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0002852.pt  val_kl=0.17315  val_mse=0.70307
+[train-e2e] New best val_kl=0.17315 -> best_val.pt
+[train-e2e] Epoch 31 done in 0.1 min
+
+[train-e2e] Epoch 32/40 | tau=0.388 | λ_c=0.010 λ_s=0.0034
+  step   2900 | loss 0.0589 | kl 0.0546 | val_kl 0.1778 | clus 0.2887 | sep 0.3935 | mse(diag) 0.6916 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0002944.pt  val_kl=0.17576  val_mse=0.69765
+[train-e2e] Epoch 32 done in 0.1 min
+
+[train-e2e] Epoch 33/40 | tau=0.352 | λ_c=0.010 λ_s=0.0036
+  step   3000 | loss 0.0555 | kl 0.0511 | val_kl 0.1721 | clus 0.2959 | sep 0.3882 | mse(diag) 0.7011 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0003036.pt  val_kl=0.17137  val_mse=0.69182
+[train-e2e] New best val_kl=0.17137 -> best_val.pt
+[train-e2e] Epoch 33 done in 0.1 min
+
+[train-e2e] Epoch 34/40 | tau=0.316 | λ_c=0.010 λ_s=0.0038
+  step   3100 | loss 0.0512 | kl 0.0469 | val_kl 0.1721 | clus 0.2869 | sep 0.3903 | mse(diag) 0.6660 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0003128.pt  val_kl=0.17206  val_mse=0.68623
+[train-e2e] Epoch 34 done in 0.1 min
+
+[train-e2e] Epoch 35/40 | tau=0.280 | λ_c=0.010 λ_s=0.0040
+  step   3200 | loss 0.0542 | kl 0.0497 | val_kl 0.1683 | clus 0.2980 | sep 0.3904 | mse(diag) 0.6811 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0003220.pt  val_kl=0.17106  val_mse=0.67947
+[train-e2e] New best val_kl=0.17106 -> best_val.pt
+[train-e2e] Epoch 35 done in 0.1 min
+
+[train-e2e] Epoch 36/40 | tau=0.244 | λ_c=0.010 λ_s=0.0042
+  step   3300 | loss 0.0575 | kl 0.0529 | val_kl 0.1695 | clus 0.3024 | sep 0.3856 | mse(diag) 0.6828 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0003312.pt  val_kl=0.16676  val_mse=0.67662
+[train-e2e] New best val_kl=0.16676 -> best_val.pt
+[train-e2e] Epoch 36 done in 0.1 min
+
+[train-e2e] Epoch 37/40 | tau=0.208 | λ_c=0.010 λ_s=0.0044
+  step   3400 | loss 0.0549 | kl 0.0501 | val_kl 0.1678 | clus 0.3005 | sep 0.3941 | mse(diag) 0.6659 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0003404.pt  val_kl=0.16701  val_mse=0.66919
+[train-e2e] Epoch 37 done in 0.1 min
+
+[train-e2e] Epoch 38/40 | tau=0.172 | λ_c=0.010 λ_s=0.0046
+[train-e2e] Saved step_0003496.pt  val_kl=0.16595  val_mse=0.66471
+[train-e2e] New best val_kl=0.16595 -> best_val.pt
+[train-e2e] Epoch 38 done in 0.1 min
+
+[train-e2e] Epoch 39/40 | tau=0.136 | λ_c=0.010 λ_s=0.0048
+  step   3500 | loss 0.0508 | kl 0.0459 | val_kl 0.1663 | clus 0.2996 | sep 0.3920 | mse(diag) 0.6597 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0003588.pt  val_kl=0.16076  val_mse=0.65925
+[train-e2e] New best val_kl=0.16076 -> best_val.pt
+[train-e2e] Epoch 39 done in 0.1 min
+
+[train-e2e] Epoch 40/40 | tau=0.100 | λ_c=0.010 λ_s=0.0050
+  step   3600 | loss 0.0506 | kl 0.0456 | val_kl 0.1667 | clus 0.3008 | sep 0.4005 | mse(diag) 0.6595 | eff_K 14/14 | dying 0
+[train-e2e] Saved step_0003680.pt  val_kl=0.16189  val_mse=0.65461
+[train-e2e] Epoch 40 done in 0.1 min
+
+[train-e2e] Done. Best val_kl = 0.16076

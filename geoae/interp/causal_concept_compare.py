@@ -48,7 +48,7 @@ from geoae.interp import _shared as shared
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--checkpoint", required=True)
-    ap.add_argument("--dataset", default="db14", choices=["db14", "emotions", "emotions_train", "ag_news"], help="Dataset to evaluate on")
+    ap.add_argument("--dataset", default="db14", choices=["db14", "emotions", "emotions_train", "ag_news", "biasbios"], help="Dataset to evaluate on")
     ap.add_argument("--layer", type=int, default=None,
                     help="Splice layer; defaults to the AE checkpoint's target_layer. "
                          "Must equal the AE's training layer (the AE is layer-specific).")

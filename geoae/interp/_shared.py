@@ -90,6 +90,7 @@ DATASET_CONFIGS = {
         "dataset_name": "LabHC/bias_in_bios",
         "dataset_split": "test",
         "text_column": "hard_text",
+        "label_column": "profession",   # this dump has no "label" column
         "prompt_head": (
             "Choose the profession of the person described in this biography from: "
             "accountant, architect, attorney, chiropractor, comedian, composer, "
@@ -206,6 +207,7 @@ def build_joint_correct_set(
     ae_sha: str | None = None,
     batch_size: int = 16,
     tag: str = "jc",
+    classes: list[int] | None = None,
 ):
     """
     Documents that BOTH the base LM and the AE-recon splice classify correctly.
@@ -252,7 +254,14 @@ def build_joint_correct_set(
                 and cached.get("docs")):
             correct = cached["docs"]
             cnt = Counter(d["label"] for d in correct)
-            min_c = min(cnt.get(c, 0) for c in range(n_classes))
+            # A cache may cover only a subset of classes (see `classes` below), so
+            # judge coverage against what was built, and say which are missing.
+            built = cached.get("classes_built") or list(range(n_classes))
+            min_c = min((cnt.get(c, 0) for c in built), default=0)
+            absent = [CLASSES[c] for c in range(n_classes) if cnt.get(c, 0) == 0]
+            if absent:
+                print(f"[{tag}] cache covers {len(built)}/{n_classes} classes; "
+                      f"not in it: {', '.join(absent)}")
             print(f"[{tag}] Loaded joint-correct set: {len(correct)} docs "
                   f"(min/class={min_c}, prompt_sha={prompt_sha}, model={cached_model}). "
                   f"To force a rebuild, delete {corr_path}")
@@ -279,9 +288,14 @@ def build_joint_correct_set(
         return correct
 
     print(f"[{tag}] Building joint base+recon correct set …")
+    label_col = dataset_cfg.get("label_column", "label")
+    # Only build the classes that will actually be evaluated. On a 28-way task one
+    # hopeless class (bias_in_bios "teacher": 0% few-shot, 4051 docs) otherwise costs
+    # ~8000 predictions to return nothing.
+    build = list(range(n_classes)) if classes is None else sorted(set(classes))
     by_class = {c: [] for c in range(n_classes)}
     for ex in ds:
-        by_class[int(ex["label"])].append(ex[dataset_cfg["text_column"]].strip())
+        by_class[int(ex[label_col])].append(ex[dataset_cfg["text_column"]].strip())
 
     def _both_correct(texts, c):
         bs = len(texts)
@@ -293,7 +307,7 @@ def build_joint_correct_set(
                 if r_base["correct"][i] and r_recon["correct"][i]]
 
     correct = []
-    for c in range(n_classes):
+    for c in build:
         print(f"[{tag}] Finding joint-correct predictions for class {c} ({CLASSES[c]}) ...")
         class_correct, batch_texts = [], []
         for text in by_class[c]:
@@ -312,7 +326,7 @@ def build_joint_correct_set(
     corr_path.parent.mkdir(parents=True, exist_ok=True)
     json.dump({"prompt_sha": prompt_sha, "dataset": dataset_name,
                "model_name": model_name, "ae_sha": ae_sha,
-               "classes": CLASSES, "docs": correct},
+               "classes": CLASSES, "classes_built": build, "docs": correct},
               open(corr_path, "w"))
     cnt = Counter(d["label"] for d in correct)
     print(f"[{tag}] joint-correct: {len(correct)} docs "

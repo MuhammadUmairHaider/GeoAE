@@ -1,0 +1,42 @@
+[judge] hard negatives from centroids of step_0014200.pt
+[judge] closest_tokens_b32k_lam1_d6144.json: 200 clusters, provider=openrouter model=google/gemini-2.5-flash-lite
+
+=== closest_tokens_b32k_lam1_d6144.json ===
+
+  clusters scored      : 200
+  monosemanticity 1-5  : mean 4.21  median 4.0
+  detection bal-acc    : mean 0.641
+  judge picked         : 7.1 of 12 items (TPR 0.73 / TNR 0.55)
+  DEGENERATE answers   : 16/200 (picked all or none)
+  NULL floor           : mean 0.507
+  LIFT over null       : +0.134   <- the number that matters
+  concept level mix    : syntax 52%  semantics 24%  entity 13%  surface 4%  morphology 2%  mixed 2%  discourse 2%  topic 1%
+[judge] hard negatives from centroids of balanced_kmeans_k2000.npz
+[judge] ct_balanced_kmeans.json: 200 clusters, provider=openrouter model=google/gemini-2.5-flash-lite
+
+=== ct_balanced_kmeans.json ===
+
+  clusters scored      : 199
+  monosemanticity 1-5  : mean 3.96  median 4.0
+  detection bal-acc    : mean 0.637
+  judge picked         : 6.8 of 12 items (TPR 0.70 / TNR 0.57)
+  DEGENERATE answers   : 6/199 (picked all or none)
+  NULL floor           : mean 0.497
+  LIFT over null       : +0.140   <- the number that matters
+  concept level mix    : syntax 54%  semantics 21%  entity 13%  morphology 5%  surface 4%  mixed 3%  topic 1%
+[judge] hard negatives from centroids of baseline_kmeans_k2000_refit.npz
+[judge] ct_plain_kmeans.json: 168 clusters, provider=openrouter model=google/gemini-2.5-flash-lite
+
+=== ct_plain_kmeans.json ===
+
+  clusters scored      : 168
+  monosemanticity 1-5  : mean 4.32  median 4.0
+  detection bal-acc    : mean 0.775
+  judge picked         : 6.7 of 12 items (TPR 0.83 / TNR 0.72)
+  DEGENERATE answers   : 15/168 (picked all or none)
+  NULL floor           : mean 0.515
+  LIFT over null       : +0.259   <- the number that matters
+  concept level mix    : syntax 54%  semantics 27%  entity 10%  surface 4%  mixed 4%  discourse 2%
+
+[judge] api calls 2031, cache hits 235
+[judge] wrote results/llm_judge_3arm.json

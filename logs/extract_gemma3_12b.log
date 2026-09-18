@@ -1,0 +1,242 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[extract] Loading tokenizer and model: google/gemma-3-12b-pt
+Fetching 5 files:   0%|          | 0/5 [00:00<?, ?it/s]Fetching 5 files:  20%|██        | 1/5 [01:10<04:42, 70.56s/it]Fetching 5 files:  40%|████      | 2/5 [01:12<01:29, 29.99s/it]Fetching 5 files: 100%|██████████| 5/5 [01:12<00:00, 14.43s/it]
+Loading weights:   0%|          | 0/1065 [00:00<?, ?it/s]Loading weights:   2%|▏         | 24/1065 [00:00<00:04, 234.54it/s]Loading weights:   5%|▌         | 56/1065 [00:00<00:03, 283.28it/s]Loading weights:   9%|▉         | 94/1065 [00:00<00:03, 319.34it/s]Loading weights:  12%|█▏        | 132/1065 [00:00<00:02, 316.52it/s]Loading weights:  16%|█▋        | 174/1065 [00:00<00:02, 340.74it/s]Loading weights:  20%|█▉        | 212/1065 [00:00<00:02, 350.42it/s]Loading weights:  23%|██▎       | 250/1065 [00:00<00:02, 359.13it/s]Loading weights:  27%|██▋       | 289/1065 [00:00<00:02, 361.37it/s]Loading weights:  31%|███       | 326/1065 [00:00<00:02, 340.09it/s]Loading weights:  34%|███▍      | 361/1065 [00:01<00:02, 339.93it/s]Loading weights:  37%|███▋      | 396/1065 [00:01<00:01, 338.44it/s]Loading weights:  41%|████      | 434/1065 [00:01<00:01, 345.38it/s]Loading weights:  44%|████▍     | 469/1065 [00:01<00:01, 344.57it/s]Loading weights:  48%|████▊     | 506/1065 [00:01<00:01, 350.36it/s]Loading weights:  51%|█████     | 542/1065 [00:01<00:01, 351.24it/s]Loading weights:  54%|█████▍    | 578/1065 [00:01<00:01, 346.20it/s]Loading weights:  58%|█████▊    | 613/1065 [00:01<00:01, 333.62it/s]Loading weights:  81%|████████  | 861/1065 [00:01<00:00, 946.09it/s]Loading weights: 100%|██████████| 1065/1065 [00:01<00:00, 534.75it/s]
+[load_lm] google/gemma-3-12b-pt: dropped vision tower (text-only use)
+[extract] Gemma3ForConditionalGeneration (decoder Gemma3TextModel): 48 layers, d=3840, vocab=262208
+[extract] Model on cuda:0
+[extract] Allocating 3 × (10,000,000, 3840) float16 = 230.4 GB in /home/exouser/RepresentationAE/GeoAE/activations_gemma3_12b
+[extract] Opening data sources:
+[extract]   + web   allenai/c4
+[extract]   + wiki  wikimedia/wikipedia
+Repo card metadata block was not found. Setting CardData to empty.
+[extract]   + code  codeparrot/codeparrot-clean-valid
+[extract]   + math  open-web-math/open-web-math
+[extract]   + pile  monology/pile-uncopyrighted
+[extract]    45,865/10,000,000 (0.5%) | 1856 tok/s | ETA 89.4 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '20%', 'pile': '19%'}
+[extract]    92,090/10,000,000 (0.9%) | 1989 tok/s | ETA 83.0 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '20%', 'pile': '19%'}
+[extract]   136,280/10,000,000 (1.4%) | 2030 tok/s | ETA 81.0 min | domains={'web': '16%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   182,274/10,000,000 (1.8%) | 2059 tok/s | ETA 79.5 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '20%', 'pile': '19%'}
+[extract]   229,052/10,000,000 (2.3%) | 2090 tok/s | ETA 77.9 min | domains={'web': '16%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   274,298/10,000,000 (2.7%) | 2092 tok/s | ETA 77.5 min | domains={'web': '16%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   321,298/10,000,000 (3.2%) | 2117 tok/s | ETA 76.2 min | domains={'web': '16%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   367,721/10,000,000 (3.7%) | 2139 tok/s | ETA 75.0 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   413,350/10,000,000 (4.1%) | 2144 tok/s | ETA 74.5 min | domains={'web': '16%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   459,670/10,000,000 (4.6%) | 2158 tok/s | ETA 73.7 min | domains={'web': '16%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   506,273/10,000,000 (5.1%) | 2166 tok/s | ETA 73.0 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   550,928/10,000,000 (5.5%) | 2167 tok/s | ETA 72.7 min | domains={'web': '16%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   597,244/10,000,000 (6.0%) | 2176 tok/s | ETA 72.0 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   642,176/10,000,000 (6.4%) | 2176 tok/s | ETA 71.7 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   689,106/10,000,000 (6.9%) | 2179 tok/s | ETA 71.2 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   734,269/10,000,000 (7.3%) | 2181 tok/s | ETA 70.8 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   780,488/10,000,000 (7.8%) | 2187 tok/s | ETA 70.3 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   826,782/10,000,000 (8.3%) | 2193 tok/s | ETA 69.7 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   872,581/10,000,000 (8.7%) | 2195 tok/s | ETA 69.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   917,621/10,000,000 (9.2%) | 2195 tok/s | ETA 69.0 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract]   962,852/10,000,000 (9.6%) | 2198 tok/s | ETA 68.5 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,008,253/10,000,000 (10.1%) | 2201 tok/s | ETA 68.1 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,053,573/10,000,000 (10.5%) | 2199 tok/s | ETA 67.8 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,098,687/10,000,000 (11.0%) | 2203 tok/s | ETA 67.3 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,143,094/10,000,000 (11.4%) | 2199 tok/s | ETA 67.1 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,189,269/10,000,000 (11.9%) | 2200 tok/s | ETA 66.7 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,233,110/10,000,000 (12.3%) | 2202 tok/s | ETA 66.4 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,278,212/10,000,000 (12.8%) | 2205 tok/s | ETA 65.9 min | domains={'web': '16%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,324,469/10,000,000 (13.2%) | 2208 tok/s | ETA 65.5 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,369,567/10,000,000 (13.7%) | 2211 tok/s | ETA 65.1 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,415,433/10,000,000 (14.2%) | 2211 tok/s | ETA 64.7 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,461,624/10,000,000 (14.6%) | 2210 tok/s | ETA 64.4 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,508,162/10,000,000 (15.1%) | 2212 tok/s | ETA 64.0 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,552,442/10,000,000 (15.5%) | 2210 tok/s | ETA 63.7 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,598,754/10,000,000 (16.0%) | 2211 tok/s | ETA 63.3 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,645,390/10,000,000 (16.5%) | 2213 tok/s | ETA 62.9 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,692,018/10,000,000 (16.9%) | 2215 tok/s | ETA 62.5 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,736,518/10,000,000 (17.4%) | 2216 tok/s | ETA 62.1 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,782,474/10,000,000 (17.8%) | 2219 tok/s | ETA 61.7 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,828,879/10,000,000 (18.3%) | 2220 tok/s | ETA 61.3 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,876,336/10,000,000 (18.8%) | 2223 tok/s | ETA 60.9 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,923,515/10,000,000 (19.2%) | 2226 tok/s | ETA 60.5 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 1,970,139/10,000,000 (19.7%) | 2227 tok/s | ETA 60.1 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,015,281/10,000,000 (20.2%) | 2226 tok/s | ETA 59.8 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,059,106/10,000,000 (20.6%) | 2225 tok/s | ETA 59.5 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,105,289/10,000,000 (21.1%) | 2226 tok/s | ETA 59.1 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,150,088/10,000,000 (21.5%) | 2224 tok/s | ETA 58.8 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,195,557/10,000,000 (22.0%) | 2226 tok/s | ETA 58.4 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,240,062/10,000,000 (22.4%) | 2222 tok/s | ETA 58.2 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,285,917/10,000,000 (22.9%) | 2221 tok/s | ETA 57.9 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,331,695/10,000,000 (23.3%) | 2221 tok/s | ETA 57.6 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,377,694/10,000,000 (23.8%) | 2221 tok/s | ETA 57.2 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,421,597/10,000,000 (24.2%) | 2220 tok/s | ETA 56.9 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,467,355/10,000,000 (24.7%) | 2222 tok/s | ETA 56.5 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,512,539/10,000,000 (25.1%) | 2222 tok/s | ETA 56.1 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,558,406/10,000,000 (25.6%) | 2222 tok/s | ETA 55.8 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,604,828/10,000,000 (26.0%) | 2221 tok/s | ETA 55.5 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,650,636/10,000,000 (26.5%) | 2223 tok/s | ETA 55.1 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,696,289/10,000,000 (27.0%) | 2224 tok/s | ETA 54.7 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,742,403/10,000,000 (27.4%) | 2224 tok/s | ETA 54.4 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,788,113/10,000,000 (27.9%) | 2225 tok/s | ETA 54.0 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,834,583/10,000,000 (28.3%) | 2226 tok/s | ETA 53.7 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,880,869/10,000,000 (28.8%) | 2226 tok/s | ETA 53.3 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,927,445/10,000,000 (29.3%) | 2226 tok/s | ETA 53.0 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 2,973,513/10,000,000 (29.7%) | 2225 tok/s | ETA 52.6 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,019,002/10,000,000 (30.2%) | 2226 tok/s | ETA 52.3 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,063,227/10,000,000 (30.6%) | 2225 tok/s | ETA 52.0 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,108,311/10,000,000 (31.1%) | 2225 tok/s | ETA 51.6 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,152,212/10,000,000 (31.5%) | 2224 tok/s | ETA 51.3 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,198,119/10,000,000 (32.0%) | 2223 tok/s | ETA 51.0 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,244,005/10,000,000 (32.4%) | 2224 tok/s | ETA 50.6 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,289,302/10,000,000 (32.9%) | 2225 tok/s | ETA 50.3 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,333,631/10,000,000 (33.3%) | 2224 tok/s | ETA 50.0 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,378,309/10,000,000 (33.8%) | 2224 tok/s | ETA 49.6 min | domains={'web': '17%', 'wiki': '22%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,423,220/10,000,000 (34.2%) | 2224 tok/s | ETA 49.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,468,742/10,000,000 (34.7%) | 2225 tok/s | ETA 48.9 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,512,826/10,000,000 (35.1%) | 2223 tok/s | ETA 48.6 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,556,580/10,000,000 (35.6%) | 2224 tok/s | ETA 48.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,601,618/10,000,000 (36.0%) | 2224 tok/s | ETA 47.9 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,646,756/10,000,000 (36.5%) | 2226 tok/s | ETA 47.6 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,690,839/10,000,000 (36.9%) | 2224 tok/s | ETA 47.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,734,507/10,000,000 (37.3%) | 2224 tok/s | ETA 47.0 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,780,074/10,000,000 (37.8%) | 2225 tok/s | ETA 46.6 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,825,748/10,000,000 (38.3%) | 2225 tok/s | ETA 46.2 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,870,557/10,000,000 (38.7%) | 2225 tok/s | ETA 45.9 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,914,113/10,000,000 (39.1%) | 2225 tok/s | ETA 45.6 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 3,958,361/10,000,000 (39.6%) | 2226 tok/s | ETA 45.2 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,003,986/10,000,000 (40.0%) | 2227 tok/s | ETA 44.9 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,048,254/10,000,000 (40.5%) | 2228 tok/s | ETA 44.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,093,383/10,000,000 (40.9%) | 2230 tok/s | ETA 44.2 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,136,791/10,000,000 (41.4%) | 2230 tok/s | ETA 43.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,181,341/10,000,000 (41.8%) | 2231 tok/s | ETA 43.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,226,913/10,000,000 (42.3%) | 2233 tok/s | ETA 43.1 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,272,120/10,000,000 (42.7%) | 2234 tok/s | ETA 42.7 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,317,788/10,000,000 (43.2%) | 2235 tok/s | ETA 42.4 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,362,812/10,000,000 (43.6%) | 2235 tok/s | ETA 42.0 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,407,024/10,000,000 (44.1%) | 2236 tok/s | ETA 41.7 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,452,110/10,000,000 (44.5%) | 2237 tok/s | ETA 41.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,497,716/10,000,000 (45.0%) | 2237 tok/s | ETA 41.0 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,543,325/10,000,000 (45.4%) | 2237 tok/s | ETA 40.7 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,588,852/10,000,000 (45.9%) | 2238 tok/s | ETA 40.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,634,663/10,000,000 (46.3%) | 2238 tok/s | ETA 40.0 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,679,349/10,000,000 (46.8%) | 2237 tok/s | ETA 39.6 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,723,807/10,000,000 (47.2%) | 2237 tok/s | ETA 39.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,768,735/10,000,000 (47.7%) | 2237 tok/s | ETA 39.0 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,813,298/10,000,000 (48.1%) | 2236 tok/s | ETA 38.7 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,858,048/10,000,000 (48.6%) | 2236 tok/s | ETA 38.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,902,878/10,000,000 (49.0%) | 2237 tok/s | ETA 38.0 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,946,728/10,000,000 (49.5%) | 2236 tok/s | ETA 37.7 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 4,990,724/10,000,000 (49.9%) | 2235 tok/s | ETA 37.4 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,035,090/10,000,000 (50.4%) | 2234 tok/s | ETA 37.0 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,078,945/10,000,000 (50.8%) | 2234 tok/s | ETA 36.7 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,123,902/10,000,000 (51.2%) | 2234 tok/s | ETA 36.4 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,169,312/10,000,000 (51.7%) | 2234 tok/s | ETA 36.0 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,213,125/10,000,000 (52.1%) | 2233 tok/s | ETA 35.7 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,258,816/10,000,000 (52.6%) | 2234 tok/s | ETA 35.4 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,303,762/10,000,000 (53.0%) | 2234 tok/s | ETA 35.0 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,347,878/10,000,000 (53.5%) | 2235 tok/s | ETA 34.7 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,393,269/10,000,000 (53.9%) | 2235 tok/s | ETA 34.4 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,438,107/10,000,000 (54.4%) | 2235 tok/s | ETA 34.0 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,484,021/10,000,000 (54.8%) | 2236 tok/s | ETA 33.7 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,528,811/10,000,000 (55.3%) | 2237 tok/s | ETA 33.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,572,880/10,000,000 (55.7%) | 2237 tok/s | ETA 33.0 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,618,642/10,000,000 (56.2%) | 2237 tok/s | ETA 32.6 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,664,163/10,000,000 (56.6%) | 2238 tok/s | ETA 32.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,709,127/10,000,000 (57.1%) | 2238 tok/s | ETA 32.0 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,754,614/10,000,000 (57.5%) | 2238 tok/s | ETA 31.6 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,799,073/10,000,000 (58.0%) | 2238 tok/s | ETA 31.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,843,719/10,000,000 (58.4%) | 2238 tok/s | ETA 30.9 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,888,021/10,000,000 (58.9%) | 2238 tok/s | ETA 30.6 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,933,010/10,000,000 (59.3%) | 2239 tok/s | ETA 30.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 5,977,861/10,000,000 (59.8%) | 2239 tok/s | ETA 29.9 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,023,201/10,000,000 (60.2%) | 2240 tok/s | ETA 29.6 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,068,190/10,000,000 (60.7%) | 2240 tok/s | ETA 29.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,112,039/10,000,000 (61.1%) | 2241 tok/s | ETA 28.9 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,156,710/10,000,000 (61.6%) | 2240 tok/s | ETA 28.6 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,201,483/10,000,000 (62.0%) | 2240 tok/s | ETA 28.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,245,635/10,000,000 (62.5%) | 2240 tok/s | ETA 27.9 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,288,931/10,000,000 (62.9%) | 2239 tok/s | ETA 27.6 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,332,453/10,000,000 (63.3%) | 2239 tok/s | ETA 27.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,377,854/10,000,000 (63.8%) | 2239 tok/s | ETA 27.0 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,423,720/10,000,000 (64.2%) | 2240 tok/s | ETA 26.6 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,467,852/10,000,000 (64.7%) | 2239 tok/s | ETA 26.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,514,213/10,000,000 (65.1%) | 2239 tok/s | ETA 25.9 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,559,048/10,000,000 (65.6%) | 2239 tok/s | ETA 25.6 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,604,438/10,000,000 (66.0%) | 2239 tok/s | ETA 25.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,649,582/10,000,000 (66.5%) | 2240 tok/s | ETA 24.9 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,694,475/10,000,000 (66.9%) | 2239 tok/s | ETA 24.6 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,739,569/10,000,000 (67.4%) | 2240 tok/s | ETA 24.3 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,786,093/10,000,000 (67.9%) | 2241 tok/s | ETA 23.9 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,832,681/10,000,000 (68.3%) | 2242 tok/s | ETA 23.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,877,910/10,000,000 (68.8%) | 2241 tok/s | ETA 23.2 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,922,564/10,000,000 (69.2%) | 2242 tok/s | ETA 22.9 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 6,968,966/10,000,000 (69.7%) | 2242 tok/s | ETA 22.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,013,226/10,000,000 (70.1%) | 2242 tok/s | ETA 22.2 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,057,198/10,000,000 (70.6%) | 2242 tok/s | ETA 21.9 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,101,224/10,000,000 (71.0%) | 2241 tok/s | ETA 21.6 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,145,792/10,000,000 (71.5%) | 2241 tok/s | ETA 21.2 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,191,131/10,000,000 (71.9%) | 2242 tok/s | ETA 20.9 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,235,350/10,000,000 (72.4%) | 2242 tok/s | ETA 20.6 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,280,408/10,000,000 (72.8%) | 2242 tok/s | ETA 20.2 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,326,647/10,000,000 (73.3%) | 2243 tok/s | ETA 19.9 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,371,705/10,000,000 (73.7%) | 2244 tok/s | ETA 19.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,417,298/10,000,000 (74.2%) | 2245 tok/s | ETA 19.2 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,462,257/10,000,000 (74.6%) | 2245 tok/s | ETA 18.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,507,138/10,000,000 (75.1%) | 2245 tok/s | ETA 18.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,552,840/10,000,000 (75.5%) | 2245 tok/s | ETA 18.2 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,597,553/10,000,000 (76.0%) | 2246 tok/s | ETA 17.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,641,070/10,000,000 (76.4%) | 2245 tok/s | ETA 17.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,685,690/10,000,000 (76.9%) | 2245 tok/s | ETA 17.2 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,730,885/10,000,000 (77.3%) | 2245 tok/s | ETA 16.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,774,961/10,000,000 (77.7%) | 2244 tok/s | ETA 16.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,819,678/10,000,000 (78.2%) | 2244 tok/s | ETA 16.2 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,864,297/10,000,000 (78.6%) | 2245 tok/s | ETA 15.9 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,909,201/10,000,000 (79.1%) | 2246 tok/s | ETA 15.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,953,637/10,000,000 (79.5%) | 2247 tok/s | ETA 15.2 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 7,999,278/10,000,000 (80.0%) | 2248 tok/s | ETA 14.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,042,836/10,000,000 (80.4%) | 2248 tok/s | ETA 14.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,087,633/10,000,000 (80.9%) | 2248 tok/s | ETA 14.2 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,132,034/10,000,000 (81.3%) | 2248 tok/s | ETA 13.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,176,473/10,000,000 (81.8%) | 2249 tok/s | ETA 13.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,221,807/10,000,000 (82.2%) | 2249 tok/s | ETA 13.2 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,265,802/10,000,000 (82.7%) | 2250 tok/s | ETA 12.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,309,431/10,000,000 (83.1%) | 2250 tok/s | ETA 12.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,353,977/10,000,000 (83.5%) | 2251 tok/s | ETA 12.2 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,399,314/10,000,000 (84.0%) | 2252 tok/s | ETA 11.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,444,902/10,000,000 (84.4%) | 2253 tok/s | ETA 11.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,491,563/10,000,000 (84.9%) | 2254 tok/s | ETA 11.2 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,537,777/10,000,000 (85.4%) | 2255 tok/s | ETA 10.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,582,578/10,000,000 (85.8%) | 2256 tok/s | ETA 10.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,627,576/10,000,000 (86.3%) | 2256 tok/s | ETA 10.1 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,673,125/10,000,000 (86.7%) | 2257 tok/s | ETA 9.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,718,340/10,000,000 (87.2%) | 2257 tok/s | ETA 9.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,762,302/10,000,000 (87.6%) | 2257 tok/s | ETA 9.1 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,807,989/10,000,000 (88.1%) | 2258 tok/s | ETA 8.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,854,119/10,000,000 (88.5%) | 2258 tok/s | ETA 8.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,900,111/10,000,000 (89.0%) | 2258 tok/s | ETA 8.1 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,944,145/10,000,000 (89.4%) | 2257 tok/s | ETA 7.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 8,990,155/10,000,000 (89.9%) | 2257 tok/s | ETA 7.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,034,684/10,000,000 (90.3%) | 2258 tok/s | ETA 7.1 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,081,009/10,000,000 (90.8%) | 2259 tok/s | ETA 6.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,127,063/10,000,000 (91.3%) | 2258 tok/s | ETA 6.4 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,173,318/10,000,000 (91.7%) | 2259 tok/s | ETA 6.1 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,217,176/10,000,000 (92.2%) | 2259 tok/s | ETA 5.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,260,651/10,000,000 (92.6%) | 2259 tok/s | ETA 5.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,305,563/10,000,000 (93.1%) | 2260 tok/s | ETA 5.1 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,349,962/10,000,000 (93.5%) | 2260 tok/s | ETA 4.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,395,199/10,000,000 (94.0%) | 2260 tok/s | ETA 4.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,440,104/10,000,000 (94.4%) | 2260 tok/s | ETA 4.1 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,485,890/10,000,000 (94.9%) | 2261 tok/s | ETA 3.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,530,974/10,000,000 (95.3%) | 2262 tok/s | ETA 3.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,574,342/10,000,000 (95.7%) | 2262 tok/s | ETA 3.1 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,618,593/10,000,000 (96.2%) | 2262 tok/s | ETA 2.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,663,650/10,000,000 (96.6%) | 2263 tok/s | ETA 2.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,709,108/10,000,000 (97.1%) | 2263 tok/s | ETA 2.1 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,753,651/10,000,000 (97.5%) | 2263 tok/s | ETA 1.8 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] 9,799,382/10,000,000 (98.0%) | 2264 tok/s | ETA 1.5 min | domains={'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+[extract] Sources exhausted at 9,826,031/10,000,000; trimming .npy files to drop trailing zero rows.
+[extract] !! float16 OVERFLOW — non-finite elements per layer: {24: 1666748, 41: 9771710, 47: 9834215}
+[extract] !! Re-run with extraction.dtype: float32 (2x disk) for these layers.
+[extract] Done. 9,826,031 tokens / 43,516 docs -> /home/exouser/RepresentationAE/GeoAE/activations_gemma3_12b/
+[extract] Domain mix: {'web': '17%', 'wiki': '21%', 'code': '22%', 'math': '21%', 'pile': '19%'}
+/home/exouser/RepresentationAE/GeoAE/.venv/lib/python3.12/site-packages/numpy/_core/_methods.py:188: RuntimeWarning: invalid value encountered in subtract
+  x = um.subtract(arr, arrmean, out=...)
+[extract] layer 24 sanity: |mean|=inf std=nan |max|=inf median_token_norm=55708.0
+[extract] layer 41 sanity: |mean|=inf std=nan |max|=inf median_token_norm=inf
+[extract] layer 47 sanity: |mean|=inf std=nan |max|=inf median_token_norm=inf

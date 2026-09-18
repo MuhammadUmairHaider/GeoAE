@@ -1,0 +1,54 @@
+[seed] seed=0 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+
+[quality] Loading raw k-means baseline: e2e/checkpoints/general/llama3.2-3B/layer27/kl_gelu/baseline_kmeans_k2000.npz
+[quality] Computing metrics for: raw_kmeans
+    silhouette … -0.0938
+    davies-bouldin … 2.0643
+    calinski-harabasz … 132.6
+    dunn index … 0.034981
+    separability ratio … 120.9969
+
+[quality] Loading AE: checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144/best_val.pt
+[quality] Computing metrics for: kmeanspp
+    silhouette … 0.0302
+    davies-bouldin … 2.8476
+    calinski-harabasz … 788.8
+    dunn index … 0.110688
+    separability ratio … 192.6638
+
+[quality] Loading AE: checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_seeded_atlas/best_val.pt
+[quality] Computing metrics for: seeded_atlas
+    silhouette … 0.0328
+    davies-bouldin … 2.8995
+    calinski-harabasz … 833.8
+    dunn index … 0.136717
+    separability ratio … 187.4620
+
+[quality] Loading AE: checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_dpc/best_val.pt
+[quality] Computing metrics for: dpc
+    silhouette … 0.0336
+    davies-bouldin … 2.9809
+    calinski-harabasz … 857.5
+    dunn index … 0.101933
+    separability ratio … 174.8171
+
+================================================================================================================
+  Metric                                raw_kmeans            kmeanspp        seeded_atlas                 dpc
+----------------------------------------------------------------------------------------------------------------
+  Silhouette ↑                           -0.0938              0.0302              0.0328              0.0336 *
+  Davies-Bouldin ↓                        2.0643 *            2.8476              2.8995              2.9809  
+  Calinski-Harabasz ↑                      132.6               788.8               833.8               857.5 *
+  Dunn Index ↑                          0.034981            0.110688            0.136717 *          0.101933  
+  Separability Ratio ↑                  120.9969            192.6638 *          187.4620            174.8171  
+  Inter-centroid Dist ↑                  77.3686             90.1799 *           88.6617             82.4592  
+  Min Centroid Dist ↑                     6.6586              8.4649              8.3629              9.5343 *
+  Intra-cluster Var ↓                     0.4111              0.2702 *            0.2770              0.2735  
+  Cluster Balance H ↑                     0.5284              0.9418              0.9512              0.9663 *
+  Empty Clusters ↓                           377                   0 *                 0 *                 0 *
+  Effective K ↑                              270                1970                1992                1997 *
+  Effective Rank ↑                        567.76 *            161.80              201.11              216.51  
+  Assignment Entropy                         N/A              0.0014              0.0008              0.0008  
+================================================================================================================
+  * = best value for that metric
+
+[quality] Full results saved → eval_out/cq_init_arms.json

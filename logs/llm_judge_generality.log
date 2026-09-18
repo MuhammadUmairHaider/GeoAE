@@ -1,0 +1,39 @@
+[judge] hard negatives from centroids of step_0014200.pt
+[judge] closest_tokens_b32k_lam1_d6144.json: 1888 clusters, provider=openrouter model=google/gemini-2.5-flash-lite
+
+=== closest_tokens_b32k_lam1_d6144.json ===
+
+  clusters scored      : 1809
+  monosemanticity 1-5  : mean 4.01  median 4.0
+  SEMANTIC coherence   : mean 4.46 ± 0.014   <- primary
+  GENERALITY 1-5       : mean 3.27 ± 0.017   <- breadth of the concept
+  coherence x generality: mean 14.69   (useful clusters need BOTH; narrow clusters are trivially coherent)
+  surface coherence    : mean 1.68   (repetition of the same string)
+  WORD INTRUSION acc   : 0.344 ± 0.008  (chance 0.167, lift +0.177)   <- behavioural
+  detection bal-acc    : mean 0.636
+  judge picked         : 6.8 of 12 items (TPR 0.70 / TNR 0.57)
+  DEGENERATE answers   : 140/1809 (picked all or none)
+  NULL floor           : mean 0.510
+  LIFT over null       : +0.126   <- the number that matters
+  concept level mix    : syntax 46%  semantics 26%  entity 16%  morphology 4%  mixed 3%  surface 2%  discourse 2%  topic 1%
+[judge] hard negatives from centroids of balanced_kmeans_k2000.npz
+[judge] ct_balanced_kmeans.json: 1983 clusters, provider=openrouter model=google/gemini-2.5-flash-lite
+
+=== ct_balanced_kmeans.json ===
+
+  clusters scored      : 1867
+  monosemanticity 1-5  : mean 3.79  median 4.0
+  SEMANTIC coherence   : mean 4.33 ± 0.013   <- primary
+  GENERALITY 1-5       : mean 3.24 ± 0.015   <- breadth of the concept
+  coherence x generality: mean 14.12   (useful clusters need BOTH; narrow clusters are trivially coherent)
+  surface coherence    : mean 1.55   (repetition of the same string)
+  WORD INTRUSION acc   : 0.371 ± 0.008  (chance 0.167, lift +0.204)   <- behavioural
+  detection bal-acc    : mean 0.650
+  judge picked         : 6.2 of 12 items (TPR 0.67 / TNR 0.64)
+  DEGENERATE answers   : 112/1867 (picked all or none)
+  NULL floor           : mean 0.506
+  LIFT over null       : +0.144   <- the number that matters
+  concept level mix    : syntax 50%  semantics 24%  entity 16%  mixed 4%  morphology 2%  discourse 2%  surface 2%  topic 1%
+
+[judge] api calls 13432, cache hits 12340
+[judge] wrote results/llm_judge_generality.json

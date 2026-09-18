@@ -1,0 +1,53 @@
+[judge] hard negatives from centroids of step_0013950.pt
+[judge] ct_l14_ae.json: 1968 clusters, provider=openrouter model=google/gemini-2.5-flash-lite
+
+=== ct_l14_ae.json ===
+
+  clusters scored      : 1968
+  monosemanticity 1-5  : mean 4.24  median 4.0
+  SEMANTIC coherence   : mean 4.57 ± 0.013   <- primary
+  GENERALITY 1-5       : mean 3.40 ± 0.017   <- breadth of the concept
+  coherence x generality: mean 15.68   (useful clusters need BOTH; narrow clusters are trivially coherent)
+  surface coherence    : mean 1.94   (repetition of the same string)
+  WORD INTRUSION acc   : 0.429 ± 0.008  (chance 0.167, lift +0.263)   <- behavioural
+  detection bal-acc    : mean 0.705
+  judge picked         : 7.2 of 12 items (TPR 0.80 / TNR 0.61)
+  DEGENERATE answers   : 137/1968 (picked all or none)
+  NULL floor           : mean 0.517
+  LIFT over null       : +0.188   <- the number that matters
+  --- token-weighted (by n_assigned) ---
+  SEMANTIC coherence   : 4.48   (cluster-avg 4.57)
+  WORD INTRUSION acc   : 0.338   (cluster-avg 0.429)
+  band              %tokens  intrusion  semantic
+  top 10% clusters    30.8%      0.214      4.29
+  next 40%            48.4%      0.354      4.55
+  bottom 50%          20.8%      0.532      4.64
+  concept level mix    : syntax 37%  semantics 36%  entity 16%  morphology 4%  mixed 2%  discourse 2%  surface 2%  topic 1%
+[judge] hard negatives from centroids of balanced_kmeans_k2000.npz
+[judge] ct_l14_balanced.json: 1986 clusters, provider=openrouter model=google/gemini-2.5-flash-lite
+
+=== ct_l14_balanced.json ===
+
+  clusters scored      : 1986
+  monosemanticity 1-5  : mean 4.14  median 4.0
+  SEMANTIC coherence   : mean 4.53 ± 0.013   <- primary
+  GENERALITY 1-5       : mean 3.36 ± 0.017   <- breadth of the concept
+  coherence x generality: mean 15.35   (useful clusters need BOTH; narrow clusters are trivially coherent)
+  surface coherence    : mean 1.83   (repetition of the same string)
+  WORD INTRUSION acc   : 0.468 ± 0.008  (chance 0.167, lift +0.301)   <- behavioural
+  detection bal-acc    : mean 0.735
+  judge picked         : 6.8 of 12 items (TPR 0.80 / TNR 0.67)
+  DEGENERATE answers   : 100/1986 (picked all or none)
+  NULL floor           : mean 0.517
+  LIFT over null       : +0.218   <- the number that matters
+  --- token-weighted (by n_assigned) ---
+  SEMANTIC coherence   : 4.48   (cluster-avg 4.53)
+  WORD INTRUSION acc   : 0.422   (cluster-avg 0.468)
+  band              %tokens  intrusion  semantic
+  top 10% clusters    27.4%      0.354      4.36
+  next 40%            44.7%      0.421      4.53
+  bottom 50%          27.8%      0.528      4.56
+  concept level mix    : syntax 41%  semantics 32%  entity 17%  morphology 3%  mixed 2%  discourse 2%  surface 2%  topic 1%
+
+[judge] api calls 26215, cache hits 1463
+[judge] wrote results/llm_judge_l14.json

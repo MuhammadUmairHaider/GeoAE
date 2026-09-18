@@ -1,0 +1,77 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[steer] LM=meta-llama/Llama-3.2-3B layer=27 (AE target_layer=27)
+[eval] Splice sanity check PASSED (max logit diff = 0.00e+00)
+[steer] Computing wiki ppl slice + z-recon baseline hook …
+[steer] Loading db14 test split …
+[steer] Building joint base+recon correct set …
+[steer] Finding joint-correct predictions for class 0 (Company) ...
+  Found 2 joint-correct docs for class 0
+[steer] Finding joint-correct predictions for class 1 (EducationalInstitution) ...
+  Found 0 joint-correct docs for class 1
+[steer] Finding joint-correct predictions for class 2 (Artist) ...
+  Found 0 joint-correct docs for class 2
+[steer] Finding joint-correct predictions for class 3 (Athlete) ...
+  Found 0 joint-correct docs for class 3
+[steer] Finding joint-correct predictions for class 4 (OfficeHolder) ...
+  Found 0 joint-correct docs for class 4
+[steer] Finding joint-correct predictions for class 5 (MeanOfTransportation) ...
+  Found 0 joint-correct docs for class 5
+[steer] Finding joint-correct predictions for class 6 (Building) ...
+  Found 119 joint-correct docs for class 6
+[steer] Finding joint-correct predictions for class 7 (NaturalPlace) ...
+  Found 0 joint-correct docs for class 7
+[steer] Finding joint-correct predictions for class 8 (Village) ...
+  Found 0 joint-correct docs for class 8
+[steer] Finding joint-correct predictions for class 9 (Animal) ...
+  Found 0 joint-correct docs for class 9
+[steer] Finding joint-correct predictions for class 10 (Plant) ...
+  Found 1 joint-correct docs for class 10
+[steer] Finding joint-correct predictions for class 11 (Album) ...
+  Found 0 joint-correct docs for class 11
+[steer] Finding joint-correct predictions for class 12 (Film) ...
+  Found 0 joint-correct docs for class 12
+[steer] Finding joint-correct predictions for class 13 (WrittenWork) ...
+  Found 130 joint-correct docs for class 13
+[steer] joint-correct: 252 docs (min/class=0, prompt_sha=e7f311cea65f) -> dbpedia/joint_correct_db14_semisup_mse1.0.json
+[steer] WARNING: class 1 has only 0 joint-correct docs; results will be noisy.
+[steer] WARNING: class 2 has only 0 joint-correct docs; results will be noisy.
+[steer] WARNING: class 3 has only 0 joint-correct docs; results will be noisy.
+[steer] WARNING: class 4 has only 0 joint-correct docs; results will be noisy.
+[steer] WARNING: class 5 has only 0 joint-correct docs; results will be noisy.
+[steer] WARNING: class 7 has only 0 joint-correct docs; results will be noisy.
+[steer] WARNING: class 8 has only 0 joint-correct docs; results will be noisy.
+[steer] WARNING: class 9 has only 0 joint-correct docs; results will be noisy.
+[steer] WARNING: class 10 has only 1 joint-correct docs; results will be noisy.
+[steer] WARNING: class 11 has only 0 joint-correct docs; results will be noisy.
+[steer] WARNING: class 12 has only 0 joint-correct docs; results will be noisy.
+[steer] Fit pass: capturing h,z for 153 docs …
+[steer] Clean eval over 99 docs …
+[steer] base acc=1.000 ppl=5.8 | z-recon acc=0.828 ppl=35.3
+[steer] WARNING: concept 1 missing fit samples; skipping.
+[steer] WARNING: concept 2 missing fit samples; skipping.
+[steer] WARNING: concept 3 missing fit samples; skipping.
+[steer] WARNING: concept 4 missing fit samples; skipping.
+[steer] WARNING: concept 5 missing fit samples; skipping.
+[steer] WARNING: concept 7 missing fit samples; skipping.
+[steer] WARNING: concept 8 missing fit samples; skipping.
+[steer] WARNING: concept 9 missing fit samples; skipping.
+[steer] WARNING: concept 11 missing fit samples; skipping.
+[steer] WARNING: concept 12 missing fit samples; skipping.
+
+=== concept 0 (Company)  base tgt 1.00/comp 1.00 | z-recon tgt 0.00/comp 0.81 ===
+  a=1.0  | h sel -1.000 (tgt 0.00, comp 1.00) | z sel +0.800 (tgt 0.00, comp 0.01)
+  a=4.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.812 (tgt 0.00, comp 0.00)
+
+=== concept 6 (Building)  base tgt 1.00/comp 1.00 | z-recon tgt 0.81/comp 0.84 ===
+  a=1.0  | h sel -0.980 (tgt 0.00, comp 0.98) | z sel -0.205 (tgt 0.00, comp 0.24)
+  a=4.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.031 (tgt 0.00, comp 0.00)
+
+=== concept 10 (Plant)  base tgt nan/comp 1.00 | z-recon tgt nan/comp 0.85 ===
+  a=1.0  | h sel +nan (tgt nan, comp 0.99) | z sel +nan (tgt nan, comp 0.31)
+  a=4.0  | h sel +nan (tgt nan, comp 0.04) | z sel +nan (tgt nan, comp 0.00)
+
+=== concept 13 (WrittenWork)  base tgt 1.00/comp 1.00 | z-recon tgt 0.86/comp 0.80 ===
+  a=1.0  | h sel -0.980 (tgt 0.00, comp 0.98) | z sel -0.064 (tgt 0.00, comp 0.00)
+  a=4.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel -0.064 (tgt 0.00, comp 0.00)
+
+[steer] Saved -> results_steering_db14_semisup_mse1.0.json

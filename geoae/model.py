@@ -5,6 +5,7 @@ Encoder variants (controlled by `nonlinearity`):
   None / "linear" : Linear(D→L)                  — rotation-ambiguous latent space
   "relu"          : Linear(D→L) → ReLU           — non-negative, privileged basis
   "gelu"          : Linear(D→L) → GeLU           — smooth, approximate sparse basis
+  "tanh"          : Linear(D→L) → tanh           — signed, bounded in (-1, 1)
 
 Privileged-basis intuition:
   A linear encoder is equivariant to rotations of the latent space — you can rotate
@@ -46,6 +47,7 @@ _NONLINEARITIES = {
     "linear":  None,
     "relu":    nn.ReLU(),
     "gelu":    nn.GELU(),
+    "tanh":    nn.Tanh(),
 }
 
 
@@ -66,8 +68,10 @@ class GeoAE(nn.Module):
         metric: str = "euclidean",
         ema_hard: bool = False,
         latent_norm: str = "none",
+        dist_scale: str = "raw",
     ):
         super().__init__()
+        self.dist_scale = dist_scale
         self.hidden_size = hidden_size
         self.latent_dim = latent_dim
         self.n_clusters = n_clusters
@@ -281,13 +285,39 @@ class GeoAE(nn.Module):
         """
         z = self.encoder(x)                              # (B, L)
         dist2 = pairwise_sq_dist(z, self.centroids, metric=self.metric)  # (B, K)
+        # SCALE OF THE SINKHORN INPUT.
+        #
+        # cluster_loss divides ||z - c||^2 by latent_dim (losses.py:187) so the
+        # cluster term is on the same per-dimension scale as MSE. forward() did
+        # NOT, so `tau` operated on distances latent_dim times larger than the
+        # loss's own notion of distance. Measured on the trained d6144 L27 run:
+        #
+        #   raw      nearest-vs-2nd gap 484.2, gap/tau = 4841  -> exp(-gap) = 0
+        #            Q row entropy 0.008 of 7.60 nats, max Q 0.996
+        #   per_dim  gap 0.0788,             gap/tau = 0.79    -> exp(-gap) = 0.46
+        #            Q row entropy 5.02 nats, max Q 0.188
+        #
+        # i.e. with dist_scale="raw" the assignment is one-hot to four decimals
+        # and the whole tau_start -> tau_end anneal is INERT: gap/tau is 484 at
+        # tau=1.0 and 4841 at tau=0.1, both effectively infinite. cluster_loss
+        # then reduces to plain k-means (one centroid pulls). Sinkhorn's column
+        # constraint still binds -- it reassigns ~2.7% of tokens as a discrete
+        # swap -- which is why balancing shapes the partition even though tau
+        # does nothing.
+        #
+        # "raw" is kept as the default so every pre-2026-09-04 checkpoint and
+        # config reproduces exactly. "per_dim" puts tau on the loss's scale and
+        # NEEDS A DIFFERENT TAU RANGE (~0.2 -> 0.01, not 1.0 -> 0.1).
+        # Only the Sinkhorn input is rescaled: `dist2` returned in AEOutput stays
+        # raw, so every argmin-based eval and the reinit path are untouched.
+        sk_dist2 = dist2 / z.shape[1] if self.dist_scale == "per_dim" else dist2
         if self.use_sinkhorn:
             if self._default_balancing():
                 # Untouched legacy path — bit-identical to every shipped checkpoint.
-                Q = sinkhorn_log(dist2, tau=self.tau, n_iter=self.sinkhorn_iters)  # (B, K)
+                Q = sinkhorn_log(sk_dist2, tau=self.tau, n_iter=self.sinkhorn_iters)  # (B, K)
             else:
                 Q, g = sinkhorn_log_dual(
-                    dist2, tau=self.tau, n_iter=self.sinkhorn_iters,
+                    sk_dist2, tau=self.tau, n_iter=self.sinkhorn_iters,
                     log_prior=self._column_log_prior(),
                     rho=self.balance_rho, eta=self.balance_eta,
                     g=self.sinkhorn_g if self.balance_eta < 1.0 else None,

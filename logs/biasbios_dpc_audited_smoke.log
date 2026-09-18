@@ -1,0 +1,37 @@
+[bias] fit=900 val=100 test=500 dedup={'train_rows_removed': 23, 'test_rows_removed': 19}
+[bias] raw: 3072 dims
+[bias] fitting gender
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+  epoch=1 val CE=0.1804 acc=0.9200
+  epoch=10 val CE=0.0288 acc=0.9900
+[bias] fitting profession
+[seed] seed=43 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+  epoch=1 val CE=1.8768 acc=0.5100
+  epoch=10 val CE=1.7988 acc=0.6500
+[bias] raw sweep gender_probe
+[bias] raw/gender_probe: val-selected half-excess k=2457 test={'task_accs': 0.5920000076293945, 'task_balanced_accs': 0.3449547290802002, 'spur_accs': 0.7699999809265137, 'spur_balanced_accs': 0.7701424360275269, 'task_kl': 1.1986427307128906, 'task_top1_change': 0.257999986410141}
+[bias] raw sweep gender_dprime
+[bias] raw/gender_dprime: val-selected half-excess k=1689 test={'task_accs': 0.6340000033378601, 'task_balanced_accs': 0.41768714785575867, 'spur_accs': 0.7519999742507935, 'spur_balanced_accs': 0.7529668807983398, 'task_kl': 0.4237510561943054, 'task_top1_change': 0.16599999368190765}
+[bias] raw sweep profession_probe
+[bias] raw/profession_probe: val-selected half-excess k=3072 test={'task_accs': 0.03400000184774399, 'task_balanced_accs': 0.0357142873108387, 'spur_accs': 0.5239999890327454, 'spur_balanced_accs': 0.5, 'task_kl': 2.4491360187530518, 'task_top1_change': 0.9340000152587891}
+[bias] raw sweep random_0
+[bias] raw/random_0: val-selected half-excess k=3072 test={'task_accs': 0.03400000184774399, 'task_balanced_accs': 0.0357142873108387, 'spur_accs': 0.5239999890327454, 'spur_balanced_accs': 0.5, 'task_kl': 2.4491360187530518, 'task_top1_change': 0.9340000152587891}
+[bias] Encoding AE latents
+[bias] geoae: 6144 dims
+[bias] fitting gender
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+  epoch=1 val CE=0.4088 acc=0.8500
+  epoch=10 val CE=0.1856 acc=0.9800
+[bias] fitting profession
+[seed] seed=43 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+  epoch=1 val CE=2.0229 acc=0.5100
+  epoch=10 val CE=2.9069 acc=0.6400
+[bias] geoae sweep gender_probe
+[bias] geoae/gender_probe: val-selected half-excess k=4608 test={'task_accs': 0.4959999918937683, 'task_balanced_accs': 0.3087957203388214, 'spur_accs': 0.6620000004768372, 'spur_balanced_accs': 0.6607383489608765, 'task_kl': 0.8955227732658386, 'task_top1_change': 0.2919999957084656}
+[bias] geoae sweep gender_dprime
+[bias] geoae/gender_dprime: val-selected half-excess k=3686 test={'task_accs': 0.4880000054836273, 'task_balanced_accs': 0.2976306080818176, 'spur_accs': 0.6919999718666077, 'spur_balanced_accs': 0.6943678259849548, 'task_kl': 0.57356196641922, 'task_top1_change': 0.25200000405311584}
+[bias] geoae sweep profession_probe
+[bias] geoae/profession_probe: val-selected half-excess k=6144 test={'task_accs': 0.035999998450279236, 'task_balanced_accs': 0.0357142873108387, 'spur_accs': 0.5239999890327454, 'spur_balanced_accs': 0.5, 'task_kl': 1.8717875480651855, 'task_top1_change': 0.9599999785423279}
+[bias] geoae sweep random_0
+[bias] geoae/random_0: val-selected half-excess k=6144 test={'task_accs': 0.035999998450279236, 'task_balanced_accs': 0.0357142873108387, 'spur_accs': 0.5239999890327454, 'spur_balanced_accs': 0.5, 'task_kl': 1.8717875480651855, 'task_top1_change': 0.9599999785423279}
+[bias] Complete: results/biasbios_dpc_audited_smoke.json

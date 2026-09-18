@@ -1,0 +1,18 @@
+[seed] seed=0 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+
+[quality] Loading raw k-means baseline: e2e/checkpoints/general/gemma3-12B/layer47/baseline_kmeans_k2000.npz
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/exouser/RepresentationAE/GeoAE/geoae/interp/clustering_quality.py", line 511, in <module>
+    main()
+  File "/home/exouser/RepresentationAE/GeoAE/geoae/interp/clustering_quality.py", line 473, in main
+    z, labels, centroids, label = load_raw_baseline(
+                                  ^^^^^^^^^^^^^^^^^^
+  File "/home/exouser/RepresentationAE/GeoAE/geoae/interp/clustering_quality.py", line 219, in load_raw_baseline
+    data = np.load(str(baseline_npz))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/exouser/RepresentationAE/GeoAE/.venv/lib/python3.12/site-packages/numpy/lib/_npyio_impl.py", line 454, in load
+    fid = stack.enter_context(open(os.fspath(file), "rb"))
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'e2e/checkpoints/general/gemma3-12B/layer47/baseline_kmeans_k2000.npz'

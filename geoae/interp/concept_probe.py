@@ -51,6 +51,19 @@ LADDER = [
     ("sentiment_long","sentiment_long.npz", "label",       "sequence", "IMDB"),
     ("subjectivity",  "subjectivity.npz",   "label",       "sequence", "subj/obj"),
     ("formality",     "formality.npz",      "label",       "sequence", "3 buckets"),
+    # FineWeb-Atlas, CHUNK LAST-TOKEN activations (the chunk's final token has
+    # attended over the whole chunk at a late layer, and is still a single token
+    # of the kind the AE trains on; a mean-pooled chunk vector is off-distribution).
+    # atlas_doc uses only chunks with EXACTLY ONE document label — unambiguous.
+    # tone and content have ZERO single-label chunks (~6-7 labels each), so they
+    # need a multi-label -> single reduction; treat them as derived, not ground
+    # truth. tone takes the RAREST-in-corpus label (most specific). Content CANNOT
+    # use that rule — with 6,461 concepts over 7,742 chunks the rarest label is
+    # near-unique per chunk and NO class reaches 25 positives — so it takes the
+    # MOST COMMON label instead (65 classes, 6,012 chunks).
+    ("atlas_doc",     "atlas_doc.npz",      "label",       "sequence", "Atlas document type, single-label"),
+    ("atlas_tone",    "atlas_tone.npz",     "label",       "sequence", "Atlas tone, rarest-label reduction"),
+    ("atlas_content", "atlas_content.npz",  "label",       "sequence", "Atlas content, rarest-label reduction"),
     ("language",      "language.npz",       "label",       "sequence", "20 languages"),
     ("domain",        "domain.npz",         "label",       "sequence", "code/math/prose"),
     ("topic4",        "topic4.npz",         "label",       "sequence", "AG News"),
@@ -138,7 +151,29 @@ def main():
     ap.add_argument("--baselines", default="auto")
     ap.add_argument("--n_token", type=int, default=80000, help="subsample for token rungs")
     ap.add_argument("--out", default=None)
+    ap.add_argument("--exclude_anchors", action="store_true",
+                    help="drop the rows that seeded init consumed as anchors. REQUIRED when "
+                         "scoring a centroid_init=seeded model: anchors come from these same "
+                         "caches, so without this the seeded rungs report a fake win (37%% of "
+                         "ravel_country was anchors on the first seeded run).")
+    ap.add_argument("--anchor_per_class", type=int, default=25)
+    ap.add_argument("--anchor_min_examples", type=int, default=5)
+    ap.add_argument("--anchor_seed", type=int, default=0)
+    ap.add_argument("--atlas_last", default="",
+                    help="atlas last-token anchor file, to hold Atlas anchor CHUNKS out. "
+                         "REQUIRED when scoring a model trained with atlas_last, or the "
+                         "atlas rungs are ~78%% contaminated.")
+    ap.add_argument("--atlas_min_examples", type=int, default=25)
     args = ap.parse_args()
+
+    excl = None
+    if args.exclude_anchors:
+        from geoae.seeded_init import anchor_row_indices
+        excl = anchor_row_indices(args.cache, None, args.anchor_per_class,
+                                  args.anchor_min_examples, args.anchor_seed,
+                                  args.atlas_last, args.atlas_min_examples)
+        print(f"[probe] excluding anchor rows from {len(excl)} rungs "
+              f"(per_class={args.anchor_per_class}, seed={args.anchor_seed})")
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     specs = []
@@ -187,7 +222,20 @@ def main():
         fp = Path(args.cache) / fname
         if not fp.exists():
             continue
-        H, y = load_rung(args.cache, fname, key, args.n_token if grain == "token" else 0)
+        # Load FULL, drop anchor rows, THEN subsample — excluding after the
+        # subsample would not line the indices up.
+        H, y = load_rung(args.cache, fname, key, 0)
+        if excl and rung in excl:
+            keep = np.ones(len(y), dtype=bool)
+            keep[excl[rung][excl[rung] < len(y)]] = False
+            n_drop = int((~keep).sum())
+            H, y = H[keep], y[keep]
+            print(f"[probe] {rung:<15} excluded {n_drop:,} anchor rows "
+                  f"({100 * n_drop / (n_drop + len(y)):.1f}% of the rung)")
+        cap = args.n_token if grain == "token" else 0
+        if cap and len(H) > cap:
+            sub = np.random.RandomState(0).choice(len(H), cap, replace=False)
+            H, y = H[sub], y[sub]
         for name, m in models.items():
             lab = assign(H, m, dev)
             res[rung][name] = dict(nmi=round(float(nmi_score(y, lab)), 4),

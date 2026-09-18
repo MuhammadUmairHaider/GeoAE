@@ -1,0 +1,62 @@
+[seed] seed=0 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+
+[quality] Loading raw k-means baseline: e2e/checkpoints/general/gemma3-12B/layer47/baseline_kmeans_k2000.npz
+[quality] Computing metrics for: raw-kmeans
+    silhouette … -0.1275
+    davies-bouldin … 2.0563
+    calinski-harabasz … 20.4
+    dunn index … 0.079805
+    separability ratio … 125.9132
+
+[quality] Loading AE: e2e/checkpoints/general/gemma3-12B/layer47/kl_k2000_vicreg_10M/best_val.pt
+[quality] Computing metrics for: kl-lm0.05
+    silhouette … -0.0535
+    davies-bouldin … 5.8606
+    calinski-harabasz … 119.6
+    dunn index … 0.081623
+    separability ratio … 62.5211
+
+[quality] Loading AE: e2e/checkpoints/general/gemma3-12B/layer47/kl_k2000_vicreg_10M_mse015/best_val.pt
+[quality] Computing metrics for: kl-lm0.15
+    silhouette … -0.0539
+    davies-bouldin … 5.7250
+    calinski-harabasz … 98.6
+    dunn index … 0.120971
+    separability ratio … 58.0813
+
+[quality] Loading AE: e2e/checkpoints/general/gemma3-12B/layer47/kl_k2000_vicreg_10M_mse030/best_val.pt
+[quality] Computing metrics for: kl-lm0.45
+    silhouette … -0.0489
+    davies-bouldin … 5.8401
+    calinski-harabasz … 85.3
+    dunn index … 0.140384
+    separability ratio … 54.6659
+
+[quality] Loading AE: checkpoints/gemma3-12B/layer47/mse_only_k2000/best_val.pt
+[quality] Computing metrics for: mse-only
+    silhouette … -0.0372
+    davies-bouldin … 4.6747
+    calinski-harabasz … 98.9
+    dunn index … 0.107676
+    separability ratio … 57.8200
+
+====================================================================================================================================
+  Metric                                raw-kmeans           kl-lm0.05           kl-lm0.15           kl-lm0.45            mse-only
+------------------------------------------------------------------------------------------------------------------------------------
+  Silhouette ↑                           -0.1275             -0.0535             -0.0539             -0.0489             -0.0372 *
+  Davies-Bouldin ↓                        2.0563 *            5.8606              5.7250              5.8401              4.6747  
+  Calinski-Harabasz ↑                       20.4               119.6 *              98.6                85.3                98.9  
+  Dunn Index ↑                          0.079805            0.081623            0.120971            0.140384 *          0.107676  
+  Separability Ratio ↑                  125.9132 *           62.5211             58.0813             54.6659             57.8200  
+  Inter-centroid Dist ↑                  87.0841 *           32.5377             34.7767             38.8496             48.7793  
+  Min Centroid Dist ↑                     0.0000              4.6751              6.6378              6.4242             10.2061 *
+  Intra-cluster Var ↓                     0.4471              0.2880 *            0.3740              0.5190              0.7636  
+  Cluster Balance H ↑                     0.1880              0.9842 *            0.9792              0.9796              0.9528  
+  Empty Clusters ↓                           684                   0 *                14                  10                   0 *
+  Effective K ↑                              270                1985                1920                1932                1995 *
+  Effective Rank ↑                       1131.01 *             58.86              130.34              163.66              432.12  
+  Assignment Entropy                         N/A              0.0818              0.0732              0.0653              0.0557  
+====================================================================================================================================
+  * = best value for that metric
+
+[quality] Full results saved → clustering_quality_gemma3_l47_kl_vs_mse.json

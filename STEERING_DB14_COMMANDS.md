@@ -9,7 +9,8 @@ comparison is built in — there is no separate baseline run to launch.
 | variant | checkpoint | λ_mse | prior steering run | usable? |
 |---|---|---|---|---|
 | kl-lm0.05 | `e2e/.../kl_k2000_vicreg_10M/best_val.pt` (ep38) | 0.05 | ep26 ckpt, Aug 13 | NO — different ckpt (ae_sha b7bca9f36344 ≠ 38ab9952b5d4) |
-| kl-lm0.15 | `e2e/.../kl_k2000_vicreg_10M_mse015/best_val.pt` | 0.15 | none | — |
+| kl-lm0.15 | `e2e/.../kl_k2000_vic
+reg_10M_mse015/best_val.pt` | 0.15 | none | — |
 | kl-lm0.45 | `e2e/.../kl_k2000_vicreg_10M_mse030/best_val.pt` (ep50) | 0.45 | **died after 6/14 concepts**, no json | NO — rerun |
 | mse-only  | `checkpoints/gemma3-12B/layer47/mse_only_k2000/best_val.pt` (ep47) | — (MSE is the recon term) | ep36 snapshot, Aug 19 | NO — stale ckpt (31fd89d4dd21 ≠ 284c37b02eb1) |
 

@@ -1,0 +1,1276 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[train] Device: cuda
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/exouser/.netrc.
+wandb: Currently logged in as: muhammadumairhaider (multifacetednlp) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: setting up run x39es1my
+wandb: Tracking run with wandb version 0.28.0
+wandb: Run data is saved locally in /home/exouser/RepresentationAE/GeoAE/wandb/run-20260826_203629-x39es1my
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run geosep_seed42
+wandb: ⭐️ View project at https://wandb.ai/multifacetednlp/geosep-general-e2e
+wandb: 🚀 View run at https://wandb.ai/multifacetednlp/geosep-general-e2e/runs/x39es1my
+[train] wandb initialised
+[data] Computing normalisation stats over 7467903 train tokens …
+[data] Pass 1/2 (Mean):   0%|          | 0/150 [00:00<?, ?it/s][data] Pass 1/2 (Mean):   1%|          | 1/150 [00:00<01:20,  1.85it/s][data] Pass 1/2 (Mean):   1%|▏         | 2/150 [00:01<01:17,  1.92it/s][data] Pass 1/2 (Mean):   2%|▏         | 3/150 [00:01<01:22,  1.77it/s][data] Pass 1/2 (Mean):   3%|▎         | 4/150 [00:02<01:18,  1.87it/s][data] Pass 1/2 (Mean):   3%|▎         | 5/150 [00:02<01:17,  1.88it/s][data] Pass 1/2 (Mean):   4%|▍         | 6/150 [00:03<01:14,  1.93it/s][data] Pass 1/2 (Mean):   5%|▍         | 7/150 [00:03<01:12,  1.98it/s][data] Pass 1/2 (Mean):   5%|▌         | 8/150 [00:04<01:10,  2.02it/s][data] Pass 1/2 (Mean):   6%|▌         | 9/150 [00:04<01:08,  2.06it/s][data] Pass 1/2 (Mean):   7%|▋         | 10/150 [00:05<01:07,  2.07it/s][data] Pass 1/2 (Mean):   7%|▋         | 11/150 [00:05<01:08,  2.04it/s][data] Pass 1/2 (Mean):   8%|▊         | 12/150 [00:06<01:14,  1.85it/s][data] Pass 1/2 (Mean):   9%|▊         | 13/150 [00:07<01:25,  1.60it/s][data] Pass 1/2 (Mean):   9%|▉         | 14/150 [00:08<01:42,  1.32it/s][data] Pass 1/2 (Mean):  10%|█         | 15/150 [00:08<01:44,  1.29it/s][data] Pass 1/2 (Mean):  11%|█         | 16/150 [00:09<01:42,  1.31it/s][data] Pass 1/2 (Mean):  11%|█▏        | 17/150 [00:10<01:39,  1.34it/s][data] Pass 1/2 (Mean):  12%|█▏        | 18/150 [00:11<01:57,  1.12it/s][data] Pass 1/2 (Mean):  13%|█▎        | 19/150 [00:12<01:39,  1.31it/s][data] Pass 1/2 (Mean):  13%|█▎        | 20/150 [00:12<01:36,  1.35it/s][data] Pass 1/2 (Mean):  14%|█▍        | 21/150 [00:13<01:25,  1.51it/s][data] Pass 1/2 (Mean):  15%|█▍        | 22/150 [00:13<01:17,  1.65it/s][data] Pass 1/2 (Mean):  15%|█▌        | 23/150 [00:14<01:18,  1.61it/s][data] Pass 1/2 (Mean):  16%|█▌        | 24/150 [00:14<01:12,  1.74it/s][data] Pass 1/2 (Mean):  17%|█▋        | 25/150 [00:15<01:08,  1.82it/s][data] Pass 1/2 (Mean):  17%|█▋        | 26/150 [00:15<01:05,  1.89it/s][data] Pass 1/2 (Mean):  18%|█▊        | 27/150 [00:16<01:03,  1.93it/s][data] Pass 1/2 (Mean):  19%|█▊        | 28/150 [00:16<01:02,  1.96it/s][data] Pass 1/2 (Mean):  19%|█▉        | 29/150 [00:17<01:01,  1.98it/s][data] Pass 1/2 (Mean):  20%|██        | 30/150 [00:17<01:00,  2.00it/s][data] Pass 1/2 (Mean):  21%|██        | 31/150 [00:18<00:58,  2.02it/s][data] Pass 1/2 (Mean):  21%|██▏       | 32/150 [00:18<00:58,  2.02it/s][data] Pass 1/2 (Mean):  22%|██▏       | 33/150 [00:19<00:57,  2.02it/s][data] Pass 1/2 (Mean):  23%|██▎       | 34/150 [00:19<00:56,  2.04it/s][data] Pass 1/2 (Mean):  23%|██▎       | 35/150 [00:20<00:57,  1.99it/s][data] Pass 1/2 (Mean):  24%|██▍       | 36/150 [00:21<01:17,  1.46it/s][data] Pass 1/2 (Mean):  25%|██▍       | 37/150 [00:22<01:31,  1.24it/s][data] Pass 1/2 (Mean):  25%|██▌       | 38/150 [00:23<01:42,  1.09it/s][data] Pass 1/2 (Mean):  26%|██▌       | 39/150 [00:24<01:46,  1.05it/s][data] Pass 1/2 (Mean):  27%|██▋       | 40/150 [00:25<01:54,  1.05s/it][data] Pass 1/2 (Mean):  27%|██▋       | 41/150 [00:27<01:56,  1.07s/it][data] Pass 1/2 (Mean):  28%|██▊       | 42/150 [00:28<01:58,  1.10s/it][data] Pass 1/2 (Mean):  29%|██▊       | 43/150 [00:29<01:55,  1.08s/it][data] Pass 1/2 (Mean):  29%|██▉       | 44/150 [00:30<01:52,  1.06s/it][data] Pass 1/2 (Mean):  30%|███       | 45/150 [00:31<01:47,  1.03s/it][data] Pass 1/2 (Mean):  31%|███       | 46/150 [00:32<01:41,  1.02it/s][data] Pass 1/2 (Mean):  31%|███▏      | 47/150 [00:32<01:36,  1.06it/s][data] Pass 1/2 (Mean):  32%|███▏      | 48/150 [00:33<01:33,  1.09it/s][data] Pass 1/2 (Mean):  33%|███▎      | 49/150 [00:34<01:29,  1.13it/s][data] Pass 1/2 (Mean):  33%|███▎      | 50/150 [00:35<01:28,  1.13it/s][data] Pass 1/2 (Mean):  34%|███▍      | 51/150 [00:36<01:30,  1.10it/s][data] Pass 1/2 (Mean):  35%|███▍      | 52/150 [00:37<01:33,  1.05it/s][data] Pass 1/2 (Mean):  35%|███▌      | 53/150 [00:38<01:30,  1.07it/s][data] Pass 1/2 (Mean):  36%|███▌      | 54/150 [00:39<01:30,  1.07it/s][data] Pass 1/2 (Mean):  37%|███▋      | 55/150 [00:40<01:35,  1.01s/it][data] Pass 1/2 (Mean):  37%|███▋      | 56/150 [00:41<01:21,  1.15it/s][data] Pass 1/2 (Mean):  38%|███▊      | 57/150 [00:41<01:11,  1.30it/s][data] Pass 1/2 (Mean):  39%|███▊      | 58/150 [00:42<01:03,  1.45it/s][data] Pass 1/2 (Mean):  39%|███▉      | 59/150 [00:42<00:58,  1.56it/s][data] Pass 1/2 (Mean):  40%|████      | 60/150 [00:43<00:55,  1.61it/s][data] Pass 1/2 (Mean):  41%|████      | 61/150 [00:43<00:52,  1.70it/s][data] Pass 1/2 (Mean):  41%|████▏     | 62/150 [00:44<00:50,  1.76it/s][data] Pass 1/2 (Mean):  42%|████▏     | 63/150 [00:44<00:47,  1.82it/s][data] Pass 1/2 (Mean):  43%|████▎     | 64/150 [00:45<00:44,  1.91it/s][data] Pass 1/2 (Mean):  43%|████▎     | 65/150 [00:45<00:42,  1.99it/s][data] Pass 1/2 (Mean):  44%|████▍     | 66/150 [00:46<00:40,  2.06it/s][data] Pass 1/2 (Mean):  45%|████▍     | 67/150 [00:46<00:39,  2.10it/s][data] Pass 1/2 (Mean):  45%|████▌     | 68/150 [00:47<00:38,  2.14it/s][data] Pass 1/2 (Mean):  46%|████▌     | 69/150 [00:47<00:37,  2.14it/s][data] Pass 1/2 (Mean):  47%|████▋     | 70/150 [00:47<00:37,  2.16it/s][data] Pass 1/2 (Mean):  47%|████▋     | 71/150 [00:48<00:36,  2.17it/s][data] Pass 1/2 (Mean):  48%|████▊     | 72/150 [00:48<00:36,  2.15it/s][data] Pass 1/2 (Mean):  49%|████▊     | 73/150 [00:49<00:35,  2.14it/s][data] Pass 1/2 (Mean):  49%|████▉     | 74/150 [00:49<00:35,  2.15it/s][data] Pass 1/2 (Mean):  50%|█████     | 75/150 [00:50<00:34,  2.16it/s][data] Pass 1/2 (Mean):  51%|█████     | 76/150 [00:50<00:35,  2.09it/s][data] Pass 1/2 (Mean):  51%|█████▏    | 77/150 [00:51<00:38,  1.92it/s][data] Pass 1/2 (Mean):  52%|█████▏    | 78/150 [00:51<00:36,  1.98it/s][data] Pass 1/2 (Mean):  53%|█████▎    | 79/150 [00:52<00:34,  2.04it/s][data] Pass 1/2 (Mean):  53%|█████▎    | 80/150 [00:52<00:33,  2.08it/s][data] Pass 1/2 (Mean):  54%|█████▍    | 81/150 [00:53<00:32,  2.10it/s][data] Pass 1/2 (Mean):  55%|█████▍    | 82/150 [00:53<00:32,  2.12it/s][data] Pass 1/2 (Mean):  55%|█████▌    | 83/150 [00:54<00:47,  1.42it/s][data] Pass 1/2 (Mean):  56%|█████▌    | 84/150 [00:55<00:41,  1.58it/s][data] Pass 1/2 (Mean):  57%|█████▋    | 85/150 [00:55<00:37,  1.71it/s][data] Pass 1/2 (Mean):  57%|█████▋    | 86/150 [00:56<00:35,  1.83it/s][data] Pass 1/2 (Mean):  58%|█████▊    | 87/150 [00:56<00:32,  1.92it/s][data] Pass 1/2 (Mean):  59%|█████▊    | 88/150 [00:57<00:34,  1.80it/s][data] Pass 1/2 (Mean):  59%|█████▉    | 89/150 [00:57<00:32,  1.90it/s][data] Pass 1/2 (Mean):  60%|██████    | 90/150 [00:58<00:30,  1.98it/s][data] Pass 1/2 (Mean):  61%|██████    | 91/150 [00:58<00:29,  2.03it/s][data] Pass 1/2 (Mean):  61%|██████▏   | 92/150 [00:59<00:28,  2.07it/s][data] Pass 1/2 (Mean):  62%|██████▏   | 93/150 [00:59<00:27,  2.09it/s][data] Pass 1/2 (Mean):  63%|██████▎   | 94/150 [01:00<00:26,  2.08it/s][data] Pass 1/2 (Mean):  63%|██████▎   | 95/150 [01:00<00:26,  2.11it/s][data] Pass 1/2 (Mean):  64%|██████▍   | 96/150 [01:01<00:26,  2.02it/s][data] Pass 1/2 (Mean):  65%|██████▍   | 97/150 [01:01<00:25,  2.05it/s][data] Pass 1/2 (Mean):  65%|██████▌   | 98/150 [01:02<00:24,  2.09it/s][data] Pass 1/2 (Mean):  66%|██████▌   | 99/150 [01:02<00:24,  2.11it/s][data] Pass 1/2 (Mean):  67%|██████▋   | 100/150 [01:03<00:23,  2.13it/s][data] Pass 1/2 (Mean):  67%|██████▋   | 101/150 [01:03<00:22,  2.14it/s][data] Pass 1/2 (Mean):  68%|██████▊   | 102/150 [01:04<00:22,  2.13it/s][data] Pass 1/2 (Mean):  69%|██████▊   | 103/150 [01:04<00:22,  2.11it/s][data] Pass 1/2 (Mean):  69%|██████▉   | 104/150 [01:05<00:24,  1.89it/s][data] Pass 1/2 (Mean):  70%|███████   | 105/150 [01:05<00:22,  1.97it/s][data] Pass 1/2 (Mean):  71%|███████   | 106/150 [01:06<00:21,  2.03it/s][data] Pass 1/2 (Mean):  71%|███████▏  | 107/150 [01:07<00:27,  1.59it/s][data] Pass 1/2 (Mean):  72%|███████▏  | 108/150 [01:07<00:25,  1.62it/s][data] Pass 1/2 (Mean):  73%|███████▎  | 109/150 [01:08<00:23,  1.77it/s][data] Pass 1/2 (Mean):  73%|███████▎  | 110/150 [01:08<00:21,  1.88it/s][data] Pass 1/2 (Mean):  74%|███████▍  | 111/150 [01:08<00:20,  1.94it/s][data] Pass 1/2 (Mean):  75%|███████▍  | 112/150 [01:09<00:18,  2.01it/s][data] Pass 1/2 (Mean):  75%|███████▌  | 113/150 [01:09<00:17,  2.07it/s][data] Pass 1/2 (Mean):  76%|███████▌  | 114/150 [01:10<00:21,  1.65it/s][data] Pass 1/2 (Mean):  77%|███████▋  | 115/150 [01:11<00:19,  1.77it/s][data] Pass 1/2 (Mean):  77%|███████▋  | 116/150 [01:11<00:18,  1.88it/s][data] Pass 1/2 (Mean):  78%|███████▊  | 117/150 [01:12<00:17,  1.89it/s][data] Pass 1/2 (Mean):  79%|███████▊  | 118/150 [01:12<00:17,  1.88it/s][data] Pass 1/2 (Mean):  79%|███████▉  | 119/150 [01:13<00:16,  1.84it/s][data] Pass 1/2 (Mean):  80%|████████  | 120/150 [01:14<00:19,  1.54it/s][data] Pass 1/2 (Mean):  81%|████████  | 121/150 [01:15<00:21,  1.37it/s][data] Pass 1/2 (Mean):  81%|████████▏ | 122/150 [01:15<00:19,  1.42it/s][data] Pass 1/2 (Mean):  82%|████████▏ | 123/150 [01:16<00:17,  1.53it/s][data] Pass 1/2 (Mean):  83%|████████▎ | 124/150 [01:16<00:15,  1.63it/s][data] Pass 1/2 (Mean):  83%|████████▎ | 125/150 [01:17<00:14,  1.68it/s][data] Pass 1/2 (Mean):  84%|████████▍ | 126/150 [01:17<00:13,  1.78it/s][data] Pass 1/2 (Mean):  85%|████████▍ | 127/150 [01:18<00:12,  1.86it/s][data] Pass 1/2 (Mean):  85%|████████▌ | 128/150 [01:18<00:11,  1.92it/s][data] Pass 1/2 (Mean):  86%|████████▌ | 129/150 [01:19<00:10,  1.99it/s][data] Pass 1/2 (Mean):  87%|████████▋ | 130/150 [01:20<00:13,  1.50it/s][data] Pass 1/2 (Mean):  87%|████████▋ | 131/150 [01:20<00:12,  1.54it/s][data] Pass 1/2 (Mean):  88%|████████▊ | 132/150 [01:21<00:11,  1.59it/s][data] Pass 1/2 (Mean):  89%|████████▊ | 133/150 [01:22<00:10,  1.70it/s][data] Pass 1/2 (Mean):  89%|████████▉ | 134/150 [01:22<00:08,  1.81it/s][data] Pass 1/2 (Mean):  90%|█████████ | 135/150 [01:23<00:08,  1.87it/s][data] Pass 1/2 (Mean):  91%|█████████ | 136/150 [01:23<00:07,  1.87it/s][data] Pass 1/2 (Mean):  91%|█████████▏| 137/150 [01:24<00:07,  1.79it/s][data] Pass 1/2 (Mean):  92%|█████████▏| 138/150 [01:24<00:06,  1.75it/s][data] Pass 1/2 (Mean):  93%|█████████▎| 139/150 [01:25<00:06,  1.80it/s][data] Pass 1/2 (Mean):  93%|█████████▎| 140/150 [01:25<00:05,  1.87it/s][data] Pass 1/2 (Mean):  94%|█████████▍| 141/150 [01:26<00:04,  1.85it/s][data] Pass 1/2 (Mean):  95%|█████████▍| 142/150 [01:26<00:04,  1.90it/s][data] Pass 1/2 (Mean):  95%|█████████▌| 143/150 [01:27<00:03,  1.92it/s][data] Pass 1/2 (Mean):  96%|█████████▌| 144/150 [01:27<00:03,  1.88it/s][data] Pass 1/2 (Mean):  97%|█████████▋| 145/150 [01:28<00:02,  1.83it/s][data] Pass 1/2 (Mean):  97%|█████████▋| 146/150 [01:29<00:02,  1.82it/s][data] Pass 1/2 (Mean):  98%|█████████▊| 147/150 [01:29<00:01,  1.79it/s][data] Pass 1/2 (Mean):  99%|█████████▊| 148/150 [01:30<00:01,  1.80it/s][data] Pass 1/2 (Mean):  99%|█████████▉| 149/150 [01:30<00:00,  1.74it/s][data] Pass 1/2 (Mean): 100%|██████████| 150/150 [01:31<00:00,  2.07it/s][data] Pass 1/2 (Mean): 100%|██████████| 150/150 [01:31<00:00,  1.65it/s]
+[data] Pass 2/2 (Std):   0%|          | 0/150 [00:00<?, ?it/s][data] Pass 2/2 (Std):   1%|          | 1/150 [00:01<02:44,  1.10s/it][data] Pass 2/2 (Std):   1%|▏         | 2/150 [00:02<02:44,  1.11s/it][data] Pass 2/2 (Std):   2%|▏         | 3/150 [00:03<02:40,  1.09s/it][data] Pass 2/2 (Std):   3%|▎         | 4/150 [00:04<02:36,  1.07s/it][data] Pass 2/2 (Std):   3%|▎         | 5/150 [00:05<02:37,  1.09s/it][data] Pass 2/2 (Std):   4%|▍         | 6/150 [00:06<02:39,  1.11s/it][data] Pass 2/2 (Std):   5%|▍         | 7/150 [00:07<02:40,  1.12s/it][data] Pass 2/2 (Std):   5%|▌         | 8/150 [00:08<02:42,  1.15s/it][data] Pass 2/2 (Std):   6%|▌         | 9/150 [00:10<02:45,  1.17s/it][data] Pass 2/2 (Std):   7%|▋         | 10/150 [00:11<02:49,  1.21s/it][data] Pass 2/2 (Std):   7%|▋         | 11/150 [00:12<02:42,  1.17s/it][data] Pass 2/2 (Std):   8%|▊         | 12/150 [00:14<03:18,  1.44s/it][data] Pass 2/2 (Std):   9%|▊         | 13/150 [00:17<04:00,  1.75s/it][data] Pass 2/2 (Std):   9%|▉         | 14/150 [00:19<04:28,  1.97s/it][data] Pass 2/2 (Std):  10%|█         | 15/150 [00:22<04:51,  2.16s/it][data] Pass 2/2 (Std):  11%|█         | 16/150 [00:24<04:49,  2.16s/it][data] Pass 2/2 (Std):  11%|█▏        | 17/150 [00:26<04:32,  2.05s/it][data] Pass 2/2 (Std):  12%|█▏        | 18/150 [00:27<04:00,  1.82s/it][data] Pass 2/2 (Std):  13%|█▎        | 19/150 [00:28<03:35,  1.64s/it][data] Pass 2/2 (Std):  13%|█▎        | 20/150 [00:30<03:28,  1.60s/it][data] Pass 2/2 (Std):  14%|█▍        | 21/150 [00:31<03:12,  1.49s/it][data] Pass 2/2 (Std):  15%|█▍        | 22/150 [00:32<03:01,  1.42s/it][data] Pass 2/2 (Std):  15%|█▌        | 23/150 [00:33<02:54,  1.37s/it][data] Pass 2/2 (Std):  16%|█▌        | 24/150 [00:35<02:46,  1.32s/it][data] Pass 2/2 (Std):  17%|█▋        | 25/150 [00:36<02:58,  1.43s/it][data] Pass 2/2 (Std):  17%|█▋        | 26/150 [00:37<02:30,  1.21s/it][data] Pass 2/2 (Std):  18%|█▊        | 27/150 [00:37<01:56,  1.06it/s][data] Pass 2/2 (Std):  19%|█▊        | 28/150 [00:38<01:32,  1.32it/s][data] Pass 2/2 (Std):  19%|█▉        | 29/150 [00:38<01:15,  1.59it/s][data] Pass 2/2 (Std):  20%|██        | 30/150 [00:38<01:04,  1.87it/s][data] Pass 2/2 (Std):  21%|██        | 31/150 [00:39<00:56,  2.12it/s][data] Pass 2/2 (Std):  21%|██▏       | 32/150 [00:39<00:50,  2.34it/s][data] Pass 2/2 (Std):  22%|██▏       | 33/150 [00:39<00:46,  2.52it/s][data] Pass 2/2 (Std):  23%|██▎       | 34/150 [00:40<00:43,  2.67it/s][data] Pass 2/2 (Std):  23%|██▎       | 35/150 [00:40<00:41,  2.78it/s][data] Pass 2/2 (Std):  24%|██▍       | 36/150 [00:40<00:39,  2.87it/s][data] Pass 2/2 (Std):  25%|██▍       | 37/150 [00:41<00:38,  2.92it/s][data] Pass 2/2 (Std):  25%|██▌       | 38/150 [00:41<00:37,  2.97it/s][data] Pass 2/2 (Std):  26%|██▌       | 39/150 [00:41<00:36,  3.00it/s][data] Pass 2/2 (Std):  27%|██▋       | 40/150 [00:41<00:36,  3.03it/s][data] Pass 2/2 (Std):  27%|██▋       | 41/150 [00:42<00:36,  3.02it/s][data] Pass 2/2 (Std):  28%|██▊       | 42/150 [00:42<00:35,  3.03it/s][data] Pass 2/2 (Std):  29%|██▊       | 43/150 [00:42<00:35,  3.03it/s][data] Pass 2/2 (Std):  29%|██▉       | 44/150 [00:43<00:34,  3.04it/s][data] Pass 2/2 (Std):  30%|███       | 45/150 [00:43<00:34,  3.02it/s][data] Pass 2/2 (Std):  31%|███       | 46/150 [00:43<00:34,  3.03it/s][data] Pass 2/2 (Std):  31%|███▏      | 47/150 [00:44<00:34,  3.03it/s][data] Pass 2/2 (Std):  32%|███▏      | 48/150 [00:44<00:33,  3.03it/s][data] Pass 2/2 (Std):  33%|███▎      | 49/150 [00:44<00:33,  3.03it/s][data] Pass 2/2 (Std):  33%|███▎      | 50/150 [00:45<00:32,  3.03it/s][data] Pass 2/2 (Std):  34%|███▍      | 51/150 [00:45<00:32,  3.03it/s][data] Pass 2/2 (Std):  35%|███▍      | 52/150 [00:45<00:32,  3.03it/s][data] Pass 2/2 (Std):  35%|███▌      | 53/150 [00:46<00:32,  3.03it/s][data] Pass 2/2 (Std):  36%|███▌      | 54/150 [00:46<00:31,  3.03it/s][data] Pass 2/2 (Std):  37%|███▋      | 55/150 [00:46<00:31,  3.05it/s][data] Pass 2/2 (Std):  37%|███▋      | 56/150 [00:47<00:30,  3.04it/s][data] Pass 2/2 (Std):  38%|███▊      | 57/150 [00:47<00:30,  3.05it/s][data] Pass 2/2 (Std):  39%|███▊      | 58/150 [00:47<00:29,  3.08it/s][data] Pass 2/2 (Std):  39%|███▉      | 59/150 [00:48<00:29,  3.08it/s][data] Pass 2/2 (Std):  40%|████      | 60/150 [00:48<00:29,  3.09it/s][data] Pass 2/2 (Std):  41%|████      | 61/150 [00:48<00:28,  3.09it/s][data] Pass 2/2 (Std):  41%|████▏     | 62/150 [00:49<00:28,  3.11it/s][data] Pass 2/2 (Std):  42%|████▏     | 63/150 [00:49<00:27,  3.11it/s][data] Pass 2/2 (Std):  43%|████▎     | 64/150 [00:49<00:27,  3.12it/s][data] Pass 2/2 (Std):  43%|████▎     | 65/150 [00:50<00:27,  3.11it/s][data] Pass 2/2 (Std):  44%|████▍     | 66/150 [00:50<00:26,  3.12it/s][data] Pass 2/2 (Std):  45%|████▍     | 67/150 [00:50<00:26,  3.11it/s][data] Pass 2/2 (Std):  45%|████▌     | 68/150 [00:51<00:26,  3.11it/s][data] Pass 2/2 (Std):  46%|████▌     | 69/150 [00:51<00:26,  3.11it/s][data] Pass 2/2 (Std):  47%|████▋     | 70/150 [00:51<00:25,  3.13it/s][data] Pass 2/2 (Std):  47%|████▋     | 71/150 [00:52<00:25,  3.12it/s][data] Pass 2/2 (Std):  48%|████▊     | 72/150 [00:52<00:24,  3.12it/s][data] Pass 2/2 (Std):  49%|████▊     | 73/150 [00:52<00:24,  3.12it/s][data] Pass 2/2 (Std):  49%|████▉     | 74/150 [00:53<00:24,  3.13it/s][data] Pass 2/2 (Std):  50%|█████     | 75/150 [00:53<00:23,  3.13it/s][data] Pass 2/2 (Std):  51%|█████     | 76/150 [00:53<00:23,  3.14it/s][data] Pass 2/2 (Std):  51%|█████▏    | 77/150 [00:53<00:23,  3.14it/s][data] Pass 2/2 (Std):  52%|█████▏    | 78/150 [00:54<00:23,  3.13it/s][data] Pass 2/2 (Std):  53%|█████▎    | 79/150 [00:54<00:22,  3.13it/s][data] Pass 2/2 (Std):  53%|█████▎    | 80/150 [00:54<00:22,  3.14it/s][data] Pass 2/2 (Std):  54%|█████▍    | 81/150 [00:55<00:22,  3.14it/s][data] Pass 2/2 (Std):  55%|█████▍    | 82/150 [00:55<00:21,  3.15it/s][data] Pass 2/2 (Std):  55%|█████▌    | 83/150 [00:55<00:21,  3.14it/s][data] Pass 2/2 (Std):  56%|█████▌    | 84/150 [00:56<00:21,  3.14it/s][data] Pass 2/2 (Std):  57%|█████▋    | 85/150 [00:56<00:20,  3.11it/s][data] Pass 2/2 (Std):  57%|█████▋    | 86/150 [00:56<00:20,  3.12it/s][data] Pass 2/2 (Std):  58%|█████▊    | 87/150 [00:57<00:20,  3.11it/s][data] Pass 2/2 (Std):  59%|█████▊    | 88/150 [00:57<00:19,  3.11it/s][data] Pass 2/2 (Std):  59%|█████▉    | 89/150 [00:57<00:19,  3.10it/s][data] Pass 2/2 (Std):  60%|██████    | 90/150 [00:58<00:19,  3.11it/s][data] Pass 2/2 (Std):  61%|██████    | 91/150 [00:58<00:19,  3.09it/s][data] Pass 2/2 (Std):  61%|██████▏   | 92/150 [00:58<00:18,  3.07it/s][data] Pass 2/2 (Std):  62%|██████▏   | 93/150 [00:59<00:18,  3.08it/s][data] Pass 2/2 (Std):  63%|██████▎   | 94/150 [00:59<00:18,  3.11it/s][data] Pass 2/2 (Std):  63%|██████▎   | 95/150 [00:59<00:17,  3.11it/s][data] Pass 2/2 (Std):  64%|██████▍   | 96/150 [01:00<00:17,  3.12it/s][data] Pass 2/2 (Std):  65%|██████▍   | 97/150 [01:00<00:17,  3.11it/s][data] Pass 2/2 (Std):  65%|██████▌   | 98/150 [01:00<00:16,  3.12it/s][data] Pass 2/2 (Std):  66%|██████▌   | 99/150 [01:01<00:16,  3.11it/s][data] Pass 2/2 (Std):  67%|██████▋   | 100/150 [01:01<00:16,  3.12it/s][data] Pass 2/2 (Std):  67%|██████▋   | 101/150 [01:01<00:15,  3.12it/s][data] Pass 2/2 (Std):  68%|██████▊   | 102/150 [01:02<00:15,  3.13it/s][data] Pass 2/2 (Std):  69%|██████▊   | 103/150 [01:02<00:15,  3.11it/s][data] Pass 2/2 (Std):  69%|██████▉   | 104/150 [01:02<00:14,  3.11it/s][data] Pass 2/2 (Std):  70%|███████   | 105/150 [01:02<00:14,  3.10it/s][data] Pass 2/2 (Std):  71%|███████   | 106/150 [01:03<00:14,  3.11it/s][data] Pass 2/2 (Std):  71%|███████▏  | 107/150 [01:03<00:13,  3.11it/s][data] Pass 2/2 (Std):  72%|███████▏  | 108/150 [01:03<00:13,  3.13it/s][data] Pass 2/2 (Std):  73%|███████▎  | 109/150 [01:04<00:13,  3.12it/s][data] Pass 2/2 (Std):  73%|███████▎  | 110/150 [01:04<00:12,  3.13it/s][data] Pass 2/2 (Std):  74%|███████▍  | 111/150 [01:04<00:12,  3.13it/s][data] Pass 2/2 (Std):  75%|███████▍  | 112/150 [01:05<00:12,  3.14it/s][data] Pass 2/2 (Std):  75%|███████▌  | 113/150 [01:05<00:11,  3.14it/s][data] Pass 2/2 (Std):  76%|███████▌  | 114/150 [01:05<00:11,  3.15it/s][data] Pass 2/2 (Std):  77%|███████▋  | 115/150 [01:06<00:11,  3.12it/s][data] Pass 2/2 (Std):  77%|███████▋  | 116/150 [01:06<00:10,  3.12it/s][data] Pass 2/2 (Std):  78%|███████▊  | 117/150 [01:06<00:10,  3.12it/s][data] Pass 2/2 (Std):  79%|███████▊  | 118/150 [01:07<00:10,  3.13it/s][data] Pass 2/2 (Std):  79%|███████▉  | 119/150 [01:07<00:09,  3.12it/s][data] Pass 2/2 (Std):  80%|████████  | 120/150 [01:07<00:09,  3.12it/s][data] Pass 2/2 (Std):  81%|████████  | 121/150 [01:08<00:09,  3.10it/s][data] Pass 2/2 (Std):  81%|████████▏ | 122/150 [01:08<00:08,  3.11it/s][data] Pass 2/2 (Std):  82%|████████▏ | 123/150 [01:08<00:08,  3.10it/s][data] Pass 2/2 (Std):  83%|████████▎ | 124/150 [01:09<00:08,  3.12it/s][data] Pass 2/2 (Std):  83%|████████▎ | 125/150 [01:09<00:07,  3.13it/s][data] Pass 2/2 (Std):  84%|████████▍ | 126/150 [01:09<00:07,  3.14it/s][data] Pass 2/2 (Std):  85%|████████▍ | 127/150 [01:10<00:07,  3.13it/s][data] Pass 2/2 (Std):  85%|████████▌ | 128/150 [01:10<00:07,  3.13it/s][data] Pass 2/2 (Std):  86%|████████▌ | 129/150 [01:10<00:06,  3.11it/s][data] Pass 2/2 (Std):  87%|████████▋ | 130/150 [01:10<00:06,  3.13it/s][data] Pass 2/2 (Std):  87%|████████▋ | 131/150 [01:11<00:06,  3.13it/s][data] Pass 2/2 (Std):  88%|████████▊ | 132/150 [01:11<00:05,  3.14it/s][data] Pass 2/2 (Std):  89%|████████▊ | 133/150 [01:11<00:05,  3.14it/s][data] Pass 2/2 (Std):  89%|████████▉ | 134/150 [01:12<00:05,  3.14it/s][data] Pass 2/2 (Std):  90%|█████████ | 135/150 [01:12<00:04,  3.14it/s][data] Pass 2/2 (Std):  91%|█████████ | 136/150 [01:12<00:04,  3.14it/s][data] Pass 2/2 (Std):  91%|█████████▏| 137/150 [01:13<00:04,  3.14it/s][data] Pass 2/2 (Std):  92%|█████████▏| 138/150 [01:13<00:03,  3.14it/s][data] Pass 2/2 (Std):  93%|█████████▎| 139/150 [01:13<00:03,  3.13it/s][data] Pass 2/2 (Std):  93%|█████████▎| 140/150 [01:14<00:03,  3.12it/s][data] Pass 2/2 (Std):  94%|█████████▍| 141/150 [01:14<00:02,  3.11it/s][data] Pass 2/2 (Std):  95%|█████████▍| 142/150 [01:14<00:02,  3.13it/s][data] Pass 2/2 (Std):  95%|█████████▌| 143/150 [01:15<00:02,  3.13it/s][data] Pass 2/2 (Std):  96%|█████████▌| 144/150 [01:15<00:01,  3.14it/s][data] Pass 2/2 (Std):  97%|█████████▋| 145/150 [01:15<00:01,  3.13it/s][data] Pass 2/2 (Std):  97%|█████████▋| 146/150 [01:16<00:01,  3.13it/s][data] Pass 2/2 (Std):  98%|█████████▊| 147/150 [01:16<00:00,  3.12it/s][data] Pass 2/2 (Std):  99%|█████████▊| 148/150 [01:16<00:00,  3.13it/s][data] Pass 2/2 (Std):  99%|█████████▉| 149/150 [01:17<00:00,  3.13it/s][data] Pass 2/2 (Std): 100%|██████████| 150/150 [01:17<00:00,  3.86it/s][data] Pass 2/2 (Std): 100%|██████████| 150/150 [01:17<00:00,  1.94it/s]
+[data] Norm stats saved to /home/exouser/RepresentationAE/GeoAE/activations_gemma3_4b/norm_params_layer33.npz
+[train] Train tokens: 7,467,903  Val tokens: 393,048
+[train] Encoder: gelu  latent_dim=2560  n_clusters=2000  metric=euclidean  sinkhorn=on
+[train] Parameters: 13,109,760
+[train] Centroid init deferred until epoch 11 (kmeans++ from trained latents)
+
+[train] Epoch 1/50 | tau=1.000 | λ_c=0.000 λ_s=0.0000 | λ_var=0.000 λ_cov=0.0000
+  step    100 | loss 0.8059 | recon 0.8059 | clus 0.3672 | sep 0.3679 | val_mse 0.7973 | fve 0.198 | eff_K 2000/2000 | dying 0
+  step    200 | loss 0.5741 | recon 0.5741 | clus 0.3889 | sep 1.0000 | val_mse 0.5754 | fve 0.426 | eff_K 2000/2000 | dying 0
+  step    300 | loss 0.4514 | recon 0.4514 | clus 0.4285 | sep 0.3679 | val_mse 0.4548 | fve 0.547 | eff_K 2000/2000 | dying 0
+  step    400 | loss 0.3798 | recon 0.3798 | clus 0.4728 | sep 0.3679 | val_mse 0.3809 | fve 0.620 | eff_K 2000/2000 | dying 0
+  step    500 | loss 0.3305 | recon 0.3305 | clus 0.5074 | sep 0.3679 | val_mse 0.3336 | fve 0.667 | eff_K 2000/2000 | dying 0
+  step    600 | loss 0.2970 | recon 0.2970 | clus 0.5442 | sep 0.3679 | val_mse 0.2999 | fve 0.701 | eff_K 2000/2000 | dying 0
+  step    700 | loss 0.2748 | recon 0.2748 | clus 0.5838 | sep 0.3679 | val_mse 0.2749 | fve 0.725 | eff_K 2000/2000 | dying 0
+  step    800 | loss 0.2540 | recon 0.2540 | clus 0.6215 | sep 1.0000 | val_mse 0.2562 | fve 0.746 | eff_K 2000/2000 | dying 0
+  step    900 | loss 0.2390 | recon 0.2390 | clus 0.6417 | sep 0.3679 | val_mse 0.2419 | fve 0.760 | eff_K 2000/2000 | dying 0
+  step   1000 | loss 0.2271 | recon 0.2271 | clus 0.6755 | sep 1.0000 | val_mse 0.2300 | fve 0.773 | eff_K 2000/2000 | dying 0
+  step   1100 | loss 0.2179 | recon 0.2179 | clus 0.7055 | sep 0.3679 | val_mse 0.2204 | fve 0.781 | eff_K 2000/2000 | dying 0
+  step   1200 | loss 0.2087 | recon 0.2087 | clus 0.7201 | sep 0.3679 | val_mse 0.2125 | fve 0.789 | eff_K 2000/2000 | dying 0
+  step   1300 | loss 0.2050 | recon 0.2050 | clus 0.7552 | sep 1.0000 | val_mse 0.2055 | fve 0.795 | eff_K 2000/2000 | dying 0
+  step   1400 | loss 0.1984 | recon 0.1984 | clus 0.7870 | sep 1.0000 | val_mse 0.1995 | fve 0.802 | eff_K 2000/2000 | dying 0
+  step   1500 | loss 0.1945 | recon 0.1945 | clus 0.8227 | sep 1.0000 | val_mse 0.1937 | fve 0.808 | eff_K 2000/2000 | dying 0
+  step   1600 | loss 0.1877 | recon 0.1877 | clus 0.8200 | sep 0.3679 | val_mse 0.1889 | fve 0.812 | eff_K 2000/2000 | dying 0
+  step   1700 | loss 0.1809 | recon 0.1809 | clus 0.8371 | sep 0.3679 | val_mse 0.1842 | fve 0.818 | eff_K 2000/2000 | dying 0
+  step   1800 | loss 0.1764 | recon 0.1764 | clus 0.8483 | sep 0.3679 | val_mse 0.1796 | fve 0.821 | eff_K 2000/2000 | dying 0
+[train] Saved checkpoint: step_0001823.pt  val_mse=0.17863
+[train] New best val_mse=0.17863 → best_val.pt
+[train] Epoch 1 done in 31.7 min
+
+[train] Epoch 2/50 | tau=1.000 | λ_c=0.000 λ_s=0.0000 | λ_var=0.000 λ_cov=0.0000
+  step   1900 | loss 0.1738 | recon 0.1738 | clus 0.8820 | sep 1.0000 | val_mse 0.1757 | fve 0.826 | eff_K 2000/2000 | dying 0
+  step   2000 | loss 0.1699 | recon 0.1699 | clus 0.8927 | sep 0.3679 | val_mse 0.1719 | fve 0.829 | eff_K 2000/2000 | dying 0
+  step   2100 | loss 0.1680 | recon 0.1680 | clus 0.9368 | sep 1.0000 | val_mse 0.1681 | fve 0.833 | eff_K 2000/2000 | dying 0
+  step   2200 | loss 0.1628 | recon 0.1628 | clus 0.9342 | sep 1.0000 | val_mse 0.1645 | fve 0.836 | eff_K 2000/2000 | dying 0
+  step   2300 | loss 0.1607 | recon 0.1607 | clus 0.9842 | sep 1.0000 | val_mse 0.1611 | fve 0.841 | eff_K 2000/2000 | dying 0
+  step   2400 | loss 0.1568 | recon 0.1568 | clus 0.9930 | sep 0.3679 | val_mse 0.1577 | fve 0.844 | eff_K 2000/2000 | dying 0
+  step   2500 | loss 0.1533 | recon 0.1533 | clus 1.0209 | sep 1.0000 | val_mse 0.1546 | fve 0.848 | eff_K 2000/2000 | dying 0
+  step   2600 | loss 0.1510 | recon 0.1510 | clus 1.0186 | sep 1.0000 | val_mse 0.1514 | fve 0.848 | eff_K 2000/2000 | dying 0
+  step   2700 | loss 0.1467 | recon 0.1467 | clus 1.0272 | sep 0.3679 | val_mse 0.1484 | fve 0.852 | eff_K 2000/2000 | dying 0
+  step   2800 | loss 0.1433 | recon 0.1433 | clus 1.0653 | sep 0.3679 | val_mse 0.1453 | fve 0.856 | eff_K 2000/2000 | dying 0
+  step   2900 | loss 0.1410 | recon 0.1410 | clus 1.0997 | sep 1.0000 | val_mse 0.1424 | fve 0.859 | eff_K 2000/2000 | dying 0
+  step   3000 | loss 0.1397 | recon 0.1397 | clus 1.1381 | sep 1.0000 | val_mse 0.1393 | fve 0.862 | eff_K 2000/2000 | dying 0
+  step   3100 | loss 0.1349 | recon 0.1349 | clus 1.1527 | sep 1.0000 | val_mse 0.1367 | fve 0.865 | eff_K 2000/2000 | dying 0
+  step   3200 | loss 0.1324 | recon 0.1324 | clus 1.1826 | sep 1.0000 | val_mse 0.1342 | fve 0.868 | eff_K 2000/2000 | dying 0
+  step   3300 | loss 0.1296 | recon 0.1296 | clus 1.2013 | sep 1.0000 | val_mse 0.1316 | fve 0.870 | eff_K 2000/2000 | dying 0
+  step   3400 | loss 0.1272 | recon 0.1272 | clus 1.2382 | sep 0.3679 | val_mse 0.1289 | fve 0.873 | eff_K 2000/2000 | dying 0
+  step   3500 | loss 0.1252 | recon 0.1252 | clus 1.2534 | sep 1.0000 | val_mse 0.1263 | fve 0.875 | eff_K 2000/2000 | dying 0
+  step   3600 | loss 0.1213 | recon 0.1213 | clus 1.2651 | sep 0.3679 | val_mse 0.1239 | fve 0.878 | eff_K 2000/2000 | dying 0
+[train] Saved checkpoint: step_0003646.pt  val_mse=0.12275
+[train] New best val_mse=0.12275 → best_val.pt
+[train] Epoch 2 done in 35.8 min
+
+[train] Epoch 3/50 | tau=1.000 | λ_c=0.000 λ_s=0.0000 | λ_var=0.000 λ_cov=0.0000
+  step   3700 | loss 0.1187 | recon 0.1187 | clus 1.3106 | sep 0.3679 | val_mse 0.1216 | fve 0.881 | eff_K 2000/2000 | dying 0
+  step   3800 | loss 0.1182 | recon 0.1182 | clus 1.3393 | sep 0.3679 | val_mse 0.1193 | fve 0.882 | eff_K 2000/2000 | dying 0
+  step   3900 | loss 0.1150 | recon 0.1150 | clus 1.3730 | sep 1.0000 | val_mse 0.1170 | fve 0.885 | eff_K 2000/2000 | dying 0
+  step   4000 | loss 0.1124 | recon 0.1124 | clus 1.3787 | sep 1.0000 | val_mse 0.1146 | fve 0.887 | eff_K 2000/2000 | dying 0
+  step   4100 | loss 0.1117 | recon 0.1117 | clus 1.4065 | sep 1.0000 | val_mse 0.1127 | fve 0.889 | eff_K 2000/2000 | dying 0
+  step   4200 | loss 0.1095 | recon 0.1095 | clus 1.4507 | sep 0.3679 | val_mse 0.1107 | fve 0.891 | eff_K 2000/2000 | dying 0
+  step   4300 | loss 0.1066 | recon 0.1066 | clus 1.4838 | sep 1.0000 | val_mse 0.1087 | fve 0.893 | eff_K 2000/2000 | dying 0
+  step   4400 | loss 0.1048 | recon 0.1048 | clus 1.5014 | sep 1.0000 | val_mse 0.1067 | fve 0.895 | eff_K 2000/2000 | dying 0
+  step   4500 | loss 0.1046 | recon 0.1046 | clus 1.5259 | sep 0.3679 | val_mse 0.1046 | fve 0.896 | eff_K 2000/2000 | dying 0
+  step   4600 | loss 0.1011 | recon 0.1011 | clus 1.5196 | sep 0.3679 | val_mse 0.1028 | fve 0.898 | eff_K 2000/2000 | dying 0
+  step   4700 | loss 0.0989 | recon 0.0989 | clus 1.5604 | sep 1.0000 | val_mse 0.1009 | fve 0.901 | eff_K 2000/2000 | dying 0
+  step   4800 | loss 0.0986 | recon 0.0986 | clus 1.5946 | sep 1.0000 | val_mse 0.0990 | fve 0.902 | eff_K 2000/2000 | dying 0
+  step   4900 | loss 0.0961 | recon 0.0961 | clus 1.6051 | sep 0.3679 | val_mse 0.0975 | fve 0.904 | eff_K 2000/2000 | dying 0
+  step   5000 | loss 0.0942 | recon 0.0942 | clus 1.6570 | sep 0.3679 | val_mse 0.0955 | fve 0.906 | eff_K 2000/2000 | dying 0
+  step   5100 | loss 0.0922 | recon 0.0922 | clus 1.6546 | sep 1.0000 | val_mse 0.0938 | fve 0.907 | eff_K 2000/2000 | dying 0
+  step   5200 | loss 0.0904 | recon 0.0904 | clus 1.6779 | sep 1.0000 | val_mse 0.0923 | fve 0.909 | eff_K 2000/2000 | dying 0
+  step   5300 | loss 0.0906 | recon 0.0906 | clus 1.7243 | sep 0.3679 | val_mse 0.0905 | fve 0.910 | eff_K 2000/2000 | dying 0
+  step   5400 | loss 0.0870 | recon 0.0870 | clus 1.7343 | sep 1.0000 | val_mse 0.0890 | fve 0.913 | eff_K 2000/2000 | dying 0
+[train] Saved checkpoint: step_0005469.pt  val_mse=0.08792
+[train] New best val_mse=0.08792 → best_val.pt
+[train] Epoch 3 done in 43.5 min
+
+[train] Epoch 4/50 | tau=1.000 | λ_c=0.000 λ_s=0.0000 | λ_var=0.000 λ_cov=0.0000
+  step   5500 | loss 0.0866 | recon 0.0866 | clus 1.7732 | sep 1.0000 | val_mse 0.0874 | fve 0.914 | eff_K 2000/2000 | dying 0
+  step   5600 | loss 0.0843 | recon 0.0843 | clus 1.7854 | sep 1.0000 | val_mse 0.0858 | fve 0.916 | eff_K 2000/2000 | dying 0
+  step   5700 | loss 0.0826 | recon 0.0826 | clus 1.7884 | sep 0.3679 | val_mse 0.0845 | fve 0.917 | eff_K 2000/2000 | dying 0
+  step   5800 | loss 0.0820 | recon 0.0820 | clus 1.8390 | sep 1.0000 | val_mse 0.0830 | fve 0.918 | eff_K 2000/2000 | dying 0
+  step   5900 | loss 0.0800 | recon 0.0800 | clus 1.8263 | sep 1.0000 | val_mse 0.0816 | fve 0.920 | eff_K 2000/2000 | dying 0
+  step   6000 | loss 0.0786 | recon 0.0786 | clus 1.8639 | sep 0.3679 | val_mse 0.0801 | fve 0.921 | eff_K 2000/2000 | dying 0
+  step   6100 | loss 0.0769 | recon 0.0769 | clus 1.8650 | sep 1.0000 | val_mse 0.0786 | fve 0.923 | eff_K 2000/2000 | dying 0
+  step   6200 | loss 0.0763 | recon 0.0763 | clus 1.9080 | sep 0.3679 | val_mse 0.0773 | fve 0.924 | eff_K 2000/2000 | dying 0
+  step   6300 | loss 0.0752 | recon 0.0752 | clus 1.9610 | sep 1.0000 | val_mse 0.0760 | fve 0.925 | eff_K 2000/2000 | dying 0
+  step   6400 | loss 0.0731 | recon 0.0731 | clus 1.9582 | sep 0.3679 | val_mse 0.0746 | fve 0.927 | eff_K 2000/2000 | dying 0
+  step   6500 | loss 0.0713 | recon 0.0713 | clus 1.9715 | sep 0.3679 | val_mse 0.0733 | fve 0.928 | eff_K 2000/2000 | dying 0
+  step   6600 | loss 0.0707 | recon 0.0707 | clus 1.9685 | sep 1.0000 | val_mse 0.0721 | fve 0.929 | eff_K 2000/2000 | dying 0
+  step   6700 | loss 0.0678 | recon 0.0678 | clus 2.0114 | sep 1.0000 | val_mse 0.0709 | fve 0.932 | eff_K 2000/2000 | dying 0
+  step   6800 | loss 0.0676 | recon 0.0676 | clus 2.0503 | sep 0.3679 | val_mse 0.0696 | fve 0.932 | eff_K 2000/2000 | dying 0
+  step   6900 | loss 0.0672 | recon 0.0672 | clus 2.0491 | sep 1.0000 | val_mse 0.0684 | fve 0.933 | eff_K 2000/2000 | dying 0
+  step   7000 | loss 0.0664 | recon 0.0664 | clus 2.0813 | sep 1.0000 | val_mse 0.0673 | fve 0.934 | eff_K 2000/2000 | dying 0
+  step   7100 | loss 0.0648 | recon 0.0648 | clus 2.1107 | sep 1.0000 | val_mse 0.0661 | fve 0.935 | eff_K 2000/2000 | dying 0
+  step   7200 | loss 0.0638 | recon 0.0638 | clus 2.0682 | sep 1.0000 | val_mse 0.0648 | fve 0.936 | eff_K 2000/2000 | dying 0
+[train] Saved checkpoint: step_0007292.pt  val_mse=0.06395
+[train] New best val_mse=0.06395 → best_val.pt
+[train] Epoch 4 done in 39.5 min
+
+[train] Epoch 5/50 | tau=1.000 | λ_c=0.000 λ_s=0.0000 | λ_var=0.000 λ_cov=0.0000
+  step   7300 | loss 0.0622 | recon 0.0622 | clus 2.1540 | sep 0.3679 | val_mse 0.0638 | fve 0.938 | eff_K 2000/2000 | dying 0
+  step   7400 | loss 0.0608 | recon 0.0608 | clus 2.1462 | sep 1.0000 | val_mse 0.0627 | fve 0.939 | eff_K 2000/2000 | dying 0
+  step   7500 | loss 0.0592 | recon 0.0592 | clus 2.1495 | sep 0.3679 | val_mse 0.0617 | fve 0.940 | eff_K 2000/2000 | dying 0
+  step   7600 | loss 0.0591 | recon 0.0591 | clus 2.2026 | sep 1.0000 | val_mse 0.0607 | fve 0.941 | eff_K 2000/2000 | dying 0
+  step   7700 | loss 0.0572 | recon 0.0572 | clus 2.1988 | sep 1.0000 | val_mse 0.0596 | fve 0.942 | eff_K 2000/2000 | dying 0
+  step   7800 | loss 0.0567 | recon 0.0567 | clus 2.2102 | sep 1.0000 | val_mse 0.0586 | fve 0.943 | eff_K 2000/2000 | dying 0
+  step   7900 | loss 0.0560 | recon 0.0560 | clus 2.2605 | sep 1.0000 | val_mse 0.0576 | fve 0.944 | eff_K 2000/2000 | dying 0
+  step   8000 | loss 0.0556 | recon 0.0556 | clus 2.2199 | sep 0.3679 | val_mse 0.0566 | fve 0.944 | eff_K 2000/2000 | dying 0
+  step   8100 | loss 0.0536 | recon 0.0536 | clus 2.2443 | sep 1.0000 | val_mse 0.0557 | fve 0.946 | eff_K 2000/2000 | dying 0
+  step   8200 | loss 0.0537 | recon 0.0537 | clus 2.2590 | sep 0.3679 | val_mse 0.0548 | fve 0.946 | eff_K 2000/2000 | dying 0
+  step   8300 | loss 0.0519 | recon 0.0519 | clus 2.2790 | sep 1.0000 | val_mse 0.0537 | fve 0.948 | eff_K 2000/2000 | dying 0
+  step   8400 | loss 0.0511 | recon 0.0511 | clus 2.2997 | sep 0.3679 | val_mse 0.0529 | fve 0.949 | eff_K 2000/2000 | dying 0
+  step   8500 | loss 0.0506 | recon 0.0506 | clus 2.3491 | sep 0.3679 | val_mse 0.0519 | fve 0.950 | eff_K 2000/2000 | dying 0
+  step   8600 | loss 0.0494 | recon 0.0494 | clus 2.3919 | sep 1.0000 | val_mse 0.0510 | fve 0.951 | eff_K 2000/2000 | dying 0
+  step   8700 | loss 0.0487 | recon 0.0487 | clus 2.4108 | sep 1.0000 | val_mse 0.0501 | fve 0.952 | eff_K 2000/2000 | dying 0
+  step   8800 | loss 0.0482 | recon 0.0482 | clus 2.4108 | sep 0.3679 | val_mse 0.0494 | fve 0.952 | eff_K 2000/2000 | dying 0
+  step   8900 | loss 0.0468 | recon 0.0468 | clus 2.4040 | sep 1.0000 | val_mse 0.0485 | fve 0.953 | eff_K 2000/2000 | dying 0
+  step   9000 | loss 0.0461 | recon 0.0461 | clus 2.3964 | sep 1.0000 | val_mse 0.0476 | fve 0.954 | eff_K 2000/2000 | dying 0
+  step   9100 | loss 0.0452 | recon 0.0452 | clus 2.4167 | sep 0.3679 | val_mse 0.0468 | fve 0.955 | eff_K 2000/2000 | dying 0
+[train] Saved checkpoint: step_0009115.pt  val_mse=0.04673
+[train] New best val_mse=0.04673 → best_val.pt
+[train] Epoch 5 done in 37.9 min
+
+[train] Epoch 6/50 | tau=1.000 | λ_c=0.000 λ_s=0.0000 | λ_var=0.300 λ_cov=0.0010
+  step   9200 | loss 0.0975 | recon 0.0579 | clus 2.0363 | sep 1.0000 | var 0.0414 | cov 27.1484 | val_mse 0.0597 | fve 0.942 | eff_K 2000/2000 | dying 0
+  step   9300 | loss 0.0843 | recon 0.0608 | clus 1.9772 | sep 1.0000 | var 0.0198 | cov 17.6356 | val_mse 0.0617 | fve 0.939 | eff_K 2000/2000 | dying 0
+  step   9400 | loss 0.0775 | recon 0.0597 | clus 1.9628 | sep 0.3679 | var 0.0108 | cov 14.5356 | val_mse 0.0608 | fve 0.941 | eff_K 2000/2000 | dying 0
+  step   9500 | loss 0.0726 | recon 0.0569 | clus 1.9265 | sep 0.3679 | var 0.0101 | cov 12.6480 | val_mse 0.0592 | fve 0.943 | eff_K 2000/2000 | dying 0
+  step   9600 | loss 0.0708 | recon 0.0570 | clus 1.9286 | sep 1.0000 | var 0.0073 | cov 11.6601 | val_mse 0.0575 | fve 0.943 | eff_K 2000/2000 | dying 0
+  step   9700 | loss 0.0673 | recon 0.0544 | clus 1.9253 | sep 1.0000 | var 0.0066 | cov 10.9322 | val_mse 0.0560 | fve 0.946 | eff_K 2000/2000 | dying 0
+  step   9800 | loss 0.0649 | recon 0.0531 | clus 1.9097 | sep 1.0000 | var 0.0063 | cov 9.9117 | val_mse 0.0547 | fve 0.947 | eff_K 2000/2000 | dying 0
+  step   9900 | loss 0.0630 | recon 0.0517 | clus 1.8969 | sep 1.0000 | var 0.0074 | cov 9.0774 | val_mse 0.0535 | fve 0.948 | eff_K 2000/2000 | dying 0
+  step  10000 | loss 0.0620 | recon 0.0516 | clus 1.9220 | sep 1.0000 | var 0.0053 | cov 8.8124 | val_mse 0.0523 | fve 0.949 | eff_K 2000/2000 | dying 0
+  step  10100 | loss 0.0600 | recon 0.0496 | clus 1.9037 | sep 0.3679 | var 0.0078 | cov 8.0729 | val_mse 0.0510 | fve 0.950 | eff_K 2000/2000 | dying 0
+  step  10200 | loss 0.0591 | recon 0.0489 | clus 1.9344 | sep 1.0000 | var 0.0053 | cov 8.6251 | val_mse 0.0500 | fve 0.951 | eff_K 2000/2000 | dying 0
+  step  10300 | loss 0.0577 | recon 0.0485 | clus 1.9496 | sep 1.0000 | var 0.0037 | cov 8.1056 | val_mse 0.0490 | fve 0.952 | eff_K 2000/2000 | dying 0
+  step  10400 | loss 0.0560 | recon 0.0464 | clus 1.9333 | sep 1.0000 | var 0.0062 | cov 7.7845 | val_mse 0.0478 | fve 0.954 | eff_K 2000/2000 | dying 0
+  step  10500 | loss 0.0551 | recon 0.0464 | clus 1.9542 | sep 1.0000 | var 0.0043 | cov 7.4275 | val_mse 0.0468 | fve 0.954 | eff_K 2000/2000 | dying 0
+  step  10600 | loss 0.0535 | recon 0.0443 | clus 1.9444 | sep 0.3679 | var 0.0062 | cov 7.3468 | val_mse 0.0458 | fve 0.955 | eff_K 2000/2000 | dying 0
+  step  10700 | loss 0.0520 | recon 0.0435 | clus 1.9540 | sep 0.3679 | var 0.0053 | cov 6.9434 | val_mse 0.0447 | fve 0.956 | eff_K 2000/2000 | dying 0
+  step  10800 | loss 0.0514 | recon 0.0428 | clus 1.9680 | sep 1.0000 | var 0.0048 | cov 7.1363 | val_mse 0.0438 | fve 0.957 | eff_K 2000/2000 | dying 0
+  step  10900 | loss 0.0502 | recon 0.0423 | clus 1.9979 | sep 1.0000 | var 0.0029 | cov 7.0487 | val_mse 0.0429 | fve 0.958 | eff_K 2000/2000 | dying 0
+[train] Saved checkpoint: step_0010938.pt  val_mse=0.04246
+[train] New best val_mse=0.04246 → best_val.pt
+[train] Epoch 6 done in 34.4 min
+
+[train] Epoch 7/50 | tau=1.000 | λ_c=0.000 λ_s=0.0000 | λ_var=0.300 λ_cov=0.0010
+  step  11000 | loss 0.0483 | recon 0.0395 | clus 1.9591 | sep 1.0000 | var 0.0078 | cov 6.4894 | val_mse 0.0419 | fve 0.960 | eff_K 2000/2000 | dying 0
+  step  11100 | loss 0.0474 | recon 0.0390 | clus 1.9802 | sep 1.0000 | var 0.0069 | cov 6.2582 | val_mse 0.0410 | fve 0.961 | eff_K 2000/2000 | dying 0
+  step  11200 | loss 0.0465 | recon 0.0386 | clus 2.0057 | sep 1.0000 | var 0.0052 | cov 6.3283 | val_mse 0.0402 | fve 0.961 | eff_K 2000/2000 | dying 0
+  step  11300 | loss 0.0460 | recon 0.0380 | clus 2.0242 | sep 1.0000 | var 0.0056 | cov 6.3034 | val_mse 0.0394 | fve 0.962 | eff_K 2000/2000 | dying 0
+  step  11400 | loss 0.0447 | recon 0.0368 | clus 2.0103 | sep 0.3679 | var 0.0063 | cov 6.0640 | val_mse 0.0385 | fve 0.963 | eff_K 2000/2000 | dying 0
+  step  11500 | loss 0.0439 | recon 0.0367 | clus 2.0501 | sep 1.0000 | var 0.0047 | cov 5.8627 | val_mse 0.0378 | fve 0.963 | eff_K 2000/2000 | dying 0
+  step  11600 | loss 0.0434 | recon 0.0362 | clus 2.0759 | sep 1.0000 | var 0.0030 | cov 6.2289 | val_mse 0.0369 | fve 0.964 | eff_K 2000/2000 | dying 0
+  step  11700 | loss 0.0427 | recon 0.0352 | clus 2.0548 | sep 0.3679 | var 0.0048 | cov 6.0177 | val_mse 0.0362 | fve 0.965 | eff_K 2000/2000 | dying 0
+  step  11800 | loss 0.0422 | recon 0.0351 | clus 2.0980 | sep 1.0000 | var 0.0031 | cov 6.1485 | val_mse 0.0355 | fve 0.965 | eff_K 2000/2000 | dying 0
+  step  11900 | loss 0.0407 | recon 0.0338 | clus 2.0928 | sep 1.0000 | var 0.0039 | cov 5.7154 | val_mse 0.0347 | fve 0.966 | eff_K 2000/2000 | dying 0
+  step  12000 | loss 0.0399 | recon 0.0331 | clus 2.1186 | sep 1.0000 | var 0.0025 | cov 6.0171 | val_mse 0.0341 | fve 0.967 | eff_K 2000/2000 | dying 0
+  step  12100 | loss 0.0395 | recon 0.0330 | clus 2.1490 | sep 0.3679 | var 0.0016 | cov 6.0301 | val_mse 0.0333 | fve 0.968 | eff_K 2000/2000 | dying 0
+  step  12200 | loss 0.0387 | recon 0.0320 | clus 2.1285 | sep 1.0000 | var 0.0045 | cov 5.3417 | val_mse 0.0327 | fve 0.968 | eff_K 2000/2000 | dying 0
+  step  12300 | loss 0.0381 | recon 0.0314 | clus 2.1533 | sep 1.0000 | var 0.0032 | cov 5.6730 | val_mse 0.0320 | fve 0.969 | eff_K 2000/2000 | dying 0
+  step  12400 | loss 0.0366 | recon 0.0304 | clus 2.1589 | sep 1.0000 | var 0.0030 | cov 5.3403 | val_mse 0.0313 | fve 0.970 | eff_K 2000/2000 | dying 0
+  step  12500 | loss 0.0358 | recon 0.0293 | clus 2.1654 | sep 0.3679 | var 0.0045 | cov 5.1651 | val_mse 0.0308 | fve 0.971 | eff_K 2000/2000 | dying 0
+  step  12600 | loss 0.0356 | recon 0.0290 | clus 2.1704 | sep 0.3679 | var 0.0047 | cov 5.2208 | val_mse 0.0302 | fve 0.971 | eff_K 2000/2000 | dying 0
+  step  12700 | loss 0.0349 | recon 0.0285 | clus 2.1992 | sep 1.0000 | var 0.0042 | cov 5.1796 | val_mse 0.0296 | fve 0.971 | eff_K 2000/2000 | dying 0
+[train] Saved checkpoint: step_0012761.pt  val_mse=0.02920
+[train] New best val_mse=0.02920 → best_val.pt
+[train] Epoch 7 done in 38.8 min
+
+[train] Epoch 8/50 | tau=1.000 | λ_c=0.000 λ_s=0.0000 | λ_var=0.300 λ_cov=0.0010
+  step  12800 | loss 0.0339 | recon 0.0278 | clus 2.2367 | sep 1.0000 | var 0.0024 | cov 5.3367 | val_mse 0.0290 | fve 0.972 | eff_K 2000/2000 | dying 0
+  step  12900 | loss 0.0337 | recon 0.0279 | clus 2.2440 | sep 0.3679 | var 0.0026 | cov 5.0174 | val_mse 0.0285 | fve 0.972 | eff_K 2000/2000 | dying 0
+  step  13000 | loss 0.0331 | recon 0.0267 | clus 2.2333 | sep 1.0000 | var 0.0041 | cov 5.1531 | val_mse 0.0279 | fve 0.973 | eff_K 2000/2000 | dying 0
+  step  13100 | loss 0.0326 | recon 0.0264 | clus 2.2510 | sep 0.3679 | var 0.0043 | cov 4.8420 | val_mse 0.0274 | fve 0.973 | eff_K 2000/2000 | dying 0
+  step  13200 | loss 0.0316 | recon 0.0256 | clus 2.2674 | sep 0.3679 | var 0.0037 | cov 4.8693 | val_mse 0.0268 | fve 0.974 | eff_K 2000/2000 | dying 0
+  step  13300 | loss 0.0316 | recon 0.0253 | clus 2.2679 | sep 1.0000 | var 0.0052 | cov 4.8319 | val_mse 0.0263 | fve 0.974 | eff_K 2000/2000 | dying 0
+  step  13400 | loss 0.0311 | recon 0.0256 | clus 2.3219 | sep 0.3679 | var 0.0020 | cov 4.9441 | val_mse 0.0258 | fve 0.975 | eff_K 2000/2000 | dying 0
+  step  13500 | loss 0.0297 | recon 0.0244 | clus 2.3342 | sep 0.3679 | var 0.0020 | cov 4.6841 | val_mse 0.0254 | fve 0.976 | eff_K 2000/2000 | dying 0
+  step  13600 | loss 0.0295 | recon 0.0241 | clus 2.3347 | sep 1.0000 | var 0.0023 | cov 4.7899 | val_mse 0.0250 | fve 0.976 | eff_K 2000/2000 | dying 0
+  step  13700 | loss 0.0293 | recon 0.0237 | clus 2.3503 | sep 1.0000 | var 0.0027 | cov 4.7509 | val_mse 0.0245 | fve 0.976 | eff_K 2000/2000 | dying 0
+  step  13800 | loss 0.0285 | recon 0.0231 | clus 2.3616 | sep 1.0000 | var 0.0028 | cov 4.5846 | val_mse 0.0240 | fve 0.977 | eff_K 2000/2000 | dying 0
+  step  13900 | loss 0.0281 | recon 0.0220 | clus 2.3471 | sep 1.0000 | var 0.0058 | cov 4.3191 | val_mse 0.0236 | fve 0.978 | eff_K 2000/2000 | dying 0
+  step  14000 | loss 0.0275 | recon 0.0223 | clus 2.3933 | sep 0.3679 | var 0.0027 | cov 4.3968 | val_mse 0.0232 | fve 0.978 | eff_K 2000/2000 | dying 0
+  step  14100 | loss 0.0273 | recon 0.0221 | clus 2.4152 | sep 1.0000 | var 0.0024 | cov 4.4692 | val_mse 0.0228 | fve 0.978 | eff_K 2000/2000 | dying 0
+  step  14200 | loss 0.0268 | recon 0.0212 | clus 2.3982 | sep 1.0000 | var 0.0045 | cov 4.3030 | val_mse 0.0223 | fve 0.979 | eff_K 2000/2000 | dying 0
+  step  14300 | loss 0.0262 | recon 0.0211 | clus 2.4353 | sep 1.0000 | var 0.0026 | cov 4.3544 | val_mse 0.0219 | fve 0.979 | eff_K 2000/2000 | dying 0
+  step  14400 | loss 0.0256 | recon 0.0206 | clus 2.4642 | sep 1.0000 | var 0.0019 | cov 4.4647 | val_mse 0.0216 | fve 0.979 | eff_K 2000/2000 | dying 0
+  step  14500 | loss 0.0255 | recon 0.0206 | clus 2.4875 | sep 0.3679 | var 0.0017 | cov 4.3818 | val_mse 0.0211 | fve 0.980 | eff_K 2000/2000 | dying 0
+[train] Saved checkpoint: step_0014584.pt  val_mse=0.02075
+[train] New best val_mse=0.02075 → best_val.pt
+[train] Epoch 8 done in 33.0 min
+
+[train] Epoch 9/50 | tau=1.000 | λ_c=0.000 λ_s=0.0000 | λ_var=0.300 λ_cov=0.0010
+  step  14600 | loss 0.0250 | recon 0.0201 | clus 2.4868 | sep 1.0000 | var 0.0022 | cov 4.2153 | val_mse 0.0207 | fve 0.980 | eff_K 2000/2000 | dying 0
+  step  14700 | loss 0.0241 | recon 0.0195 | clus 2.5120 | sep 1.0000 | var 0.0017 | cov 4.0758 | val_mse 0.0203 | fve 0.981 | eff_K 2000/2000 | dying 0
+  step  14800 | loss 0.0236 | recon 0.0190 | clus 2.5107 | sep 0.3679 | var 0.0019 | cov 4.0589 | val_mse 0.0200 | fve 0.981 | eff_K 2000/2000 | dying 0
+  step  14900 | loss 0.0235 | recon 0.0189 | clus 2.5353 | sep 1.0000 | var 0.0018 | cov 4.0892 | val_mse 0.0196 | fve 0.981 | eff_K 2000/2000 | dying 0
+  step  15000 | loss 0.0233 | recon 0.0186 | clus 2.5560 | sep 1.0000 | var 0.0017 | cov 4.2111 | val_mse 0.0192 | fve 0.982 | eff_K 2000/2000 | dying 0
+  step  15100 | loss 0.0228 | recon 0.0176 | clus 2.5328 | sep 0.3679 | var 0.0038 | cov 4.0340 | val_mse 0.0188 | fve 0.982 | eff_K 2000/2000 | dying 0
+  step  15200 | loss 0.0226 | recon 0.0179 | clus 2.5800 | sep 1.0000 | var 0.0022 | cov 4.0511 | val_mse 0.0185 | fve 0.982 | eff_K 2000/2000 | dying 0
+  step  15300 | loss 0.0220 | recon 0.0174 | clus 2.5971 | sep 0.3679 | var 0.0021 | cov 3.9252 | val_mse 0.0181 | fve 0.983 | eff_K 2000/2000 | dying 0
+  step  15400 | loss 0.0214 | recon 0.0168 | clus 2.5990 | sep 1.0000 | var 0.0022 | cov 3.8521 | val_mse 0.0177 | fve 0.983 | eff_K 2000/2000 | dying 0
+  step  15500 | loss 0.0209 | recon 0.0164 | clus 2.6147 | sep 1.0000 | var 0.0024 | cov 3.7718 | val_mse 0.0174 | fve 0.984 | eff_K 2000/2000 | dying 0
+  step  15600 | loss 0.0208 | recon 0.0163 | clus 2.6257 | sep 0.3679 | var 0.0028 | cov 3.6878 | val_mse 0.0171 | fve 0.984 | eff_K 2000/2000 | dying 0
+  step  15700 | loss 0.0203 | recon 0.0160 | clus 2.6642 | sep 0.3679 | var 0.0016 | cov 3.8818 | val_mse 0.0168 | fve 0.984 | eff_K 2000/2000 | dying 0
+  step  15800 | loss 0.0201 | recon 0.0157 | clus 2.6732 | sep 0.3679 | var 0.0024 | cov 3.6562 | val_mse 0.0165 | fve 0.984 | eff_K 2000/2000 | dying 0
+  step  15900 | loss 0.0198 | recon 0.0154 | clus 2.6802 | sep 1.0000 | var 0.0028 | cov 3.6133 | val_mse 0.0161 | fve 0.985 | eff_K 2000/2000 | dying 0
+  step  16000 | loss 0.0194 | recon 0.0151 | clus 2.7081 | sep 0.3679 | var 0.0024 | cov 3.6509 | val_mse 0.0159 | fve 0.985 | eff_K 2000/2000 | dying 0
+  step  16100 | loss 0.0190 | recon 0.0149 | clus 2.7255 | sep 1.0000 | var 0.0018 | cov 3.5777 | val_mse 0.0156 | fve 0.985 | eff_K 2000/2000 | dying 0
+  step  16200 | loss 0.0189 | recon 0.0143 | clus 2.7247 | sep 1.0000 | var 0.0033 | cov 3.5356 | val_mse 0.0153 | fve 0.986 | eff_K 2000/2000 | dying 0
+  step  16300 | loss 0.0188 | recon 0.0146 | clus 2.7722 | sep 1.0000 | var 0.0018 | cov 3.6889 | val_mse 0.0151 | fve 0.986 | eff_K 2000/2000 | dying 0
+  step  16400 | loss 0.0185 | recon 0.0144 | clus 2.7851 | sep 0.3679 | var 0.0015 | cov 3.6272 | val_mse 0.0148 | fve 0.986 | eff_K 2000/2000 | dying 0
+[train] Saved checkpoint: step_0016407.pt  val_mse=0.01481
+[train] New best val_mse=0.01481 → best_val.pt
+[train] Epoch 9 done in 35.7 min
+
+[train] Epoch 10/50 | tau=1.000 | λ_c=0.000 λ_s=0.0000 | λ_var=0.300 λ_cov=0.0010
+  step  16500 | loss 0.0178 | recon 0.0139 | clus 2.7998 | sep 1.0000 | var 0.0015 | cov 3.4606 | val_mse 0.0145 | fve 0.986 | eff_K 2000/2000 | dying 0
+  step  16600 | loss 0.0176 | recon 0.0134 | clus 2.8062 | sep 1.0000 | var 0.0025 | cov 3.4579 | val_mse 0.0144 | fve 0.987 | eff_K 2000/2000 | dying 0
+  step  16700 | loss 0.0172 | recon 0.0131 | clus 2.8255 | sep 0.3679 | var 0.0021 | cov 3.4094 | val_mse 0.0141 | fve 0.987 | eff_K 2000/2000 | dying 0
+  step  16800 | loss 0.0169 | recon 0.0130 | clus 2.8415 | sep 0.3679 | var 0.0019 | cov 3.3521 | val_mse 0.0138 | fve 0.987 | eff_K 2000/2000 | dying 0
+  step  16900 | loss 0.0171 | recon 0.0130 | clus 2.8743 | sep 1.0000 | var 0.0020 | cov 3.4887 | val_mse 0.0136 | fve 0.987 | eff_K 2000/2000 | dying 0
+  step  17000 | loss 0.0169 | recon 0.0130 | clus 2.9046 | sep 1.0000 | var 0.0014 | cov 3.4665 | val_mse 0.0134 | fve 0.987 | eff_K 2000/2000 | dying 0
+  step  17100 | loss 0.0164 | recon 0.0126 | clus 2.9061 | sep 0.3679 | var 0.0013 | cov 3.4489 | val_mse 0.0132 | fve 0.987 | eff_K 2000/2000 | dying 0
+  step  17200 | loss 0.0163 | recon 0.0123 | clus 2.9171 | sep 1.0000 | var 0.0023 | cov 3.2759 | val_mse 0.0129 | fve 0.988 | eff_K 2000/2000 | dying 0
+  step  17300 | loss 0.0159 | recon 0.0122 | clus 2.9442 | sep 0.3679 | var 0.0011 | cov 3.3898 | val_mse 0.0127 | fve 0.988 | eff_K 2000/2000 | dying 0
+  step  17400 | loss 0.0160 | recon 0.0123 | clus 2.9657 | sep 0.3679 | var 0.0014 | cov 3.3251 | val_mse 0.0125 | fve 0.988 | eff_K 2000/2000 | dying 0
+  step  17500 | loss 0.0155 | recon 0.0116 | clus 2.9584 | sep 0.3679 | var 0.0021 | cov 3.3170 | val_mse 0.0123 | fve 0.988 | eff_K 2000/2000 | dying 0
+  step  17600 | loss 0.0154 | recon 0.0118 | clus 3.0051 | sep 1.0000 | var 0.0013 | cov 3.2949 | val_mse 0.0121 | fve 0.988 | eff_K 2000/2000 | dying 0
+  step  17700 | loss 0.0151 | recon 0.0114 | clus 3.0157 | sep 0.3679 | var 0.0015 | cov 3.2111 | val_mse 0.0119 | fve 0.989 | eff_K 2000/2000 | dying 0
+  step  17800 | loss 0.0148 | recon 0.0112 | clus 3.0327 | sep 1.0000 | var 0.0012 | cov 3.2123 | val_mse 0.0118 | fve 0.989 | eff_K 2000/2000 | dying 0
+  step  17900 | loss 0.0146 | recon 0.0109 | clus 3.0431 | sep 0.3679 | var 0.0017 | cov 3.2152 | val_mse 0.0116 | fve 0.989 | eff_K 2000/2000 | dying 0
+  step  18000 | loss 0.0146 | recon 0.0111 | clus 3.0768 | sep 0.3679 | var 0.0008 | cov 3.2486 | val_mse 0.0114 | fve 0.989 | eff_K 2000/2000 | dying 0
+  step  18100 | loss 0.0142 | recon 0.0107 | clus 3.0797 | sep 1.0000 | var 0.0015 | cov 3.1216 | val_mse 0.0113 | fve 0.989 | eff_K 2000/2000 | dying 0
+  step  18200 | loss 0.0140 | recon 0.0104 | clus 3.0992 | sep 0.3679 | var 0.0014 | cov 3.2005 | val_mse 0.0111 | fve 0.990 | eff_K 2000/2000 | dying 0
+[train] Saved checkpoint: step_0018230.pt  val_mse=0.01100
+[train] New best val_mse=0.01100 → best_val.pt
+[train] Epoch 10 done in 36.3 min
+[train] Epoch 11: k-means++ init of 2000 centroids from 4096 trained latents
+
+[train] Epoch 11/50 | tau=1.000 | λ_c=0.050 λ_s=0.0000 | λ_var=0.300 λ_cov=0.0010
+  step  18300 | loss 0.0552 | recon 0.0104 | clus 0.8107 | sep 0.5084 | var 0.0033 | cov 3.3066 | val_mse 0.0109 | fve 0.990 | eff_K 2000/2000 | dying 0
+  step  18400 | loss 0.0535 | recon 0.0102 | clus 0.7839 | sep 0.4389 | var 0.0021 | cov 3.5016 | val_mse 0.0106 | fve 0.990 | eff_K 2000/2000 | dying 797
+  step  18500 | loss 0.0536 | recon 0.0100 | clus 0.7831 | sep 0.4243 | var 0.0034 | cov 3.4602 | val_mse 0.0105 | fve 0.990 | eff_K 1726/2000 | dying 643
+  step  18600 | loss 0.0520 | recon 0.0093 | clus 0.7542 | sep 0.4179 | var 0.0054 | cov 3.3474 | val_mse 0.0103 | fve 0.991 | eff_K 1811/2000 | dying 499
+  step  18700 | loss 0.0519 | recon 0.0094 | clus 0.7581 | sep 0.4150 | var 0.0034 | cov 3.5504 | val_mse 0.0101 | fve 0.991 | eff_K 1856/2000 | dying 434
+  step  18800 | loss 0.0522 | recon 0.0095 | clus 0.7663 | sep 0.4095 | var 0.0025 | cov 3.5574 | val_mse 0.0100 | fve 0.991 | eff_K 1892/2000 | dying 412
+  step  18900 | loss 0.0519 | recon 0.0094 | clus 0.7629 | sep 0.4037 | var 0.0024 | cov 3.6552 | val_mse 0.0099 | fve 0.991 | eff_K 1911/2000 | dying 363
+  step  19000 | loss 0.0517 | recon 0.0092 | clus 0.7553 | sep 0.4032 | var 0.0038 | cov 3.5616 | val_mse 0.0097 | fve 0.991 | eff_K 1923/2000 | dying 347
+  [reinit] step 19000: reinitialised 74 dead clusters
+  step  19100 | loss 0.0518 | recon 0.0093 | clus 0.7656 | sep 0.4010 | var 0.0018 | cov 3.6079 | val_mse 0.0096 | fve 0.991 | eff_K 1932/2000 | dying 373
+  step  19200 | loss 0.0511 | recon 0.0088 | clus 0.7508 | sep 0.3994 | var 0.0036 | cov 3.6348 | val_mse 0.0095 | fve 0.991 | eff_K 1944/2000 | dying 384
+  step  19300 | loss 0.0510 | recon 0.0088 | clus 0.7501 | sep 0.4010 | var 0.0038 | cov 3.5713 | val_mse 0.0093 | fve 0.991 | eff_K 1952/2000 | dying 346
+  step  19400 | loss 0.0508 | recon 0.0087 | clus 0.7537 | sep 0.3987 | var 0.0027 | cov 3.5908 | val_mse 0.0092 | fve 0.991 | eff_K 1957/2000 | dying 353
+  step  19500 | loss 0.0508 | recon 0.0085 | clus 0.7447 | sep 0.3971 | var 0.0050 | cov 3.5754 | val_mse 0.0091 | fve 0.991 | eff_K 1966/2000 | dying 345
+  step  19600 | loss 0.0505 | recon 0.0084 | clus 0.7520 | sep 0.3990 | var 0.0036 | cov 3.4531 | val_mse 0.0090 | fve 0.992 | eff_K 1973/2000 | dying 336
+  step  19700 | loss 0.0503 | recon 0.0083 | clus 0.7517 | sep 0.4002 | var 0.0030 | cov 3.5018 | val_mse 0.0089 | fve 0.992 | eff_K 1975/2000 | dying 330
+  step  19800 | loss 0.0500 | recon 0.0082 | clus 0.7461 | sep 0.3939 | var 0.0032 | cov 3.4751 | val_mse 0.0088 | fve 0.992 | eff_K 1980/2000 | dying 342
+  step  19900 | loss 0.0507 | recon 0.0085 | clus 0.7557 | sep 0.3958 | var 0.0026 | cov 3.6882 | val_mse 0.0087 | fve 0.992 | eff_K 1982/2000 | dying 332
+  step  20000 | loss 0.0501 | recon 0.0080 | clus 0.7514 | sep 0.3951 | var 0.0036 | cov 3.4736 | val_mse 0.0086 | fve 0.992 | eff_K 1985/2000 | dying 333
+  [reinit] step 20000: reinitialised 13 dead clusters
+[train] Saved checkpoint: step_0020053.pt  val_mse=0.00869
+[train] New best val_mse=0.00869 → best_val.pt
+[train] Epoch 11 done in 39.5 min
+
+[train] Epoch 12/50 | tau=0.977 | λ_c=0.050 λ_s=0.0001 | λ_var=0.300 λ_cov=0.0010
+  step  20100 | loss 0.0499 | recon 0.0081 | clus 0.7459 | sep 0.3940 | var 0.0025 | cov 3.6667 | val_mse 0.0085 | fve 0.992 | eff_K 1989/2000 | dying 386
+  step  20200 | loss 0.0495 | recon 0.0079 | clus 0.7437 | sep 0.3937 | var 0.0027 | cov 3.5928 | val_mse 0.0084 | fve 0.992 | eff_K 1988/2000 | dying 382
+  step  20300 | loss 0.0496 | recon 0.0075 | clus 0.7401 | sep 0.3922 | var 0.0059 | cov 3.3036 | val_mse 0.0082 | fve 0.992 | eff_K 1991/2000 | dying 337
+  step  20400 | loss 0.0495 | recon 0.0077 | clus 0.7421 | sep 0.3935 | var 0.0036 | cov 3.5475 | val_mse 0.0082 | fve 0.992 | eff_K 1991/2000 | dying 332
+  step  20500 | loss 0.0493 | recon 0.0075 | clus 0.7445 | sep 0.3934 | var 0.0033 | cov 3.5192 | val_mse 0.0081 | fve 0.993 | eff_K 1992/2000 | dying 325
+  step  20600 | loss 0.0495 | recon 0.0074 | clus 0.7451 | sep 0.3871 | var 0.0040 | cov 3.5062 | val_mse 0.0080 | fve 0.993 | eff_K 1992/2000 | dying 339
+  step  20700 | loss 0.0489 | recon 0.0072 | clus 0.7402 | sep 0.3956 | var 0.0039 | cov 3.4781 | val_mse 0.0079 | fve 0.993 | eff_K 1991/2000 | dying 328
+  step  20800 | loss 0.0490 | recon 0.0072 | clus 0.7430 | sep 0.3905 | var 0.0036 | cov 3.4739 | val_mse 0.0079 | fve 0.993 | eff_K 1991/2000 | dying 338
+  step  20900 | loss 0.0491 | recon 0.0072 | clus 0.7482 | sep 0.3968 | var 0.0038 | cov 3.3448 | val_mse 0.0078 | fve 0.993 | eff_K 1992/2000 | dying 338
+  step  21000 | loss 0.0486 | recon 0.0071 | clus 0.7387 | sep 0.3904 | var 0.0030 | cov 3.6174 | val_mse 0.0077 | fve 0.993 | eff_K 1992/2000 | dying 343
+  [reinit] step 21000: reinitialised 11 dead clusters
+  step  21100 | loss 0.0486 | recon 0.0071 | clus 0.7470 | sep 0.3872 | var 0.0023 | cov 3.4869 | val_mse 0.0076 | fve 0.993 | eff_K 1991/2000 | dying 356
+  step  21200 | loss 0.0489 | recon 0.0071 | clus 0.7511 | sep 0.3888 | var 0.0023 | cov 3.4343 | val_mse 0.0076 | fve 0.993 | eff_K 1991/2000 | dying 344
+  step  21300 | loss 0.0492 | recon 0.0073 | clus 0.7540 | sep 0.3877 | var 0.0023 | cov 3.4920 | val_mse 0.0075 | fve 0.993 | eff_K 1991/2000 | dying 341
+  step  21400 | loss 0.0484 | recon 0.0067 | clus 0.7392 | sep 0.3920 | var 0.0039 | cov 3.4834 | val_mse 0.0074 | fve 0.993 | eff_K 1992/2000 | dying 346
+  step  21500 | loss 0.0482 | recon 0.0067 | clus 0.7408 | sep 0.3863 | var 0.0032 | cov 3.4673 | val_mse 0.0073 | fve 0.993 | eff_K 1994/2000 | dying 341
+  step  21600 | loss 0.0484 | recon 0.0067 | clus 0.7473 | sep 0.3853 | var 0.0028 | cov 3.4179 | val_mse 0.0072 | fve 0.993 | eff_K 1997/2000 | dying 350
+  step  21700 | loss 0.0483 | recon 0.0066 | clus 0.7431 | sep 0.3879 | var 0.0035 | cov 3.4133 | val_mse 0.0071 | fve 0.993 | eff_K 1996/2000 | dying 349
+  step  21800 | loss 0.0485 | recon 0.0067 | clus 0.7457 | sep 0.3854 | var 0.0036 | cov 3.3706 | val_mse 0.0071 | fve 0.993 | eff_K 1996/2000 | dying 361
+[train] Saved checkpoint: step_0021876.pt  val_mse=0.00704
+[train] New best val_mse=0.00704 → best_val.pt
+[train] Epoch 12 done in 55.5 min
+
+[train] Epoch 13/50 | tau=0.954 | λ_c=0.050 λ_s=0.0003 | λ_var=0.300 λ_cov=0.0010
+  step  21900 | loss 0.0481 | recon 0.0065 | clus 0.7434 | sep 0.3870 | var 0.0035 | cov 3.3526 | val_mse 0.0070 | fve 0.994 | eff_K 1996/2000 | dying 372
+  step  22000 | loss 0.0481 | recon 0.0065 | clus 0.7419 | sep 0.3935 | var 0.0032 | cov 3.4413 | val_mse 0.0069 | fve 0.993 | eff_K 1998/2000 | dying 352
+  [reinit] step 22000: reinitialised 3 dead clusters
+  step  22100 | loss 0.0480 | recon 0.0063 | clus 0.7428 | sep 0.3855 | var 0.0038 | cov 3.3142 | val_mse 0.0069 | fve 0.994 | eff_K 1996/2000 | dying 347
+  step  22200 | loss 0.0480 | recon 0.0063 | clus 0.7444 | sep 0.3878 | var 0.0037 | cov 3.2793 | val_mse 0.0069 | fve 0.994 | eff_K 1996/2000 | dying 358
+  step  22300 | loss 0.0476 | recon 0.0061 | clus 0.7373 | sep 0.3897 | var 0.0038 | cov 3.3397 | val_mse 0.0068 | fve 0.994 | eff_K 1997/2000 | dying 342
+  step  22400 | loss 0.0483 | recon 0.0063 | clus 0.7474 | sep 0.3885 | var 0.0039 | cov 3.3610 | val_mse 0.0067 | fve 0.994 | eff_K 1997/2000 | dying 356
+  step  22500 | loss 0.0480 | recon 0.0063 | clus 0.7483 | sep 0.3840 | var 0.0028 | cov 3.3319 | val_mse 0.0067 | fve 0.994 | eff_K 1997/2000 | dying 356
+  step  22600 | loss 0.0480 | recon 0.0064 | clus 0.7443 | sep 0.3837 | var 0.0030 | cov 3.4185 | val_mse 0.0066 | fve 0.994 | eff_K 1996/2000 | dying 348
+  step  22700 | loss 0.0477 | recon 0.0062 | clus 0.7458 | sep 0.3832 | var 0.0024 | cov 3.4015 | val_mse 0.0066 | fve 0.994 | eff_K 1997/2000 | dying 355
+  step  22800 | loss 0.0475 | recon 0.0059 | clus 0.7346 | sep 0.3884 | var 0.0046 | cov 3.3527 | val_mse 0.0065 | fve 0.994 | eff_K 1998/2000 | dying 349
+  step  22900 | loss 0.0478 | recon 0.0061 | clus 0.7495 | sep 0.3823 | var 0.0023 | cov 3.4150 | val_mse 0.0065 | fve 0.994 | eff_K 1999/2000 | dying 357
+  step  23000 | loss 0.0472 | recon 0.0058 | clus 0.7386 | sep 0.3849 | var 0.0030 | cov 3.3798 | val_mse 0.0064 | fve 0.994 | eff_K 1999/2000 | dying 357
+  [reinit] step 23000: reinitialised 5 dead clusters
+  step  23100 | loss 0.0478 | recon 0.0061 | clus 0.7513 | sep 0.3817 | var 0.0030 | cov 3.1828 | val_mse 0.0063 | fve 0.994 | eff_K 1995/2000 | dying 366
+  step  23200 | loss 0.0475 | recon 0.0059 | clus 0.7450 | sep 0.3866 | var 0.0029 | cov 3.3504 | val_mse 0.0063 | fve 0.994 | eff_K 1994/2000 | dying 355
+  step  23300 | loss 0.0473 | recon 0.0058 | clus 0.7495 | sep 0.3839 | var 0.0025 | cov 3.2225 | val_mse 0.0062 | fve 0.994 | eff_K 1993/2000 | dying 352
+  step  23400 | loss 0.0472 | recon 0.0057 | clus 0.7377 | sep 0.3814 | var 0.0042 | cov 3.2535 | val_mse 0.0062 | fve 0.994 | eff_K 1994/2000 | dying 349
+  step  23500 | loss 0.0471 | recon 0.0056 | clus 0.7461 | sep 0.3834 | var 0.0030 | cov 3.2181 | val_mse 0.0061 | fve 0.994 | eff_K 1996/2000 | dying 369
+  step  23600 | loss 0.0470 | recon 0.0056 | clus 0.7439 | sep 0.3795 | var 0.0029 | cov 3.2180 | val_mse 0.0061 | fve 0.994 | eff_K 1996/2000 | dying 361
+[train] Saved checkpoint: step_0023699.pt  val_mse=0.00605
+[train] New best val_mse=0.00605 → best_val.pt
+[train] Epoch 13 done in 41.3 min
+
+[train] Epoch 14/50 | tau=0.931 | λ_c=0.050 λ_s=0.0004 | λ_var=0.300 λ_cov=0.0010
+  step  23700 | loss 0.0469 | recon 0.0055 | clus 0.7442 | sep 0.3804 | var 0.0028 | cov 3.2234 | val_mse 0.0060 | fve 0.994 | eff_K 1995/2000 | dying 356
+  step  23800 | loss 0.0470 | recon 0.0056 | clus 0.7442 | sep 0.3768 | var 0.0024 | cov 3.3154 | val_mse 0.0060 | fve 0.994 | eff_K 1996/2000 | dying 357
+  step  23900 | loss 0.0471 | recon 0.0056 | clus 0.7409 | sep 0.3790 | var 0.0034 | cov 3.2733 | val_mse 0.0060 | fve 0.994 | eff_K 1996/2000 | dying 353
+  step  24000 | loss 0.0471 | recon 0.0057 | clus 0.7456 | sep 0.3815 | var 0.0023 | cov 3.3651 | val_mse 0.0060 | fve 0.994 | eff_K 1997/2000 | dying 358
+  [reinit] step 24000: reinitialised 8 dead clusters
+  step  24100 | loss 0.0472 | recon 0.0055 | clus 0.7543 | sep 0.3818 | var 0.0020 | cov 3.2640 | val_mse 0.0059 | fve 0.995 | eff_K 1993/2000 | dying 356
+  step  24200 | loss 0.0471 | recon 0.0054 | clus 0.7531 | sep 0.3771 | var 0.0017 | cov 3.3494 | val_mse 0.0059 | fve 0.995 | eff_K 1993/2000 | dying 365
+  step  24300 | loss 0.0467 | recon 0.0054 | clus 0.7426 | sep 0.3812 | var 0.0024 | cov 3.3085 | val_mse 0.0058 | fve 0.995 | eff_K 1993/2000 | dying 372
+  step  24400 | loss 0.0471 | recon 0.0055 | clus 0.7486 | sep 0.3841 | var 0.0025 | cov 3.3146 | val_mse 0.0057 | fve 0.995 | eff_K 1993/2000 | dying 362
+  step  24500 | loss 0.0468 | recon 0.0053 | clus 0.7470 | sep 0.3799 | var 0.0022 | cov 3.2704 | val_mse 0.0057 | fve 0.995 | eff_K 1992/2000 | dying 358
+  step  24600 | loss 0.0468 | recon 0.0054 | clus 0.7502 | sep 0.3803 | var 0.0013 | cov 3.3365 | val_mse 0.0057 | fve 0.995 | eff_K 1994/2000 | dying 367
+  step  24700 | loss 0.0465 | recon 0.0053 | clus 0.7394 | sep 0.3763 | var 0.0024 | cov 3.3285 | val_mse 0.0056 | fve 0.995 | eff_K 1995/2000 | dying 368
+  step  24800 | loss 0.0466 | recon 0.0049 | clus 0.7352 | sep 0.3795 | var 0.0058 | cov 3.0309 | val_mse 0.0056 | fve 0.995 | eff_K 1995/2000 | dying 361
+  step  24900 | loss 0.0467 | recon 0.0053 | clus 0.7506 | sep 0.3786 | var 0.0018 | cov 3.2354 | val_mse 0.0056 | fve 0.995 | eff_K 1996/2000 | dying 359
+  step  25000 | loss 0.0468 | recon 0.0052 | clus 0.7544 | sep 0.3798 | var 0.0016 | cov 3.2816 | val_mse 0.0056 | fve 0.995 | eff_K 1994/2000 | dying 362
+  [reinit] step 25000: reinitialised 7 dead clusters
+  step  25100 | loss 0.0464 | recon 0.0051 | clus 0.7423 | sep 0.3756 | var 0.0028 | cov 3.1809 | val_mse 0.0055 | fve 0.995 | eff_K 1994/2000 | dying 367
+  step  25200 | loss 0.0463 | recon 0.0050 | clus 0.7419 | sep 0.3768 | var 0.0028 | cov 3.1783 | val_mse 0.0055 | fve 0.995 | eff_K 1995/2000 | dying 367
+  step  25300 | loss 0.0466 | recon 0.0051 | clus 0.7485 | sep 0.3780 | var 0.0020 | cov 3.2573 | val_mse 0.0054 | fve 0.995 | eff_K 1995/2000 | dying 360
+  step  25400 | loss 0.0463 | recon 0.0049 | clus 0.7423 | sep 0.3748 | var 0.0027 | cov 3.2437 | val_mse 0.0054 | fve 0.995 | eff_K 1994/2000 | dying 354
+  step  25500 | loss 0.0462 | recon 0.0049 | clus 0.7409 | sep 0.3746 | var 0.0035 | cov 3.1009 | val_mse 0.0054 | fve 0.995 | eff_K 1995/2000 | dying 342
+[train] Saved checkpoint: step_0025522.pt  val_mse=0.00539
+[train] New best val_mse=0.00539 → best_val.pt
+[train] Epoch 14 done in 34.4 min
+
+[train] Epoch 15/50 | tau=0.908 | λ_c=0.050 λ_s=0.0005 | λ_var=0.300 λ_cov=0.0010
+  step  25600 | loss 0.0462 | recon 0.0049 | clus 0.7432 | sep 0.3740 | var 0.0023 | cov 3.2229 | val_mse 0.0054 | fve 0.995 | eff_K 1994/2000 | dying 355
+  step  25700 | loss 0.0465 | recon 0.0051 | clus 0.7476 | sep 0.3746 | var 0.0019 | cov 3.2882 | val_mse 0.0053 | fve 0.995 | eff_K 1994/2000 | dying 354
+  step  25800 | loss 0.0464 | recon 0.0050 | clus 0.7417 | sep 0.3772 | var 0.0028 | cov 3.2808 | val_mse 0.0053 | fve 0.995 | eff_K 1996/2000 | dying 371
+  step  25900 | loss 0.0463 | recon 0.0049 | clus 0.7434 | sep 0.3749 | var 0.0032 | cov 3.1101 | val_mse 0.0053 | fve 0.995 | eff_K 1995/2000 | dying 368
+  step  26000 | loss 0.0461 | recon 0.0049 | clus 0.7415 | sep 0.3790 | var 0.0025 | cov 3.2208 | val_mse 0.0052 | fve 0.995 | eff_K 1995/2000 | dying 356
+  [reinit] step 26000: reinitialised 7 dead clusters
+  step  26100 | loss 0.0462 | recon 0.0047 | clus 0.7480 | sep 0.3740 | var 0.0022 | cov 3.1746 | val_mse 0.0052 | fve 0.995 | eff_K 1994/2000 | dying 348
+  step  26200 | loss 0.0463 | recon 0.0048 | clus 0.7467 | sep 0.3752 | var 0.0025 | cov 3.2101 | val_mse 0.0052 | fve 0.995 | eff_K 1994/2000 | dying 368
+  step  26300 | loss 0.0462 | recon 0.0048 | clus 0.7466 | sep 0.3746 | var 0.0020 | cov 3.2324 | val_mse 0.0052 | fve 0.995 | eff_K 1994/2000 | dying 382
+  step  26400 | loss 0.0460 | recon 0.0047 | clus 0.7476 | sep 0.3716 | var 0.0020 | cov 3.2175 | val_mse 0.0051 | fve 0.995 | eff_K 1995/2000 | dying 357
+  step  26500 | loss 0.0462 | recon 0.0047 | clus 0.7475 | sep 0.3769 | var 0.0024 | cov 3.2441 | val_mse 0.0051 | fve 0.995 | eff_K 1996/2000 | dying 360
+  step  26600 | loss 0.0459 | recon 0.0047 | clus 0.7419 | sep 0.3764 | var 0.0028 | cov 3.0962 | val_mse 0.0050 | fve 0.995 | eff_K 1996/2000 | dying 363
+  step  26700 | loss 0.0459 | recon 0.0046 | clus 0.7383 | sep 0.3765 | var 0.0037 | cov 3.1346 | val_mse 0.0050 | fve 0.995 | eff_K 1996/2000 | dying 367
+  step  26800 | loss 0.0459 | recon 0.0046 | clus 0.7489 | sep 0.3722 | var 0.0018 | cov 3.1364 | val_mse 0.0050 | fve 0.995 | eff_K 1997/2000 | dying 360
+  step  26900 | loss 0.0460 | recon 0.0048 | clus 0.7460 | sep 0.3752 | var 0.0016 | cov 3.2728 | val_mse 0.0050 | fve 0.995 | eff_K 1998/2000 | dying 363
+  step  27000 | loss 0.0460 | recon 0.0047 | clus 0.7431 | sep 0.3723 | var 0.0026 | cov 3.2157 | val_mse 0.0049 | fve 0.995 | eff_K 1998/2000 | dying 377
+  [reinit] step 27000: reinitialised 4 dead clusters
+  step  27100 | loss 0.0459 | recon 0.0045 | clus 0.7454 | sep 0.3690 | var 0.0029 | cov 3.0733 | val_mse 0.0049 | fve 0.996 | eff_K 1996/2000 | dying 379
+  step  27200 | loss 0.0458 | recon 0.0046 | clus 0.7457 | sep 0.3705 | var 0.0022 | cov 3.0091 | val_mse 0.0050 | fve 0.995 | eff_K 1996/2000 | dying 376
+  step  27300 | loss 0.0462 | recon 0.0047 | clus 0.7546 | sep 0.3693 | var 0.0010 | cov 3.3117 | val_mse 0.0049 | fve 0.995 | eff_K 1996/2000 | dying 395
+[train] Saved checkpoint: step_0027345.pt  val_mse=0.00489
+[train] New best val_mse=0.00489 → best_val.pt
+[train] Epoch 15 done in 36.3 min
+
+[train] Epoch 16/50 | tau=0.885 | λ_c=0.050 λ_s=0.0006 | λ_var=0.300 λ_cov=0.0010
+  step  27400 | loss 0.0461 | recon 0.0046 | clus 0.7526 | sep 0.3728 | var 0.0016 | cov 3.1652 | val_mse 0.0049 | fve 0.995 | eff_K 1996/2000 | dying 381
+  step  27500 | loss 0.0455 | recon 0.0044 | clus 0.7448 | sep 0.3713 | var 0.0018 | cov 3.0977 | val_mse 0.0048 | fve 0.996 | eff_K 1996/2000 | dying 375
+  step  27600 | loss 0.0460 | recon 0.0045 | clus 0.7512 | sep 0.3727 | var 0.0018 | cov 3.1418 | val_mse 0.0048 | fve 0.996 | eff_K 1996/2000 | dying 367
+  step  27700 | loss 0.0456 | recon 0.0044 | clus 0.7442 | sep 0.3726 | var 0.0016 | cov 3.2554 | val_mse 0.0048 | fve 0.996 | eff_K 1997/2000 | dying 377
+  step  27800 | loss 0.0457 | recon 0.0044 | clus 0.7420 | sep 0.3738 | var 0.0027 | cov 3.1280 | val_mse 0.0048 | fve 0.996 | eff_K 1998/2000 | dying 384
+  step  27900 | loss 0.0457 | recon 0.0045 | clus 0.7441 | sep 0.3731 | var 0.0022 | cov 3.1327 | val_mse 0.0048 | fve 0.996 | eff_K 1999/2000 | dying 373
+  step  28000 | loss 0.0455 | recon 0.0043 | clus 0.7419 | sep 0.3714 | var 0.0031 | cov 2.9825 | val_mse 0.0047 | fve 0.996 | eff_K 1999/2000 | dying 375
+  [reinit] step 28000: reinitialised 4 dead clusters
+  step  28100 | loss 0.0457 | recon 0.0043 | clus 0.7461 | sep 0.3706 | var 0.0025 | cov 3.0618 | val_mse 0.0047 | fve 0.996 | eff_K 1997/2000 | dying 393
+  step  28200 | loss 0.0456 | recon 0.0042 | clus 0.7467 | sep 0.3711 | var 0.0025 | cov 3.0672 | val_mse 0.0047 | fve 0.996 | eff_K 1996/2000 | dying 401
+  step  28300 | loss 0.0452 | recon 0.0042 | clus 0.7367 | sep 0.3728 | var 0.0034 | cov 2.9724 | val_mse 0.0046 | fve 0.996 | eff_K 1997/2000 | dying 381
+  step  28400 | loss 0.0452 | recon 0.0042 | clus 0.7370 | sep 0.3704 | var 0.0021 | cov 3.2632 | val_mse 0.0046 | fve 0.996 | eff_K 1997/2000 | dying 372
+  step  28500 | loss 0.0456 | recon 0.0043 | clus 0.7444 | sep 0.3715 | var 0.0022 | cov 3.1585 | val_mse 0.0046 | fve 0.996 | eff_K 1998/2000 | dying 369
+  step  28600 | loss 0.0454 | recon 0.0041 | clus 0.7443 | sep 0.3713 | var 0.0031 | cov 2.9213 | val_mse 0.0046 | fve 0.996 | eff_K 1999/2000 | dying 361
+  step  28700 | loss 0.0453 | recon 0.0041 | clus 0.7393 | sep 0.3740 | var 0.0033 | cov 3.0007 | val_mse 0.0046 | fve 0.996 | eff_K 1999/2000 | dying 385
+  step  28800 | loss 0.0456 | recon 0.0041 | clus 0.7485 | sep 0.3711 | var 0.0025 | cov 3.0298 | val_mse 0.0045 | fve 0.996 | eff_K 2000/2000 | dying 373
+  step  28900 | loss 0.0453 | recon 0.0041 | clus 0.7445 | sep 0.3660 | var 0.0024 | cov 2.9966 | val_mse 0.0045 | fve 0.996 | eff_K 2000/2000 | dying 386
+  step  29000 | loss 0.0455 | recon 0.0043 | clus 0.7444 | sep 0.3688 | var 0.0021 | cov 3.1215 | val_mse 0.0045 | fve 0.996 | eff_K 2000/2000 | dying 389
+  [reinit] step 29000: reinitialised 4 dead clusters
+  step  29100 | loss 0.0452 | recon 0.0041 | clus 0.7358 | sep 0.3698 | var 0.0033 | cov 3.0540 | val_mse 0.0045 | fve 0.996 | eff_K 1997/2000 | dying 386
+[train] Saved checkpoint: step_0029168.pt  val_mse=0.00449
+[train] New best val_mse=0.00449 → best_val.pt
+[train] Epoch 16 done in 37.9 min
+
+[train] Epoch 17/50 | tau=0.862 | λ_c=0.050 λ_s=0.0008 | λ_var=0.300 λ_cov=0.0010
+  step  29200 | loss 0.0457 | recon 0.0042 | clus 0.7496 | sep 0.3686 | var 0.0022 | cov 3.0726 | val_mse 0.0045 | fve 0.996 | eff_K 1996/2000 | dying 389
+  step  29300 | loss 0.0454 | recon 0.0041 | clus 0.7445 | sep 0.3671 | var 0.0023 | cov 3.0847 | val_mse 0.0044 | fve 0.996 | eff_K 1995/2000 | dying 381
+  step  29400 | loss 0.0454 | recon 0.0041 | clus 0.7388 | sep 0.3672 | var 0.0034 | cov 3.0782 | val_mse 0.0044 | fve 0.996 | eff_K 1996/2000 | dying 381
+  step  29500 | loss 0.0454 | recon 0.0040 | clus 0.7468 | sep 0.3712 | var 0.0026 | cov 2.9646 | val_mse 0.0044 | fve 0.996 | eff_K 1997/2000 | dying 370
+  step  29600 | loss 0.0455 | recon 0.0040 | clus 0.7478 | sep 0.3684 | var 0.0027 | cov 3.0045 | val_mse 0.0044 | fve 0.996 | eff_K 1997/2000 | dying 377
+  step  29700 | loss 0.0454 | recon 0.0040 | clus 0.7431 | sep 0.3665 | var 0.0033 | cov 2.9754 | val_mse 0.0044 | fve 0.996 | eff_K 1998/2000 | dying 379
+  step  29800 | loss 0.0454 | recon 0.0042 | clus 0.7418 | sep 0.3678 | var 0.0025 | cov 3.0915 | val_mse 0.0044 | fve 0.996 | eff_K 1998/2000 | dying 379
+  step  29900 | loss 0.0456 | recon 0.0041 | clus 0.7519 | sep 0.3661 | var 0.0022 | cov 2.9828 | val_mse 0.0044 | fve 0.996 | eff_K 1998/2000 | dying 389
+  step  30000 | loss 0.0454 | recon 0.0041 | clus 0.7487 | sep 0.3691 | var 0.0016 | cov 3.1453 | val_mse 0.0044 | fve 0.996 | eff_K 1998/2000 | dying 365
+  [reinit] step 30000: reinitialised 2 dead clusters
+  step  30100 | loss 0.0453 | recon 0.0039 | clus 0.7414 | sep 0.3692 | var 0.0035 | cov 2.9277 | val_mse 0.0043 | fve 0.996 | eff_K 1998/2000 | dying 379
+  step  30200 | loss 0.0449 | recon 0.0038 | clus 0.7373 | sep 0.3685 | var 0.0031 | cov 3.0104 | val_mse 0.0043 | fve 0.996 | eff_K 1998/2000 | dying 394
+  step  30300 | loss 0.0453 | recon 0.0039 | clus 0.7446 | sep 0.3687 | var 0.0029 | cov 2.9407 | val_mse 0.0043 | fve 0.996 | eff_K 1998/2000 | dying 389
+  step  30400 | loss 0.0457 | recon 0.0042 | clus 0.7566 | sep 0.3670 | var 0.0008 | cov 3.1527 | val_mse 0.0043 | fve 0.996 | eff_K 1998/2000 | dying 393
+  step  30500 | loss 0.0454 | recon 0.0040 | clus 0.7516 | sep 0.3652 | var 0.0014 | cov 3.0882 | val_mse 0.0043 | fve 0.996 | eff_K 1998/2000 | dying 390
+  step  30600 | loss 0.0451 | recon 0.0039 | clus 0.7489 | sep 0.3690 | var 0.0015 | cov 3.0269 | val_mse 0.0043 | fve 0.996 | eff_K 1998/2000 | dying 392
+  step  30700 | loss 0.0452 | recon 0.0039 | clus 0.7451 | sep 0.3700 | var 0.0022 | cov 3.0786 | val_mse 0.0042 | fve 0.996 | eff_K 1998/2000 | dying 375
+  step  30800 | loss 0.0447 | recon 0.0038 | clus 0.7380 | sep 0.3658 | var 0.0019 | cov 3.1030 | val_mse 0.0042 | fve 0.996 | eff_K 1999/2000 | dying 384
+  step  30900 | loss 0.0450 | recon 0.0038 | clus 0.7385 | sep 0.3684 | var 0.0033 | cov 2.9843 | val_mse 0.0042 | fve 0.996 | eff_K 1999/2000 | dying 395
+[train] Saved checkpoint: step_0030991.pt  val_mse=0.00419
+[train] New best val_mse=0.00419 → best_val.pt
+[train] Epoch 17 done in 34.4 min
+
+[train] Epoch 18/50 | tau=0.838 | λ_c=0.050 λ_s=0.0009 | λ_var=0.300 λ_cov=0.0010
+  step  31000 | loss 0.0454 | recon 0.0039 | clus 0.7520 | sep 0.3672 | var 0.0021 | cov 2.9333 | val_mse 0.0042 | fve 0.996 | eff_K 1999/2000 | dying 393
+  [reinit] step 31000: reinitialised 4 dead clusters
+  step  31100 | loss 0.0451 | recon 0.0038 | clus 0.7353 | sep 0.3695 | var 0.0038 | cov 3.0238 | val_mse 0.0042 | fve 0.996 | eff_K 1997/2000 | dying 383
+  step  31200 | loss 0.0449 | recon 0.0037 | clus 0.7380 | sep 0.3670 | var 0.0031 | cov 3.0194 | val_mse 0.0042 | fve 0.996 | eff_K 1996/2000 | dying 389
+  step  31300 | loss 0.0453 | recon 0.0040 | clus 0.7427 | sep 0.3695 | var 0.0025 | cov 3.0901 | val_mse 0.0042 | fve 0.996 | eff_K 1996/2000 | dying 391
+  step  31400 | loss 0.0449 | recon 0.0038 | clus 0.7357 | sep 0.3673 | var 0.0031 | cov 3.0948 | val_mse 0.0041 | fve 0.996 | eff_K 1996/2000 | dying 396
+  step  31500 | loss 0.0450 | recon 0.0038 | clus 0.7470 | sep 0.3648 | var 0.0021 | cov 2.9547 | val_mse 0.0042 | fve 0.996 | eff_K 1996/2000 | dying 399
+  step  31600 | loss 0.0451 | recon 0.0037 | clus 0.7490 | sep 0.3640 | var 0.0022 | cov 2.9660 | val_mse 0.0041 | fve 0.996 | eff_K 1996/2000 | dying 387
+  step  31700 | loss 0.0448 | recon 0.0037 | clus 0.7389 | sep 0.3676 | var 0.0030 | cov 2.9208 | val_mse 0.0041 | fve 0.996 | eff_K 1998/2000 | dying 399
+  step  31800 | loss 0.0450 | recon 0.0037 | clus 0.7468 | sep 0.3622 | var 0.0023 | cov 2.9328 | val_mse 0.0041 | fve 0.996 | eff_K 1999/2000 | dying 388
+  step  31900 | loss 0.0449 | recon 0.0037 | clus 0.7418 | sep 0.3662 | var 0.0024 | cov 3.0262 | val_mse 0.0041 | fve 0.996 | eff_K 1999/2000 | dying 396
+  step  32000 | loss 0.0449 | recon 0.0037 | clus 0.7433 | sep 0.3661 | var 0.0027 | cov 2.9460 | val_mse 0.0041 | fve 0.996 | eff_K 2000/2000 | dying 382
+  step  32100 | loss 0.0451 | recon 0.0038 | clus 0.7508 | sep 0.3666 | var 0.0016 | cov 2.9550 | val_mse 0.0041 | fve 0.996 | eff_K 2000/2000 | dying 383
+  step  32200 | loss 0.0451 | recon 0.0036 | clus 0.7397 | sep 0.3672 | var 0.0039 | cov 3.0055 | val_mse 0.0040 | fve 0.996 | eff_K 2000/2000 | dying 389
+  step  32300 | loss 0.0453 | recon 0.0039 | clus 0.7556 | sep 0.3637 | var 0.0010 | cov 2.9780 | val_mse 0.0040 | fve 0.996 | eff_K 2000/2000 | dying 387
+  step  32400 | loss 0.0451 | recon 0.0037 | clus 0.7507 | sep 0.3647 | var 0.0023 | cov 2.9030 | val_mse 0.0040 | fve 0.996 | eff_K 2000/2000 | dying 363
+  step  32500 | loss 0.0448 | recon 0.0036 | clus 0.7409 | sep 0.3640 | var 0.0028 | cov 3.0046 | val_mse 0.0040 | fve 0.996 | eff_K 2000/2000 | dying 372
+  step  32600 | loss 0.0448 | recon 0.0036 | clus 0.7457 | sep 0.3642 | var 0.0025 | cov 2.8677 | val_mse 0.0040 | fve 0.996 | eff_K 2000/2000 | dying 382
+  step  32700 | loss 0.0448 | recon 0.0036 | clus 0.7472 | sep 0.3651 | var 0.0015 | cov 3.0088 | val_mse 0.0040 | fve 0.996 | eff_K 2000/2000 | dying 384
+  step  32800 | loss 0.0453 | recon 0.0038 | clus 0.7534 | sep 0.3634 | var 0.0014 | cov 3.0598 | val_mse 0.0040 | fve 0.996 | eff_K 2000/2000 | dying 386
+[train] Saved checkpoint: step_0032814.pt  val_mse=0.00396
+[train] New best val_mse=0.00396 → best_val.pt
+[train] Epoch 18 done in 38.0 min
+
+[train] Epoch 19/50 | tau=0.815 | λ_c=0.050 λ_s=0.0010 | λ_var=0.300 λ_cov=0.0010
+  step  32900 | loss 0.0449 | recon 0.0037 | clus 0.7422 | sep 0.3614 | var 0.0020 | cov 3.1130 | val_mse 0.0040 | fve 0.996 | eff_K 2000/2000 | dying 372
+  step  33000 | loss 0.0448 | recon 0.0036 | clus 0.7460 | sep 0.3645 | var 0.0017 | cov 2.9680 | val_mse 0.0039 | fve 0.996 | eff_K 2000/2000 | dying 384
+  [reinit] step 33000: reinitialised 4 dead clusters
+  step  33100 | loss 0.0453 | recon 0.0037 | clus 0.7530 | sep 0.3649 | var 0.0017 | cov 2.9990 | val_mse 0.0040 | fve 0.996 | eff_K 1998/2000 | dying 380
+  step  33200 | loss 0.0453 | recon 0.0037 | clus 0.7466 | sep 0.3657 | var 0.0034 | cov 2.8713 | val_mse 0.0039 | fve 0.996 | eff_K 1996/2000 | dying 383
+  step  33300 | loss 0.0451 | recon 0.0035 | clus 0.7520 | sep 0.3641 | var 0.0022 | cov 2.9011 | val_mse 0.0039 | fve 0.996 | eff_K 1996/2000 | dying 379
+  step  33400 | loss 0.0448 | recon 0.0036 | clus 0.7418 | sep 0.3628 | var 0.0023 | cov 2.9953 | val_mse 0.0039 | fve 0.996 | eff_K 1997/2000 | dying 386
+  step  33500 | loss 0.0448 | recon 0.0036 | clus 0.7422 | sep 0.3667 | var 0.0026 | cov 2.9535 | val_mse 0.0039 | fve 0.996 | eff_K 1998/2000 | dying 389
+  step  33600 | loss 0.0448 | recon 0.0037 | clus 0.7445 | sep 0.3645 | var 0.0018 | cov 3.0368 | val_mse 0.0039 | fve 0.996 | eff_K 1997/2000 | dying 385
+  step  33700 | loss 0.0450 | recon 0.0036 | clus 0.7494 | sep 0.3626 | var 0.0018 | cov 3.0140 | val_mse 0.0039 | fve 0.996 | eff_K 1997/2000 | dying 383
+  step  33800 | loss 0.0448 | recon 0.0035 | clus 0.7407 | sep 0.3619 | var 0.0029 | cov 2.9694 | val_mse 0.0039 | fve 0.996 | eff_K 1999/2000 | dying 392
+  step  33900 | loss 0.0451 | recon 0.0037 | clus 0.7495 | sep 0.3636 | var 0.0015 | cov 3.1015 | val_mse 0.0038 | fve 0.996 | eff_K 1998/2000 | dying 385
+  step  34000 | loss 0.0450 | recon 0.0036 | clus 0.7495 | sep 0.3623 | var 0.0018 | cov 3.0055 | val_mse 0.0039 | fve 0.996 | eff_K 2000/2000 | dying 378
+  [reinit] step 34000: reinitialised 2 dead clusters
+  step  34100 | loss 0.0452 | recon 0.0036 | clus 0.7566 | sep 0.3645 | var 0.0007 | cov 3.1308 | val_mse 0.0038 | fve 0.996 | eff_K 1998/2000 | dying 369
+  step  34200 | loss 0.0447 | recon 0.0035 | clus 0.7432 | sep 0.3637 | var 0.0022 | cov 2.9445 | val_mse 0.0038 | fve 0.996 | eff_K 1998/2000 | dying 389
+  step  34300 | loss 0.0448 | recon 0.0035 | clus 0.7462 | sep 0.3638 | var 0.0024 | cov 2.8778 | val_mse 0.0038 | fve 0.996 | eff_K 1998/2000 | dying 390
+  step  34400 | loss 0.0446 | recon 0.0035 | clus 0.7454 | sep 0.3599 | var 0.0017 | cov 3.0374 | val_mse 0.0038 | fve 0.997 | eff_K 1998/2000 | dying 387
+  step  34500 | loss 0.0448 | recon 0.0035 | clus 0.7476 | sep 0.3622 | var 0.0022 | cov 2.9022 | val_mse 0.0038 | fve 0.996 | eff_K 1998/2000 | dying 387
+  step  34600 | loss 0.0448 | recon 0.0035 | clus 0.7492 | sep 0.3635 | var 0.0012 | cov 3.0830 | val_mse 0.0038 | fve 0.997 | eff_K 1998/2000 | dying 386
+[train] Saved checkpoint: step_0034637.pt  val_mse=0.00377
+[train] New best val_mse=0.00377 → best_val.pt
+[train] Epoch 19 done in 35.2 min
+
+[train] Epoch 20/50 | tau=0.792 | λ_c=0.050 λ_s=0.0012 | λ_var=0.300 λ_cov=0.0010
+  step  34700 | loss 0.0447 | recon 0.0034 | clus 0.7461 | sep 0.3616 | var 0.0018 | cov 2.9630 | val_mse 0.0038 | fve 0.997 | eff_K 1998/2000 | dying 388
+  step  34800 | loss 0.0446 | recon 0.0035 | clus 0.7395 | sep 0.3643 | var 0.0027 | cov 2.9272 | val_mse 0.0038 | fve 0.997 | eff_K 1998/2000 | dying 377
+  step  34900 | loss 0.0445 | recon 0.0033 | clus 0.7405 | sep 0.3636 | var 0.0028 | cov 2.8843 | val_mse 0.0038 | fve 0.997 | eff_K 1998/2000 | dying 383
+  step  35000 | loss 0.0445 | recon 0.0033 | clus 0.7422 | sep 0.3650 | var 0.0019 | cov 3.0749 | val_mse 0.0038 | fve 0.997 | eff_K 1998/2000 | dying 376
+  [reinit] step 35000: reinitialised 2 dead clusters
+  step  35100 | loss 0.0447 | recon 0.0035 | clus 0.7434 | sep 0.3610 | var 0.0022 | cov 2.9467 | val_mse 0.0037 | fve 0.997 | eff_K 1998/2000 | dying 383
+  step  35200 | loss 0.0442 | recon 0.0032 | clus 0.7395 | sep 0.3615 | var 0.0021 | cov 2.9894 | val_mse 0.0037 | fve 0.997 | eff_K 1998/2000 | dying 391
+  step  35300 | loss 0.0448 | recon 0.0035 | clus 0.7486 | sep 0.3603 | var 0.0020 | cov 2.9252 | val_mse 0.0037 | fve 0.997 | eff_K 1998/2000 | dying 395
+  step  35400 | loss 0.0447 | recon 0.0034 | clus 0.7448 | sep 0.3641 | var 0.0021 | cov 2.9662 | val_mse 0.0037 | fve 0.997 | eff_K 1999/2000 | dying 387
+  step  35500 | loss 0.0449 | recon 0.0034 | clus 0.7518 | sep 0.3640 | var 0.0022 | cov 2.8217 | val_mse 0.0037 | fve 0.997 | eff_K 1999/2000 | dying 390
+  step  35600 | loss 0.0446 | recon 0.0034 | clus 0.7468 | sep 0.3681 | var 0.0019 | cov 2.8537 | val_mse 0.0037 | fve 0.997 | eff_K 1999/2000 | dying 392
+  step  35700 | loss 0.0446 | recon 0.0034 | clus 0.7477 | sep 0.3616 | var 0.0021 | cov 2.7980 | val_mse 0.0037 | fve 0.997 | eff_K 1999/2000 | dying 400
+  step  35800 | loss 0.0445 | recon 0.0033 | clus 0.7435 | sep 0.3640 | var 0.0021 | cov 2.9437 | val_mse 0.0037 | fve 0.997 | eff_K 1999/2000 | dying 387
+  step  35900 | loss 0.0444 | recon 0.0033 | clus 0.7404 | sep 0.3628 | var 0.0025 | cov 2.9492 | val_mse 0.0037 | fve 0.997 | eff_K 1999/2000 | dying 395
+  step  36000 | loss 0.0450 | recon 0.0034 | clus 0.7523 | sep 0.3624 | var 0.0017 | cov 2.9879 | val_mse 0.0036 | fve 0.997 | eff_K 1999/2000 | dying 409
+  [reinit] step 36000: reinitialised 4 dead clusters
+  step  36100 | loss 0.0446 | recon 0.0035 | clus 0.7473 | sep 0.3614 | var 0.0014 | cov 2.8982 | val_mse 0.0037 | fve 0.997 | eff_K 1997/2000 | dying 386
+  step  36200 | loss 0.0444 | recon 0.0033 | clus 0.7367 | sep 0.3618 | var 0.0030 | cov 2.9261 | val_mse 0.0036 | fve 0.997 | eff_K 1996/2000 | dying 375
+  step  36300 | loss 0.0448 | recon 0.0034 | clus 0.7473 | sep 0.3583 | var 0.0018 | cov 3.0146 | val_mse 0.0036 | fve 0.997 | eff_K 1997/2000 | dying 385
+  step  36400 | loss 0.0448 | recon 0.0034 | clus 0.7512 | sep 0.3589 | var 0.0019 | cov 2.8839 | val_mse 0.0036 | fve 0.997 | eff_K 1997/2000 | dying 418
+[train] Saved checkpoint: step_0036460.pt  val_mse=0.00362
+[train] New best val_mse=0.00362 → best_val.pt
+[train] Epoch 20 done in 35.1 min
+
+[train] Epoch 21/50 | tau=0.769 | λ_c=0.050 λ_s=0.0013 | λ_var=0.300 λ_cov=0.0010
+  step  36500 | loss 0.0444 | recon 0.0033 | clus 0.7479 | sep 0.3591 | var 0.0014 | cov 2.8733 | val_mse 0.0036 | fve 0.997 | eff_K 1998/2000 | dying 401
+  step  36600 | loss 0.0446 | recon 0.0034 | clus 0.7412 | sep 0.3629 | var 0.0020 | cov 3.0289 | val_mse 0.0036 | fve 0.997 | eff_K 1998/2000 | dying 390
+  step  36700 | loss 0.0449 | recon 0.0033 | clus 0.7441 | sep 0.3607 | var 0.0032 | cov 2.9086 | val_mse 0.0036 | fve 0.997 | eff_K 1998/2000 | dying 397
+  step  36800 | loss 0.0445 | recon 0.0034 | clus 0.7418 | sep 0.3565 | var 0.0020 | cov 3.0332 | val_mse 0.0036 | fve 0.997 | eff_K 1998/2000 | dying 389
+  step  36900 | loss 0.0444 | recon 0.0032 | clus 0.7417 | sep 0.3583 | var 0.0017 | cov 3.0769 | val_mse 0.0036 | fve 0.997 | eff_K 1998/2000 | dying 397
+  step  37000 | loss 0.0445 | recon 0.0033 | clus 0.7422 | sep 0.3596 | var 0.0023 | cov 2.9181 | val_mse 0.0036 | fve 0.997 | eff_K 1998/2000 | dying 389
+  [reinit] step 37000: reinitialised 2 dead clusters
+  step  37100 | loss 0.0448 | recon 0.0033 | clus 0.7420 | sep 0.3604 | var 0.0034 | cov 2.9000 | val_mse 0.0036 | fve 0.997 | eff_K 1998/2000 | dying 390
+  step  37200 | loss 0.0447 | recon 0.0033 | clus 0.7456 | sep 0.3597 | var 0.0026 | cov 2.8482 | val_mse 0.0035 | fve 0.997 | eff_K 1998/2000 | dying 389
+  step  37300 | loss 0.0443 | recon 0.0030 | clus 0.7367 | sep 0.3608 | var 0.0042 | cov 2.7570 | val_mse 0.0035 | fve 0.997 | eff_K 1998/2000 | dying 394
+  step  37400 | loss 0.0442 | recon 0.0031 | clus 0.7398 | sep 0.3612 | var 0.0024 | cov 2.9378 | val_mse 0.0035 | fve 0.997 | eff_K 1998/2000 | dying 391
+  step  37500 | loss 0.0445 | recon 0.0033 | clus 0.7392 | sep 0.3630 | var 0.0028 | cov 2.9350 | val_mse 0.0035 | fve 0.997 | eff_K 1998/2000 | dying 396
+  step  37600 | loss 0.0443 | recon 0.0031 | clus 0.7402 | sep 0.3592 | var 0.0028 | cov 2.8685 | val_mse 0.0035 | fve 0.997 | eff_K 1998/2000 | dying 388
+  step  37700 | loss 0.0444 | recon 0.0032 | clus 0.7412 | sep 0.3666 | var 0.0025 | cov 2.9279 | val_mse 0.0035 | fve 0.997 | eff_K 1998/2000 | dying 391
+  step  37800 | loss 0.0445 | recon 0.0032 | clus 0.7420 | sep 0.3612 | var 0.0028 | cov 2.8985 | val_mse 0.0035 | fve 0.997 | eff_K 1998/2000 | dying 399
+  step  37900 | loss 0.0444 | recon 0.0032 | clus 0.7455 | sep 0.3600 | var 0.0017 | cov 2.9767 | val_mse 0.0035 | fve 0.997 | eff_K 1998/2000 | dying 376
+  step  38000 | loss 0.0443 | recon 0.0032 | clus 0.7429 | sep 0.3586 | var 0.0026 | cov 2.8011 | val_mse 0.0035 | fve 0.997 | eff_K 1998/2000 | dying 394
+  [reinit] step 38000: reinitialised 2 dead clusters
+  step  38100 | loss 0.0446 | recon 0.0032 | clus 0.7502 | sep 0.3607 | var 0.0019 | cov 2.8555 | val_mse 0.0035 | fve 0.997 | eff_K 1998/2000 | dying 396
+  step  38200 | loss 0.0446 | recon 0.0033 | clus 0.7441 | sep 0.3614 | var 0.0020 | cov 3.0313 | val_mse 0.0035 | fve 0.997 | eff_K 1998/2000 | dying 388
+[train] Saved checkpoint: step_0038283.pt  val_mse=0.00346
+[train] New best val_mse=0.00346 → best_val.pt
+[train] Epoch 21 done in 35.1 min
+
+[train] Epoch 22/50 | tau=0.746 | λ_c=0.050 λ_s=0.0014 | λ_var=0.300 λ_cov=0.0010
+  step  38300 | loss 0.0445 | recon 0.0032 | clus 0.7408 | sep 0.3606 | var 0.0025 | cov 2.9717 | val_mse 0.0035 | fve 0.997 | eff_K 1998/2000 | dying 398
+  step  38400 | loss 0.0446 | recon 0.0033 | clus 0.7430 | sep 0.3592 | var 0.0021 | cov 2.9764 | val_mse 0.0035 | fve 0.997 | eff_K 1998/2000 | dying 396
+  step  38500 | loss 0.0447 | recon 0.0033 | clus 0.7488 | sep 0.3566 | var 0.0012 | cov 3.0869 | val_mse 0.0035 | fve 0.997 | eff_K 1999/2000 | dying 384
+  step  38600 | loss 0.0443 | recon 0.0031 | clus 0.7443 | sep 0.3568 | var 0.0019 | cov 2.9273 | val_mse 0.0035 | fve 0.997 | eff_K 1999/2000 | dying 379
+  step  38700 | loss 0.0441 | recon 0.0030 | clus 0.7308 | sep 0.3605 | var 0.0037 | cov 2.9325 | val_mse 0.0035 | fve 0.997 | eff_K 1999/2000 | dying 383
+  step  38800 | loss 0.0445 | recon 0.0032 | clus 0.7512 | sep 0.3582 | var 0.0012 | cov 2.8665 | val_mse 0.0035 | fve 0.997 | eff_K 2000/2000 | dying 392
+  step  38900 | loss 0.0443 | recon 0.0031 | clus 0.7410 | sep 0.3611 | var 0.0022 | cov 2.9667 | val_mse 0.0035 | fve 0.997 | eff_K 2000/2000 | dying 391
+  step  39000 | loss 0.0441 | recon 0.0032 | clus 0.7411 | sep 0.3588 | var 0.0015 | cov 2.9451 | val_mse 0.0035 | fve 0.997 | eff_K 2000/2000 | dying 381
+  [reinit] step 39000: reinitialised 2 dead clusters
+  step  39100 | loss 0.0446 | recon 0.0032 | clus 0.7427 | sep 0.3596 | var 0.0034 | cov 2.7881 | val_mse 0.0034 | fve 0.997 | eff_K 1999/2000 | dying 382
+  step  39200 | loss 0.0446 | recon 0.0032 | clus 0.7453 | sep 0.3581 | var 0.0028 | cov 2.7994 | val_mse 0.0034 | fve 0.997 | eff_K 1997/2000 | dying 395
+  step  39300 | loss 0.0444 | recon 0.0031 | clus 0.7380 | sep 0.3604 | var 0.0032 | cov 2.8583 | val_mse 0.0034 | fve 0.997 | eff_K 1998/2000 | dying 389
+  step  39400 | loss 0.0442 | recon 0.0031 | clus 0.7359 | sep 0.3571 | var 0.0031 | cov 2.8892 | val_mse 0.0034 | fve 0.997 | eff_K 1999/2000 | dying 393
+  step  39500 | loss 0.0444 | recon 0.0032 | clus 0.7457 | sep 0.3597 | var 0.0016 | cov 2.9506 | val_mse 0.0034 | fve 0.997 | eff_K 1999/2000 | dying 377
+  step  39600 | loss 0.0444 | recon 0.0031 | clus 0.7503 | sep 0.3575 | var 0.0012 | cov 2.9092 | val_mse 0.0034 | fve 0.997 | eff_K 1998/2000 | dying 385
+  step  39700 | loss 0.0445 | recon 0.0032 | clus 0.7508 | sep 0.3573 | var 0.0011 | cov 2.8953 | val_mse 0.0034 | fve 0.997 | eff_K 1998/2000 | dying 392
+  step  39800 | loss 0.0446 | recon 0.0032 | clus 0.7491 | sep 0.3603 | var 0.0017 | cov 2.9394 | val_mse 0.0034 | fve 0.997 | eff_K 1998/2000 | dying 393
+  step  39900 | loss 0.0443 | recon 0.0031 | clus 0.7442 | sep 0.3574 | var 0.0022 | cov 2.8588 | val_mse 0.0034 | fve 0.997 | eff_K 1998/2000 | dying 390
+  step  40000 | loss 0.0445 | recon 0.0031 | clus 0.7374 | sep 0.3601 | var 0.0042 | cov 2.7894 | val_mse 0.0034 | fve 0.997 | eff_K 1998/2000 | dying 392
+  step  40100 | loss 0.0445 | recon 0.0031 | clus 0.7477 | sep 0.3595 | var 0.0017 | cov 2.9409 | val_mse 0.0034 | fve 0.997 | eff_K 1999/2000 | dying 393
+[train] Saved checkpoint: step_0040106.pt  val_mse=0.00339
+[train] New best val_mse=0.00339 → best_val.pt
+[train] Epoch 22 done in 32.9 min
+
+[train] Epoch 23/50 | tau=0.723 | λ_c=0.050 λ_s=0.0015 | λ_var=0.300 λ_cov=0.0010
+  step  40200 | loss 0.0443 | recon 0.0030 | clus 0.7359 | sep 0.3624 | var 0.0036 | cov 2.8362 | val_mse 0.0034 | fve 0.997 | eff_K 1999/2000 | dying 406
+  step  40300 | loss 0.0442 | recon 0.0030 | clus 0.7420 | sep 0.3562 | var 0.0020 | cov 2.9261 | val_mse 0.0034 | fve 0.997 | eff_K 1999/2000 | dying 394
+  step  40400 | loss 0.0443 | recon 0.0030 | clus 0.7441 | sep 0.3598 | var 0.0018 | cov 2.9343 | val_mse 0.0034 | fve 0.997 | eff_K 1999/2000 | dying 399
+  step  40500 | loss 0.0442 | recon 0.0030 | clus 0.7433 | sep 0.3573 | var 0.0021 | cov 2.8893 | val_mse 0.0034 | fve 0.997 | eff_K 2000/2000 | dying 397
+  step  40600 | loss 0.0446 | recon 0.0031 | clus 0.7501 | sep 0.3590 | var 0.0017 | cov 2.8982 | val_mse 0.0033 | fve 0.997 | eff_K 2000/2000 | dying 384
+  step  40700 | loss 0.0443 | recon 0.0031 | clus 0.7453 | sep 0.3591 | var 0.0017 | cov 2.8845 | val_mse 0.0033 | fve 0.997 | eff_K 2000/2000 | dying 396
+  step  40800 | loss 0.0441 | recon 0.0030 | clus 0.7318 | sep 0.3597 | var 0.0035 | cov 2.8984 | val_mse 0.0033 | fve 0.997 | eff_K 1999/2000 | dying 390
+  step  40900 | loss 0.0445 | recon 0.0030 | clus 0.7513 | sep 0.3566 | var 0.0022 | cov 2.7183 | val_mse 0.0033 | fve 0.997 | eff_K 1999/2000 | dying 391
+  step  41000 | loss 0.0444 | recon 0.0030 | clus 0.7450 | sep 0.3588 | var 0.0019 | cov 2.9365 | val_mse 0.0033 | fve 0.997 | eff_K 1999/2000 | dying 398
+  [reinit] step 41000: reinitialised 2 dead clusters
+  step  41100 | loss 0.0441 | recon 0.0029 | clus 0.7397 | sep 0.3584 | var 0.0026 | cov 2.9051 | val_mse 0.0033 | fve 0.997 | eff_K 1998/2000 | dying 404
+  step  41200 | loss 0.0444 | recon 0.0029 | clus 0.7492 | sep 0.3598 | var 0.0022 | cov 2.7776 | val_mse 0.0033 | fve 0.997 | eff_K 1998/2000 | dying 409
+  step  41300 | loss 0.0443 | recon 0.0030 | clus 0.7462 | sep 0.3600 | var 0.0018 | cov 2.8560 | val_mse 0.0033 | fve 0.997 | eff_K 1998/2000 | dying 398
+  step  41400 | loss 0.0441 | recon 0.0030 | clus 0.7364 | sep 0.3594 | var 0.0022 | cov 3.0333 | val_mse 0.0033 | fve 0.997 | eff_K 1999/2000 | dying 403
+  step  41500 | loss 0.0449 | recon 0.0031 | clus 0.7606 | sep 0.3574 | var 0.0009 | cov 2.9321 | val_mse 0.0033 | fve 0.997 | eff_K 1999/2000 | dying 399
+  step  41600 | loss 0.0444 | recon 0.0030 | clus 0.7446 | sep 0.3602 | var 0.0027 | cov 2.7950 | val_mse 0.0033 | fve 0.997 | eff_K 1999/2000 | dying 403
+  step  41700 | loss 0.0443 | recon 0.0031 | clus 0.7441 | sep 0.3603 | var 0.0019 | cov 2.8717 | val_mse 0.0033 | fve 0.997 | eff_K 1999/2000 | dying 399
+  step  41800 | loss 0.0443 | recon 0.0030 | clus 0.7480 | sep 0.3566 | var 0.0018 | cov 2.8010 | val_mse 0.0033 | fve 0.997 | eff_K 1999/2000 | dying 405
+  step  41900 | loss 0.0443 | recon 0.0030 | clus 0.7474 | sep 0.3588 | var 0.0019 | cov 2.8769 | val_mse 0.0033 | fve 0.997 | eff_K 1999/2000 | dying 406
+[train] Saved checkpoint: step_0041929.pt  val_mse=0.00329
+[train] New best val_mse=0.00329 → best_val.pt
+[train] Epoch 23 done in 35.8 min
+
+[train] Epoch 24/50 | tau=0.700 | λ_c=0.050 λ_s=0.0017 | λ_var=0.300 λ_cov=0.0010
+  step  42000 | loss 0.0444 | recon 0.0030 | clus 0.7478 | sep 0.3564 | var 0.0022 | cov 2.8115 | val_mse 0.0033 | fve 0.997 | eff_K 1999/2000 | dying 397
+  [reinit] step 42000: reinitialised 2 dead clusters
+  step  42100 | loss 0.0442 | recon 0.0028 | clus 0.7327 | sep 0.3596 | var 0.0041 | cov 2.8626 | val_mse 0.0033 | fve 0.997 | eff_K 1998/2000 | dying 384
+  step  42200 | loss 0.0442 | recon 0.0029 | clus 0.7428 | sep 0.3614 | var 0.0018 | cov 2.9521 | val_mse 0.0032 | fve 0.997 | eff_K 1998/2000 | dying 387
+  step  42300 | loss 0.0443 | recon 0.0030 | clus 0.7487 | sep 0.3605 | var 0.0011 | cov 2.9038 | val_mse 0.0033 | fve 0.997 | eff_K 1998/2000 | dying 397
+  step  42400 | loss 0.0442 | recon 0.0030 | clus 0.7395 | sep 0.3578 | var 0.0026 | cov 2.8695 | val_mse 0.0033 | fve 0.997 | eff_K 1998/2000 | dying 393
+  step  42500 | loss 0.0443 | recon 0.0029 | clus 0.7453 | sep 0.3596 | var 0.0025 | cov 2.7997 | val_mse 0.0032 | fve 0.997 | eff_K 1998/2000 | dying 410
+  step  42600 | loss 0.0445 | recon 0.0030 | clus 0.7462 | sep 0.3613 | var 0.0017 | cov 2.9874 | val_mse 0.0033 | fve 0.997 | eff_K 1998/2000 | dying 410
+  step  42700 | loss 0.0442 | recon 0.0029 | clus 0.7441 | sep 0.3557 | var 0.0020 | cov 2.8763 | val_mse 0.0033 | fve 0.997 | eff_K 1998/2000 | dying 388
+  step  42800 | loss 0.0441 | recon 0.0029 | clus 0.7422 | sep 0.3564 | var 0.0022 | cov 2.8700 | val_mse 0.0033 | fve 0.997 | eff_K 1998/2000 | dying 405
+  step  42900 | loss 0.0443 | recon 0.0030 | clus 0.7468 | sep 0.3543 | var 0.0016 | cov 2.8839 | val_mse 0.0032 | fve 0.997 | eff_K 1998/2000 | dying 402
+  step  43000 | loss 0.0442 | recon 0.0030 | clus 0.7415 | sep 0.3571 | var 0.0020 | cov 2.9242 | val_mse 0.0032 | fve 0.997 | eff_K 1998/2000 | dying 396
+  [reinit] step 43000: reinitialised 2 dead clusters
+  step  43100 | loss 0.0442 | recon 0.0031 | clus 0.7406 | sep 0.3607 | var 0.0023 | cov 2.8688 | val_mse 0.0032 | fve 0.997 | eff_K 1998/2000 | dying 409
+  step  43200 | loss 0.0439 | recon 0.0029 | clus 0.7375 | sep 0.3581 | var 0.0019 | cov 2.9465 | val_mse 0.0032 | fve 0.997 | eff_K 1998/2000 | dying 393
+  step  43300 | loss 0.0439 | recon 0.0028 | clus 0.7400 | sep 0.3547 | var 0.0026 | cov 2.7655 | val_mse 0.0032 | fve 0.997 | eff_K 1999/2000 | dying 396
+  step  43400 | loss 0.0443 | recon 0.0030 | clus 0.7438 | sep 0.3581 | var 0.0013 | cov 3.0666 | val_mse 0.0032 | fve 0.997 | eff_K 1999/2000 | dying 408
+  step  43500 | loss 0.0444 | recon 0.0029 | clus 0.7501 | sep 0.3537 | var 0.0016 | cov 2.8955 | val_mse 0.0032 | fve 0.997 | eff_K 1999/2000 | dying 404
+  step  43600 | loss 0.0444 | recon 0.0030 | clus 0.7483 | sep 0.3559 | var 0.0016 | cov 2.9320 | val_mse 0.0032 | fve 0.997 | eff_K 1999/2000 | dying 401
+  step  43700 | loss 0.0441 | recon 0.0029 | clus 0.7420 | sep 0.3552 | var 0.0023 | cov 2.8194 | val_mse 0.0032 | fve 0.997 | eff_K 1999/2000 | dying 395
+[train] Saved checkpoint: step_0043752.pt  val_mse=0.00318
+[train] New best val_mse=0.00318 → best_val.pt
+[train] Epoch 24 done in 34.8 min
+
+[train] Epoch 25/50 | tau=0.677 | λ_c=0.050 λ_s=0.0018 | λ_var=0.300 λ_cov=0.0010
+  step  43800 | loss 0.0442 | recon 0.0029 | clus 0.7404 | sep 0.3542 | var 0.0025 | cov 2.8357 | val_mse 0.0032 | fve 0.997 | eff_K 1999/2000 | dying 397
+  step  43900 | loss 0.0442 | recon 0.0029 | clus 0.7407 | sep 0.3574 | var 0.0025 | cov 2.8561 | val_mse 0.0032 | fve 0.997 | eff_K 1999/2000 | dying 416
+  step  44000 | loss 0.0441 | recon 0.0029 | clus 0.7391 | sep 0.3579 | var 0.0028 | cov 2.8178 | val_mse 0.0032 | fve 0.997 | eff_K 1999/2000 | dying 416
+  [reinit] step 44000: reinitialised 3 dead clusters
+  step  44100 | loss 0.0445 | recon 0.0029 | clus 0.7471 | sep 0.3587 | var 0.0029 | cov 2.7800 | val_mse 0.0031 | fve 0.997 | eff_K 1999/2000 | dying 409
+  step  44200 | loss 0.0442 | recon 0.0029 | clus 0.7472 | sep 0.3559 | var 0.0013 | cov 2.8940 | val_mse 0.0032 | fve 0.997 | eff_K 1997/2000 | dying 404
+  step  44300 | loss 0.0442 | recon 0.0029 | clus 0.7442 | sep 0.3557 | var 0.0018 | cov 2.9019 | val_mse 0.0032 | fve 0.997 | eff_K 1997/2000 | dying 392
+  step  44400 | loss 0.0443 | recon 0.0029 | clus 0.7446 | sep 0.3553 | var 0.0023 | cov 2.7990 | val_mse 0.0032 | fve 0.997 | eff_K 1998/2000 | dying 401
+  step  44500 | loss 0.0440 | recon 0.0028 | clus 0.7406 | sep 0.3602 | var 0.0024 | cov 2.8594 | val_mse 0.0032 | fve 0.997 | eff_K 1998/2000 | dying 414
+  step  44600 | loss 0.0442 | recon 0.0029 | clus 0.7466 | sep 0.3534 | var 0.0018 | cov 2.8315 | val_mse 0.0032 | fve 0.997 | eff_K 1998/2000 | dying 393
+  step  44700 | loss 0.0446 | recon 0.0030 | clus 0.7547 | sep 0.3561 | var 0.0010 | cov 2.8857 | val_mse 0.0032 | fve 0.997 | eff_K 1998/2000 | dying 388
+  step  44800 | loss 0.0441 | recon 0.0029 | clus 0.7442 | sep 0.3561 | var 0.0016 | cov 2.8888 | val_mse 0.0031 | fve 0.997 | eff_K 1999/2000 | dying 408
+  step  44900 | loss 0.0440 | recon 0.0029 | clus 0.7424 | sep 0.3546 | var 0.0018 | cov 2.8358 | val_mse 0.0032 | fve 0.997 | eff_K 2000/2000 | dying 407
+  step  45000 | loss 0.0442 | recon 0.0028 | clus 0.7470 | sep 0.3528 | var 0.0022 | cov 2.7085 | val_mse 0.0031 | fve 0.997 | eff_K 2000/2000 | dying 401
+  [reinit] step 45000: reinitialised 1 dead clusters
+  step  45100 | loss 0.0440 | recon 0.0029 | clus 0.7427 | sep 0.3567 | var 0.0015 | cov 2.8702 | val_mse 0.0031 | fve 0.997 | eff_K 2000/2000 | dying 409
+  step  45200 | loss 0.0440 | recon 0.0028 | clus 0.7424 | sep 0.3598 | var 0.0014 | cov 2.9353 | val_mse 0.0031 | fve 0.997 | eff_K 1999/2000 | dying 403
+  step  45300 | loss 0.0443 | recon 0.0030 | clus 0.7480 | sep 0.3544 | var 0.0013 | cov 2.8791 | val_mse 0.0031 | fve 0.997 | eff_K 1999/2000 | dying 395
+  step  45400 | loss 0.0443 | recon 0.0030 | clus 0.7415 | sep 0.3526 | var 0.0016 | cov 3.0398 | val_mse 0.0031 | fve 0.997 | eff_K 1999/2000 | dying 389
+  step  45500 | loss 0.0440 | recon 0.0028 | clus 0.7440 | sep 0.3572 | var 0.0016 | cov 2.8251 | val_mse 0.0031 | fve 0.997 | eff_K 1999/2000 | dying 397
+[train] Saved checkpoint: step_0045575.pt  val_mse=0.00311
+[train] New best val_mse=0.00311 → best_val.pt
+[train] Epoch 25 done in 35.8 min
+
+[train] Epoch 26/50 | tau=0.654 | λ_c=0.050 λ_s=0.0019 | λ_var=0.300 λ_cov=0.0010
+  step  45600 | loss 0.0440 | recon 0.0029 | clus 0.7377 | sep 0.3561 | var 0.0020 | cov 2.9192 | val_mse 0.0031 | fve 0.997 | eff_K 1998/2000 | dying 393
+  step  45700 | loss 0.0444 | recon 0.0029 | clus 0.7480 | sep 0.3547 | var 0.0020 | cov 2.8073 | val_mse 0.0031 | fve 0.997 | eff_K 1999/2000 | dying 390
+  step  45800 | loss 0.0438 | recon 0.0028 | clus 0.7387 | sep 0.3536 | var 0.0016 | cov 2.9260 | val_mse 0.0031 | fve 0.997 | eff_K 1999/2000 | dying 417
+  step  45900 | loss 0.0445 | recon 0.0030 | clus 0.7475 | sep 0.3556 | var 0.0011 | cov 3.0708 | val_mse 0.0031 | fve 0.997 | eff_K 1999/2000 | dying 407
+  step  46000 | loss 0.0440 | recon 0.0027 | clus 0.7412 | sep 0.3547 | var 0.0023 | cov 2.8786 | val_mse 0.0031 | fve 0.997 | eff_K 1999/2000 | dying 415
+  [reinit] step 46000: reinitialised 5 dead clusters
+  step  46100 | loss 0.0440 | recon 0.0028 | clus 0.7353 | sep 0.3550 | var 0.0026 | cov 2.9134 | val_mse 0.0031 | fve 0.997 | eff_K 1995/2000 | dying 420
+  step  46200 | loss 0.0442 | recon 0.0029 | clus 0.7456 | sep 0.3595 | var 0.0015 | cov 2.8948 | val_mse 0.0031 | fve 0.997 | eff_K 1995/2000 | dying 423
+  step  46300 | loss 0.0441 | recon 0.0028 | clus 0.7448 | sep 0.3560 | var 0.0014 | cov 2.8643 | val_mse 0.0031 | fve 0.997 | eff_K 1995/2000 | dying 408
+  step  46400 | loss 0.0444 | recon 0.0029 | clus 0.7487 | sep 0.3574 | var 0.0017 | cov 2.8744 | val_mse 0.0031 | fve 0.997 | eff_K 1997/2000 | dying 400
+  step  46500 | loss 0.0441 | recon 0.0028 | clus 0.7448 | sep 0.3583 | var 0.0016 | cov 2.8701 | val_mse 0.0031 | fve 0.997 | eff_K 1997/2000 | dying 386
+  step  46600 | loss 0.0443 | recon 0.0028 | clus 0.7383 | sep 0.3554 | var 0.0039 | cov 2.7629 | val_mse 0.0031 | fve 0.997 | eff_K 1997/2000 | dying 395
+  step  46700 | loss 0.0443 | recon 0.0028 | clus 0.7493 | sep 0.3553 | var 0.0013 | cov 2.8653 | val_mse 0.0031 | fve 0.997 | eff_K 1998/2000 | dying 398
+  step  46800 | loss 0.0446 | recon 0.0028 | clus 0.7447 | sep 0.3565 | var 0.0036 | cov 2.7428 | val_mse 0.0031 | fve 0.997 | eff_K 1998/2000 | dying 409
+  step  46900 | loss 0.0441 | recon 0.0028 | clus 0.7396 | sep 0.3566 | var 0.0021 | cov 2.9176 | val_mse 0.0030 | fve 0.997 | eff_K 1998/2000 | dying 415
+  step  47000 | loss 0.0441 | recon 0.0028 | clus 0.7422 | sep 0.3559 | var 0.0023 | cov 2.8080 | val_mse 0.0031 | fve 0.997 | eff_K 1998/2000 | dying 416
+  [reinit] step 47000: reinitialised 3 dead clusters
+  step  47100 | loss 0.0444 | recon 0.0028 | clus 0.7497 | sep 0.3566 | var 0.0019 | cov 2.8155 | val_mse 0.0030 | fve 0.997 | eff_K 1997/2000 | dying 402
+  step  47200 | loss 0.0441 | recon 0.0028 | clus 0.7443 | sep 0.3565 | var 0.0021 | cov 2.7840 | val_mse 0.0031 | fve 0.997 | eff_K 1997/2000 | dying 406
+  step  47300 | loss 0.0440 | recon 0.0028 | clus 0.7395 | sep 0.3556 | var 0.0023 | cov 2.9104 | val_mse 0.0031 | fve 0.997 | eff_K 1997/2000 | dying 407
+[train] Saved checkpoint: step_0047398.pt  val_mse=0.00302
+[train] New best val_mse=0.00302 → best_val.pt
+[train] Epoch 26 done in 35.1 min
+
+[train] Epoch 27/50 | tau=0.631 | λ_c=0.050 λ_s=0.0021 | λ_var=0.300 λ_cov=0.0010
+  step  47400 | loss 0.0441 | recon 0.0029 | clus 0.7409 | sep 0.3561 | var 0.0021 | cov 2.8778 | val_mse 0.0030 | fve 0.997 | eff_K 1997/2000 | dying 411
+  step  47500 | loss 0.0439 | recon 0.0028 | clus 0.7460 | sep 0.3548 | var 0.0009 | cov 2.8721 | val_mse 0.0030 | fve 0.997 | eff_K 1998/2000 | dying 403
+  step  47600 | loss 0.0439 | recon 0.0026 | clus 0.7395 | sep 0.3544 | var 0.0025 | cov 2.7793 | val_mse 0.0030 | fve 0.997 | eff_K 1998/2000 | dying 398
+  step  47700 | loss 0.0442 | recon 0.0028 | clus 0.7398 | sep 0.3563 | var 0.0031 | cov 2.7915 | val_mse 0.0031 | fve 0.997 | eff_K 1997/2000 | dying 396
+  step  47800 | loss 0.0443 | recon 0.0028 | clus 0.7459 | sep 0.3542 | var 0.0020 | cov 2.8772 | val_mse 0.0030 | fve 0.997 | eff_K 1998/2000 | dying 396
+  step  47900 | loss 0.0443 | recon 0.0028 | clus 0.7490 | sep 0.3548 | var 0.0016 | cov 2.8522 | val_mse 0.0031 | fve 0.997 | eff_K 1999/2000 | dying 388
+  step  48000 | loss 0.0442 | recon 0.0028 | clus 0.7452 | sep 0.3558 | var 0.0017 | cov 2.9051 | val_mse 0.0030 | fve 0.997 | eff_K 1999/2000 | dying 404
+  step  48100 | loss 0.0439 | recon 0.0027 | clus 0.7407 | sep 0.3564 | var 0.0020 | cov 2.8174 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 416
+  step  48200 | loss 0.0441 | recon 0.0028 | clus 0.7454 | sep 0.3551 | var 0.0013 | cov 2.9535 | val_mse 0.0030 | fve 0.997 | eff_K 1999/2000 | dying 407
+  step  48300 | loss 0.0445 | recon 0.0029 | clus 0.7514 | sep 0.3543 | var 0.0015 | cov 2.8983 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 400
+  step  48400 | loss 0.0437 | recon 0.0027 | clus 0.7381 | sep 0.3538 | var 0.0015 | cov 2.9123 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 403
+  step  48500 | loss 0.0440 | recon 0.0027 | clus 0.7437 | sep 0.3538 | var 0.0015 | cov 2.8829 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 406
+  step  48600 | loss 0.0442 | recon 0.0027 | clus 0.7469 | sep 0.3536 | var 0.0021 | cov 2.7514 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 415
+  step  48700 | loss 0.0442 | recon 0.0027 | clus 0.7493 | sep 0.3542 | var 0.0014 | cov 2.8529 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 399
+  step  48800 | loss 0.0442 | recon 0.0028 | clus 0.7478 | sep 0.3524 | var 0.0016 | cov 2.8081 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 402
+  step  48900 | loss 0.0446 | recon 0.0028 | clus 0.7614 | sep 0.3587 | var 0.0009 | cov 2.7414 | val_mse 0.0030 | fve 0.997 | eff_K 1999/2000 | dying 406
+  step  49000 | loss 0.0441 | recon 0.0028 | clus 0.7453 | sep 0.3534 | var 0.0016 | cov 2.8535 | val_mse 0.0030 | fve 0.997 | eff_K 1999/2000 | dying 406
+  [reinit] step 49000: reinitialised 1 dead clusters
+  step  49100 | loss 0.0442 | recon 0.0028 | clus 0.7467 | sep 0.3515 | var 0.0018 | cov 2.8237 | val_mse 0.0030 | fve 0.997 | eff_K 1999/2000 | dying 420
+  step  49200 | loss 0.0439 | recon 0.0028 | clus 0.7373 | sep 0.3555 | var 0.0020 | cov 2.9053 | val_mse 0.0030 | fve 0.997 | eff_K 1999/2000 | dying 416
+[train] Saved checkpoint: step_0049221.pt  val_mse=0.00301
+[train] New best val_mse=0.00301 → best_val.pt
+[train] Epoch 27 done in 38.9 min
+
+[train] Epoch 28/50 | tau=0.608 | λ_c=0.050 λ_s=0.0022 | λ_var=0.300 λ_cov=0.0010
+  step  49300 | loss 0.0442 | recon 0.0028 | clus 0.7453 | sep 0.3564 | var 0.0017 | cov 2.8723 | val_mse 0.0030 | fve 0.997 | eff_K 1999/2000 | dying 418
+  step  49400 | loss 0.0442 | recon 0.0028 | clus 0.7462 | sep 0.3579 | var 0.0017 | cov 2.8609 | val_mse 0.0030 | fve 0.997 | eff_K 1999/2000 | dying 411
+  step  49500 | loss 0.0439 | recon 0.0028 | clus 0.7389 | sep 0.3555 | var 0.0015 | cov 2.9153 | val_mse 0.0030 | fve 0.997 | eff_K 1999/2000 | dying 412
+  step  49600 | loss 0.0439 | recon 0.0027 | clus 0.7386 | sep 0.3548 | var 0.0018 | cov 2.9287 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 402
+  step  49700 | loss 0.0440 | recon 0.0027 | clus 0.7416 | sep 0.3544 | var 0.0024 | cov 2.7257 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 397
+  step  49800 | loss 0.0439 | recon 0.0027 | clus 0.7411 | sep 0.3529 | var 0.0015 | cov 2.8683 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 409
+  step  49900 | loss 0.0441 | recon 0.0028 | clus 0.7402 | sep 0.3556 | var 0.0021 | cov 2.8723 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 410
+  step  50000 | loss 0.0441 | recon 0.0027 | clus 0.7442 | sep 0.3522 | var 0.0019 | cov 2.8337 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 413
+  step  50100 | loss 0.0442 | recon 0.0028 | clus 0.7426 | sep 0.3530 | var 0.0026 | cov 2.7906 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 410
+  step  50200 | loss 0.0440 | recon 0.0027 | clus 0.7430 | sep 0.3553 | var 0.0017 | cov 2.8907 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 415
+  step  50300 | loss 0.0440 | recon 0.0027 | clus 0.7381 | sep 0.3546 | var 0.0024 | cov 2.8540 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 418
+  step  50400 | loss 0.0439 | recon 0.0026 | clus 0.7376 | sep 0.3563 | var 0.0023 | cov 2.8646 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 420
+  step  50500 | loss 0.0440 | recon 0.0027 | clus 0.7431 | sep 0.3540 | var 0.0018 | cov 2.8282 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 418
+  step  50600 | loss 0.0439 | recon 0.0026 | clus 0.7419 | sep 0.3555 | var 0.0019 | cov 2.7986 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 419
+  step  50700 | loss 0.0440 | recon 0.0027 | clus 0.7427 | sep 0.3548 | var 0.0019 | cov 2.8226 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 430
+  step  50800 | loss 0.0439 | recon 0.0027 | clus 0.7392 | sep 0.3552 | var 0.0014 | cov 2.9798 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 431
+  step  50900 | loss 0.0440 | recon 0.0027 | clus 0.7435 | sep 0.3565 | var 0.0018 | cov 2.8025 | val_mse 0.0030 | fve 0.997 | eff_K 2000/2000 | dying 418
+  step  51000 | loss 0.0442 | recon 0.0027 | clus 0.7500 | sep 0.3554 | var 0.0014 | cov 2.7949 | val_mse 0.0029 | fve 0.997 | eff_K 2000/2000 | dying 435
+  [reinit] step 51000: reinitialised 4 dead clusters
+[train] Saved checkpoint: step_0051044.pt  val_mse=0.00295
+[train] New best val_mse=0.00295 → best_val.pt
+[train] Epoch 28 done in 39.6 min
+
+[train] Epoch 29/50 | tau=0.585 | λ_c=0.050 λ_s=0.0023 | λ_var=0.300 λ_cov=0.0010
+  step  51100 | loss 0.0440 | recon 0.0027 | clus 0.7431 | sep 0.3531 | var 0.0015 | cov 2.8512 | val_mse 0.0030 | fve 0.997 | eff_K 1999/2000 | dying 419
+  step  51200 | loss 0.0441 | recon 0.0027 | clus 0.7433 | sep 0.3546 | var 0.0017 | cov 2.8654 | val_mse 0.0030 | fve 0.997 | eff_K 1996/2000 | dying 411
+  step  51300 | loss 0.0440 | recon 0.0026 | clus 0.7421 | sep 0.3584 | var 0.0023 | cov 2.7744 | val_mse 0.0029 | fve 0.997 | eff_K 1996/2000 | dying 416
+  step  51400 | loss 0.0441 | recon 0.0027 | clus 0.7416 | sep 0.3558 | var 0.0023 | cov 2.7954 | val_mse 0.0029 | fve 0.997 | eff_K 1995/2000 | dying 424
+  step  51500 | loss 0.0436 | recon 0.0025 | clus 0.7300 | sep 0.3535 | var 0.0034 | cov 2.7765 | val_mse 0.0029 | fve 0.997 | eff_K 1995/2000 | dying 410
+  step  51600 | loss 0.0441 | recon 0.0026 | clus 0.7474 | sep 0.3532 | var 0.0018 | cov 2.8236 | val_mse 0.0029 | fve 0.997 | eff_K 1996/2000 | dying 412
+  step  51700 | loss 0.0438 | recon 0.0026 | clus 0.7392 | sep 0.3526 | var 0.0022 | cov 2.7069 | val_mse 0.0029 | fve 0.997 | eff_K 1996/2000 | dying 414
+  step  51800 | loss 0.0438 | recon 0.0026 | clus 0.7393 | sep 0.3550 | var 0.0023 | cov 2.7614 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 421
+  step  51900 | loss 0.0439 | recon 0.0027 | clus 0.7407 | sep 0.3564 | var 0.0016 | cov 2.8823 | val_mse 0.0029 | fve 0.997 | eff_K 1996/2000 | dying 414
+  step  52000 | loss 0.0442 | recon 0.0027 | clus 0.7495 | sep 0.3537 | var 0.0014 | cov 2.8103 | val_mse 0.0029 | fve 0.997 | eff_K 1998/2000 | dying 418
+  [reinit] step 52000: reinitialised 3 dead clusters
+  step  52100 | loss 0.0445 | recon 0.0028 | clus 0.7481 | sep 0.3535 | var 0.0023 | cov 2.7556 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 412
+  step  52200 | loss 0.0443 | recon 0.0027 | clus 0.7496 | sep 0.3548 | var 0.0014 | cov 2.8952 | val_mse 0.0030 | fve 0.997 | eff_K 1997/2000 | dying 402
+  step  52300 | loss 0.0441 | recon 0.0027 | clus 0.7425 | sep 0.3527 | var 0.0025 | cov 2.7432 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 418
+  step  52400 | loss 0.0441 | recon 0.0026 | clus 0.7475 | sep 0.3537 | var 0.0011 | cov 2.9413 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 413
+  step  52500 | loss 0.0438 | recon 0.0025 | clus 0.7456 | sep 0.3561 | var 0.0013 | cov 2.7618 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 410
+  step  52600 | loss 0.0441 | recon 0.0027 | clus 0.7416 | sep 0.3538 | var 0.0024 | cov 2.7903 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 415
+  step  52700 | loss 0.0440 | recon 0.0026 | clus 0.7430 | sep 0.3555 | var 0.0016 | cov 2.9112 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 428
+  step  52800 | loss 0.0446 | recon 0.0029 | clus 0.7532 | sep 0.3547 | var 0.0009 | cov 2.9694 | val_mse 0.0029 | fve 0.997 | eff_K 1996/2000 | dying 420
+[train] Saved checkpoint: step_0052867.pt  val_mse=0.00293
+[train] New best val_mse=0.00293 → best_val.pt
+[train] Epoch 29 done in 38.0 min
+
+[train] Epoch 30/50 | tau=0.562 | λ_c=0.050 λ_s=0.0024 | λ_var=0.300 λ_cov=0.0010
+  step  52900 | loss 0.0443 | recon 0.0028 | clus 0.7411 | sep 0.3541 | var 0.0026 | cov 2.8303 | val_mse 0.0029 | fve 0.997 | eff_K 1996/2000 | dying 410
+  step  53000 | loss 0.0441 | recon 0.0027 | clus 0.7469 | sep 0.3530 | var 0.0012 | cov 2.8331 | val_mse 0.0029 | fve 0.997 | eff_K 1996/2000 | dying 417
+  [reinit] step 53000: reinitialised 4 dead clusters
+  step  53100 | loss 0.0443 | recon 0.0027 | clus 0.7529 | sep 0.3496 | var 0.0013 | cov 2.7666 | val_mse 0.0029 | fve 0.997 | eff_K 1996/2000 | dying 409
+  step  53200 | loss 0.0439 | recon 0.0027 | clus 0.7433 | sep 0.3528 | var 0.0010 | cov 2.8883 | val_mse 0.0029 | fve 0.997 | eff_K 1996/2000 | dying 414
+  step  53300 | loss 0.0440 | recon 0.0026 | clus 0.7431 | sep 0.3510 | var 0.0022 | cov 2.6975 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 398
+  step  53400 | loss 0.0440 | recon 0.0026 | clus 0.7440 | sep 0.3528 | var 0.0014 | cov 2.8636 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 400
+  step  53500 | loss 0.0444 | recon 0.0026 | clus 0.7557 | sep 0.3523 | var 0.0014 | cov 2.6695 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 410
+  step  53600 | loss 0.0439 | recon 0.0026 | clus 0.7418 | sep 0.3550 | var 0.0012 | cov 2.9628 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 407
+  step  53700 | loss 0.0444 | recon 0.0027 | clus 0.7522 | sep 0.3553 | var 0.0013 | cov 2.8208 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 401
+  step  53800 | loss 0.0440 | recon 0.0026 | clus 0.7443 | sep 0.3539 | var 0.0019 | cov 2.7555 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 415
+  step  53900 | loss 0.0438 | recon 0.0026 | clus 0.7390 | sep 0.3541 | var 0.0020 | cov 2.8244 | val_mse 0.0029 | fve 0.997 | eff_K 1998/2000 | dying 423
+  step  54000 | loss 0.0438 | recon 0.0027 | clus 0.7370 | sep 0.3539 | var 0.0016 | cov 2.9079 | val_mse 0.0029 | fve 0.997 | eff_K 1998/2000 | dying 413
+  [reinit] step 54000: reinitialised 3 dead clusters
+  step  54100 | loss 0.0435 | recon 0.0024 | clus 0.7348 | sep 0.3526 | var 0.0021 | cov 2.8421 | val_mse 0.0029 | fve 0.998 | eff_K 1997/2000 | dying 409
+  step  54200 | loss 0.0440 | recon 0.0025 | clus 0.7421 | sep 0.3577 | var 0.0030 | cov 2.6514 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 417
+  step  54300 | loss 0.0443 | recon 0.0027 | clus 0.7504 | sep 0.3533 | var 0.0012 | cov 2.8627 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 408
+  step  54400 | loss 0.0441 | recon 0.0026 | clus 0.7417 | sep 0.3482 | var 0.0029 | cov 2.6677 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 419
+  step  54500 | loss 0.0440 | recon 0.0026 | clus 0.7424 | sep 0.3507 | var 0.0021 | cov 2.8307 | val_mse 0.0028 | fve 0.997 | eff_K 1997/2000 | dying 409
+  step  54600 | loss 0.0440 | recon 0.0025 | clus 0.7403 | sep 0.3544 | var 0.0022 | cov 2.8893 | val_mse 0.0028 | fve 0.997 | eff_K 1997/2000 | dying 414
+[train] Saved checkpoint: step_0054690.pt  val_mse=0.00286
+[train] New best val_mse=0.00286 → best_val.pt
+[train] Epoch 30 done in 41.1 min
+
+[train] Epoch 31/50 | tau=0.538 | λ_c=0.050 λ_s=0.0026 | λ_var=0.300 λ_cov=0.0010
+  step  54700 | loss 0.0439 | recon 0.0027 | clus 0.7404 | sep 0.3557 | var 0.0012 | cov 2.9430 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 417
+  step  54800 | loss 0.0443 | recon 0.0027 | clus 0.7421 | sep 0.3554 | var 0.0028 | cov 2.8245 | val_mse 0.0029 | fve 0.997 | eff_K 1996/2000 | dying 427
+  step  54900 | loss 0.0441 | recon 0.0027 | clus 0.7432 | sep 0.3538 | var 0.0016 | cov 2.9328 | val_mse 0.0029 | fve 0.997 | eff_K 1996/2000 | dying 418
+  step  55000 | loss 0.0441 | recon 0.0026 | clus 0.7434 | sep 0.3534 | var 0.0018 | cov 2.8456 | val_mse 0.0028 | fve 0.997 | eff_K 1996/2000 | dying 419
+  [reinit] step 55000: reinitialised 5 dead clusters
+  step  55100 | loss 0.0440 | recon 0.0025 | clus 0.7430 | sep 0.3544 | var 0.0024 | cov 2.6948 | val_mse 0.0029 | fve 0.997 | eff_K 1996/2000 | dying 423
+  step  55200 | loss 0.0442 | recon 0.0027 | clus 0.7462 | sep 0.3542 | var 0.0015 | cov 2.8954 | val_mse 0.0029 | fve 0.997 | eff_K 1995/2000 | dying 414
+  step  55300 | loss 0.0440 | recon 0.0026 | clus 0.7440 | sep 0.3536 | var 0.0018 | cov 2.8080 | val_mse 0.0028 | fve 0.997 | eff_K 1996/2000 | dying 413
+  step  55400 | loss 0.0441 | recon 0.0027 | clus 0.7429 | sep 0.3520 | var 0.0016 | cov 2.8828 | val_mse 0.0029 | fve 0.997 | eff_K 1997/2000 | dying 418
+  step  55500 | loss 0.0439 | recon 0.0027 | clus 0.7406 | sep 0.3522 | var 0.0012 | cov 2.9539 | val_mse 0.0028 | fve 0.997 | eff_K 1999/2000 | dying 410
+  step  55600 | loss 0.0439 | recon 0.0026 | clus 0.7441 | sep 0.3529 | var 0.0014 | cov 2.8000 | val_mse 0.0028 | fve 0.997 | eff_K 1998/2000 | dying 423
+  step  55700 | loss 0.0440 | recon 0.0026 | clus 0.7417 | sep 0.3484 | var 0.0020 | cov 2.8353 | val_mse 0.0028 | fve 0.997 | eff_K 1999/2000 | dying 419
+  step  55800 | loss 0.0442 | recon 0.0027 | clus 0.7469 | sep 0.3536 | var 0.0012 | cov 2.8388 | val_mse 0.0028 | fve 0.997 | eff_K 1999/2000 | dying 409
+  step  55900 | loss 0.0438 | recon 0.0025 | clus 0.7409 | sep 0.3540 | var 0.0016 | cov 2.8716 | val_mse 0.0028 | fve 0.997 | eff_K 1998/2000 | dying 418
+  step  56000 | loss 0.0438 | recon 0.0025 | clus 0.7444 | sep 0.3515 | var 0.0014 | cov 2.7703 | val_mse 0.0028 | fve 0.997 | eff_K 1998/2000 | dying 423
+  [reinit] step 56000: reinitialised 4 dead clusters
+  step  56100 | loss 0.0441 | recon 0.0026 | clus 0.7476 | sep 0.3505 | var 0.0015 | cov 2.7952 | val_mse 0.0028 | fve 0.997 | eff_K 1997/2000 | dying 404
+  step  56200 | loss 0.0440 | recon 0.0024 | clus 0.7431 | sep 0.3525 | var 0.0024 | cov 2.7186 | val_mse 0.0028 | fve 0.998 | eff_K 1996/2000 | dying 405
+  step  56300 | loss 0.0438 | recon 0.0026 | clus 0.7401 | sep 0.3538 | var 0.0013 | cov 2.8792 | val_mse 0.0028 | fve 0.997 | eff_K 1996/2000 | dying 410
+  step  56400 | loss 0.0440 | recon 0.0026 | clus 0.7420 | sep 0.3548 | var 0.0024 | cov 2.7522 | val_mse 0.0028 | fve 0.997 | eff_K 1995/2000 | dying 407
+  step  56500 | loss 0.0440 | recon 0.0026 | clus 0.7458 | sep 0.3529 | var 0.0011 | cov 2.9186 | val_mse 0.0028 | fve 0.997 | eff_K 1995/2000 | dying 396
+[train] Saved checkpoint: step_0056513.pt  val_mse=0.00284
+[train] New best val_mse=0.00284 → best_val.pt
+[train] Epoch 31 done in 37.5 min
+
+[train] Epoch 32/50 | tau=0.515 | λ_c=0.050 λ_s=0.0027 | λ_var=0.300 λ_cov=0.0010
+  step  56600 | loss 0.0441 | recon 0.0026 | clus 0.7459 | sep 0.3510 | var 0.0013 | cov 2.8115 | val_mse 0.0028 | fve 0.997 | eff_K 1996/2000 | dying 394
+  step  56700 | loss 0.0440 | recon 0.0025 | clus 0.7394 | sep 0.3519 | var 0.0030 | cov 2.7451 | val_mse 0.0028 | fve 0.998 | eff_K 1997/2000 | dying 409
+  step  56800 | loss 0.0439 | recon 0.0026 | clus 0.7388 | sep 0.3531 | var 0.0018 | cov 2.8834 | val_mse 0.0028 | fve 0.997 | eff_K 1998/2000 | dying 412
+  step  56900 | loss 0.0444 | recon 0.0026 | clus 0.7542 | sep 0.3506 | var 0.0007 | cov 2.8704 | val_mse 0.0028 | fve 0.997 | eff_K 1998/2000 | dying 421
+  step  57000 | loss 0.0441 | recon 0.0026 | clus 0.7363 | sep 0.3511 | var 0.0034 | cov 2.7503 | val_mse 0.0028 | fve 0.997 | eff_K 1998/2000 | dying 416
+  [reinit] step 57000: reinitialised 4 dead clusters
+  step  57100 | loss 0.0441 | recon 0.0026 | clus 0.7476 | sep 0.3516 | var 0.0013 | cov 2.8267 | val_mse 0.0028 | fve 0.997 | eff_K 1998/2000 | dying 424
+  step  57200 | loss 0.0439 | recon 0.0026 | clus 0.7383 | sep 0.3533 | var 0.0018 | cov 2.9308 | val_mse 0.0028 | fve 0.997 | eff_K 1996/2000 | dying 409
+  step  57300 | loss 0.0439 | recon 0.0026 | clus 0.7401 | sep 0.3534 | var 0.0014 | cov 2.9214 | val_mse 0.0028 | fve 0.997 | eff_K 1996/2000 | dying 413
+  step  57400 | loss 0.0440 | recon 0.0026 | clus 0.7458 | sep 0.3501 | var 0.0010 | cov 2.8941 | val_mse 0.0028 | fve 0.997 | eff_K 1996/2000 | dying 416
+  step  57500 | loss 0.0440 | recon 0.0026 | clus 0.7393 | sep 0.3554 | var 0.0022 | cov 2.8017 | val_mse 0.0028 | fve 0.997 | eff_K 1996/2000 | dying 413
+  step  57600 | loss 0.0441 | recon 0.0026 | clus 0.7480 | sep 0.3502 | var 0.0014 | cov 2.7170 | val_mse 0.0028 | fve 0.997 | eff_K 1995/2000 | dying 418
+  step  57700 | loss 0.0440 | recon 0.0026 | clus 0.7413 | sep 0.3510 | var 0.0016 | cov 2.8346 | val_mse 0.0028 | fve 0.997 | eff_K 1996/2000 | dying 417
+  step  57800 | loss 0.0441 | recon 0.0026 | clus 0.7445 | sep 0.3495 | var 0.0018 | cov 2.8088 | val_mse 0.0028 | fve 0.997 | eff_K 1996/2000 | dying 416
+  step  57900 | loss 0.0437 | recon 0.0025 | clus 0.7366 | sep 0.3521 | var 0.0017 | cov 2.8966 | val_mse 0.0028 | fve 0.998 | eff_K 1996/2000 | dying 421
+  step  58000 | loss 0.0440 | recon 0.0027 | clus 0.7428 | sep 0.3523 | var 0.0010 | cov 2.8983 | val_mse 0.0028 | fve 0.997 | eff_K 1997/2000 | dying 426
+  [reinit] step 58000: reinitialised 2 dead clusters
+  step  58100 | loss 0.0438 | recon 0.0025 | clus 0.7385 | sep 0.3521 | var 0.0014 | cov 2.9298 | val_mse 0.0028 | fve 0.997 | eff_K 1998/2000 | dying 439
+  step  58200 | loss 0.0440 | recon 0.0026 | clus 0.7368 | sep 0.3511 | var 0.0026 | cov 2.8347 | val_mse 0.0028 | fve 0.997 | eff_K 1998/2000 | dying 425
+  step  58300 | loss 0.0440 | recon 0.0026 | clus 0.7429 | sep 0.3517 | var 0.0014 | cov 2.9205 | val_mse 0.0028 | fve 0.997 | eff_K 1997/2000 | dying 420
+[train] Saved checkpoint: step_0058336.pt  val_mse=0.00280
+[train] New best val_mse=0.00280 → best_val.pt
+[train] Epoch 32 done in 39.8 min
+
+[train] Epoch 33/50 | tau=0.492 | λ_c=0.050 λ_s=0.0028 | λ_var=0.300 λ_cov=0.0010
+  step  58400 | loss 0.0442 | recon 0.0026 | clus 0.7492 | sep 0.3483 | var 0.0016 | cov 2.7128 | val_mse 0.0028 | fve 0.997 | eff_K 1997/2000 | dying 422
+  step  58500 | loss 0.0439 | recon 0.0025 | clus 0.7374 | sep 0.3486 | var 0.0021 | cov 2.8404 | val_mse 0.0028 | fve 0.997 | eff_K 1997/2000 | dying 432
+  step  58600 | loss 0.0443 | recon 0.0026 | clus 0.7522 | sep 0.3500 | var 0.0014 | cov 2.7437 | val_mse 0.0028 | fve 0.997 | eff_K 1997/2000 | dying 417
+  step  58700 | loss 0.0440 | recon 0.0025 | clus 0.7380 | sep 0.3537 | var 0.0025 | cov 2.8171 | val_mse 0.0028 | fve 0.997 | eff_K 1996/2000 | dying 421
+  step  58800 | loss 0.0442 | recon 0.0025 | clus 0.7490 | sep 0.3515 | var 0.0011 | cov 2.8810 | val_mse 0.0028 | fve 0.998 | eff_K 1996/2000 | dying 412
+  step  58900 | loss 0.0441 | recon 0.0025 | clus 0.7473 | sep 0.3526 | var 0.0017 | cov 2.7825 | val_mse 0.0027 | fve 0.998 | eff_K 1997/2000 | dying 398
+  step  59000 | loss 0.0442 | recon 0.0026 | clus 0.7472 | sep 0.3509 | var 0.0012 | cov 2.9027 | val_mse 0.0027 | fve 0.997 | eff_K 1997/2000 | dying 407
+  [reinit] step 59000: reinitialised 3 dead clusters
+  step  59100 | loss 0.0435 | recon 0.0024 | clus 0.7308 | sep 0.3529 | var 0.0023 | cov 2.8679 | val_mse 0.0028 | fve 0.998 | eff_K 1996/2000 | dying 419
+  step  59200 | loss 0.0442 | recon 0.0026 | clus 0.7480 | sep 0.3521 | var 0.0016 | cov 2.7468 | val_mse 0.0027 | fve 0.997 | eff_K 1996/2000 | dying 407
+  step  59300 | loss 0.0439 | recon 0.0025 | clus 0.7422 | sep 0.3523 | var 0.0020 | cov 2.7230 | val_mse 0.0027 | fve 0.998 | eff_K 1997/2000 | dying 416
+  step  59400 | loss 0.0439 | recon 0.0025 | clus 0.7419 | sep 0.3500 | var 0.0016 | cov 2.8069 | val_mse 0.0028 | fve 0.997 | eff_K 1996/2000 | dying 431
+  step  59500 | loss 0.0439 | recon 0.0025 | clus 0.7445 | sep 0.3508 | var 0.0014 | cov 2.7671 | val_mse 0.0028 | fve 0.998 | eff_K 1996/2000 | dying 428
+  step  59600 | loss 0.0440 | recon 0.0025 | clus 0.7406 | sep 0.3522 | var 0.0022 | cov 2.8336 | val_mse 0.0027 | fve 0.997 | eff_K 1996/2000 | dying 416
+  step  59700 | loss 0.0440 | recon 0.0025 | clus 0.7428 | sep 0.3556 | var 0.0016 | cov 2.8544 | val_mse 0.0028 | fve 0.997 | eff_K 1996/2000 | dying 419
+  step  59800 | loss 0.0445 | recon 0.0026 | clus 0.7552 | sep 0.3507 | var 0.0012 | cov 2.8089 | val_mse 0.0028 | fve 0.997 | eff_K 1996/2000 | dying 419
+  step  59900 | loss 0.0441 | recon 0.0025 | clus 0.7409 | sep 0.3556 | var 0.0027 | cov 2.6798 | val_mse 0.0028 | fve 0.997 | eff_K 1996/2000 | dying 432
+  step  60000 | loss 0.0438 | recon 0.0025 | clus 0.7388 | sep 0.3527 | var 0.0019 | cov 2.8001 | val_mse 0.0027 | fve 0.997 | eff_K 1996/2000 | dying 430
+  [reinit] step 60000: reinitialised 3 dead clusters
+  step  60100 | loss 0.0443 | recon 0.0025 | clus 0.7500 | sep 0.3502 | var 0.0019 | cov 2.7093 | val_mse 0.0027 | fve 0.997 | eff_K 1995/2000 | dying 422
+[train] Saved checkpoint: step_0060159.pt  val_mse=0.00274
+[train] New best val_mse=0.00274 → best_val.pt
+[train] Epoch 33 done in 39.6 min
+
+[train] Epoch 34/50 | tau=0.469 | λ_c=0.050 λ_s=0.0029 | λ_var=0.300 λ_cov=0.0010
+  step  60200 | loss 0.0440 | recon 0.0025 | clus 0.7454 | sep 0.3496 | var 0.0013 | cov 2.8275 | val_mse 0.0027 | fve 0.997 | eff_K 1994/2000 | dying 426
+  step  60300 | loss 0.0439 | recon 0.0025 | clus 0.7445 | sep 0.3528 | var 0.0013 | cov 2.7681 | val_mse 0.0027 | fve 0.998 | eff_K 1994/2000 | dying 432
+  step  60400 | loss 0.0440 | recon 0.0025 | clus 0.7389 | sep 0.3533 | var 0.0026 | cov 2.7589 | val_mse 0.0027 | fve 0.997 | eff_K 1994/2000 | dying 435
+  step  60500 | loss 0.0441 | recon 0.0025 | clus 0.7363 | sep 0.3525 | var 0.0034 | cov 2.7403 | val_mse 0.0028 | fve 0.997 | eff_K 1995/2000 | dying 425
+  step  60600 | loss 0.0440 | recon 0.0025 | clus 0.7441 | sep 0.3503 | var 0.0012 | cov 2.8327 | val_mse 0.0027 | fve 0.997 | eff_K 1994/2000 | dying 429
+  step  60700 | loss 0.0438 | recon 0.0024 | clus 0.7365 | sep 0.3518 | var 0.0027 | cov 2.7528 | val_mse 0.0027 | fve 0.998 | eff_K 1996/2000 | dying 428
+  step  60800 | loss 0.0441 | recon 0.0026 | clus 0.7421 | sep 0.3532 | var 0.0020 | cov 2.8022 | val_mse 0.0027 | fve 0.997 | eff_K 1997/2000 | dying 430
+  step  60900 | loss 0.0440 | recon 0.0024 | clus 0.7469 | sep 0.3503 | var 0.0012 | cov 2.8154 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 434
+  step  61000 | loss 0.0441 | recon 0.0024 | clus 0.7456 | sep 0.3534 | var 0.0021 | cov 2.7097 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 426
+  [reinit] step 61000: reinitialised 3 dead clusters
+  step  61100 | loss 0.0441 | recon 0.0026 | clus 0.7431 | sep 0.3509 | var 0.0017 | cov 2.8312 | val_mse 0.0027 | fve 0.997 | eff_K 1998/2000 | dying 410
+  step  61200 | loss 0.0439 | recon 0.0025 | clus 0.7280 | sep 0.3508 | var 0.0040 | cov 2.7893 | val_mse 0.0027 | fve 0.997 | eff_K 1997/2000 | dying 411
+  step  61300 | loss 0.0446 | recon 0.0026 | clus 0.7568 | sep 0.3538 | var 0.0006 | cov 2.8691 | val_mse 0.0027 | fve 0.997 | eff_K 1997/2000 | dying 431
+  step  61400 | loss 0.0439 | recon 0.0025 | clus 0.7404 | sep 0.3523 | var 0.0024 | cov 2.7108 | val_mse 0.0027 | fve 0.998 | eff_K 1997/2000 | dying 433
+  step  61500 | loss 0.0438 | recon 0.0025 | clus 0.7389 | sep 0.3495 | var 0.0013 | cov 2.9777 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 426
+  step  61600 | loss 0.0442 | recon 0.0025 | clus 0.7416 | sep 0.3562 | var 0.0025 | cov 2.7711 | val_mse 0.0027 | fve 0.997 | eff_K 1997/2000 | dying 419
+  step  61700 | loss 0.0440 | recon 0.0025 | clus 0.7398 | sep 0.3539 | var 0.0024 | cov 2.8094 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 420
+  step  61800 | loss 0.0441 | recon 0.0025 | clus 0.7485 | sep 0.3531 | var 0.0007 | cov 2.8539 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 426
+  step  61900 | loss 0.0438 | recon 0.0025 | clus 0.7363 | sep 0.3510 | var 0.0018 | cov 2.9056 | val_mse 0.0027 | fve 0.997 | eff_K 1998/2000 | dying 432
+[train] Saved checkpoint: step_0061982.pt  val_mse=0.00277
+[train] Epoch 34 done in 38.3 min
+
+[train] Epoch 35/50 | tau=0.446 | λ_c=0.050 λ_s=0.0031 | λ_var=0.300 λ_cov=0.0010
+  step  62000 | loss 0.0441 | recon 0.0026 | clus 0.7418 | sep 0.3514 | var 0.0015 | cov 2.8927 | val_mse 0.0027 | fve 0.997 | eff_K 1999/2000 | dying 439
+  [reinit] step 62000: reinitialised 1 dead clusters
+  step  62100 | loss 0.0442 | recon 0.0026 | clus 0.7463 | sep 0.3542 | var 0.0015 | cov 2.8038 | val_mse 0.0028 | fve 0.997 | eff_K 1998/2000 | dying 425
+  step  62200 | loss 0.0441 | recon 0.0025 | clus 0.7438 | sep 0.3555 | var 0.0017 | cov 2.7706 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 414
+  step  62300 | loss 0.0439 | recon 0.0025 | clus 0.7403 | sep 0.3497 | var 0.0018 | cov 2.7870 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 417
+  step  62400 | loss 0.0440 | recon 0.0025 | clus 0.7432 | sep 0.3514 | var 0.0010 | cov 2.9584 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 421
+  step  62500 | loss 0.0440 | recon 0.0026 | clus 0.7406 | sep 0.3493 | var 0.0018 | cov 2.8434 | val_mse 0.0027 | fve 0.997 | eff_K 1998/2000 | dying 423
+  step  62600 | loss 0.0440 | recon 0.0025 | clus 0.7413 | sep 0.3509 | var 0.0021 | cov 2.7249 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 441
+  step  62700 | loss 0.0440 | recon 0.0025 | clus 0.7402 | sep 0.3514 | var 0.0011 | cov 3.0314 | val_mse 0.0027 | fve 0.998 | eff_K 1999/2000 | dying 432
+  step  62800 | loss 0.0438 | recon 0.0025 | clus 0.7344 | sep 0.3519 | var 0.0020 | cov 2.9384 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 425
+  step  62900 | loss 0.0445 | recon 0.0026 | clus 0.7517 | sep 0.3486 | var 0.0012 | cov 2.8100 | val_mse 0.0027 | fve 0.997 | eff_K 1998/2000 | dying 420
+  step  63000 | loss 0.0441 | recon 0.0026 | clus 0.7487 | sep 0.3503 | var 0.0008 | cov 2.8413 | val_mse 0.0027 | fve 0.997 | eff_K 1997/2000 | dying 410
+  [reinit] step 63000: reinitialised 2 dead clusters
+  step  63100 | loss 0.0437 | recon 0.0023 | clus 0.7316 | sep 0.3514 | var 0.0035 | cov 2.7454 | val_mse 0.0027 | fve 0.998 | eff_K 1996/2000 | dying 418
+  step  63200 | loss 0.0440 | recon 0.0026 | clus 0.7421 | sep 0.3515 | var 0.0010 | cov 2.9881 | val_mse 0.0027 | fve 0.997 | eff_K 1997/2000 | dying 430
+  step  63300 | loss 0.0441 | recon 0.0025 | clus 0.7439 | sep 0.3537 | var 0.0019 | cov 2.7366 | val_mse 0.0027 | fve 0.997 | eff_K 1997/2000 | dying 410
+  step  63400 | loss 0.0443 | recon 0.0025 | clus 0.7518 | sep 0.3492 | var 0.0012 | cov 2.7420 | val_mse 0.0027 | fve 0.998 | eff_K 1997/2000 | dying 426
+  step  63500 | loss 0.0441 | recon 0.0025 | clus 0.7473 | sep 0.3517 | var 0.0012 | cov 2.8209 | val_mse 0.0027 | fve 0.998 | eff_K 1997/2000 | dying 420
+  step  63600 | loss 0.0442 | recon 0.0026 | clus 0.7492 | sep 0.3485 | var 0.0012 | cov 2.7843 | val_mse 0.0027 | fve 0.997 | eff_K 1997/2000 | dying 421
+  step  63700 | loss 0.0442 | recon 0.0025 | clus 0.7449 | sep 0.3523 | var 0.0017 | cov 2.7900 | val_mse 0.0027 | fve 0.997 | eff_K 1998/2000 | dying 432
+  step  63800 | loss 0.0442 | recon 0.0025 | clus 0.7506 | sep 0.3530 | var 0.0010 | cov 2.8335 | val_mse 0.0027 | fve 0.998 | eff_K 1997/2000 | dying 432
+[train] Saved checkpoint: step_0063805.pt  val_mse=0.00270
+[train] New best val_mse=0.00270 → best_val.pt
+[train] Epoch 35 done in 40.2 min
+
+[train] Epoch 36/50 | tau=0.423 | λ_c=0.050 λ_s=0.0032 | λ_var=0.300 λ_cov=0.0010
+  step  63900 | loss 0.0442 | recon 0.0025 | clus 0.7487 | sep 0.3510 | var 0.0009 | cov 2.8969 | val_mse 0.0027 | fve 0.998 | eff_K 1997/2000 | dying 432
+  step  64000 | loss 0.0439 | recon 0.0025 | clus 0.7392 | sep 0.3491 | var 0.0018 | cov 2.8428 | val_mse 0.0027 | fve 0.998 | eff_K 1997/2000 | dying 425
+  [reinit] step 64000: reinitialised 3 dead clusters
+  step  64100 | loss 0.0437 | recon 0.0024 | clus 0.7369 | sep 0.3516 | var 0.0015 | cov 2.8742 | val_mse 0.0027 | fve 0.998 | eff_K 1996/2000 | dying 420
+  step  64200 | loss 0.0442 | recon 0.0025 | clus 0.7461 | sep 0.3520 | var 0.0018 | cov 2.7010 | val_mse 0.0027 | fve 0.997 | eff_K 1996/2000 | dying 415
+  step  64300 | loss 0.0438 | recon 0.0024 | clus 0.7359 | sep 0.3500 | var 0.0021 | cov 2.8591 | val_mse 0.0027 | fve 0.998 | eff_K 1996/2000 | dying 421
+  step  64400 | loss 0.0442 | recon 0.0025 | clus 0.7491 | sep 0.3528 | var 0.0012 | cov 2.7543 | val_mse 0.0027 | fve 0.998 | eff_K 1997/2000 | dying 430
+  step  64500 | loss 0.0439 | recon 0.0024 | clus 0.7435 | sep 0.3502 | var 0.0012 | cov 2.8386 | val_mse 0.0027 | fve 0.998 | eff_K 1997/2000 | dying 433
+  step  64600 | loss 0.0438 | recon 0.0024 | clus 0.7418 | sep 0.3480 | var 0.0012 | cov 2.8510 | val_mse 0.0027 | fve 0.998 | eff_K 1997/2000 | dying 433
+  step  64700 | loss 0.0442 | recon 0.0025 | clus 0.7436 | sep 0.3477 | var 0.0026 | cov 2.7169 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 439
+  step  64800 | loss 0.0441 | recon 0.0025 | clus 0.7429 | sep 0.3557 | var 0.0013 | cov 2.8853 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 431
+  step  64900 | loss 0.0441 | recon 0.0025 | clus 0.7450 | sep 0.3488 | var 0.0008 | cov 3.0202 | val_mse 0.0027 | fve 0.998 | eff_K 2000/2000 | dying 441
+  step  65000 | loss 0.0442 | recon 0.0025 | clus 0.7408 | sep 0.3530 | var 0.0026 | cov 2.7258 | val_mse 0.0027 | fve 0.998 | eff_K 2000/2000 | dying 438
+  [reinit] step 65000: reinitialised 2 dead clusters
+  step  65100 | loss 0.0440 | recon 0.0024 | clus 0.7419 | sep 0.3512 | var 0.0021 | cov 2.7636 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 423
+  step  65200 | loss 0.0443 | recon 0.0025 | clus 0.7434 | sep 0.3531 | var 0.0022 | cov 2.8308 | val_mse 0.0027 | fve 0.997 | eff_K 1997/2000 | dying 426
+  step  65300 | loss 0.0442 | recon 0.0025 | clus 0.7476 | sep 0.3505 | var 0.0014 | cov 2.8450 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 419
+  step  65400 | loss 0.0437 | recon 0.0024 | clus 0.7374 | sep 0.3495 | var 0.0017 | cov 2.7763 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 444
+  step  65500 | loss 0.0442 | recon 0.0025 | clus 0.7475 | sep 0.3512 | var 0.0008 | cov 2.9177 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 436
+  step  65600 | loss 0.0441 | recon 0.0025 | clus 0.7466 | sep 0.3519 | var 0.0011 | cov 2.8278 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 448
+[train] Saved checkpoint: step_0065628.pt  val_mse=0.00267
+[train] New best val_mse=0.00267 → best_val.pt
+[train] Epoch 36 done in 39.0 min
+
+[train] Epoch 37/50 | tau=0.400 | λ_c=0.050 λ_s=0.0033 | λ_var=0.300 λ_cov=0.0010
+  step  65700 | loss 0.0439 | recon 0.0024 | clus 0.7423 | sep 0.3514 | var 0.0012 | cov 2.8179 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 447
+  step  65800 | loss 0.0444 | recon 0.0026 | clus 0.7452 | sep 0.3503 | var 0.0012 | cov 2.9284 | val_mse 0.0027 | fve 0.997 | eff_K 1998/2000 | dying 432
+  step  65900 | loss 0.0444 | recon 0.0025 | clus 0.7536 | sep 0.3486 | var 0.0008 | cov 2.7349 | val_mse 0.0027 | fve 0.997 | eff_K 1999/2000 | dying 430
+  step  66000 | loss 0.0441 | recon 0.0024 | clus 0.7469 | sep 0.3515 | var 0.0015 | cov 2.7678 | val_mse 0.0027 | fve 0.998 | eff_K 1999/2000 | dying 431
+  [reinit] step 66000: reinitialised 2 dead clusters
+  step  66100 | loss 0.0445 | recon 0.0025 | clus 0.7561 | sep 0.3496 | var 0.0007 | cov 2.8423 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 428
+  step  66200 | loss 0.0441 | recon 0.0025 | clus 0.7380 | sep 0.3559 | var 0.0026 | cov 2.7836 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 434
+  step  66300 | loss 0.0439 | recon 0.0024 | clus 0.7416 | sep 0.3521 | var 0.0014 | cov 2.8306 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 420
+  step  66400 | loss 0.0441 | recon 0.0024 | clus 0.7435 | sep 0.3502 | var 0.0014 | cov 2.9398 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 434
+  step  66500 | loss 0.0443 | recon 0.0026 | clus 0.7472 | sep 0.3477 | var 0.0013 | cov 2.8010 | val_mse 0.0026 | fve 0.997 | eff_K 1998/2000 | dying 435
+  step  66600 | loss 0.0438 | recon 0.0023 | clus 0.7386 | sep 0.3516 | var 0.0018 | cov 2.8134 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 435
+  step  66700 | loss 0.0440 | recon 0.0025 | clus 0.7439 | sep 0.3490 | var 0.0009 | cov 2.8693 | val_mse 0.0027 | fve 0.998 | eff_K 1999/2000 | dying 439
+  step  66800 | loss 0.0441 | recon 0.0024 | clus 0.7453 | sep 0.3478 | var 0.0016 | cov 2.7282 | val_mse 0.0027 | fve 0.998 | eff_K 1999/2000 | dying 429
+  step  66900 | loss 0.0444 | recon 0.0025 | clus 0.7532 | sep 0.3524 | var 0.0008 | cov 2.8249 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 422
+  step  67000 | loss 0.0439 | recon 0.0025 | clus 0.7402 | sep 0.3538 | var 0.0014 | cov 2.8209 | val_mse 0.0027 | fve 0.998 | eff_K 1999/2000 | dying 421
+  [reinit] step 67000: reinitialised 1 dead clusters
+  step  67100 | loss 0.0441 | recon 0.0025 | clus 0.7440 | sep 0.3492 | var 0.0018 | cov 2.7881 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 430
+  step  67200 | loss 0.0441 | recon 0.0025 | clus 0.7389 | sep 0.3514 | var 0.0021 | cov 2.8099 | val_mse 0.0027 | fve 0.997 | eff_K 1999/2000 | dying 427
+  step  67300 | loss 0.0447 | recon 0.0026 | clus 0.7577 | sep 0.3487 | var 0.0009 | cov 2.7803 | val_mse 0.0026 | fve 0.997 | eff_K 1999/2000 | dying 426
+  step  67400 | loss 0.0442 | recon 0.0025 | clus 0.7452 | sep 0.3513 | var 0.0017 | cov 2.8166 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 432
+[train] Saved checkpoint: step_0067451.pt  val_mse=0.00265
+[train] New best val_mse=0.00265 → best_val.pt
+[train] Epoch 37 done in 41.8 min
+
+[train] Epoch 38/50 | tau=0.377 | λ_c=0.050 λ_s=0.0035 | λ_var=0.300 λ_cov=0.0010
+  step  67500 | loss 0.0440 | recon 0.0024 | clus 0.7478 | sep 0.3465 | var 0.0015 | cov 2.6285 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 443
+  step  67600 | loss 0.0442 | recon 0.0025 | clus 0.7450 | sep 0.3515 | var 0.0014 | cov 2.7990 | val_mse 0.0026 | fve 0.997 | eff_K 1998/2000 | dying 436
+  step  67700 | loss 0.0442 | recon 0.0024 | clus 0.7472 | sep 0.3507 | var 0.0020 | cov 2.6788 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 428
+  step  67800 | loss 0.0439 | recon 0.0024 | clus 0.7335 | sep 0.3513 | var 0.0030 | cov 2.7016 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 436
+  step  67900 | loss 0.0441 | recon 0.0025 | clus 0.7459 | sep 0.3510 | var 0.0009 | cov 2.8456 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 440
+  step  68000 | loss 0.0442 | recon 0.0024 | clus 0.7461 | sep 0.3512 | var 0.0018 | cov 2.7481 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 440
+  [reinit] step 68000: reinitialised 1 dead clusters
+  step  68100 | loss 0.0439 | recon 0.0023 | clus 0.7401 | sep 0.3541 | var 0.0021 | cov 2.7321 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 431
+  step  68200 | loss 0.0442 | recon 0.0025 | clus 0.7471 | sep 0.3490 | var 0.0014 | cov 2.7916 | val_mse 0.0026 | fve 0.998 | eff_K 1997/2000 | dying 430
+  step  68300 | loss 0.0441 | recon 0.0024 | clus 0.7344 | sep 0.3548 | var 0.0037 | cov 2.7224 | val_mse 0.0026 | fve 0.998 | eff_K 1997/2000 | dying 437
+  step  68400 | loss 0.0440 | recon 0.0025 | clus 0.7416 | sep 0.3503 | var 0.0012 | cov 2.8618 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 427
+  step  68500 | loss 0.0442 | recon 0.0026 | clus 0.7439 | sep 0.3480 | var 0.0014 | cov 2.7839 | val_mse 0.0027 | fve 0.997 | eff_K 1997/2000 | dying 428
+  step  68600 | loss 0.0442 | recon 0.0024 | clus 0.7419 | sep 0.3483 | var 0.0026 | cov 2.6958 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 440
+  step  68700 | loss 0.0440 | recon 0.0024 | clus 0.7450 | sep 0.3497 | var 0.0014 | cov 2.7593 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 442
+  step  68800 | loss 0.0442 | recon 0.0025 | clus 0.7400 | sep 0.3506 | var 0.0024 | cov 2.7549 | val_mse 0.0026 | fve 0.998 | eff_K 1997/2000 | dying 434
+  step  68900 | loss 0.0439 | recon 0.0024 | clus 0.7369 | sep 0.3520 | var 0.0016 | cov 2.9455 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 439
+  step  69000 | loss 0.0439 | recon 0.0024 | clus 0.7371 | sep 0.3503 | var 0.0025 | cov 2.7192 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 429
+  [reinit] step 69000: reinitialised 2 dead clusters
+  step  69100 | loss 0.0442 | recon 0.0024 | clus 0.7447 | sep 0.3521 | var 0.0011 | cov 3.0180 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 437
+  step  69200 | loss 0.0444 | recon 0.0025 | clus 0.7448 | sep 0.3546 | var 0.0020 | cov 2.8121 | val_mse 0.0028 | fve 0.997 | eff_K 1998/2000 | dying 426
+[train] Saved checkpoint: step_0069274.pt  val_mse=0.00262
+[train] New best val_mse=0.00262 → best_val.pt
+[train] Epoch 38 done in 42.2 min
+
+[train] Epoch 39/50 | tau=0.354 | λ_c=0.050 λ_s=0.0036 | λ_var=0.300 λ_cov=0.0010
+  step  69300 | loss 0.0439 | recon 0.0023 | clus 0.7396 | sep 0.3497 | var 0.0021 | cov 2.7477 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 429
+  step  69400 | loss 0.0441 | recon 0.0023 | clus 0.7366 | sep 0.3500 | var 0.0031 | cov 2.7142 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 435
+  step  69500 | loss 0.0443 | recon 0.0024 | clus 0.7512 | sep 0.3493 | var 0.0010 | cov 2.7612 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 437
+  step  69600 | loss 0.0442 | recon 0.0024 | clus 0.7449 | sep 0.3490 | var 0.0019 | cov 2.7441 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 428
+  step  69700 | loss 0.0439 | recon 0.0023 | clus 0.7374 | sep 0.3482 | var 0.0021 | cov 2.7676 | val_mse 0.0026 | fve 0.998 | eff_K 1997/2000 | dying 446
+  step  69800 | loss 0.0441 | recon 0.0025 | clus 0.7407 | sep 0.3532 | var 0.0019 | cov 2.8242 | val_mse 0.0026 | fve 0.998 | eff_K 1997/2000 | dying 441
+  step  69900 | loss 0.0439 | recon 0.0024 | clus 0.7329 | sep 0.3517 | var 0.0022 | cov 2.9192 | val_mse 0.0026 | fve 0.998 | eff_K 1997/2000 | dying 435
+  step  70000 | loss 0.0439 | recon 0.0024 | clus 0.7330 | sep 0.3516 | var 0.0021 | cov 2.9255 | val_mse 0.0026 | fve 0.998 | eff_K 1997/2000 | dying 431
+  [reinit] step 70000: reinitialised 3 dead clusters
+  step  70100 | loss 0.0443 | recon 0.0024 | clus 0.7458 | sep 0.3531 | var 0.0021 | cov 2.7081 | val_mse 0.0026 | fve 0.998 | eff_K 1997/2000 | dying 435
+  step  70200 | loss 0.0444 | recon 0.0024 | clus 0.7476 | sep 0.3507 | var 0.0017 | cov 2.7777 | val_mse 0.0027 | fve 0.998 | eff_K 1997/2000 | dying 429
+  step  70300 | loss 0.0439 | recon 0.0024 | clus 0.7391 | sep 0.3523 | var 0.0010 | cov 2.9360 | val_mse 0.0026 | fve 0.998 | eff_K 1997/2000 | dying 435
+  step  70400 | loss 0.0443 | recon 0.0025 | clus 0.7442 | sep 0.3509 | var 0.0014 | cov 2.8855 | val_mse 0.0026 | fve 0.997 | eff_K 1997/2000 | dying 444
+  step  70500 | loss 0.0439 | recon 0.0024 | clus 0.7373 | sep 0.3499 | var 0.0012 | cov 2.9823 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 441
+  step  70600 | loss 0.0438 | recon 0.0023 | clus 0.7374 | sep 0.3510 | var 0.0019 | cov 2.7630 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 428
+  step  70700 | loss 0.0441 | recon 0.0024 | clus 0.7425 | sep 0.3497 | var 0.0012 | cov 2.9617 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 425
+  step  70800 | loss 0.0438 | recon 0.0022 | clus 0.7380 | sep 0.3504 | var 0.0024 | cov 2.6886 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 427
+  step  70900 | loss 0.0440 | recon 0.0023 | clus 0.7413 | sep 0.3517 | var 0.0022 | cov 2.7128 | val_mse 0.0026 | fve 0.998 | eff_K 2000/2000 | dying 433
+  step  71000 | loss 0.0443 | recon 0.0024 | clus 0.7485 | sep 0.3486 | var 0.0017 | cov 2.6967 | val_mse 0.0026 | fve 0.998 | eff_K 2000/2000 | dying 438
+[train] Saved checkpoint: step_0071097.pt  val_mse=0.00259
+[train] New best val_mse=0.00259 → best_val.pt
+[train] Epoch 39 done in 40.2 min
+
+[train] Epoch 40/50 | tau=0.331 | λ_c=0.050 λ_s=0.0037 | λ_var=0.300 λ_cov=0.0010
+  step  71100 | loss 0.0440 | recon 0.0023 | clus 0.7464 | sep 0.3481 | var 0.0010 | cov 2.7768 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 426
+  step  71200 | loss 0.0442 | recon 0.0024 | clus 0.7451 | sep 0.3500 | var 0.0010 | cov 2.8664 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 433
+  step  71300 | loss 0.0443 | recon 0.0024 | clus 0.7446 | sep 0.3495 | var 0.0021 | cov 2.7587 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 440
+  step  71400 | loss 0.0440 | recon 0.0024 | clus 0.7389 | sep 0.3481 | var 0.0021 | cov 2.7426 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 421
+  step  71500 | loss 0.0440 | recon 0.0024 | clus 0.7388 | sep 0.3535 | var 0.0017 | cov 2.8601 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 431
+  step  71600 | loss 0.0442 | recon 0.0024 | clus 0.7434 | sep 0.3515 | var 0.0020 | cov 2.7568 | val_mse 0.0026 | fve 0.998 | eff_K 2000/2000 | dying 447
+  step  71700 | loss 0.0441 | recon 0.0024 | clus 0.7419 | sep 0.3477 | var 0.0020 | cov 2.7571 | val_mse 0.0026 | fve 0.998 | eff_K 2000/2000 | dying 449
+  step  71800 | loss 0.0441 | recon 0.0024 | clus 0.7450 | sep 0.3513 | var 0.0013 | cov 2.7794 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 440
+  step  71900 | loss 0.0436 | recon 0.0023 | clus 0.7332 | sep 0.3511 | var 0.0017 | cov 2.8867 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 440
+  step  72000 | loss 0.0440 | recon 0.0023 | clus 0.7442 | sep 0.3494 | var 0.0014 | cov 2.7652 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 434
+  [reinit] step 72000: reinitialised 1 dead clusters
+  step  72100 | loss 0.0441 | recon 0.0024 | clus 0.7380 | sep 0.3488 | var 0.0018 | cov 2.9517 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 421
+  step  72200 | loss 0.0439 | recon 0.0023 | clus 0.7374 | sep 0.3534 | var 0.0025 | cov 2.6889 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 421
+  step  72300 | loss 0.0437 | recon 0.0022 | clus 0.7336 | sep 0.3511 | var 0.0026 | cov 2.7247 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 427
+  step  72400 | loss 0.0441 | recon 0.0024 | clus 0.7443 | sep 0.3490 | var 0.0012 | cov 2.8053 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 432
+  step  72500 | loss 0.0442 | recon 0.0024 | clus 0.7417 | sep 0.3507 | var 0.0021 | cov 2.7928 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 427
+  step  72600 | loss 0.0441 | recon 0.0023 | clus 0.7411 | sep 0.3521 | var 0.0023 | cov 2.6650 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 419
+  step  72700 | loss 0.0441 | recon 0.0024 | clus 0.7326 | sep 0.3517 | var 0.0037 | cov 2.6872 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 420
+  step  72800 | loss 0.0442 | recon 0.0024 | clus 0.7495 | sep 0.3494 | var 0.0005 | cov 2.9119 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 436
+  step  72900 | loss 0.0441 | recon 0.0025 | clus 0.7420 | sep 0.3505 | var 0.0013 | cov 2.8885 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 443
+[train] Saved checkpoint: step_0072920.pt  val_mse=0.00258
+[train] New best val_mse=0.00258 → best_val.pt
+[train] Epoch 40 done in 39.1 min
+
+[train] Epoch 41/50 | tau=0.308 | λ_c=0.050 λ_s=0.0038 | λ_var=0.300 λ_cov=0.0010
+  step  73000 | loss 0.0445 | recon 0.0024 | clus 0.7501 | sep 0.3499 | var 0.0015 | cov 2.7492 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 427
+  [reinit] step 73000: reinitialised 2 dead clusters
+  step  73100 | loss 0.0439 | recon 0.0023 | clus 0.7395 | sep 0.3494 | var 0.0017 | cov 2.7767 | val_mse 0.0026 | fve 0.998 | eff_K 1997/2000 | dying 433
+  step  73200 | loss 0.0441 | recon 0.0024 | clus 0.7435 | sep 0.3522 | var 0.0014 | cov 2.7737 | val_mse 0.0026 | fve 0.998 | eff_K 1997/2000 | dying 439
+  step  73300 | loss 0.0439 | recon 0.0024 | clus 0.7319 | sep 0.3476 | var 0.0024 | cov 2.8473 | val_mse 0.0026 | fve 0.998 | eff_K 1997/2000 | dying 438
+  step  73400 | loss 0.0442 | recon 0.0024 | clus 0.7467 | sep 0.3482 | var 0.0015 | cov 2.7413 | val_mse 0.0026 | fve 0.998 | eff_K 1997/2000 | dying 437
+  step  73500 | loss 0.0440 | recon 0.0024 | clus 0.7387 | sep 0.3486 | var 0.0020 | cov 2.7722 | val_mse 0.0026 | fve 0.998 | eff_K 1996/2000 | dying 430
+  step  73600 | loss 0.0444 | recon 0.0025 | clus 0.7498 | sep 0.3471 | var 0.0011 | cov 2.7774 | val_mse 0.0026 | fve 0.998 | eff_K 1996/2000 | dying 440
+  step  73700 | loss 0.0443 | recon 0.0024 | clus 0.7487 | sep 0.3484 | var 0.0012 | cov 2.7364 | val_mse 0.0026 | fve 0.998 | eff_K 1997/2000 | dying 455
+  step  73800 | loss 0.0441 | recon 0.0023 | clus 0.7389 | sep 0.3525 | var 0.0030 | cov 2.6178 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 447
+  step  73900 | loss 0.0439 | recon 0.0024 | clus 0.7376 | sep 0.3478 | var 0.0015 | cov 2.8523 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 456
+  step  74000 | loss 0.0439 | recon 0.0024 | clus 0.7365 | sep 0.3521 | var 0.0020 | cov 2.8076 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 441
+  [reinit] step 74000: reinitialised 2 dead clusters
+  step  74100 | loss 0.0443 | recon 0.0024 | clus 0.7443 | sep 0.3507 | var 0.0020 | cov 2.7279 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 431
+  step  74200 | loss 0.0441 | recon 0.0023 | clus 0.7435 | sep 0.3500 | var 0.0013 | cov 2.8583 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 438
+  step  74300 | loss 0.0441 | recon 0.0024 | clus 0.7450 | sep 0.3516 | var 0.0010 | cov 2.8326 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 426
+  step  74400 | loss 0.0440 | recon 0.0023 | clus 0.7471 | sep 0.3472 | var 0.0012 | cov 2.7074 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 423
+  step  74500 | loss 0.0438 | recon 0.0024 | clus 0.7351 | sep 0.3490 | var 0.0015 | cov 2.9280 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 435
+  step  74600 | loss 0.0441 | recon 0.0024 | clus 0.7407 | sep 0.3513 | var 0.0024 | cov 2.6113 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 447
+  step  74700 | loss 0.0442 | recon 0.0023 | clus 0.7407 | sep 0.3513 | var 0.0030 | cov 2.6162 | val_mse 0.0025 | fve 0.998 | eff_K 1998/2000 | dying 436
+[train] Saved checkpoint: step_0074743.pt  val_mse=0.00255
+[train] New best val_mse=0.00255 → best_val.pt
+[train] Epoch 41 done in 39.3 min
+
+[train] Epoch 42/50 | tau=0.285 | λ_c=0.050 λ_s=0.0040 | λ_var=0.300 λ_cov=0.0010
+  step  74800 | loss 0.0442 | recon 0.0024 | clus 0.7383 | sep 0.3477 | var 0.0024 | cov 2.8145 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 428
+  step  74900 | loss 0.0445 | recon 0.0025 | clus 0.7503 | sep 0.3488 | var 0.0012 | cov 2.7700 | val_mse 0.0026 | fve 0.998 | eff_K 1997/2000 | dying 441
+  step  75000 | loss 0.0441 | recon 0.0023 | clus 0.7393 | sep 0.3486 | var 0.0024 | cov 2.7302 | val_mse 0.0026 | fve 0.998 | eff_K 1997/2000 | dying 432
+  [reinit] step 75000: reinitialised 2 dead clusters
+  step  75100 | loss 0.0440 | recon 0.0023 | clus 0.7425 | sep 0.3519 | var 0.0013 | cov 2.8056 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 443
+  step  75200 | loss 0.0441 | recon 0.0023 | clus 0.7396 | sep 0.3478 | var 0.0022 | cov 2.7639 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 439
+  step  75300 | loss 0.0442 | recon 0.0024 | clus 0.7415 | sep 0.3502 | var 0.0019 | cov 2.7611 | val_mse 0.0025 | fve 0.998 | eff_K 1997/2000 | dying 443
+  step  75400 | loss 0.0444 | recon 0.0024 | clus 0.7492 | sep 0.3483 | var 0.0011 | cov 2.7557 | val_mse 0.0025 | fve 0.998 | eff_K 1998/2000 | dying 432
+  step  75500 | loss 0.0442 | recon 0.0024 | clus 0.7459 | sep 0.3482 | var 0.0013 | cov 2.7580 | val_mse 0.0025 | fve 0.998 | eff_K 1998/2000 | dying 437
+  step  75600 | loss 0.0445 | recon 0.0023 | clus 0.7500 | sep 0.3492 | var 0.0021 | cov 2.6170 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 433
+  step  75700 | loss 0.0442 | recon 0.0025 | clus 0.7385 | sep 0.3506 | var 0.0012 | cov 3.0677 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 435
+  step  75800 | loss 0.0443 | recon 0.0024 | clus 0.7448 | sep 0.3512 | var 0.0014 | cov 2.7887 | val_mse 0.0026 | fve 0.998 | eff_K 2000/2000 | dying 441
+  step  75900 | loss 0.0443 | recon 0.0023 | clus 0.7475 | sep 0.3495 | var 0.0019 | cov 2.6368 | val_mse 0.0026 | fve 0.998 | eff_K 2000/2000 | dying 440
+  step  76000 | loss 0.0445 | recon 0.0024 | clus 0.7524 | sep 0.3469 | var 0.0009 | cov 2.7957 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 428
+  step  76100 | loss 0.0438 | recon 0.0023 | clus 0.7340 | sep 0.3459 | var 0.0023 | cov 2.7168 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 427
+  step  76200 | loss 0.0443 | recon 0.0024 | clus 0.7467 | sep 0.3467 | var 0.0016 | cov 2.7454 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 436
+  step  76300 | loss 0.0443 | recon 0.0023 | clus 0.7447 | sep 0.3478 | var 0.0015 | cov 2.8502 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 439
+  step  76400 | loss 0.0440 | recon 0.0023 | clus 0.7413 | sep 0.3478 | var 0.0021 | cov 2.6328 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 433
+  step  76500 | loss 0.0443 | recon 0.0024 | clus 0.7470 | sep 0.3494 | var 0.0017 | cov 2.6998 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 436
+[train] Saved checkpoint: step_0076566.pt  val_mse=0.00255
+[train] Epoch 42 done in 44.0 min
+
+[train] Epoch 43/50 | tau=0.262 | λ_c=0.050 λ_s=0.0041 | λ_var=0.300 λ_cov=0.0010
+  step  76600 | loss 0.0442 | recon 0.0023 | clus 0.7376 | sep 0.3491 | var 0.0030 | cov 2.6618 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 431
+  step  76700 | loss 0.0440 | recon 0.0024 | clus 0.7390 | sep 0.3493 | var 0.0014 | cov 2.8285 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 437
+  step  76800 | loss 0.0440 | recon 0.0023 | clus 0.7387 | sep 0.3513 | var 0.0018 | cov 2.8126 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 440
+  step  76900 | loss 0.0441 | recon 0.0023 | clus 0.7447 | sep 0.3489 | var 0.0015 | cov 2.7270 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 435
+  step  77000 | loss 0.0443 | recon 0.0024 | clus 0.7481 | sep 0.3486 | var 0.0015 | cov 2.6830 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 444
+  [reinit] step 77000: reinitialised 1 dead clusters
+  step  77100 | loss 0.0442 | recon 0.0023 | clus 0.7432 | sep 0.3513 | var 0.0017 | cov 2.8110 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 423
+  step  77200 | loss 0.0445 | recon 0.0024 | clus 0.7492 | sep 0.3498 | var 0.0011 | cov 2.8212 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 422
+  step  77300 | loss 0.0439 | recon 0.0023 | clus 0.7360 | sep 0.3478 | var 0.0017 | cov 2.8431 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 430
+  step  77400 | loss 0.0443 | recon 0.0024 | clus 0.7474 | sep 0.3507 | var 0.0009 | cov 2.8469 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 434
+  step  77500 | loss 0.0440 | recon 0.0023 | clus 0.7380 | sep 0.3473 | var 0.0019 | cov 2.7679 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 432
+  step  77600 | loss 0.0441 | recon 0.0023 | clus 0.7439 | sep 0.3514 | var 0.0013 | cov 2.7896 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 433
+  step  77700 | loss 0.0440 | recon 0.0022 | clus 0.7394 | sep 0.3457 | var 0.0021 | cov 2.7548 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 432
+  step  77800 | loss 0.0442 | recon 0.0023 | clus 0.7504 | sep 0.3487 | var 0.0007 | cov 2.7538 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 451
+  step  77900 | loss 0.0437 | recon 0.0022 | clus 0.7323 | sep 0.3499 | var 0.0023 | cov 2.7340 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 438
+  step  78000 | loss 0.0440 | recon 0.0024 | clus 0.7404 | sep 0.3452 | var 0.0011 | cov 2.9073 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 445
+  [reinit] step 78000: reinitialised 1 dead clusters
+  step  78100 | loss 0.0442 | recon 0.0024 | clus 0.7453 | sep 0.3495 | var 0.0011 | cov 2.8173 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 451
+  step  78200 | loss 0.0445 | recon 0.0024 | clus 0.7469 | sep 0.3485 | var 0.0019 | cov 2.7573 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 445
+  step  78300 | loss 0.0435 | recon 0.0022 | clus 0.7317 | sep 0.3507 | var 0.0018 | cov 2.8181 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 447
+[train] Saved checkpoint: step_0078389.pt  val_mse=0.00251
+[train] New best val_mse=0.00251 → best_val.pt
+[train] Epoch 43 done in 41.7 min
+
+[train] Epoch 44/50 | tau=0.238 | λ_c=0.050 λ_s=0.0042 | λ_var=0.300 λ_cov=0.0010
+  step  78400 | loss 0.0442 | recon 0.0024 | clus 0.7421 | sep 0.3470 | var 0.0015 | cov 2.8264 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 440
+  step  78500 | loss 0.0444 | recon 0.0024 | clus 0.7336 | sep 0.3514 | var 0.0036 | cov 2.7809 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 439
+  step  78600 | loss 0.0442 | recon 0.0022 | clus 0.7428 | sep 0.3506 | var 0.0022 | cov 2.6534 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 448
+  step  78700 | loss 0.0440 | recon 0.0023 | clus 0.7350 | sep 0.3478 | var 0.0023 | cov 2.8111 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 457
+  step  78800 | loss 0.0440 | recon 0.0023 | clus 0.7407 | sep 0.3477 | var 0.0013 | cov 2.7637 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 435
+  step  78900 | loss 0.0442 | recon 0.0024 | clus 0.7385 | sep 0.3499 | var 0.0019 | cov 2.7973 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 432
+  step  79000 | loss 0.0442 | recon 0.0024 | clus 0.7361 | sep 0.3471 | var 0.0023 | cov 2.8715 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 438
+  [reinit] step 79000: reinitialised 1 dead clusters
+  step  79100 | loss 0.0440 | recon 0.0023 | clus 0.7427 | sep 0.3508 | var 0.0010 | cov 2.8206 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 443
+  step  79200 | loss 0.0441 | recon 0.0023 | clus 0.7382 | sep 0.3497 | var 0.0017 | cov 2.8755 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 433
+  step  79300 | loss 0.0443 | recon 0.0023 | clus 0.7407 | sep 0.3502 | var 0.0027 | cov 2.6620 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 423
+  step  79400 | loss 0.0442 | recon 0.0023 | clus 0.7444 | sep 0.3450 | var 0.0014 | cov 2.7519 | val_mse 0.0025 | fve 0.998 | eff_K 1998/2000 | dying 444
+  step  79500 | loss 0.0442 | recon 0.0023 | clus 0.7419 | sep 0.3505 | var 0.0015 | cov 2.7994 | val_mse 0.0025 | fve 0.998 | eff_K 1998/2000 | dying 434
+  step  79600 | loss 0.0442 | recon 0.0024 | clus 0.7405 | sep 0.3483 | var 0.0015 | cov 2.8329 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 438
+  step  79700 | loss 0.0440 | recon 0.0023 | clus 0.7365 | sep 0.3486 | var 0.0019 | cov 2.8188 | val_mse 0.0025 | fve 0.998 | eff_K 1998/2000 | dying 447
+  step  79800 | loss 0.0441 | recon 0.0022 | clus 0.7405 | sep 0.3501 | var 0.0025 | cov 2.6484 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 438
+  step  79900 | loss 0.0441 | recon 0.0022 | clus 0.7461 | sep 0.3489 | var 0.0014 | cov 2.6942 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 437
+  step  80000 | loss 0.0441 | recon 0.0024 | clus 0.7387 | sep 0.3472 | var 0.0019 | cov 2.8087 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 435
+  [reinit] step 80000: reinitialised 1 dead clusters
+  step  80100 | loss 0.0441 | recon 0.0023 | clus 0.7427 | sep 0.3486 | var 0.0016 | cov 2.7344 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 428
+  step  80200 | loss 0.0439 | recon 0.0023 | clus 0.7342 | sep 0.3466 | var 0.0017 | cov 2.8934 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 428
+[train] Saved checkpoint: step_0080212.pt  val_mse=0.00251
+[train] New best val_mse=0.00251 → best_val.pt
+[train] Epoch 44 done in 41.8 min
+
+[train] Epoch 45/50 | tau=0.215 | λ_c=0.050 λ_s=0.0044 | λ_var=0.300 λ_cov=0.0010
+  step  80300 | loss 0.0442 | recon 0.0023 | clus 0.7397 | sep 0.3477 | var 0.0022 | cov 2.7547 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 425
+  step  80400 | loss 0.0445 | recon 0.0023 | clus 0.7487 | sep 0.3483 | var 0.0025 | cov 2.5565 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 435
+  step  80500 | loss 0.0445 | recon 0.0024 | clus 0.7507 | sep 0.3481 | var 0.0006 | cov 2.8613 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 431
+  step  80600 | loss 0.0447 | recon 0.0025 | clus 0.7512 | sep 0.3477 | var 0.0006 | cov 2.9096 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 436
+  step  80700 | loss 0.0445 | recon 0.0024 | clus 0.7512 | sep 0.3450 | var 0.0011 | cov 2.6916 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 450
+  step  80800 | loss 0.0440 | recon 0.0023 | clus 0.7344 | sep 0.3499 | var 0.0020 | cov 2.8229 | val_mse 0.0025 | fve 0.998 | eff_K 1998/2000 | dying 446
+  step  80900 | loss 0.0443 | recon 0.0023 | clus 0.7472 | sep 0.3503 | var 0.0007 | cov 2.8984 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 455
+  step  81000 | loss 0.0441 | recon 0.0023 | clus 0.7381 | sep 0.3498 | var 0.0016 | cov 2.8766 | val_mse 0.0025 | fve 0.998 | eff_K 1998/2000 | dying 450
+  step  81100 | loss 0.0443 | recon 0.0023 | clus 0.7373 | sep 0.3525 | var 0.0029 | cov 2.6895 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 447
+  step  81200 | loss 0.0443 | recon 0.0023 | clus 0.7425 | sep 0.3475 | var 0.0021 | cov 2.7364 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 453
+  step  81300 | loss 0.0442 | recon 0.0023 | clus 0.7443 | sep 0.3470 | var 0.0010 | cov 2.8634 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 449
+  step  81400 | loss 0.0441 | recon 0.0023 | clus 0.7409 | sep 0.3503 | var 0.0018 | cov 2.7616 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 448
+  step  81500 | loss 0.0442 | recon 0.0023 | clus 0.7441 | sep 0.3496 | var 0.0011 | cov 2.8030 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 443
+  step  81600 | loss 0.0443 | recon 0.0023 | clus 0.7422 | sep 0.3485 | var 0.0017 | cov 2.8114 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 439
+  step  81700 | loss 0.0439 | recon 0.0023 | clus 0.7334 | sep 0.3466 | var 0.0021 | cov 2.7734 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 444
+  step  81800 | loss 0.0443 | recon 0.0023 | clus 0.7419 | sep 0.3489 | var 0.0020 | cov 2.7675 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 440
+  step  81900 | loss 0.0441 | recon 0.0024 | clus 0.7443 | sep 0.3482 | var 0.0009 | cov 2.7828 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 440
+  step  82000 | loss 0.0445 | recon 0.0025 | clus 0.7403 | sep 0.3471 | var 0.0021 | cov 2.8763 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 448
+  [reinit] step 82000: reinitialised 1 dead clusters
+[train] Saved checkpoint: step_0082035.pt  val_mse=0.00250
+[train] New best val_mse=0.00250 → best_val.pt
+[train] Epoch 45 done in 41.8 min
+
+[train] Epoch 46/50 | tau=0.192 | λ_c=0.050 λ_s=0.0045 | λ_var=0.300 λ_cov=0.0010
+  step  82100 | loss 0.0445 | recon 0.0024 | clus 0.7478 | sep 0.3518 | var 0.0007 | cov 2.8696 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 453
+  step  82200 | loss 0.0442 | recon 0.0024 | clus 0.7405 | sep 0.3511 | var 0.0018 | cov 2.7560 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 446
+  step  82300 | loss 0.0444 | recon 0.0024 | clus 0.7465 | sep 0.3473 | var 0.0008 | cov 2.8090 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 448
+  step  82400 | loss 0.0441 | recon 0.0023 | clus 0.7350 | sep 0.3486 | var 0.0024 | cov 2.7569 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 446
+  step  82500 | loss 0.0443 | recon 0.0023 | clus 0.7469 | sep 0.3477 | var 0.0009 | cov 2.8342 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 437
+  step  82600 | loss 0.0441 | recon 0.0023 | clus 0.7393 | sep 0.3463 | var 0.0017 | cov 2.8230 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 438
+  step  82700 | loss 0.0445 | recon 0.0023 | clus 0.7562 | sep 0.3467 | var 0.0010 | cov 2.6165 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 459
+  step  82800 | loss 0.0442 | recon 0.0023 | clus 0.7377 | sep 0.3474 | var 0.0024 | cov 2.7376 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 447
+  step  82900 | loss 0.0443 | recon 0.0023 | clus 0.7447 | sep 0.3477 | var 0.0017 | cov 2.7047 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 451
+  step  83000 | loss 0.0443 | recon 0.0023 | clus 0.7479 | sep 0.3475 | var 0.0010 | cov 2.7385 | val_mse 0.0026 | fve 0.998 | eff_K 2000/2000 | dying 453
+  step  83100 | loss 0.0439 | recon 0.0023 | clus 0.7363 | sep 0.3483 | var 0.0015 | cov 2.8081 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 446
+  step  83200 | loss 0.0442 | recon 0.0023 | clus 0.7427 | sep 0.3500 | var 0.0019 | cov 2.6504 | val_mse 0.0026 | fve 0.998 | eff_K 2000/2000 | dying 450
+  step  83300 | loss 0.0439 | recon 0.0023 | clus 0.7392 | sep 0.3468 | var 0.0012 | cov 2.7929 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 446
+  step  83400 | loss 0.0441 | recon 0.0023 | clus 0.7379 | sep 0.3477 | var 0.0022 | cov 2.7501 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 444
+  step  83500 | loss 0.0439 | recon 0.0023 | clus 0.7348 | sep 0.3489 | var 0.0020 | cov 2.7380 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 452
+  step  83600 | loss 0.0443 | recon 0.0024 | clus 0.7452 | sep 0.3519 | var 0.0006 | cov 2.8928 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 457
+  step  83700 | loss 0.0444 | recon 0.0023 | clus 0.7477 | sep 0.3510 | var 0.0011 | cov 2.7833 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 459
+  step  83800 | loss 0.0444 | recon 0.0023 | clus 0.7489 | sep 0.3472 | var 0.0005 | cov 2.9036 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 442
+[train] Saved checkpoint: step_0083858.pt  val_mse=0.00255
+[train] Epoch 46 done in 41.3 min
+
+[train] Epoch 47/50 | tau=0.169 | λ_c=0.050 λ_s=0.0046 | λ_var=0.300 λ_cov=0.0010
+  step  83900 | loss 0.0445 | recon 0.0025 | clus 0.7455 | sep 0.3490 | var 0.0012 | cov 2.7635 | val_mse 0.0027 | fve 0.998 | eff_K 2000/2000 | dying 465
+  step  84000 | loss 0.0443 | recon 0.0024 | clus 0.7384 | sep 0.3441 | var 0.0022 | cov 2.7055 | val_mse 0.0027 | fve 0.998 | eff_K 1999/2000 | dying 463
+  [reinit] step 84000: reinitialised 1 dead clusters
+  step  84100 | loss 0.0444 | recon 0.0024 | clus 0.7390 | sep 0.3491 | var 0.0023 | cov 2.7930 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 444
+  step  84200 | loss 0.0441 | recon 0.0023 | clus 0.7420 | sep 0.3444 | var 0.0011 | cov 2.8028 | val_mse 0.0025 | fve 0.998 | eff_K 1998/2000 | dying 430
+  step  84300 | loss 0.0443 | recon 0.0023 | clus 0.7405 | sep 0.3466 | var 0.0018 | cov 2.7751 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 447
+  step  84400 | loss 0.0443 | recon 0.0023 | clus 0.7451 | sep 0.3498 | var 0.0012 | cov 2.7876 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 443
+  step  84500 | loss 0.0440 | recon 0.0023 | clus 0.7329 | sep 0.3473 | var 0.0021 | cov 2.8394 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 453
+  step  84600 | loss 0.0444 | recon 0.0024 | clus 0.7447 | sep 0.3470 | var 0.0013 | cov 2.8000 | val_mse 0.0025 | fve 0.998 | eff_K 1998/2000 | dying 454
+  step  84700 | loss 0.0440 | recon 0.0023 | clus 0.7372 | sep 0.3460 | var 0.0015 | cov 2.8359 | val_mse 0.0025 | fve 0.998 | eff_K 1998/2000 | dying 442
+  step  84800 | loss 0.0444 | recon 0.0024 | clus 0.7474 | sep 0.3471 | var 0.0005 | cov 2.9016 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 448
+  step  84900 | loss 0.0440 | recon 0.0023 | clus 0.7325 | sep 0.3451 | var 0.0020 | cov 2.8847 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 444
+  step  85000 | loss 0.0442 | recon 0.0025 | clus 0.7409 | sep 0.3460 | var 0.0010 | cov 2.8254 | val_mse 0.0027 | fve 0.998 | eff_K 1999/2000 | dying 448
+  [reinit] step 85000: reinitialised 4 dead clusters
+  step  85100 | loss 0.0442 | recon 0.0023 | clus 0.7382 | sep 0.3468 | var 0.0025 | cov 2.6471 | val_mse 0.0025 | fve 0.998 | eff_K 1996/2000 | dying 452
+  step  85200 | loss 0.0442 | recon 0.0023 | clus 0.7376 | sep 0.3478 | var 0.0022 | cov 2.7401 | val_mse 0.0025 | fve 0.998 | eff_K 1996/2000 | dying 442
+  step  85300 | loss 0.0439 | recon 0.0023 | clus 0.7329 | sep 0.3459 | var 0.0018 | cov 2.8232 | val_mse 0.0025 | fve 0.998 | eff_K 1994/2000 | dying 439
+  step  85400 | loss 0.0444 | recon 0.0023 | clus 0.7497 | sep 0.3488 | var 0.0011 | cov 2.7553 | val_mse 0.0025 | fve 0.998 | eff_K 1997/2000 | dying 448
+  step  85500 | loss 0.0443 | recon 0.0024 | clus 0.7431 | sep 0.3470 | var 0.0011 | cov 2.8410 | val_mse 0.0025 | fve 0.998 | eff_K 1998/2000 | dying 448
+  step  85600 | loss 0.0441 | recon 0.0023 | clus 0.7356 | sep 0.3473 | var 0.0018 | cov 2.8426 | val_mse 0.0025 | fve 0.998 | eff_K 1998/2000 | dying 446
+[train] Saved checkpoint: step_0085681.pt  val_mse=0.00252
+[train] Epoch 47 done in 40.5 min
+
+[train] Epoch 48/50 | tau=0.146 | λ_c=0.050 λ_s=0.0047 | λ_var=0.300 λ_cov=0.0010
+  step  85700 | loss 0.0444 | recon 0.0023 | clus 0.7464 | sep 0.3466 | var 0.0011 | cov 2.8066 | val_mse 0.0025 | fve 0.998 | eff_K 1998/2000 | dying 454
+  step  85800 | loss 0.0447 | recon 0.0025 | clus 0.7477 | sep 0.3458 | var 0.0007 | cov 2.9398 | val_mse 0.0025 | fve 0.998 | eff_K 1998/2000 | dying 447
+  step  85900 | loss 0.0442 | recon 0.0023 | clus 0.7375 | sep 0.3468 | var 0.0020 | cov 2.7275 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 452
+  step  86000 | loss 0.0444 | recon 0.0025 | clus 0.7429 | sep 0.3495 | var 0.0005 | cov 2.9244 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 451
+  [reinit] step 86000: reinitialised 2 dead clusters
+  step  86100 | loss 0.0447 | recon 0.0025 | clus 0.7510 | sep 0.3466 | var 0.0013 | cov 2.6708 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 461
+  step  86200 | loss 0.0445 | recon 0.0024 | clus 0.7407 | sep 0.3477 | var 0.0022 | cov 2.7247 | val_mse 0.0025 | fve 0.998 | eff_K 1998/2000 | dying 447
+  step  86300 | loss 0.0447 | recon 0.0024 | clus 0.7454 | sep 0.3470 | var 0.0028 | cov 2.5252 | val_mse 0.0027 | fve 0.998 | eff_K 1998/2000 | dying 442
+  step  86400 | loss 0.0445 | recon 0.0024 | clus 0.7484 | sep 0.3477 | var 0.0012 | cov 2.7354 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 452
+  step  86500 | loss 0.0441 | recon 0.0024 | clus 0.7379 | sep 0.3465 | var 0.0014 | cov 2.7919 | val_mse 0.0026 | fve 0.998 | eff_K 1999/2000 | dying 443
+  step  86600 | loss 0.0444 | recon 0.0024 | clus 0.7415 | sep 0.3452 | var 0.0018 | cov 2.7552 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 450
+  step  86700 | loss 0.0444 | recon 0.0024 | clus 0.7368 | sep 0.3478 | var 0.0022 | cov 2.8451 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 450
+  step  86800 | loss 0.0442 | recon 0.0022 | clus 0.7394 | sep 0.3487 | var 0.0018 | cov 2.7494 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 432
+  step  86900 | loss 0.0441 | recon 0.0023 | clus 0.7400 | sep 0.3488 | var 0.0014 | cov 2.7721 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 450
+  step  87000 | loss 0.0443 | recon 0.0023 | clus 0.7331 | sep 0.3502 | var 0.0033 | cov 2.7319 | val_mse 0.0025 | fve 0.998 | eff_K 2000/2000 | dying 449
+  [reinit] step 87000: reinitialised 1 dead clusters
+  step  87100 | loss 0.0445 | recon 0.0023 | clus 0.7485 | sep 0.3481 | var 0.0017 | cov 2.6060 | val_mse 0.0025 | fve 0.998 | eff_K 1999/2000 | dying 459
+  step  87200 | loss 0.0443 | recon 0.0023 | clus 0.7460 | sep 0.3483 | var 0.0010 | cov 2.7791 | val_mse 0.0024 | fve 0.998 | eff_K 1998/2000 | dying 453
+  step  87300 | loss 0.0442 | recon 0.0021 | clus 0.7448 | sep 0.3447 | var 0.0024 | cov 2.5624 | val_mse 0.0023 | fve 0.998 | eff_K 1998/2000 | dying 457
+  step  87400 | loss 0.0445 | recon 0.0020 | clus 0.7543 | sep 0.3467 | var 0.0011 | cov 2.7153 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 454
+  step  87500 | loss 0.0440 | recon 0.0020 | clus 0.7472 | sep 0.3475 | var 0.0011 | cov 2.6270 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 446
+[train] Saved checkpoint: step_0087504.pt  val_mse=0.00217
+[train] New best val_mse=0.00217 → best_val.pt
+[train] Epoch 48 done in 41.5 min
+
+[train] Epoch 49/50 | tau=0.123 | λ_c=0.050 λ_s=0.0049 | λ_var=0.300 λ_cov=0.0010
+  step  87600 | loss 0.0441 | recon 0.0021 | clus 0.7459 | sep 0.3468 | var 0.0012 | cov 2.6727 | val_mse 0.0022 | fve 0.998 | eff_K 1997/2000 | dying 444
+  step  87700 | loss 0.0444 | recon 0.0021 | clus 0.7506 | sep 0.3468 | var 0.0011 | cov 2.6510 | val_mse 0.0023 | fve 0.998 | eff_K 1998/2000 | dying 455
+  step  87800 | loss 0.0443 | recon 0.0021 | clus 0.7496 | sep 0.3465 | var 0.0014 | cov 2.6150 | val_mse 0.0022 | fve 0.998 | eff_K 1997/2000 | dying 458
+  step  87900 | loss 0.0442 | recon 0.0022 | clus 0.7466 | sep 0.3483 | var 0.0013 | cov 2.6228 | val_mse 0.0023 | fve 0.998 | eff_K 1998/2000 | dying 452
+  step  88000 | loss 0.0442 | recon 0.0021 | clus 0.7437 | sep 0.3527 | var 0.0019 | cov 2.6218 | val_mse 0.0023 | fve 0.998 | eff_K 1998/2000 | dying 442
+  [reinit] step 88000: reinitialised 2 dead clusters
+  step  88100 | loss 0.0445 | recon 0.0022 | clus 0.7514 | sep 0.3492 | var 0.0016 | cov 2.5808 | val_mse 0.0023 | fve 0.998 | eff_K 1997/2000 | dying 441
+  step  88200 | loss 0.0438 | recon 0.0020 | clus 0.7395 | sep 0.3470 | var 0.0012 | cov 2.7764 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 453
+  step  88300 | loss 0.0436 | recon 0.0020 | clus 0.7336 | sep 0.3456 | var 0.0015 | cov 2.8293 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 443
+  step  88400 | loss 0.0439 | recon 0.0021 | clus 0.7362 | sep 0.3471 | var 0.0023 | cov 2.6212 | val_mse 0.0023 | fve 0.998 | eff_K 1998/2000 | dying 451
+  step  88500 | loss 0.0440 | recon 0.0020 | clus 0.7413 | sep 0.3482 | var 0.0020 | cov 2.6321 | val_mse 0.0022 | fve 0.998 | eff_K 1997/2000 | dying 461
+  step  88600 | loss 0.0441 | recon 0.0021 | clus 0.7460 | sep 0.3479 | var 0.0006 | cov 2.8291 | val_mse 0.0022 | fve 0.998 | eff_K 1997/2000 | dying 453
+  step  88700 | loss 0.0442 | recon 0.0020 | clus 0.7448 | sep 0.3504 | var 0.0020 | cov 2.6223 | val_mse 0.0022 | fve 0.998 | eff_K 1997/2000 | dying 446
+  step  88800 | loss 0.0442 | recon 0.0021 | clus 0.7419 | sep 0.3479 | var 0.0027 | cov 2.5704 | val_mse 0.0022 | fve 0.998 | eff_K 1997/2000 | dying 436
+  step  88900 | loss 0.0442 | recon 0.0023 | clus 0.7426 | sep 0.3456 | var 0.0013 | cov 2.7330 | val_mse 0.0024 | fve 0.998 | eff_K 1998/2000 | dying 450
+  step  89000 | loss 0.0439 | recon 0.0020 | clus 0.7364 | sep 0.3470 | var 0.0018 | cov 2.7875 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 452
+  [reinit] step 89000: reinitialised 2 dead clusters
+  step  89100 | loss 0.0439 | recon 0.0021 | clus 0.7382 | sep 0.3484 | var 0.0015 | cov 2.7448 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 448
+  step  89200 | loss 0.0442 | recon 0.0021 | clus 0.7489 | sep 0.3478 | var 0.0012 | cov 2.6169 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 449
+  step  89300 | loss 0.0440 | recon 0.0020 | clus 0.7429 | sep 0.3466 | var 0.0013 | cov 2.7425 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 451
+[train] Saved checkpoint: step_0089327.pt  val_mse=0.00222
+[train] Epoch 49 done in 40.9 min
+
+[train] Epoch 50/50 | tau=0.100 | λ_c=0.050 λ_s=0.0050 | λ_var=0.300 λ_cov=0.0010
+  step  89400 | loss 0.0442 | recon 0.0022 | clus 0.7422 | sep 0.3466 | var 0.0012 | cov 2.7861 | val_mse 0.0023 | fve 0.998 | eff_K 1998/2000 | dying 464
+  step  89500 | loss 0.0443 | recon 0.0022 | clus 0.7476 | sep 0.3455 | var 0.0009 | cov 2.7146 | val_mse 0.0023 | fve 0.998 | eff_K 1998/2000 | dying 449
+  step  89600 | loss 0.0443 | recon 0.0024 | clus 0.7391 | sep 0.3477 | var 0.0015 | cov 2.7398 | val_mse 0.0026 | fve 0.998 | eff_K 1998/2000 | dying 449
+  step  89700 | loss 0.0439 | recon 0.0021 | clus 0.7412 | sep 0.3474 | var 0.0007 | cov 2.8346 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 463
+  step  89800 | loss 0.0442 | recon 0.0021 | clus 0.7466 | sep 0.3458 | var 0.0009 | cov 2.7813 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 478
+  step  89900 | loss 0.0439 | recon 0.0021 | clus 0.7391 | sep 0.3458 | var 0.0013 | cov 2.7139 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 462
+  step  90000 | loss 0.0443 | recon 0.0021 | clus 0.7478 | sep 0.3451 | var 0.0015 | cov 2.6822 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 458
+  [reinit] step 90000: reinitialised 2 dead clusters
+  step  90100 | loss 0.0441 | recon 0.0021 | clus 0.7368 | sep 0.3476 | var 0.0025 | cov 2.6727 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 465
+  step  90200 | loss 0.0442 | recon 0.0020 | clus 0.7454 | sep 0.3481 | var 0.0014 | cov 2.6695 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 453
+  step  90300 | loss 0.0439 | recon 0.0020 | clus 0.7366 | sep 0.3491 | var 0.0023 | cov 2.6805 | val_mse 0.0022 | fve 0.998 | eff_K 1997/2000 | dying 459
+  step  90400 | loss 0.0441 | recon 0.0021 | clus 0.7431 | sep 0.3470 | var 0.0014 | cov 2.6833 | val_mse 0.0023 | fve 0.998 | eff_K 1998/2000 | dying 446
+  step  90500 | loss 0.0444 | recon 0.0023 | clus 0.7489 | sep 0.3457 | var 0.0011 | cov 2.6289 | val_mse 0.0024 | fve 0.998 | eff_K 1998/2000 | dying 442
+  step  90600 | loss 0.0441 | recon 0.0021 | clus 0.7448 | sep 0.3459 | var 0.0014 | cov 2.6365 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 444
+  step  90700 | loss 0.0440 | recon 0.0020 | clus 0.7369 | sep 0.3478 | var 0.0026 | cov 2.6303 | val_mse 0.0022 | fve 0.998 | eff_K 1997/2000 | dying 437
+  step  90800 | loss 0.0443 | recon 0.0021 | clus 0.7487 | sep 0.3488 | var 0.0012 | cov 2.6251 | val_mse 0.0023 | fve 0.998 | eff_K 1998/2000 | dying 443
+  step  90900 | loss 0.0441 | recon 0.0021 | clus 0.7465 | sep 0.3459 | var 0.0012 | cov 2.6148 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 460
+  step  91000 | loss 0.0438 | recon 0.0021 | clus 0.7330 | sep 0.3471 | var 0.0019 | cov 2.7395 | val_mse 0.0022 | fve 0.998 | eff_K 1998/2000 | dying 455
+  [reinit] step 91000: reinitialised 1 dead clusters
+  step  91100 | loss 0.0441 | recon 0.0020 | clus 0.7475 | sep 0.3463 | var 0.0013 | cov 2.5989 | val_mse 0.0022 | fve 0.998 | eff_K 1999/2000 | dying 431
+[train] Saved checkpoint: step_0091150.pt  val_mse=0.00219
+[train] Epoch 50 done in 42.9 min
+wandb: updating run metadata
+wandb: uploading history steps 910-910, summary, console lines 1228-1229
+wandb: 
+wandb: Run history:
+wandb:    centroid_dist_max ▁▁▁▁▁▁▁▁▇█████████████████████████████▇█
+wandb:   centroid_dist_mean ▁▁▁▁▁▁▁▁▁▁▁▁▁███████████████████████████
+wandb:    centroid_dist_min ▁▁▁▁▁▁▁▁███▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇▇
+wandb:     cluster/dominant ▁▁▁▁▁▅▅▆▆▆▆▆▇▇▆▆▆▆▇▇▇▆▇▇▇▇▇▇▇█▇▇▇▇█▇██▇▇
+wandb:        cluster/dying ▁▁▁▁▁▁▁█▄▄▄▄▄▄▄▄▄▄▄▄▄▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅
+wandb:  cluster/effective_k ███████▁▃▅▅▂▅▆▆▆▆▇█▆▇█▇██▆▃▆▃▇▆▅▆█▆█▇▆▆▆
+wandb:      cluster/entropy █████▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁
+wandb:    cluster/intra_var ▁▅▇█████▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅▅
+wandb: cluster/reinit_count █▇▂▃▅▅▃▂▃▂▂▂▂▂▂▁▃▂▃▂▂▃▂▂▂▂▁▁▂▂▂▂▁▁▁▁▃▂▂▁
+wandb:   cluster/silhouette ▁▁▁▁▁▁▁▁▁███████████████████████████████
+wandb:                  +11 ...
+wandb: 
+wandb: Run summary:
+wandb:    centroid_dist_max 114.70876
+wandb:   centroid_dist_mean 43.73856
+wandb:    centroid_dist_min 9.01442
+wandb:     cluster/dominant 25
+wandb:        cluster/dying 431
+wandb:  cluster/effective_k 1999
+wandb:      cluster/entropy 0.00082
+wandb:    cluster/intra_var 0.73614
+wandb: cluster/reinit_count 1
+wandb:   cluster/silhouette -0.03444
+wandb:                  +11 ...
+wandb: 
+wandb: 🚀 View run geosep_seed42 at: https://wandb.ai/multifacetednlp/geosep-general-e2e/runs/x39es1my
+wandb: ⭐️ View project at: https://wandb.ai/multifacetednlp/geosep-general-e2e
+wandb: Synced 5 W&B file(s), 0 media file(s), 0 artifact file(s) and 0 other file(s)
+wandb: Find logs at: ./wandb/run-20260826_203629-x39es1my/logs
+
+[train] Training complete. Best val_mse = 0.00217

@@ -1,0 +1,25 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/exouser/RepresentationAE/GeoAE/geoae/interp/steering_concept_compare.py", line 308, in <module>
+    main()
+  File "/home/exouser/RepresentationAE/GeoAE/geoae/interp/steering_concept_compare.py", line 89, in main
+    ae, norm, cfg = load_ae_from_checkpoint(ckpt, device)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/exouser/RepresentationAE/GeoAE/geoae/evaluate.py", line 41, in load_ae_from_checkpoint
+    model, norm_mean, norm_std, ckpt = load_ae_checkpoint(ckpt_path, device)
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/exouser/RepresentationAE/GeoAE/geoae/checkpoint.py", line 29, in load_ae_checkpoint
+    ckpt = torch.load(str(ckpt_path), map_location=device, weights_only=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/exouser/RepresentationAE/GeoAE/.venv/lib/python3.12/site-packages/torch/serialization.py", line 1561, in load
+    with _open_file_like(f, "rb") as opened_file:
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/exouser/RepresentationAE/GeoAE/.venv/lib/python3.12/site-packages/torch/serialization.py", line 795, in _open_file_like
+    return _open_file(name_or_buffer, mode)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/exouser/RepresentationAE/GeoAE/.venv/lib/python3.12/site-packages/torch/serialization.py", line 776, in __init__
+    super().__init__(open(name, mode))  # noqa: SIM115
+                     ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: 'checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam2_d3072_pd/step_0014200.p'

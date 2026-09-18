@@ -56,6 +56,33 @@ SEP_GRID = [
     (2.0, 0.3, "batch", "hinge"),
 ]
 
+# --grid cov : how hard to push DECORRELATION.
+#
+# cov is the only loss term that is not O(1): it sat at ~10 for the whole b32k
+# L27 run while recon/clus/sep/var were all below 0.35. That is not a scaling
+# artefact — covariance_loss already divides by L. Measured on the trained
+# d6144 checkpoint over 32,768 real tokens:
+#
+#   cov on real z                                 9.84
+#   cov, independent noise, std 1.0, same shape   0.19   <- achievable floor
+#
+# so the term is 52x above its floor and lambda_cov 0.01 contributes 0.098 of a
+# 0.596 total loss. The latent is correlated: mean |r| 0.031 but p99 |r| 0.25
+# and max |r| 0.995 — some dimension pairs are near-duplicates. Effective rank
+# (squared-SV) is 546/6144 on z and 165/1999 on centroids, both ~9%.
+#
+# This grid holds cluster/sep/var at the b32k settings and moves ONLY lambda_cov,
+# including a 0.0 control, so any change in rank or cov is attributable.
+COV_GRID = [
+    # (lambda_cluster, lambda_sep, latent_norm, sep_mode, lambda_cov)
+    (1.0, 0.3, "batch", "hinge", 0.0),    # control: no decorrelation at all
+    (1.0, 0.3, "batch", "hinge", 0.01),   # shipped
+    (1.0, 0.3, "batch", "hinge", 0.1),
+    (1.0, 0.3, "batch", "hinge", 0.5),
+    (1.0, 0.3, "batch", "hinge", 2.0),
+    (1.0, 0.3, "batch", "hinge", 8.0),
+]
+
 DEFAULT_GRID = [
     (0.05, 0.005, "none"),   # shipped weights, for reference
     (0.5,  0.3,   "none"),
@@ -82,7 +109,10 @@ def run_grid(args, grid):
     for entry in grid:
         lc, ls, ln = entry[0], entry[1], entry[2]
         sm = entry[3] if len(entry) > 3 else "median"
+        lcov = entry[4] if len(entry) > 4 else None
         tag = f"clu{lc}_sep{ls}_{ln}" + (f"_{sm}" if len(entry) > 3 else "")
+        if lcov is not None:
+            tag += f"_cov{lcov}"
         out = Path(args.out_dir) / tag
         if (out / "best_val.pt").exists() and not args.force:
             print(f"=== {tag}: already done, skipping (use --force to redo)")
@@ -91,6 +121,8 @@ def run_grid(args, grid):
         cfg["loss"]["lambda_cluster"], cfg["loss"]["lambda_sep"] = lc, ls
         cfg["model"]["latent_norm"] = ln
         cfg["loss"]["sep_mode"] = sm
+        if lcov is not None:
+            cfg["loss"]["lambda_cov"] = lcov
         cfg["train"].update(
             n_epochs=args.epochs, recon_only_epochs=2, geometry_start_epoch=2,
             clustering_start_epoch=3, full_loss_start_epoch=3,
@@ -145,7 +177,10 @@ def score(args, grid):
     for entry in grid:
         lc, ls, ln = entry[0], entry[1], entry[2]
         sm = entry[3] if len(entry) > 3 else "median"
+        lcov = entry[4] if len(entry) > 4 else None
         tag = f"clu{lc}_sep{ls}_{ln}" + (f"_{sm}" if len(entry) > 3 else "")
+        if lcov is not None:
+            tag += f"_cov{lcov}"
         # best_val.pt selects on val_mse, which is monotonically best BEFORE
         # clustering engages, so on a phased run it captures a pre-clustering
         # model whose centroids were never initialised (1 live cluster). Always
@@ -189,13 +224,13 @@ def main():
     ap.add_argument("--score_blocks", type=int, default=600, help="200-row blocks for scoring")
     ap.add_argument("--score_only", action="store_true")
     ap.add_argument("--force", action="store_true", help="Redo configs that already finished")
-    ap.add_argument("--grid", default="lambda", choices=["lambda", "sep"],
+    ap.add_argument("--grid", default="lambda", choices=["lambda", "sep", "cov"],
                     help="lambda: sweep clustering strength. sep: sweep sep_mode x latent_norm.")
     ap.add_argument("--print_every", type=int, default=500,
                     help="Echo a step line to the terminal every N steps.")
     args = ap.parse_args()
 
-    grid = DEFAULT_GRID if args.grid == "lambda" else SEP_GRID
+    grid = {"lambda": DEFAULT_GRID, "sep": SEP_GRID, "cov": COV_GRID}[args.grid]
     if not args.score_only:
         run_grid(args, grid)
     score(args, grid)

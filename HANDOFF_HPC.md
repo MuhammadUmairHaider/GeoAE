@@ -1,5 +1,8 @@
 # GeoAE — handoff for an HPC session (2026-09-03)
 
+> **Superseded by `HANDOFF_DELTA.md` (2026-09-18).** The notes it refers to below
+> are now in the repo at `docs/notes/` (index: `docs/notes/MEMORY.md`).
+
 Llama-3.2-3B residual-stream autoencoder + Sinkhorn-balanced clustering. This
 file is the state of play, the tooling built in the 2026-09-02/03 session, the
 runs that are configured but not started, and the traps that cost the most time.

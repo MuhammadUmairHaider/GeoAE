@@ -1,0 +1,38 @@
+[seed] seed=0 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+
+[quality] Loading AE: checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_dpc_tanh/step_0014200.pt
+[quality] Computing metrics for: tanh50
+    silhouette … 0.0141
+    davies-bouldin … 3.6253
+    calinski-harabasz … 547.2
+    dunn index … 0.188767
+    separability ratio … 126.4420
+
+[quality] Loading AE: checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_dpc/step_0014200.pt
+[quality] Computing metrics for: gelu50
+    silhouette … 0.0361
+    davies-bouldin … 2.9706
+    calinski-harabasz … 856.5
+    dunn index … 0.151216
+    separability ratio … 175.6556
+
+========================================================================
+  Metric                                    tanh50              gelu50
+------------------------------------------------------------------------
+  Silhouette ↑                            0.0141              0.0361 *
+  Davies-Bouldin ↓                        3.6253              2.9706 *
+  Calinski-Harabasz ↑                      547.2               856.5 *
+  Dunn Index ↑                          0.188767 *          0.151216  
+  Separability Ratio ↑                  126.4420            175.6556 *
+  Inter-centroid Dist ↑                  42.5603             82.5382 *
+  Min Centroid Dist ↑                     7.8888              9.4888 *
+  Intra-cluster Var ↓                     0.1197 *            0.2745  
+  Cluster Balance H ↑                     0.9686 *            0.9662  
+  Empty Clusters ↓                             0 *                 0 *
+  Effective K ↑                             1991                1997 *
+  Effective Rank ↑                        124.72              216.67 *
+  Assignment Entropy                      0.0014              0.0005  
+========================================================================
+  * = best value for that metric
+
+[quality] Full results saved → eval_out/cq_tanh50.json

@@ -15,14 +15,32 @@
 # nearly a definition of an outlier. The parent run churned 20-43 clusters per
 # 125-step cycle for 30 epochs before settling.
 #
-# reinit_mode "anchor" gives strict priority to UNUSED LABELLED examples: a
-# labelled point is a known mode, and the pool (~11k examples at per_class=25)
-# is spent farthest-from-live-centroids first, so each reinit fills a labelled
-# region the partition currently has no home for. Only once the pool is
-# exhausted does it fall back to D^2 sampling — k-means++'s rule, drawn
-# probabilistically rather than greedily. Anchors are re-encoded at every reinit
-# rather than cached, since the encoder keeps training and init-time latents go
-# stale within an epoch.
+# reinit_mode "anchor" gives strict priority to UNSERVED LABELLED CLASSES.
+#
+# NOTE THIS IS THE CORRECTED RULE. The first seeded run (L14, 2026-09-04) picked
+# the individual unused example FARTHEST from any live centroid — which is
+# farthest-first selection, the same outlier-seeking rule as k-means++ merely
+# restricted to a labelled subset, and within a class it seeds on that class's
+# most ATYPICAL member. That run reinitialised 1470 clusters against the
+# k-means++ parent's 315 (586 in epoch 11 alone) and ended 2.4x more
+# concentrated (usage perplexity 1162 vs 1459).
+#
+# The rule now is:
+#   priority   per CLASS, (distance from class mean to nearest live centroid)
+#              divided by the class's own radius -- a COVERAGE question, not a
+#              distance one: "does this concept have a home, relative to how
+#              tight it is?"
+#   placement  the MEAN of the anchor_mean_k most typical members. Averaging >=5
+#              examples stops one unusual example defining a concept.
+#   consumption a class is spent once seeded, so successive reinits move on to
+#              the next unserved concept instead of re-seeding the same one.
+#
+# Anchors are re-encoded at every reinit rather than cached, since the encoder
+# keeps training and init-time latents go stale within an epoch.
+#
+# EVALUATE WITH `concept_probe --exclude_anchors`. Anchors are drawn from the
+# same concept caches the probe scores on; without the holdout the seeded rungs
+# report an inflated result (37% of ravel_country rows were anchors).
 #
 # WHAT SEEDING ACTUALLY BUYS HERE. K=2000 against 511 labelled classes, which
 # dedupe to ~419 anchors (rungs overlap — a token can be both a POS tag and an
@@ -160,7 +178,8 @@ train:
   anchor_min_examples: 5       # skip classes with fewer than this
   anchor_rungs: ""             # empty = all 19 rungs (511 classes -> ~419 anchors)
   density_power: 1.0           # 0 = pure coverage (k-means++), higher = denser picks
-  reinit_mode: "anchor"        # <<< unused LABELLED points first, then D^2 sampling
+  anchor_mean_k: 5             # reinit seed = MEAN of this many most-typical members
+  reinit_mode: "anchor"        # <<< unserved labelled CLASS first, then D^2 sampling
   checkpoints_dir: "checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_seeded"
   diag_every: 12            # 284 steps/epoch now, not 2278
   reinit_every: 125         # was 1000 steps = 0.44 epoch at B=4096

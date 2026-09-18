@@ -1,0 +1,45 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[steer] LM=meta-llama/Llama-3.2-3B layer=27 (AE target_layer=27)
+[eval] Splice sanity check PASSED (max logit diff = 0.00e+00)
+[steer] Computing wiki ppl slice + z-recon baseline hook …
+[steer] Loading ag_news test split …
+[steer] Cache dbpedia/joint_correct_predictions_ag_news.json is stale (built on a DIFFERENT model (None != 'meta-llama/Llama-3.2-3B')); rebuilding (sha=e45cd0c311f1).
+[steer] Building joint base+recon correct set …
+[steer] Finding joint-correct predictions for class 0 (World) ...
+  Found 130 joint-correct docs for class 0
+[steer] Finding joint-correct predictions for class 1 (Sports) ...
+  Found 130 joint-correct docs for class 1
+[steer] Finding joint-correct predictions for class 2 (Business) ...
+  Found 130 joint-correct docs for class 2
+[steer] Finding joint-correct predictions for class 3 (Sci/Tech) ...
+  Found 40 joint-correct docs for class 3
+[steer] joint-correct: 430 docs (min/class=40, prompt_sha=e45cd0c311f1, model=meta-llama/Llama-3.2-3B, ae=2fc8704cd883) -> dbpedia/joint_correct_predictions_ag_news.json
+[steer] Fit pass: capturing h,z for 264 docs …
+[steer] Clean eval over 166 docs …
+[steer] base acc=1.000 ppl=5.8 | z-recon acc=1.000 ppl=6.0
+
+=== concept 0 (World)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -0.020 (tgt 0.98, comp 1.00) | z sel -0.020 (tgt 0.98, comp 1.00)
+  a=1.0  | h sel -0.120 (tgt 0.88, comp 1.00) | z sel -0.100 (tgt 0.90, comp 1.00)
+  a=1.5  | h sel -0.280 (tgt 0.72, comp 1.00) | z sel -0.300 (tgt 0.70, comp 1.00)
+  a=2.0  | h sel -1.000 (tgt 0.00, comp 1.00) | z sel -0.988 (tgt 0.00, comp 0.99)
+
+=== concept 1 (Sports)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -1.000 (tgt 0.00, comp 1.00) | z sel -0.988 (tgt 0.00, comp 0.99)
+  a=1.0  | h sel -0.925 (tgt 0.00, comp 0.93) | z sel -0.875 (tgt 0.00, comp 0.88)
+  a=1.5  | h sel -0.775 (tgt 0.00, comp 0.78) | z sel -0.750 (tgt 0.00, comp 0.75)
+  a=2.0  | h sel -0.650 (tgt 0.00, comp 0.65) | z sel -0.650 (tgt 0.00, comp 0.65)
+
+=== concept 2 (Business)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -0.950 (tgt 0.00, comp 0.95) | z sel -0.925 (tgt 0.00, comp 0.93)
+  a=1.0  | h sel -0.900 (tgt 0.00, comp 0.90) | z sel -0.875 (tgt 0.00, comp 0.88)
+  a=1.5  | h sel -0.863 (tgt 0.00, comp 0.86) | z sel -0.850 (tgt 0.00, comp 0.85)
+  a=2.0  | h sel -0.838 (tgt 0.00, comp 0.84) | z sel -0.838 (tgt 0.00, comp 0.84)
+
+=== concept 3 (Sci/Tech)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -0.938 (tgt 0.00, comp 0.94) | z sel -0.988 (tgt 0.00, comp 0.99)
+  a=1.0  | h sel -0.863 (tgt 0.00, comp 0.86) | z sel -0.925 (tgt 0.00, comp 0.93)
+  a=1.5  | h sel -0.812 (tgt 0.00, comp 0.81) | z sel -0.850 (tgt 0.00, comp 0.85)
+  a=2.0  | h sel -0.750 (tgt 0.00, comp 0.75) | z sel -0.775 (tgt 0.00, comp 0.78)
+
+[steer] Saved -> results/steer_agnews_b32k_lam1_d6144.json

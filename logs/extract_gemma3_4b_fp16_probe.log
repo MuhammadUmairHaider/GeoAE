@@ -1,0 +1,28 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[extract] Loading tokenizer and model: google/gemma-3-4b-pt
+Fetching 2 files:   0%|          | 0/2 [00:00<?, ?it/s]Fetching 2 files:  50%|█████     | 1/2 [00:25<00:25, 25.52s/it]Fetching 2 files: 100%|██████████| 2/2 [00:25<00:00, 12.76s/it]
+Loading weights:   0%|          | 0/883 [00:00<?, ?it/s]Loading weights:   6%|▌         | 49/883 [00:00<00:01, 482.59it/s]Loading weights:  13%|█▎        | 111/883 [00:00<00:01, 562.77it/s]Loading weights:  19%|█▉        | 168/883 [00:00<00:02, 304.73it/s]Loading weights:  24%|██▎       | 208/883 [00:00<00:03, 206.05it/s]Loading weights:  27%|██▋       | 237/883 [00:01<00:03, 173.06it/s]Loading weights:  29%|██▉       | 260/883 [00:01<00:04, 145.50it/s]Loading weights:  32%|███▏      | 279/883 [00:01<00:04, 142.86it/s]Loading weights:  39%|███▊      | 340/883 [00:01<00:02, 221.43it/s]Loading weights:  46%|████▌     | 406/883 [00:01<00:01, 305.57it/s]Loading weights:  64%|██████▍   | 565/883 [00:01<00:00, 588.58it/s]Loading weights:  94%|█████████▍| 834/883 [00:01<00:00, 1091.19it/s]Loading weights: 100%|██████████| 883/883 [00:01<00:00, 465.14it/s] 
+[load_lm] google/gemma-3-4b-pt: dropped vision tower (text-only use)
+[extract] Gemma3ForConditionalGeneration (decoder Gemma3TextModel): 34 layers, d=2560, vocab=262208
+[extract] Model on cuda:0
+[extract] Allocating 1 × (200,000, 2560) float16 = 1.0 GB in /tmp/g3_4b_fp16_probe
+[extract] Opening data sources:
+[extract]   + web   allenai/c4
+[extract]   + wiki  wikimedia/wikipedia
+Repo card metadata block was not found. Setting CardData to empty.
+[extract]   + code  codeparrot/codeparrot-clean-valid
+[extract]   + math  open-web-math/open-web-math
+[extract]   + pile  monology/pile-uncopyrighted
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/exouser/RepresentationAE/GeoAE/geoae/extract.py", line 388, in <module>
+    main()
+  File "/home/exouser/RepresentationAE/GeoAE/geoae/extract.py", line 377, in main
+    extract(
+  File "/home/exouser/RepresentationAE/GeoAE/geoae/extract.py", line 271, in extract
+    raise RuntimeError(
+RuntimeError: float16 OVERFLOW after 200 docs / 45,865 tokens: non-finite elements per layer {33: 39482}.
+  This model's residual stream exceeds the float16 max of 65504, so the dump would be poisoned with inf.
+  Fix: set `extraction.dtype: float32` in the config (2x disk — reduce n_tokens to match) and re-run.
+  Partial files in /tmp/g3_4b_fp16_probe are sparse and will be overwritten by the next run.

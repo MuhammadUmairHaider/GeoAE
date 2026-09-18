@@ -46,9 +46,13 @@ class ModelConfig:
     hidden_size: int = 3072
     latent_dim: int = 2048
     n_clusters: int = 128
-    nonlinearity: str = "linear"   # "linear" | "relu" | "gelu"
+    nonlinearity: str = "linear"   # "linear" | "relu" | "gelu" | "tanh"
     metric: str = "euclidean"      # "euclidean" (magnitude) | "cosine" (directional)
-    latent_norm: str = "none"      # "none" | "batch" (BatchNorm1d between linear and act)
+    latent_norm: str = "none"
+    dist_scale: str = "raw"        # "raw" | "per_dim" — scale of dist2 fed to Sinkhorn.
+                                   # raw reproduces every run before 2026-09-04;
+                                   # per_dim divides by latent_dim so `tau` is on the
+                                   # same scale cluster_loss already uses. See model.py.      # "none" | "batch" (BatchNorm1d between linear and act)
 
 
 @dataclass
@@ -60,6 +64,7 @@ class LossConfig:
     lambda_usage: float = 0.1
     lambda_mse: float = 0.0   # weak MSE recon anchor for e2e KL training (0 = off)
     lambda_var: float = 0.0   # VICReg variance hinge on latents (anti-contraction, 0 = off)
+    var_gamma: float = 1.0    # variance hinge target std; must be < 1 for tanh (std is capped at 1)
     lambda_cov: float = 0.0   # VICReg covariance on latents (anti low-rank collapse, 0 = off)
     lambda_unif: float = 0.0  # Wang–Isola uniformity on unit-sphere latents (cosine runs, 0 = off)
     sinkhorn_iters: int = 3
@@ -96,16 +101,27 @@ class TrainConfig:
     save_every: int = 1              # save checkpoint every N epochs
     keep_checkpoints: int = 3        # keep last N + best-by-val-recon
 
-    centroid_init: str = "kmeans++"   # "kmeans++" | "semisup" | "class_means" | "seeded"
+    centroid_init: str = "kmeans++"   # "kmeans++" | "semisup" | "class_means" | "seeded" | "dpc"
+                                      #   dpc: density peaks, unsupervised, no anchor cache
     semisup_cap: int = 500            # semisup init: max labeled samples/class for class-mean centroids
     # --- "seeded" init: labelled anchors + density x coverage fill -----------
     anchor_cache: str = "cache"       # concept-cache dir; MUST match target_layer
     anchor_per_class: int = 25        # labelled examples averaged per anchor (5-100)
     anchor_min_examples: int = 5      # skip classes with fewer than this
+    anchor_mean_k: int = 5            # reinit seeds = mean of this many MOST TYPICAL members
+    atlas_last: str = ""              # FineWeb-Atlas last-token anchors (cache/atlas8k_last.npz)
+    atlas_min_examples: int = 25      # >=25 -> ~448 classes; >=5 -> ~2081, which exceeds K=2000
     anchor_rungs: str = ""            # comma list; empty = every rung in the cache
     density_power: float = 1.0        # 0 = pure coverage (k-means++), 1 = balanced
-    reinit_mode: str = "loss"         # "loss" (highest-recon-error) | "anchor" | "density"
+    fill_mode: str = "coverage"       # "seeded" non-anchor fill: "coverage" | "peaks"
+    reinit_mode: str = "loss"         # "loss" (highest-recon-error) | "anchor" | "density" | "peaks"
                                       #   anchor: unused LABELLED points first, then D^2
+    # --- density peaks: "dpc" init / fill_mode "peaks" / reinit_mode "peaks" --
+    density_pool: int = 32768         # latents encoded for the density estimate; delta is O(N^2)
+    density_knn: int = 32             # k for the kNN density rho
+    peak_min_sep_frac: float = 0.25   # reject a peak within this x median pair distance of a kept one
+    peak_refine_k: int = 8            # centroid = mean of this many NNs; 0 = the exact peak point
+    peak_reinit_pool: int = 8192      # batch rows used by reinit_mode "peaks" (O(N^2) per cycle)
     teacher_mode: str = "cached"      # e2e only: "cached" (precomputed logits) |
                                       # "onfly" (teacher = head(norm(x)) in-loop, no cache)
     checkpoints_dir: str = "checkpoints"
@@ -114,6 +130,17 @@ class TrainConfig:
 
     wandb_project: str = "geoae"
     wandb_entity: Optional[str] = None
+
+
+# Enumerated train fields. from_yaml only checks that a key EXISTS, so without
+# this a typo ("dcp", "peak") silently falls through to the default branch and a
+# 50-epoch run produces the wrong arm with no error anywhere in the log.
+_TRAIN_CHOICES = {
+    "centroid_init": {"kmeans++", "semisup", "class_means", "seeded", "dpc"},
+    "reinit_mode": {"loss", "anchor", "density", "peaks"},
+    "fill_mode": {"coverage", "peaks"},
+    "teacher_mode": {"cached", "onfly"},
+}
 
 
 @dataclass
@@ -137,7 +164,18 @@ class Config:
                 if not hasattr(sub, k):
                     raise ValueError(f"Unknown config key: {section}.{k!r}")
                 setattr(sub, k, v)
+        cfg.validate()
         return cfg
+
+    def validate(self) -> "Config":
+        """Reject out-of-range values for the enumerated train fields."""
+        for k, allowed in _TRAIN_CHOICES.items():
+            v = getattr(self.train, k)
+            if v not in allowed:
+                raise ValueError(
+                    f"Invalid train.{k}={v!r}; expected one of {sorted(allowed)}"
+                )
+        return self
 
     def to_dict(self) -> dict:
         return asdict(self)

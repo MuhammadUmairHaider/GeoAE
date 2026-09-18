@@ -40,7 +40,7 @@ def _alpha_tag(alpha: float) -> str:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--checkpoint", required=True)
-    ap.add_argument("--dataset", default="ag_news", choices=["db14", "emotions", "emotions_train", "ag_news"])
+    ap.add_argument("--dataset", default="ag_news", choices=["db14", "emotions", "emotions_train", "ag_news", "biasbios"])
     ap.add_argument(
         "--layer",
         type=int,
@@ -136,6 +136,7 @@ def main():
         ds, dataset_cfg, tokenizer, lm, device, hook, z_recon, corr_path, need,
         args.dataset, model_name=model_name,
         ae_sha=shared.ae_fingerprint(ae), batch_size=args.jc_batch_size, tag="steer",
+        classes=concepts,
     )
 
     pool = {c: [d["text"] for d in correct if d["label"] == c] for c in range(len(shared.CLASSES))}

@@ -1,0 +1,62 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[train] Device: cuda
+[train] Train tokens: 1,900,000  Val tokens: 100,000
+[train] Encoder: gelu  latent_dim=3840  n_clusters=2000  metric=euclidean  sinkhorn=off
+[train] Parameters: 29,495,040
+[train] Centroid init deferred until epoch 3 (kmeans++ from trained latents)
+
+[train] Epoch 1/30 | tau=1.000 | λ_c=0.000 λ_s=0.0000
+  step    100 | loss 0.8587 | recon 0.7462 | clus 0.4984 | sep 0.3679 | var 0.3608 | cov 4.2853 | val_mse 0.7650 | fve 0.252 | eff_K 2000/2000 | dying 0
+  step    200 | loss 0.6408 | recon 0.5526 | clus 0.6452 | sep 1.0000 | var 0.2737 | cov 6.0847 | val_mse 0.5566 | fve 0.452 | eff_K 2000/2000 | dying 0
+  step    300 | loss 0.5043 | recon 0.4396 | clus 0.8356 | sep 1.0000 | var 0.1771 | cov 11.5983 | val_mse 0.4494 | fve 0.565 | eff_K 2000/2000 | dying 0
+  step    400 | loss 0.4251 | recon 0.3743 | clus 0.9446 | sep 1.0000 | var 0.1326 | cov 11.0483 | val_mse 0.3853 | fve 0.626 | eff_K 2000/2000 | dying 0
+[train] Saved checkpoint: step_0000463.pt  val_mse=0.35580
+[train] New best val_mse=0.35580 → best_val.pt
+[train] Epoch 1 done in 1.3 min
+
+[train] Epoch 2/30 | tau=1.000 | λ_c=0.000 λ_s=0.0000
+  step    500 | loss 0.3697 | recon 0.3311 | clus 1.0727 | sep 0.3679 | var 0.0833 | cov 13.5765 | val_mse 0.3411 | fve 0.669 | eff_K 2000/2000 | dying 0
+  step    600 | loss 0.3260 | recon 0.2952 | clus 1.1751 | sep 0.3679 | var 0.0493 | cov 16.0379 | val_mse 0.3074 | fve 0.704 | eff_K 2000/2000 | dying 0
+  step    700 | loss 0.2955 | recon 0.2708 | clus 1.2554 | sep 1.0000 | var 0.0258 | cov 16.9043 | val_mse 0.2796 | fve 0.730 | eff_K 2000/2000 | dying 0
+  step    800 | loss 0.2686 | recon 0.2456 | clus 1.2745 | sep 1.0000 | var 0.0250 | cov 15.6107 | val_mse 0.2569 | fve 0.753 | eff_K 2000/2000 | dying 0
+  step    900 | loss 0.2524 | recon 0.2303 | clus 1.3031 | sep 0.3679 | var 0.0220 | cov 15.4457 | val_mse 0.2379 | fve 0.768 | eff_K 2000/2000 | dying 0
+[train] Saved checkpoint: step_0000926.pt  val_mse=0.23329
+[train] New best val_mse=0.23329 → best_val.pt
+[train] Epoch 2 done in 1.5 min
+[train] Epoch 3: k-means++ init of 2000 centroids from 4096 trained latents
+
+[train] Epoch 3/30 | tau=1.000 | λ_c=0.050 λ_s=0.0000
+  step   1000 | loss 0.2687 | recon 0.2126 | clus 0.6627 | sep 0.5297 | var 0.0236 | cov 15.9635 | val_mse 0.2210 | fve 0.788 | eff_K 2000/2000 | dying 0
+  [reinit] step 1000: reinitialised 1282 dead clusters
+  step   1100 | loss 0.2531 | recon 0.1984 | clus 0.6601 | sep 0.5360 | var 0.0204 | cov 15.6402 | val_mse 0.2078 | fve 0.801 | eff_K 2000/2000 | dying 1402
+  step   1200 | loss 0.2436 | recon 0.1882 | clus 0.6617 | sep 0.5287 | var 0.0216 | cov 15.8673 | val_mse 0.1968 | fve 0.812 | eff_K 829/2000 | dying 1378
+  step   1300 | loss 0.2358 | recon 0.1797 | clus 0.6656 | sep 0.5268 | var 0.0223 | cov 16.1888 | val_mse 0.1877 | fve 0.819 | eff_K 874/2000 | dying 1353
+[train] Saved checkpoint: step_0001389.pt  val_mse=0.18074
+[train] New best val_mse=0.18074 → best_val.pt
+[train] Epoch 3 done in 5.8 min
+
+[train] Epoch 4/30 | tau=1.000 | λ_c=0.050 λ_s=0.0000
+  step   1400 | loss 0.2284 | recon 0.1728 | clus 0.6617 | sep 0.5194 | var 0.0163 | cov 17.6630 | val_mse 0.1799 | fve 0.827 | eff_K 918/2000 | dying 1338
+  step   1500 | loss 0.2208 | recon 0.1654 | clus 0.6687 | sep 0.5215 | var 0.0177 | cov 16.6659 | val_mse 0.1735 | fve 0.834 | eff_K 963/2000 | dying 1327
+  step   1600 | loss 0.2148 | recon 0.1597 | clus 0.6778 | sep 0.5213 | var 0.0126 | cov 17.3439 | val_mse 0.1678 | fve 0.841 | eff_K 985/2000 | dying 1311
+  step   1700 | loss 0.2115 | recon 0.1556 | clus 0.6773 | sep 0.5156 | var 0.0183 | cov 16.6159 | val_mse 0.1628 | fve 0.844 | eff_K 1000/2000 | dying 1303
+  step   1800 | loss 0.2081 | recon 0.1519 | clus 0.6750 | sep 0.5168 | var 0.0161 | cov 17.6337 | val_mse 0.1582 | fve 0.848 | eff_K 1024/2000 | dying 1293
+[train] Saved checkpoint: step_0001852.pt  val_mse=0.15612
+[train] New best val_mse=0.15612 → best_val.pt
+[train] Epoch 4 done in 8.7 min
+
+[train] Epoch 5/30 | tau=1.000 | λ_c=0.050 λ_s=0.0000
+  step   1900 | loss 0.2020 | recon 0.1459 | clus 0.6760 | sep 0.5149 | var 0.0153 | cov 17.6640 | val_mse 0.1545 | fve 0.854 | eff_K 1038/2000 | dying 1288
+  step   2000 | loss 0.1988 | recon 0.1429 | clus 0.6761 | sep 0.5123 | var 0.0143 | cov 17.7870 | val_mse 0.1509 | fve 0.856 | eff_K 1047/2000 | dying 1285
+  [reinit] step 2000: reinitialised 954 dead clusters
+  step   2100 | loss 0.1960 | recon 0.1406 | clus 0.6877 | sep 0.5155 | var 0.0089 | cov 18.3595 | val_mse 0.1476 | fve 0.860 | eff_K 1041/2000 | dying 1285
+  step   2200 | loss 0.1925 | recon 0.1372 | clus 0.6832 | sep 0.5061 | var 0.0118 | cov 17.6333 | val_mse 0.1445 | fve 0.863 | eff_K 1079/2000 | dying 1277
+  step   2300 | loss 0.1902 | recon 0.1342 | clus 0.6832 | sep 0.5035 | var 0.0155 | cov 17.1653 | val_mse 0.1418 | fve 0.865 | eff_K 1126/2000 | dying 1270
+[train] Saved checkpoint: step_0002315.pt  val_mse=0.14137
+[train] New best val_mse=0.14137 → best_val.pt
+[train] Epoch 5 done in 7.6 min
+
+[train] Epoch 6/30 | tau=1.000 | λ_c=0.050 λ_s=0.0000
+  step   2400 | loss 0.1872 | recon 0.1322 | clus 0.6907 | sep 0.5028 | var 0.0107 | cov 17.3436 | val_mse 0.1393 | fve 0.869 | eff_K 1165/2000 | dying 1269
+  step   2500 | loss 0.1853 | recon 0.1294 | clus 0.6926 | sep 0.5047 | var 0.0123 | cov 17.5656 | val_mse 0.1368 | fve 0.871 | eff_K 1197/2000 | dying 1257
+  step   2600 | loss 0.1824 | recon 0.1264 | clus 0.6916 | sep 0.4952 | var 0.0123 | cov 17.7707 | val_mse 0.1344 | fve 0.874 | eff_K 1219/2000 | dying 1246

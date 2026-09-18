@@ -1,0 +1,1399 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[train-e2e] Device: cuda
+wandb: [wandb.login()] Loaded credentials for https://api.wandb.ai from /home/exouser/.netrc.
+wandb: Currently logged in as: muhammadumairhaider (multifacetednlp) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.28.0
+wandb: Run data is saved locally in /home/exouser/RepresentationAE/GeoAE/wandb/run-20260816_171233-tkmmd6id
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run geosep_e2e_seed42
+wandb: ⭐️ View project at https://wandb.ai/multifacetednlp/geosep-general-e2e
+wandb: 🚀 View run at https://wandb.ai/multifacetednlp/geosep-general-e2e/runs/tkmmd6id
+[train-e2e] wandb initialised
+[train-e2e] Loading frozen LLM: google/gemma-3-12b-pt
+Loading weights:   0%|          | 0/1065 [00:00<?, ?it/s]Loading weights:  32%|███▏      | 339/1065 [00:00<00:00, 3387.32it/s]Loading weights:  64%|██████▎   | 678/1065 [00:00<00:00, 3297.95it/s]Loading weights:  95%|█████████▍| 1008/1065 [00:00<00:00, 3251.43it/s]Loading weights: 100%|██████████| 1065/1065 [00:00<00:00, 3274.41it/s]
+[load_lm] google/gemma-3-12b-pt: dropped vision tower (text-only use)
+[train-e2e] target layer 47 of 48 (is_last=True); head-only (lm_head∘norm)
+[train-e2e] teacher_mode=onfly — head(norm(x)) computed in-loop, no cache
+[train-e2e] Train docs: 9,334,729  Val docs: 491,302
+[train-e2e] Encoder=gelu latent_dim=3840 K=2000 metric=euclidean sinkhorn=on
+[train-e2e] lr=2e-05 grad_clip=1 lambda_mse=0.15 (MSE anchor ON)
+[train-e2e] logits sanity (onfly): head path OK, logits shape=(512, 262208) (teacher = same path, no cache)
+[resume] e2e/checkpoints/general/gemma3-12B/layer47/kl_k2000_vicreg_10M/step_0729240.pt
+[resume] epoch 40 step 729240 tau 0.320 val_kl 0.03649 | centroids_initialized=True
+[resume] resuming at epoch 41, step counter continues from 729240
+
+[train-e2e] Epoch 41/50 | tau=0.298 | λ_c=0.050 λ_s=0.0039
+  step 729300 | loss 0.0849 | kl 0.0320 | val_kl 0.0374 | clus 0.3214 | sep 0.3773 | mse(diag) 0.2359 | eff_K 2000/2000 | dying 62
+  step 729400 | loss 0.0770 | kl 0.0243 | val_kl 0.0370 | clus 0.3186 | sep 0.3747 | mse(diag) 0.2355 | eff_K 2000/2000 | dying 43
+  step 729500 | loss 0.0899 | kl 0.0365 | val_kl 0.0386 | clus 0.3188 | sep 0.3736 | mse(diag) 0.2405 | eff_K 2000/2000 | dying 44
+  step 729600 | loss 0.0826 | kl 0.0294 | val_kl 0.0370 | clus 0.3113 | sep 0.3741 | mse(diag) 0.2412 | eff_K 2000/2000 | dying 47
+  step 729700 | loss 0.0827 | kl 0.0312 | val_kl 0.0366 | clus 0.3204 | sep 0.3746 | mse(diag) 0.2266 | eff_K 2000/2000 | dying 43
+  step 729800 | loss 0.0764 | kl 0.0258 | val_kl 0.0375 | clus 0.3189 | sep 0.3760 | mse(diag) 0.2214 | eff_K 2000/2000 | dying 47
+  step 729900 | loss 0.0874 | kl 0.0367 | val_kl 0.0368 | clus 0.3123 | sep 0.3790 | mse(diag) 0.2242 | eff_K 2000/2000 | dying 45
+  step 730000 | loss 0.0856 | kl 0.0343 | val_kl 0.0374 | clus 0.3217 | sep 0.3715 | mse(diag) 0.2254 | eff_K 2000/2000 | dying 46
+  [reinit] step 730000: 174 dead clusters
+  step 730100 | loss 0.0810 | kl 0.0313 | val_kl 0.0374 | clus 0.3203 | sep 0.3760 | mse(diag) 0.2144 | eff_K 2000/2000 | dying 36
+  step 730200 | loss 0.0885 | kl 0.0357 | val_kl 0.0400 | clus 0.3180 | sep 0.3693 | mse(diag) 0.2367 | eff_K 2000/2000 | dying 46
+  step 730300 | loss 0.0783 | kl 0.0263 | val_kl 0.0391 | clus 0.3218 | sep 0.3728 | mse(diag) 0.2297 | eff_K 2000/2000 | dying 46
+  step 730400 | loss 0.0719 | kl 0.0211 | val_kl 0.0362 | clus 0.3091 | sep 0.3764 | mse(diag) 0.2259 | eff_K 2000/2000 | dying 40
+  step 730500 | loss 0.0823 | kl 0.0302 | val_kl 0.0364 | clus 0.3210 | sep 0.3735 | mse(diag) 0.2308 | eff_K 2000/2000 | dying 39
+  step 730600 | loss 0.0736 | kl 0.0231 | val_kl 0.0360 | clus 0.3109 | sep 0.3705 | mse(diag) 0.2238 | eff_K 2000/2000 | dying 41
+  step 730700 | loss 0.0813 | kl 0.0285 | val_kl 0.0359 | clus 0.3349 | sep 0.3723 | mse(diag) 0.2304 | eff_K 2000/2000 | dying 37
+  step 730800 | loss 0.0768 | kl 0.0249 | val_kl 0.0366 | clus 0.3136 | sep 0.3735 | mse(diag) 0.2320 | eff_K 2000/2000 | dying 52
+  step 730900 | loss 0.0814 | kl 0.0289 | val_kl 0.0379 | clus 0.3234 | sep 0.3735 | mse(diag) 0.2328 | eff_K 2000/2000 | dying 38
+  step 731000 | loss 0.0771 | kl 0.0269 | val_kl 0.0366 | clus 0.3229 | sep 0.3721 | mse(diag) 0.2176 | eff_K 2000/2000 | dying 40
+  [reinit] step 731000: 165 dead clusters
+  step 731100 | loss 0.0763 | kl 0.0258 | val_kl 0.0365 | clus 0.3286 | sep 0.3740 | mse(diag) 0.2175 | eff_K 2000/2000 | dying 30
+  step 731200 | loss 0.0763 | kl 0.0250 | val_kl 0.0374 | clus 0.3256 | sep 0.3752 | mse(diag) 0.2233 | eff_K 2000/2000 | dying 37
+  step 731300 | loss 0.0801 | kl 0.0299 | val_kl 0.0375 | clus 0.3219 | sep 0.3742 | mse(diag) 0.2179 | eff_K 2000/2000 | dying 33
+  step 731400 | loss 0.0789 | kl 0.0274 | val_kl 0.0356 | clus 0.3281 | sep 0.3725 | mse(diag) 0.2246 | eff_K 2000/2000 | dying 40
+  step 731500 | loss 0.0796 | kl 0.0279 | val_kl 0.0366 | clus 0.3223 | sep 0.3718 | mse(diag) 0.2278 | eff_K 2000/2000 | dying 39
+  step 731600 | loss 0.0836 | kl 0.0297 | val_kl 0.0365 | clus 0.3262 | sep 0.3717 | mse(diag) 0.2407 | eff_K 2000/2000 | dying 54
+  step 731700 | loss 0.0772 | kl 0.0259 | val_kl 0.0371 | clus 0.3147 | sep 0.3722 | mse(diag) 0.2270 | eff_K 2000/2000 | dying 47
+  step 731800 | loss 0.0745 | kl 0.0251 | val_kl 0.0363 | clus 0.3118 | sep 0.3754 | mse(diag) 0.2157 | eff_K 2000/2000 | dying 44
+  step 731900 | loss 0.0802 | kl 0.0290 | val_kl 0.0363 | clus 0.3262 | sep 0.3721 | mse(diag) 0.2231 | eff_K 2000/2000 | dying 46
+  step 732000 | loss 0.0771 | kl 0.0271 | val_kl 0.0375 | clus 0.3239 | sep 0.3779 | mse(diag) 0.2155 | eff_K 2000/2000 | dying 46
+  [reinit] step 732000: 178 dead clusters
+  step 732100 | loss 0.0789 | kl 0.0280 | val_kl 0.0384 | clus 0.3290 | sep 0.3761 | mse(diag) 0.2202 | eff_K 2000/2000 | dying 37
+  step 732200 | loss 0.0783 | kl 0.0279 | val_kl 0.0374 | clus 0.3231 | sep 0.3747 | mse(diag) 0.2187 | eff_K 2000/2000 | dying 51
+  step 732300 | loss 0.0749 | kl 0.0242 | val_kl 0.0365 | clus 0.3176 | sep 0.3776 | mse(diag) 0.2222 | eff_K 2000/2000 | dying 48
+  step 732400 | loss 0.0769 | kl 0.0254 | val_kl 0.0370 | clus 0.3301 | sep 0.3774 | mse(diag) 0.2237 | eff_K 2000/2000 | dying 49
+  step 732500 | loss 0.0755 | kl 0.0231 | val_kl 0.0361 | clus 0.3271 | sep 0.3695 | mse(diag) 0.2309 | eff_K 2000/2000 | dying 57
+  step 732600 | loss 0.0895 | kl 0.0371 | val_kl 0.0370 | clus 0.3253 | sep 0.3702 | mse(diag) 0.2311 | eff_K 2000/2000 | dying 57
+  step 732700 | loss 0.0738 | kl 0.0228 | val_kl 0.0368 | clus 0.3211 | sep 0.3722 | mse(diag) 0.2232 | eff_K 2000/2000 | dying 45
+  step 732800 | loss 0.0817 | kl 0.0309 | val_kl 0.0371 | clus 0.3096 | sep 0.3730 | mse(diag) 0.2256 | eff_K 2000/2000 | dying 57
+  step 732900 | loss 0.0805 | kl 0.0297 | val_kl 0.0395 | clus 0.3121 | sep 0.3702 | mse(diag) 0.2250 | eff_K 2000/2000 | dying 51
+  step 733000 | loss 0.0761 | kl 0.0247 | val_kl 0.0369 | clus 0.3238 | sep 0.3758 | mse(diag) 0.2253 | eff_K 2000/2000 | dying 55
+  [reinit] step 733000: 183 dead clusters
+  step 733100 | loss 0.0800 | kl 0.0304 | val_kl 0.0376 | clus 0.3207 | sep 0.3736 | mse(diag) 0.2143 | eff_K 2000/2000 | dying 29
+  step 733200 | loss 0.0834 | kl 0.0324 | val_kl 0.0371 | clus 0.3204 | sep 0.3759 | mse(diag) 0.2234 | eff_K 2000/2000 | dying 43
+  step 733300 | loss 0.0774 | kl 0.0271 | val_kl 0.0373 | clus 0.3289 | sep 0.3753 | mse(diag) 0.2160 | eff_K 2000/2000 | dying 39
+  step 733400 | loss 0.0751 | kl 0.0250 | val_kl 0.0358 | clus 0.3245 | sep 0.3730 | mse(diag) 0.2161 | eff_K 2000/2000 | dying 43
+  step 733500 | loss 0.0762 | kl 0.0260 | val_kl 0.0364 | clus 0.3235 | sep 0.3724 | mse(diag) 0.2177 | eff_K 2000/2000 | dying 41
+  step 733600 | loss 0.0744 | kl 0.0241 | val_kl 0.0373 | clus 0.3231 | sep 0.3743 | mse(diag) 0.2175 | eff_K 2000/2000 | dying 43
+  step 733700 | loss 0.0837 | kl 0.0322 | val_kl 0.0365 | clus 0.3287 | sep 0.3766 | mse(diag) 0.2235 | eff_K 2000/2000 | dying 46
+  step 733800 | loss 0.0790 | kl 0.0281 | val_kl 0.0380 | clus 0.3307 | sep 0.3742 | mse(diag) 0.2192 | eff_K 2000/2000 | dying 46
+  step 733900 | loss 0.0767 | kl 0.0258 | val_kl 0.0378 | clus 0.3340 | sep 0.3737 | mse(diag) 0.2186 | eff_K 2000/2000 | dying 48
+  step 734000 | loss 0.0781 | kl 0.0278 | val_kl 0.0376 | clus 0.3260 | sep 0.3733 | mse(diag) 0.2166 | eff_K 2000/2000 | dying 40
+  [reinit] step 734000: 153 dead clusters
+  step 734100 | loss 0.0774 | kl 0.0273 | val_kl 0.0368 | clus 0.3321 | sep 0.3693 | mse(diag) 0.2138 | eff_K 2000/2000 | dying 32
+  step 734200 | loss 0.0774 | kl 0.0260 | val_kl 0.0370 | clus 0.3282 | sep 0.3739 | mse(diag) 0.2235 | eff_K 2000/2000 | dying 56
+  step 734300 | loss 0.0810 | kl 0.0302 | val_kl 0.0363 | clus 0.3311 | sep 0.3742 | mse(diag) 0.2188 | eff_K 2000/2000 | dying 57
+  step 734400 | loss 0.0734 | kl 0.0237 | val_kl 0.0371 | clus 0.3143 | sep 0.3715 | mse(diag) 0.2173 | eff_K 2000/2000 | dying 62
+  step 734500 | loss 0.0799 | kl 0.0296 | val_kl 0.0369 | clus 0.3277 | sep 0.3734 | mse(diag) 0.2166 | eff_K 2000/2000 | dying 64
+  step 734600 | loss 0.0754 | kl 0.0258 | val_kl 0.0366 | clus 0.3275 | sep 0.3746 | mse(diag) 0.2114 | eff_K 2000/2000 | dying 65
+  step 734700 | loss 0.0819 | kl 0.0298 | val_kl 0.0370 | clus 0.3341 | sep 0.3693 | mse(diag) 0.2261 | eff_K 2000/2000 | dying 65
+  step 734800 | loss 0.0780 | kl 0.0267 | val_kl 0.0377 | clus 0.3325 | sep 0.3725 | mse(diag) 0.2218 | eff_K 2000/2000 | dying 60
+  step 734900 | loss 0.0782 | kl 0.0273 | val_kl 0.0378 | clus 0.3378 | sep 0.3744 | mse(diag) 0.2165 | eff_K 2000/2000 | dying 63
+  step 735000 | loss 0.0912 | kl 0.0407 | val_kl 0.0365 | clus 0.3350 | sep 0.3740 | mse(diag) 0.2156 | eff_K 2000/2000 | dying 61
+  [reinit] step 735000: 166 dead clusters
+  step 735100 | loss 0.0751 | kl 0.0244 | val_kl 0.0368 | clus 0.3286 | sep 0.3753 | mse(diag) 0.2187 | eff_K 2000/2000 | dying 46
+  step 735200 | loss 0.0785 | kl 0.0280 | val_kl 0.0366 | clus 0.3367 | sep 0.3710 | mse(diag) 0.2146 | eff_K 2000/2000 | dying 52
+  step 735300 | loss 0.0787 | kl 0.0290 | val_kl 0.0387 | clus 0.3260 | sep 0.3716 | mse(diag) 0.2133 | eff_K 2000/2000 | dying 54
+  step 735400 | loss 0.0769 | kl 0.0263 | val_kl 0.0375 | clus 0.3287 | sep 0.3760 | mse(diag) 0.2182 | eff_K 2000/2000 | dying 56
+  step 735500 | loss 0.0865 | kl 0.0360 | val_kl 0.0351 | clus 0.3364 | sep 0.3715 | mse(diag) 0.2146 | eff_K 2000/2000 | dying 61
+  step 735600 | loss 0.0725 | kl 0.0225 | val_kl 0.0372 | clus 0.3276 | sep 0.3718 | mse(diag) 0.2147 | eff_K 2000/2000 | dying 60
+  step 735700 | loss 0.0763 | kl 0.0254 | val_kl 0.0358 | clus 0.3321 | sep 0.3745 | mse(diag) 0.2187 | eff_K 2000/2000 | dying 58
+  step 735800 | loss 0.0788 | kl 0.0286 | val_kl 0.0352 | clus 0.3320 | sep 0.3717 | mse(diag) 0.2142 | eff_K 2000/2000 | dying 65
+  step 735900 | loss 0.0825 | kl 0.0314 | val_kl 0.0384 | clus 0.3216 | sep 0.3690 | mse(diag) 0.2239 | eff_K 2000/2000 | dying 59
+  step 736000 | loss 0.0786 | kl 0.0273 | val_kl 0.0370 | clus 0.3346 | sep 0.3770 | mse(diag) 0.2209 | eff_K 2000/2000 | dying 64
+  [reinit] step 736000: 162 dead clusters
+  step 736100 | loss 0.0764 | kl 0.0267 | val_kl 0.0363 | clus 0.3278 | sep 0.3697 | mse(diag) 0.2128 | eff_K 2000/2000 | dying 46
+  step 736200 | loss 0.0792 | kl 0.0269 | val_kl 0.0358 | clus 0.3308 | sep 0.3756 | mse(diag) 0.2291 | eff_K 2000/2000 | dying 47
+  step 736300 | loss 0.0768 | kl 0.0265 | val_kl 0.0354 | clus 0.3350 | sep 0.3723 | mse(diag) 0.2138 | eff_K 2000/2000 | dying 52
+  step 736400 | loss 0.0796 | kl 0.0291 | val_kl 0.0342 | clus 0.3356 | sep 0.3684 | mse(diag) 0.2152 | eff_K 2000/2000 | dying 53
+  step 736500 | loss 0.0791 | kl 0.0283 | val_kl 0.0355 | clus 0.3392 | sep 0.3722 | mse(diag) 0.2163 | eff_K 2000/2000 | dying 49
+  step 736600 | loss 0.0757 | kl 0.0273 | val_kl 0.0355 | clus 0.3214 | sep 0.3713 | mse(diag) 0.2063 | eff_K 2000/2000 | dying 59
+  step 736700 | loss 0.0762 | kl 0.0248 | val_kl 0.0355 | clus 0.3346 | sep 0.3746 | mse(diag) 0.2217 | eff_K 2000/2000 | dying 58
+  step 736800 | loss 0.0723 | kl 0.0226 | val_kl 0.0376 | clus 0.3173 | sep 0.3764 | mse(diag) 0.2154 | eff_K 2000/2000 | dying 60
+  step 736900 | loss 0.0780 | kl 0.0281 | val_kl 0.0376 | clus 0.3268 | sep 0.3710 | mse(diag) 0.2143 | eff_K 2000/2000 | dying 54
+  step 737000 | loss 0.0737 | kl 0.0222 | val_kl 0.0364 | clus 0.3268 | sep 0.3725 | mse(diag) 0.2248 | eff_K 2000/2000 | dying 54
+  [reinit] step 737000: 148 dead clusters
+  step 737100 | loss 0.0812 | kl 0.0296 | val_kl 0.0363 | clus 0.3421 | sep 0.3747 | mse(diag) 0.2201 | eff_K 2000/2000 | dying 44
+  step 737200 | loss 0.0818 | kl 0.0301 | val_kl 0.0369 | clus 0.3318 | sep 0.3762 | mse(diag) 0.2247 | eff_K 2000/2000 | dying 51
+  step 737300 | loss 0.0765 | kl 0.0266 | val_kl 0.0351 | clus 0.3323 | sep 0.3727 | mse(diag) 0.2120 | eff_K 2000/2000 | dying 60
+  step 737400 | loss 0.0767 | kl 0.0249 | val_kl 0.0357 | clus 0.3466 | sep 0.3735 | mse(diag) 0.2200 | eff_K 2000/2000 | dying 59
+  step 737500 | loss 0.0799 | kl 0.0281 | val_kl 0.0366 | clus 0.3413 | sep 0.3732 | mse(diag) 0.2223 | eff_K 2000/2000 | dying 48
+  step 737600 | loss 0.0751 | kl 0.0238 | val_kl 0.0360 | clus 0.3384 | sep 0.3727 | mse(diag) 0.2196 | eff_K 2000/2000 | dying 43
+  step 737700 | loss 0.0776 | kl 0.0281 | val_kl 0.0378 | clus 0.3247 | sep 0.3702 | mse(diag) 0.2118 | eff_K 2000/2000 | dying 48
+  step 737800 | loss 0.0793 | kl 0.0299 | val_kl 0.0378 | clus 0.3297 | sep 0.3737 | mse(diag) 0.2101 | eff_K 2000/2000 | dying 48
+  step 737900 | loss 0.0714 | kl 0.0240 | val_kl 0.0371 | clus 0.3158 | sep 0.3699 | mse(diag) 0.2015 | eff_K 2000/2000 | dying 45
+  step 738000 | loss 0.0761 | kl 0.0278 | val_kl 0.0361 | clus 0.3227 | sep 0.3746 | mse(diag) 0.2051 | eff_K 2000/2000 | dying 50
+  [reinit] step 738000: 175 dead clusters
+  step 738100 | loss 0.0758 | kl 0.0246 | val_kl 0.0373 | clus 0.3413 | sep 0.3741 | mse(diag) 0.2182 | eff_K 2000/2000 | dying 36
+  step 738200 | loss 0.0830 | kl 0.0323 | val_kl 0.0362 | clus 0.3355 | sep 0.3703 | mse(diag) 0.2161 | eff_K 2000/2000 | dying 39
+  step 738300 | loss 0.0810 | kl 0.0307 | val_kl 0.0351 | clus 0.3296 | sep 0.3720 | mse(diag) 0.2156 | eff_K 2000/2000 | dying 47
+  step 738400 | loss 0.0821 | kl 0.0318 | val_kl 0.0363 | clus 0.3404 | sep 0.3732 | mse(diag) 0.2122 | eff_K 2000/2000 | dying 43
+  step 738500 | loss 0.0726 | kl 0.0239 | val_kl 0.0372 | clus 0.3260 | sep 0.3704 | mse(diag) 0.2066 | eff_K 2000/2000 | dying 43
+  step 738600 | loss 0.0732 | kl 0.0247 | val_kl 0.0379 | clus 0.3318 | sep 0.3715 | mse(diag) 0.2025 | eff_K 2000/2000 | dying 45
+  step 738700 | loss 0.0797 | kl 0.0300 | val_kl 0.0373 | clus 0.3265 | sep 0.3687 | mse(diag) 0.2124 | eff_K 2000/2000 | dying 47
+  step 738800 | loss 0.0707 | kl 0.0216 | val_kl 0.0362 | clus 0.3143 | sep 0.3707 | mse(diag) 0.2133 | eff_K 2000/2000 | dying 50
+  step 738900 | loss 0.0742 | kl 0.0265 | val_kl 0.0363 | clus 0.3198 | sep 0.3706 | mse(diag) 0.2016 | eff_K 2000/2000 | dying 44
+  step 739000 | loss 0.0751 | kl 0.0242 | val_kl 0.0374 | clus 0.3457 | sep 0.3712 | mse(diag) 0.2147 | eff_K 2000/2000 | dying 42
+  [reinit] step 739000: 172 dead clusters
+  step 739100 | loss 0.0768 | kl 0.0280 | val_kl 0.0360 | clus 0.3369 | sep 0.3737 | mse(diag) 0.2031 | eff_K 2000/2000 | dying 43
+  step 739200 | loss 0.0749 | kl 0.0237 | val_kl 0.0355 | clus 0.3437 | sep 0.3738 | mse(diag) 0.2169 | eff_K 2000/2000 | dying 65
+  step 739300 | loss 0.0830 | kl 0.0337 | val_kl 0.0378 | clus 0.3387 | sep 0.3701 | mse(diag) 0.2060 | eff_K 2000/2000 | dying 62
+  step 739400 | loss 0.0795 | kl 0.0298 | val_kl 0.0376 | clus 0.3423 | sep 0.3708 | mse(diag) 0.2074 | eff_K 2000/2000 | dying 57
+  step 739500 | loss 0.0798 | kl 0.0298 | val_kl 0.0353 | clus 0.3350 | sep 0.3718 | mse(diag) 0.2121 | eff_K 2000/2000 | dying 65
+  step 739600 | loss 0.0739 | kl 0.0243 | val_kl 0.0359 | clus 0.3251 | sep 0.3736 | mse(diag) 0.2126 | eff_K 2000/2000 | dying 65
+  step 739700 | loss 0.0803 | kl 0.0302 | val_kl 0.0371 | clus 0.3404 | sep 0.3739 | mse(diag) 0.2104 | eff_K 2000/2000 | dying 63
+  step 739800 | loss 0.0844 | kl 0.0339 | val_kl 0.0379 | clus 0.3394 | sep 0.3725 | mse(diag) 0.2138 | eff_K 2000/2000 | dying 64
+  step 739900 | loss 0.0771 | kl 0.0272 | val_kl 0.0346 | clus 0.3328 | sep 0.3720 | mse(diag) 0.2125 | eff_K 2000/2000 | dying 68
+  step 740000 | loss 0.0749 | kl 0.0263 | val_kl 0.0362 | clus 0.3294 | sep 0.3724 | mse(diag) 0.2047 | eff_K 2000/2000 | dying 64
+  [reinit] step 740000: 172 dead clusters
+  step 740100 | loss 0.0764 | kl 0.0263 | val_kl 0.0367 | clus 0.3426 | sep 0.3731 | mse(diag) 0.2099 | eff_K 2000/2000 | dying 43
+  step 740200 | loss 0.0764 | kl 0.0260 | val_kl 0.0363 | clus 0.3378 | sep 0.3728 | mse(diag) 0.2132 | eff_K 2000/2000 | dying 40
+  step 740300 | loss 0.0750 | kl 0.0263 | val_kl 0.0353 | clus 0.3276 | sep 0.3713 | mse(diag) 0.2056 | eff_K 2000/2000 | dying 43
+  step 740400 | loss 0.0733 | kl 0.0231 | val_kl 0.0374 | clus 0.3313 | sep 0.3746 | mse(diag) 0.2143 | eff_K 2000/2000 | dying 55
+  step 740500 | loss 0.0748 | kl 0.0249 | val_kl 0.0363 | clus 0.3471 | sep 0.3720 | mse(diag) 0.2079 | eff_K 2000/2000 | dying 59
+  step 740600 | loss 0.0744 | kl 0.0238 | val_kl 0.0367 | clus 0.3312 | sep 0.3733 | mse(diag) 0.2172 | eff_K 2000/2000 | dying 53
+  step 740700 | loss 0.0784 | kl 0.0292 | val_kl 0.0354 | clus 0.3399 | sep 0.3713 | mse(diag) 0.2055 | eff_K 2000/2000 | dying 48
+  step 740800 | loss 0.0727 | kl 0.0238 | val_kl 0.0358 | clus 0.3283 | sep 0.3718 | mse(diag) 0.2064 | eff_K 2000/2000 | dying 49
+  step 740900 | loss 0.0737 | kl 0.0247 | val_kl 0.0366 | clus 0.3334 | sep 0.3724 | mse(diag) 0.2054 | eff_K 2000/2000 | dying 45
+  step 741000 | loss 0.0734 | kl 0.0240 | val_kl 0.0377 | clus 0.3357 | sep 0.3728 | mse(diag) 0.2077 | eff_K 2000/2000 | dying 51
+  [reinit] step 741000: 162 dead clusters
+  step 741100 | loss 0.0740 | kl 0.0242 | val_kl 0.0356 | clus 0.3416 | sep 0.3727 | mse(diag) 0.2087 | eff_K 2000/2000 | dying 39
+  step 741200 | loss 0.0762 | kl 0.0261 | val_kl 0.0361 | clus 0.3381 | sep 0.3704 | mse(diag) 0.2120 | eff_K 2000/2000 | dying 52
+  step 741300 | loss 0.0778 | kl 0.0285 | val_kl 0.0353 | clus 0.3383 | sep 0.3720 | mse(diag) 0.2059 | eff_K 2000/2000 | dying 53
+  step 741400 | loss 0.0732 | kl 0.0231 | val_kl 0.0351 | clus 0.3366 | sep 0.3759 | mse(diag) 0.2121 | eff_K 2000/2000 | dying 46
+  step 741500 | loss 0.0813 | kl 0.0316 | val_kl 0.0354 | clus 0.3469 | sep 0.3715 | mse(diag) 0.2064 | eff_K 2000/2000 | dying 48
+  step 741600 | loss 0.0716 | kl 0.0225 | val_kl 0.0357 | clus 0.3306 | sep 0.3648 | mse(diag) 0.2073 | eff_K 2000/2000 | dying 46
+  step 741700 | loss 0.0746 | kl 0.0247 | val_kl 0.0355 | clus 0.3311 | sep 0.3713 | mse(diag) 0.2126 | eff_K 2000/2000 | dying 49
+  step 741800 | loss 0.0741 | kl 0.0242 | val_kl 0.0355 | clus 0.3297 | sep 0.3713 | mse(diag) 0.2136 | eff_K 2000/2000 | dying 47
+  step 741900 | loss 0.0732 | kl 0.0240 | val_kl 0.0356 | clus 0.3416 | sep 0.3705 | mse(diag) 0.2045 | eff_K 2000/2000 | dying 45
+  step 742000 | loss 0.0740 | kl 0.0245 | val_kl 0.0372 | clus 0.3416 | sep 0.3751 | mse(diag) 0.2063 | eff_K 2000/2000 | dying 51
+  [reinit] step 742000: 169 dead clusters
+  step 742100 | loss 0.0788 | kl 0.0283 | val_kl 0.0352 | clus 0.3490 | sep 0.3762 | mse(diag) 0.2110 | eff_K 2000/2000 | dying 35
+  step 742200 | loss 0.0785 | kl 0.0280 | val_kl 0.0367 | clus 0.3457 | sep 0.3700 | mse(diag) 0.2116 | eff_K 2000/2000 | dying 49
+  step 742300 | loss 0.0732 | kl 0.0257 | val_kl 0.0360 | clus 0.3370 | sep 0.3725 | mse(diag) 0.1947 | eff_K 2000/2000 | dying 52
+  step 742400 | loss 0.0739 | kl 0.0248 | val_kl 0.0364 | clus 0.3379 | sep 0.3701 | mse(diag) 0.2051 | eff_K 2000/2000 | dying 62
+  step 742500 | loss 0.0749 | kl 0.0248 | val_kl 0.0358 | clus 0.3442 | sep 0.3703 | mse(diag) 0.2100 | eff_K 2000/2000 | dying 66
+  step 742600 | loss 0.0771 | kl 0.0266 | val_kl 0.0364 | clus 0.3388 | sep 0.3738 | mse(diag) 0.2138 | eff_K 2000/2000 | dying 65
+  step 742700 | loss 0.0752 | kl 0.0247 | val_kl 0.0363 | clus 0.3470 | sep 0.3739 | mse(diag) 0.2112 | eff_K 2000/2000 | dying 70
+  step 742800 | loss 0.0721 | kl 0.0240 | val_kl 0.0358 | clus 0.3436 | sep 0.3728 | mse(diag) 0.1959 | eff_K 2000/2000 | dying 64
+  step 742900 | loss 0.0734 | kl 0.0247 | val_kl 0.0373 | clus 0.3307 | sep 0.3710 | mse(diag) 0.2046 | eff_K 2000/2000 | dying 59
+  step 743000 | loss 0.0736 | kl 0.0242 | val_kl 0.0367 | clus 0.3369 | sep 0.3742 | mse(diag) 0.2074 | eff_K 2000/2000 | dying 59
+  [reinit] step 743000: 173 dead clusters
+  step 743100 | loss 0.0792 | kl 0.0286 | val_kl 0.0373 | clus 0.3579 | sep 0.3699 | mse(diag) 0.2079 | eff_K 2000/2000 | dying 33
+  step 743200 | loss 0.0748 | kl 0.0251 | val_kl 0.0371 | clus 0.3468 | sep 0.3720 | mse(diag) 0.2057 | eff_K 2000/2000 | dying 46
+  step 743300 | loss 0.0725 | kl 0.0233 | val_kl 0.0357 | clus 0.3416 | sep 0.3704 | mse(diag) 0.2041 | eff_K 2000/2000 | dying 54
+  step 743400 | loss 0.0731 | kl 0.0230 | val_kl 0.0368 | clus 0.3381 | sep 0.3703 | mse(diag) 0.2119 | eff_K 2000/2000 | dying 51
+  step 743500 | loss 0.0771 | kl 0.0275 | val_kl 0.0346 | clus 0.3450 | sep 0.3749 | mse(diag) 0.2062 | eff_K 2000/2000 | dying 60
+  step 743600 | loss 0.0829 | kl 0.0330 | val_kl 0.0359 | clus 0.3438 | sep 0.3717 | mse(diag) 0.2085 | eff_K 2000/2000 | dying 60
+  step 743700 | loss 0.0710 | kl 0.0225 | val_kl 0.0379 | clus 0.3304 | sep 0.3740 | mse(diag) 0.2038 | eff_K 2000/2000 | dying 55
+  step 743800 | loss 0.0734 | kl 0.0234 | val_kl 0.0361 | clus 0.3445 | sep 0.3730 | mse(diag) 0.2083 | eff_K 2000/2000 | dying 62
+  step 743900 | loss 0.0777 | kl 0.0284 | val_kl 0.0359 | clus 0.3502 | sep 0.3743 | mse(diag) 0.2019 | eff_K 2000/2000 | dying 59
+  step 744000 | loss 0.0742 | kl 0.0244 | val_kl 0.0362 | clus 0.3410 | sep 0.3711 | mse(diag) 0.2082 | eff_K 2000/2000 | dying 64
+  [reinit] step 744000: 164 dead clusters
+  step 744100 | loss 0.0763 | kl 0.0270 | val_kl 0.0364 | clus 0.3456 | sep 0.3734 | mse(diag) 0.2034 | eff_K 2000/2000 | dying 43
+  step 744200 | loss 0.0746 | kl 0.0259 | val_kl 0.0357 | clus 0.3393 | sep 0.3711 | mse(diag) 0.2024 | eff_K 2000/2000 | dying 48
+  step 744300 | loss 0.0743 | kl 0.0241 | val_kl 0.0358 | clus 0.3464 | sep 0.3717 | mse(diag) 0.2096 | eff_K 2000/2000 | dying 44
+  step 744400 | loss 0.0781 | kl 0.0294 | val_kl 0.0350 | clus 0.3444 | sep 0.3754 | mse(diag) 0.2004 | eff_K 2000/2000 | dying 54
+  step 744500 | loss 0.0713 | kl 0.0226 | val_kl 0.0345 | clus 0.3366 | sep 0.3746 | mse(diag) 0.2030 | eff_K 2000/2000 | dying 60
+  step 744600 | loss 0.0762 | kl 0.0259 | val_kl 0.0360 | clus 0.3391 | sep 0.3724 | mse(diag) 0.2128 | eff_K 2000/2000 | dying 55
+  step 744700 | loss 0.0736 | kl 0.0234 | val_kl 0.0343 | clus 0.3482 | sep 0.3735 | mse(diag) 0.2085 | eff_K 2000/2000 | dying 47
+  step 744800 | loss 0.0777 | kl 0.0282 | val_kl 0.0356 | clus 0.3538 | sep 0.3716 | mse(diag) 0.2030 | eff_K 2000/2000 | dying 56
+  step 744900 | loss 0.0759 | kl 0.0271 | val_kl 0.0362 | clus 0.3517 | sep 0.3737 | mse(diag) 0.1982 | eff_K 2000/2000 | dying 55
+  step 745000 | loss 0.0722 | kl 0.0235 | val_kl 0.0356 | clus 0.3345 | sep 0.3725 | mse(diag) 0.2035 | eff_K 2000/2000 | dying 51
+  [reinit] step 745000: 182 dead clusters
+  step 745100 | loss 0.0750 | kl 0.0261 | val_kl 0.0378 | clus 0.3443 | sep 0.3724 | mse(diag) 0.2018 | eff_K 2000/2000 | dying 27
+  step 745200 | loss 0.0759 | kl 0.0268 | val_kl 0.0357 | clus 0.3459 | sep 0.3710 | mse(diag) 0.2026 | eff_K 2000/2000 | dying 30
+  step 745300 | loss 0.0733 | kl 0.0248 | val_kl 0.0361 | clus 0.3392 | sep 0.3706 | mse(diag) 0.2008 | eff_K 2000/2000 | dying 32
+  step 745400 | loss 0.0707 | kl 0.0222 | val_kl 0.0365 | clus 0.3388 | sep 0.3729 | mse(diag) 0.2007 | eff_K 2000/2000 | dying 37
+  step 745500 | loss 0.0712 | kl 0.0227 | val_kl 0.0380 | clus 0.3441 | sep 0.3740 | mse(diag) 0.1990 | eff_K 2000/2000 | dying 36
+  step 745600 | loss 0.0747 | kl 0.0263 | val_kl 0.0361 | clus 0.3464 | sep 0.3723 | mse(diag) 0.1979 | eff_K 2000/2000 | dying 37
+  step 745700 | loss 0.0734 | kl 0.0251 | val_kl 0.0361 | clus 0.3320 | sep 0.3728 | mse(diag) 0.2014 | eff_K 2000/2000 | dying 41
+  step 745800 | loss 0.0768 | kl 0.0267 | val_kl 0.0373 | clus 0.3472 | sep 0.3713 | mse(diag) 0.2082 | eff_K 2000/2000 | dying 36
+  step 745900 | loss 0.0699 | kl 0.0218 | val_kl 0.0368 | clus 0.3286 | sep 0.3707 | mse(diag) 0.2015 | eff_K 2000/2000 | dying 47
+  step 746000 | loss 0.0740 | kl 0.0263 | val_kl 0.0370 | clus 0.3306 | sep 0.3745 | mse(diag) 0.1986 | eff_K 2000/2000 | dying 43
+  [reinit] step 746000: 175 dead clusters
+  step 746100 | loss 0.0760 | kl 0.0269 | val_kl 0.0360 | clus 0.3526 | sep 0.3715 | mse(diag) 0.2000 | eff_K 2000/2000 | dying 39
+  step 746200 | loss 0.0738 | kl 0.0243 | val_kl 0.0360 | clus 0.3411 | sep 0.3709 | mse(diag) 0.2064 | eff_K 2000/2000 | dying 42
+  step 746300 | loss 0.0744 | kl 0.0253 | val_kl 0.0360 | clus 0.3481 | sep 0.3720 | mse(diag) 0.2021 | eff_K 2000/2000 | dying 37
+  step 746400 | loss 0.0753 | kl 0.0271 | val_kl 0.0357 | clus 0.3476 | sep 0.3687 | mse(diag) 0.1961 | eff_K 2000/2000 | dying 44
+  step 746500 | loss 0.0802 | kl 0.0305 | val_kl 0.0353 | clus 0.3460 | sep 0.3739 | mse(diag) 0.2058 | eff_K 2000/2000 | dying 52
+  step 746600 | loss 0.0743 | kl 0.0264 | val_kl 0.0383 | clus 0.3452 | sep 0.3735 | mse(diag) 0.1947 | eff_K 2000/2000 | dying 52
+  step 746700 | loss 0.0794 | kl 0.0299 | val_kl 0.0361 | clus 0.3449 | sep 0.3751 | mse(diag) 0.2052 | eff_K 2000/2000 | dying 40
+  step 746800 | loss 0.0722 | kl 0.0212 | val_kl 0.0356 | clus 0.3425 | sep 0.3736 | mse(diag) 0.2157 | eff_K 2000/2000 | dying 43
+  step 746900 | loss 0.0740 | kl 0.0248 | val_kl 0.0344 | clus 0.3475 | sep 0.3745 | mse(diag) 0.2026 | eff_K 2000/2000 | dying 47
+  step 747000 | loss 0.0732 | kl 0.0244 | val_kl 0.0373 | clus 0.3464 | sep 0.3752 | mse(diag) 0.1999 | eff_K 2000/2000 | dying 43
+  [reinit] step 747000: 175 dead clusters
+  step 747100 | loss 0.0769 | kl 0.0284 | val_kl 0.0375 | clus 0.3598 | sep 0.3680 | mse(diag) 0.1941 | eff_K 2000/2000 | dying 34
+  step 747200 | loss 0.0753 | kl 0.0255 | val_kl 0.0343 | clus 0.3610 | sep 0.3705 | mse(diag) 0.2022 | eff_K 2000/2000 | dying 43
+  step 747300 | loss 0.0731 | kl 0.0239 | val_kl 0.0349 | clus 0.3524 | sep 0.3690 | mse(diag) 0.2011 | eff_K 2000/2000 | dying 44
+  step 747400 | loss 0.0738 | kl 0.0246 | val_kl 0.0361 | clus 0.3435 | sep 0.3718 | mse(diag) 0.2040 | eff_K 2000/2000 | dying 51
+[train-e2e] Saved step_0747471.pt  val_kl=0.03744  val_mse=0.20018
+[train-e2e] New best val_kl=0.03744 -> best_val.pt
+[train-e2e] Epoch 41 done in 113.1 min
+
+[train-e2e] Epoch 42/50 | tau=0.276 | λ_c=0.050 λ_s=0.0040
+  step 747500 | loss 0.0786 | kl 0.0301 | val_kl 0.0375 | clus 0.3436 | sep 0.3725 | mse(diag) 0.1988 | eff_K 2000/2000 | dying 48
+  step 747600 | loss 0.0756 | kl 0.0268 | val_kl 0.0371 | clus 0.3466 | sep 0.3731 | mse(diag) 0.1998 | eff_K 2000/2000 | dying 53
+  step 747700 | loss 0.0735 | kl 0.0259 | val_kl 0.0379 | clus 0.3456 | sep 0.3735 | mse(diag) 0.1918 | eff_K 2000/2000 | dying 56
+  step 747800 | loss 0.0695 | kl 0.0219 | val_kl 0.0381 | clus 0.3303 | sep 0.3706 | mse(diag) 0.1975 | eff_K 2000/2000 | dying 47
+  step 747900 | loss 0.0783 | kl 0.0279 | val_kl 0.0370 | clus 0.3594 | sep 0.3727 | mse(diag) 0.2063 | eff_K 2000/2000 | dying 46
+  step 748000 | loss 0.0848 | kl 0.0350 | val_kl 0.0383 | clus 0.3467 | sep 0.3705 | mse(diag) 0.2060 | eff_K 2000/2000 | dying 49
+  [reinit] step 748000: 166 dead clusters
+  step 748100 | loss 0.0797 | kl 0.0292 | val_kl 0.0387 | clus 0.3648 | sep 0.3692 | mse(diag) 0.2053 | eff_K 2000/2000 | dying 38
+  step 748200 | loss 0.0949 | kl 0.0467 | val_kl 0.0379 | clus 0.3509 | sep 0.3729 | mse(diag) 0.1947 | eff_K 2000/2000 | dying 49
+  step 748300 | loss 0.0729 | kl 0.0249 | val_kl 0.0359 | clus 0.3398 | sep 0.3685 | mse(diag) 0.1969 | eff_K 2000/2000 | dying 52
+  step 748400 | loss 0.0734 | kl 0.0240 | val_kl 0.0400 | clus 0.3462 | sep 0.3716 | mse(diag) 0.2033 | eff_K 2000/2000 | dying 52
+  step 748500 | loss 0.0757 | kl 0.0261 | val_kl 0.0367 | clus 0.3547 | sep 0.3750 | mse(diag) 0.2022 | eff_K 2000/2000 | dying 57
+  step 748600 | loss 0.0809 | kl 0.0309 | val_kl 0.0391 | clus 0.3613 | sep 0.3717 | mse(diag) 0.2025 | eff_K 2000/2000 | dying 47
+  step 748700 | loss 0.0751 | kl 0.0268 | val_kl 0.0375 | clus 0.3401 | sep 0.3734 | mse(diag) 0.1989 | eff_K 2000/2000 | dying 49
+  step 748800 | loss 0.0731 | kl 0.0248 | val_kl 0.0382 | clus 0.3487 | sep 0.3754 | mse(diag) 0.1956 | eff_K 2000/2000 | dying 48
+  step 748900 | loss 0.0919 | kl 0.0418 | val_kl 0.0357 | clus 0.3545 | sep 0.3722 | mse(diag) 0.2054 | eff_K 2000/2000 | dying 48
+  step 749000 | loss 0.0738 | kl 0.0253 | val_kl 0.0367 | clus 0.3420 | sep 0.3754 | mse(diag) 0.1993 | eff_K 2000/2000 | dying 56
+  [reinit] step 749000: 172 dead clusters
+  step 749100 | loss 0.0789 | kl 0.0303 | val_kl 0.0380 | clus 0.3581 | sep 0.3734 | mse(diag) 0.1947 | eff_K 2000/2000 | dying 33
+  step 749200 | loss 0.0810 | kl 0.0326 | val_kl 0.0370 | clus 0.3468 | sep 0.3754 | mse(diag) 0.1976 | eff_K 2000/2000 | dying 32
+  step 749300 | loss 0.0734 | kl 0.0264 | val_kl 0.0356 | clus 0.3343 | sep 0.3729 | mse(diag) 0.1923 | eff_K 2000/2000 | dying 36
+  step 749400 | loss 0.0866 | kl 0.0380 | val_kl 0.0386 | clus 0.3533 | sep 0.3720 | mse(diag) 0.1961 | eff_K 2000/2000 | dying 35
+  step 749500 | loss 0.0778 | kl 0.0277 | val_kl 0.0370 | clus 0.3576 | sep 0.3761 | mse(diag) 0.2043 | eff_K 2000/2000 | dying 39
+  step 749600 | loss 0.0788 | kl 0.0303 | val_kl 0.0366 | clus 0.3493 | sep 0.3724 | mse(diag) 0.1973 | eff_K 2000/2000 | dying 46
+  step 749700 | loss 0.0775 | kl 0.0266 | val_kl 0.0366 | clus 0.3469 | sep 0.3722 | mse(diag) 0.2138 | eff_K 2000/2000 | dying 48
+  step 749800 | loss 0.0743 | kl 0.0255 | val_kl 0.0348 | clus 0.3382 | sep 0.3736 | mse(diag) 0.2026 | eff_K 2000/2000 | dying 47
+  step 749900 | loss 0.0723 | kl 0.0226 | val_kl 0.0369 | clus 0.3500 | sep 0.3743 | mse(diag) 0.2049 | eff_K 2000/2000 | dying 39
+  step 750000 | loss 0.0822 | kl 0.0327 | val_kl 0.0364 | clus 0.3506 | sep 0.3680 | mse(diag) 0.2034 | eff_K 2000/2000 | dying 36
+  [reinit] step 750000: 171 dead clusters
+  step 750100 | loss 0.0811 | kl 0.0314 | val_kl 0.0364 | clus 0.3622 | sep 0.3748 | mse(diag) 0.2003 | eff_K 2000/2000 | dying 37
+  step 750200 | loss 0.0722 | kl 0.0221 | val_kl 0.0374 | clus 0.3482 | sep 0.3723 | mse(diag) 0.2079 | eff_K 2000/2000 | dying 44
+  step 750300 | loss 0.0817 | kl 0.0314 | val_kl 0.0369 | clus 0.3599 | sep 0.3706 | mse(diag) 0.2052 | eff_K 2000/2000 | dying 46
+  step 750400 | loss 0.0890 | kl 0.0403 | val_kl 0.0371 | clus 0.3412 | sep 0.3716 | mse(diag) 0.2013 | eff_K 2000/2000 | dying 48
+  step 750500 | loss 0.0731 | kl 0.0255 | val_kl 0.0376 | clus 0.3382 | sep 0.3723 | mse(diag) 0.1945 | eff_K 2000/2000 | dying 49
+  step 750600 | loss 0.0831 | kl 0.0327 | val_kl 0.0376 | clus 0.3520 | sep 0.3723 | mse(diag) 0.2082 | eff_K 2000/2000 | dying 41
+  step 750700 | loss 0.0753 | kl 0.0267 | val_kl 0.0387 | clus 0.3488 | sep 0.3725 | mse(diag) 0.1974 | eff_K 2000/2000 | dying 45
+  step 750800 | loss 0.0735 | kl 0.0251 | val_kl 0.0377 | clus 0.3466 | sep 0.3711 | mse(diag) 0.1970 | eff_K 2000/2000 | dying 50
+  step 750900 | loss 0.0742 | kl 0.0255 | val_kl 0.0367 | clus 0.3528 | sep 0.3711 | mse(diag) 0.1966 | eff_K 2000/2000 | dying 48
+  step 751000 | loss 0.0792 | kl 0.0295 | val_kl 0.0359 | clus 0.3515 | sep 0.3745 | mse(diag) 0.2040 | eff_K 2000/2000 | dying 51
+  [reinit] step 751000: 169 dead clusters
+  step 751100 | loss 0.0743 | kl 0.0262 | val_kl 0.0344 | clus 0.3526 | sep 0.3696 | mse(diag) 0.1928 | eff_K 2000/2000 | dying 38
+  step 751200 | loss 0.0766 | kl 0.0289 | val_kl 0.0369 | clus 0.3477 | sep 0.3745 | mse(diag) 0.1922 | eff_K 2000/2000 | dying 44
+  step 751300 | loss 0.0786 | kl 0.0289 | val_kl 0.0346 | clus 0.3585 | sep 0.3714 | mse(diag) 0.2016 | eff_K 2000/2000 | dying 41
+  step 751400 | loss 0.0729 | kl 0.0249 | val_kl 0.0369 | clus 0.3444 | sep 0.3716 | mse(diag) 0.1954 | eff_K 2000/2000 | dying 55
+  step 751500 | loss 0.0749 | kl 0.0256 | val_kl 0.0373 | clus 0.3564 | sep 0.3729 | mse(diag) 0.1999 | eff_K 2000/2000 | dying 66
+  step 751600 | loss 0.0745 | kl 0.0253 | val_kl 0.0352 | clus 0.3541 | sep 0.3723 | mse(diag) 0.1996 | eff_K 2000/2000 | dying 57
+  step 751700 | loss 0.0734 | kl 0.0256 | val_kl 0.0360 | clus 0.3473 | sep 0.3756 | mse(diag) 0.1927 | eff_K 2000/2000 | dying 63
+  step 751800 | loss 0.0776 | kl 0.0291 | val_kl 0.0380 | clus 0.3484 | sep 0.3714 | mse(diag) 0.1970 | eff_K 2000/2000 | dying 63
+  step 751900 | loss 0.0779 | kl 0.0295 | val_kl 0.0360 | clus 0.3540 | sep 0.3699 | mse(diag) 0.1949 | eff_K 2000/2000 | dying 55
+  step 752000 | loss 0.0749 | kl 0.0250 | val_kl 0.0356 | clus 0.3597 | sep 0.3746 | mse(diag) 0.2025 | eff_K 2000/2000 | dying 67
+  [reinit] step 752000: 186 dead clusters
+  step 752100 | loss 0.0792 | kl 0.0305 | val_kl 0.0367 | clus 0.3591 | sep 0.3737 | mse(diag) 0.1945 | eff_K 2000/2000 | dying 43
+  step 752200 | loss 0.0792 | kl 0.0320 | val_kl 0.0352 | clus 0.3594 | sep 0.3740 | mse(diag) 0.1850 | eff_K 2000/2000 | dying 38
+  step 752300 | loss 0.0748 | kl 0.0266 | val_kl 0.0377 | clus 0.3549 | sep 0.3718 | mse(diag) 0.1934 | eff_K 2000/2000 | dying 49
+  step 752400 | loss 0.0766 | kl 0.0281 | val_kl 0.0370 | clus 0.3527 | sep 0.3742 | mse(diag) 0.1957 | eff_K 2000/2000 | dying 47
+  step 752500 | loss 0.0743 | kl 0.0255 | val_kl 0.0382 | clus 0.3564 | sep 0.3738 | mse(diag) 0.1968 | eff_K 2000/2000 | dying 51
+  step 752600 | loss 0.0696 | kl 0.0215 | val_kl 0.0347 | clus 0.3441 | sep 0.3732 | mse(diag) 0.1960 | eff_K 2000/2000 | dying 50
+  step 752700 | loss 0.0718 | kl 0.0245 | val_kl 0.0357 | clus 0.3584 | sep 0.3702 | mse(diag) 0.1861 | eff_K 2000/2000 | dying 59
+  step 752800 | loss 0.0794 | kl 0.0302 | val_kl 0.0361 | clus 0.3582 | sep 0.3697 | mse(diag) 0.1992 | eff_K 2000/2000 | dying 53
+  step 752900 | loss 0.0749 | kl 0.0265 | val_kl 0.0374 | clus 0.3534 | sep 0.3747 | mse(diag) 0.1950 | eff_K 2000/2000 | dying 47
+  step 753000 | loss 0.0724 | kl 0.0241 | val_kl 0.0365 | clus 0.3458 | sep 0.3744 | mse(diag) 0.1969 | eff_K 2000/2000 | dying 51
+  [reinit] step 753000: 171 dead clusters
+  step 753100 | loss 0.0771 | kl 0.0283 | val_kl 0.0358 | clus 0.3693 | sep 0.3742 | mse(diag) 0.1918 | eff_K 2000/2000 | dying 34
+  step 753200 | loss 0.0757 | kl 0.0270 | val_kl 0.0361 | clus 0.3626 | sep 0.3743 | mse(diag) 0.1934 | eff_K 2000/2000 | dying 49
+  step 753300 | loss 0.0780 | kl 0.0290 | val_kl 0.0360 | clus 0.3595 | sep 0.3733 | mse(diag) 0.1971 | eff_K 2000/2000 | dying 55
+  step 753400 | loss 0.0716 | kl 0.0231 | val_kl 0.0352 | clus 0.3506 | sep 0.3743 | mse(diag) 0.1958 | eff_K 2000/2000 | dying 53
+  step 753500 | loss 0.0798 | kl 0.0316 | val_kl 0.0378 | clus 0.3602 | sep 0.3698 | mse(diag) 0.1917 | eff_K 2000/2000 | dying 58
+  step 753600 | loss 0.0719 | kl 0.0223 | val_kl 0.0347 | clus 0.3628 | sep 0.3756 | mse(diag) 0.1999 | eff_K 2000/2000 | dying 50
+  step 753700 | loss 0.0761 | kl 0.0264 | val_kl 0.0361 | clus 0.3645 | sep 0.3765 | mse(diag) 0.2002 | eff_K 2000/2000 | dying 67
+  step 753800 | loss 0.0734 | kl 0.0254 | val_kl 0.0355 | clus 0.3514 | sep 0.3691 | mse(diag) 0.1929 | eff_K 2000/2000 | dying 58
+  step 753900 | loss 0.0722 | kl 0.0236 | val_kl 0.0361 | clus 0.3516 | sep 0.3675 | mse(diag) 0.1971 | eff_K 2000/2000 | dying 66
+  step 754000 | loss 0.0720 | kl 0.0240 | val_kl 0.0363 | clus 0.3529 | sep 0.3746 | mse(diag) 0.1924 | eff_K 2000/2000 | dying 64
+  [reinit] step 754000: 186 dead clusters
+  step 754100 | loss 0.0763 | kl 0.0277 | val_kl 0.0353 | clus 0.3608 | sep 0.3717 | mse(diag) 0.1933 | eff_K 2000/2000 | dying 43
+  step 754200 | loss 0.0809 | kl 0.0319 | val_kl 0.0367 | clus 0.3568 | sep 0.3729 | mse(diag) 0.1972 | eff_K 2000/2000 | dying 47
+  step 754300 | loss 0.0721 | kl 0.0236 | val_kl 0.0357 | clus 0.3603 | sep 0.3716 | mse(diag) 0.1927 | eff_K 2000/2000 | dying 52
+  step 754400 | loss 0.0726 | kl 0.0239 | val_kl 0.0354 | clus 0.3619 | sep 0.3741 | mse(diag) 0.1936 | eff_K 2000/2000 | dying 57
+  step 754500 | loss 0.0753 | kl 0.0268 | val_kl 0.0348 | clus 0.3546 | sep 0.3731 | mse(diag) 0.1950 | eff_K 2000/2000 | dying 52
+  step 754600 | loss 0.0756 | kl 0.0273 | val_kl 0.0371 | clus 0.3546 | sep 0.3736 | mse(diag) 0.1937 | eff_K 2000/2000 | dying 51
+  step 754700 | loss 0.0748 | kl 0.0269 | val_kl 0.0358 | clus 0.3600 | sep 0.3710 | mse(diag) 0.1891 | eff_K 2000/2000 | dying 51
+  step 754800 | loss 0.0695 | kl 0.0214 | val_kl 0.0361 | clus 0.3512 | sep 0.3708 | mse(diag) 0.1940 | eff_K 2000/2000 | dying 48
+  step 754900 | loss 0.0726 | kl 0.0249 | val_kl 0.0350 | clus 0.3610 | sep 0.3723 | mse(diag) 0.1877 | eff_K 2000/2000 | dying 44
+  step 755000 | loss 0.0761 | kl 0.0273 | val_kl 0.0359 | clus 0.3575 | sep 0.3744 | mse(diag) 0.1959 | eff_K 2000/2000 | dying 43
+  [reinit] step 755000: 164 dead clusters
+  step 755100 | loss 0.0756 | kl 0.0269 | val_kl 0.0354 | clus 0.3691 | sep 0.3693 | mse(diag) 0.1923 | eff_K 2000/2000 | dying 37
+  step 755200 | loss 0.0709 | kl 0.0237 | val_kl 0.0358 | clus 0.3541 | sep 0.3710 | mse(diag) 0.1862 | eff_K 2000/2000 | dying 43
+  step 755300 | loss 0.0697 | kl 0.0216 | val_kl 0.0368 | clus 0.3439 | sep 0.3743 | mse(diag) 0.1960 | eff_K 2000/2000 | dying 43
+  step 755400 | loss 0.0771 | kl 0.0295 | val_kl 0.0368 | clus 0.3610 | sep 0.3700 | mse(diag) 0.1865 | eff_K 2000/2000 | dying 45
+  step 755500 | loss 0.0745 | kl 0.0251 | val_kl 0.0360 | clus 0.3611 | sep 0.3729 | mse(diag) 0.1985 | eff_K 2000/2000 | dying 51
+  step 755600 | loss 0.0801 | kl 0.0319 | val_kl 0.0363 | clus 0.3551 | sep 0.3739 | mse(diag) 0.1931 | eff_K 2000/2000 | dying 51
+  step 755700 | loss 0.0751 | kl 0.0262 | val_kl 0.0373 | clus 0.3576 | sep 0.3685 | mse(diag) 0.1965 | eff_K 2000/2000 | dying 60
+  step 755800 | loss 0.0713 | kl 0.0226 | val_kl 0.0361 | clus 0.3566 | sep 0.3741 | mse(diag) 0.1958 | eff_K 2000/2000 | dying 52
+  step 755900 | loss 0.0710 | kl 0.0240 | val_kl 0.0358 | clus 0.3538 | sep 0.3727 | mse(diag) 0.1855 | eff_K 2000/2000 | dying 56
+  step 756000 | loss 0.0754 | kl 0.0273 | val_kl 0.0357 | clus 0.3513 | sep 0.3723 | mse(diag) 0.1939 | eff_K 2000/2000 | dying 58
+  [reinit] step 756000: 170 dead clusters
+  step 756100 | loss 0.0715 | kl 0.0245 | val_kl 0.0357 | clus 0.3548 | sep 0.3724 | mse(diag) 0.1852 | eff_K 2000/2000 | dying 33
+  step 756200 | loss 0.0766 | kl 0.0279 | val_kl 0.0358 | clus 0.3583 | sep 0.3717 | mse(diag) 0.1951 | eff_K 2000/2000 | dying 30
+  step 756300 | loss 0.0731 | kl 0.0244 | val_kl 0.0361 | clus 0.3483 | sep 0.3740 | mse(diag) 0.1988 | eff_K 2000/2000 | dying 36
+  step 756400 | loss 0.0742 | kl 0.0256 | val_kl 0.0363 | clus 0.3615 | sep 0.3713 | mse(diag) 0.1936 | eff_K 2000/2000 | dying 36
+  step 756500 | loss 0.0712 | kl 0.0230 | val_kl 0.0360 | clus 0.3585 | sep 0.3727 | mse(diag) 0.1917 | eff_K 2000/2000 | dying 37
+  step 756600 | loss 0.0810 | kl 0.0324 | val_kl 0.0359 | clus 0.3652 | sep 0.3712 | mse(diag) 0.1924 | eff_K 2000/2000 | dying 44
+  step 756700 | loss 0.0743 | kl 0.0260 | val_kl 0.0362 | clus 0.3592 | sep 0.3758 | mse(diag) 0.1919 | eff_K 2000/2000 | dying 37
+  step 756800 | loss 0.0737 | kl 0.0247 | val_kl 0.0362 | clus 0.3582 | sep 0.3715 | mse(diag) 0.1971 | eff_K 2000/2000 | dying 45
+  step 756900 | loss 0.0778 | kl 0.0300 | val_kl 0.0353 | clus 0.3640 | sep 0.3715 | mse(diag) 0.1871 | eff_K 2000/2000 | dying 44
+  step 757000 | loss 0.0737 | kl 0.0259 | val_kl 0.0357 | clus 0.3558 | sep 0.3728 | mse(diag) 0.1905 | eff_K 2000/2000 | dying 50
+  [reinit] step 757000: 181 dead clusters
+  step 757100 | loss 0.0735 | kl 0.0259 | val_kl 0.0364 | clus 0.3568 | sep 0.3736 | mse(diag) 0.1883 | eff_K 2000/2000 | dying 37
+  step 757200 | loss 0.0767 | kl 0.0271 | val_kl 0.0358 | clus 0.3678 | sep 0.3708 | mse(diag) 0.1986 | eff_K 2000/2000 | dying 38
+  step 757300 | loss 0.0793 | kl 0.0301 | val_kl 0.0367 | clus 0.3614 | sep 0.3741 | mse(diag) 0.1980 | eff_K 2000/2000 | dying 43
+  step 757400 | loss 0.0763 | kl 0.0281 | val_kl 0.0367 | clus 0.3624 | sep 0.3729 | mse(diag) 0.1909 | eff_K 2000/2000 | dying 47
+  step 757500 | loss 0.0721 | kl 0.0236 | val_kl 0.0362 | clus 0.3470 | sep 0.3761 | mse(diag) 0.1973 | eff_K 2000/2000 | dying 53
+  step 757600 | loss 0.0690 | kl 0.0219 | val_kl 0.0371 | clus 0.3484 | sep 0.3759 | mse(diag) 0.1883 | eff_K 2000/2000 | dying 48
+  step 757700 | loss 0.0708 | kl 0.0232 | val_kl 0.0370 | clus 0.3511 | sep 0.3745 | mse(diag) 0.1902 | eff_K 2000/2000 | dying 49
+  step 757800 | loss 0.0725 | kl 0.0244 | val_kl 0.0354 | clus 0.3458 | sep 0.3695 | mse(diag) 0.1955 | eff_K 2000/2000 | dying 49
+  step 757900 | loss 0.0763 | kl 0.0276 | val_kl 0.0377 | clus 0.3637 | sep 0.3705 | mse(diag) 0.1936 | eff_K 2000/2000 | dying 42
+  step 758000 | loss 0.0727 | kl 0.0252 | val_kl 0.0345 | clus 0.3538 | sep 0.3696 | mse(diag) 0.1886 | eff_K 2000/2000 | dying 49
+  [reinit] step 758000: 154 dead clusters
+  step 758100 | loss 0.0704 | kl 0.0222 | val_kl 0.0372 | clus 0.3620 | sep 0.3732 | mse(diag) 0.1909 | eff_K 2000/2000 | dying 32
+  step 758200 | loss 0.0764 | kl 0.0287 | val_kl 0.0357 | clus 0.3526 | sep 0.3671 | mse(diag) 0.1901 | eff_K 2000/2000 | dying 43
+  step 758300 | loss 0.0707 | kl 0.0229 | val_kl 0.0364 | clus 0.3540 | sep 0.3703 | mse(diag) 0.1909 | eff_K 2000/2000 | dying 39
+  step 758400 | loss 0.0730 | kl 0.0244 | val_kl 0.0355 | clus 0.3574 | sep 0.3743 | mse(diag) 0.1945 | eff_K 2000/2000 | dying 38
+  step 758500 | loss 0.0743 | kl 0.0268 | val_kl 0.0355 | clus 0.3638 | sep 0.3732 | mse(diag) 0.1857 | eff_K 2000/2000 | dying 43
+  step 758600 | loss 0.0732 | kl 0.0257 | val_kl 0.0350 | clus 0.3561 | sep 0.3711 | mse(diag) 0.1879 | eff_K 2000/2000 | dying 45
+  step 758700 | loss 0.0749 | kl 0.0256 | val_kl 0.0347 | clus 0.3576 | sep 0.3704 | mse(diag) 0.1991 | eff_K 2000/2000 | dying 46
+  step 758800 | loss 0.0741 | kl 0.0257 | val_kl 0.0356 | clus 0.3528 | sep 0.3717 | mse(diag) 0.1954 | eff_K 2000/2000 | dying 45
+  step 758900 | loss 0.0796 | kl 0.0337 | val_kl 0.0361 | clus 0.3478 | sep 0.3733 | mse(diag) 0.1801 | eff_K 2000/2000 | dying 38
+  step 759000 | loss 0.0714 | kl 0.0246 | val_kl 0.0378 | clus 0.3550 | sep 0.3736 | mse(diag) 0.1842 | eff_K 2000/2000 | dying 40
+  [reinit] step 759000: 160 dead clusters
+  step 759100 | loss 0.0715 | kl 0.0233 | val_kl 0.0336 | clus 0.3724 | sep 0.3728 | mse(diag) 0.1875 | eff_K 2000/2000 | dying 31
+  step 759200 | loss 0.0712 | kl 0.0232 | val_kl 0.0361 | clus 0.3573 | sep 0.3709 | mse(diag) 0.1907 | eff_K 2000/2000 | dying 42
+  step 759300 | loss 0.0715 | kl 0.0245 | val_kl 0.0357 | clus 0.3512 | sep 0.3728 | mse(diag) 0.1859 | eff_K 2000/2000 | dying 41
+  step 759400 | loss 0.0724 | kl 0.0248 | val_kl 0.0341 | clus 0.3590 | sep 0.3757 | mse(diag) 0.1876 | eff_K 2000/2000 | dying 42
+  step 759500 | loss 0.0737 | kl 0.0259 | val_kl 0.0374 | clus 0.3635 | sep 0.3697 | mse(diag) 0.1874 | eff_K 2000/2000 | dying 52
+  step 759600 | loss 0.0707 | kl 0.0233 | val_kl 0.0362 | clus 0.3447 | sep 0.3766 | mse(diag) 0.1911 | eff_K 2000/2000 | dying 47
+  step 759700 | loss 0.0687 | kl 0.0202 | val_kl 0.0371 | clus 0.3527 | sep 0.3740 | mse(diag) 0.1958 | eff_K 2000/2000 | dying 50
+  step 759800 | loss 0.0757 | kl 0.0265 | val_kl 0.0360 | clus 0.3619 | sep 0.3750 | mse(diag) 0.1977 | eff_K 2000/2000 | dying 46
+  step 759900 | loss 0.0754 | kl 0.0268 | val_kl 0.0360 | clus 0.3595 | sep 0.3686 | mse(diag) 0.1942 | eff_K 2000/2000 | dying 42
+  step 760000 | loss 0.0830 | kl 0.0352 | val_kl 0.0345 | clus 0.3708 | sep 0.3725 | mse(diag) 0.1847 | eff_K 2000/2000 | dying 48
+  [reinit] step 760000: 173 dead clusters
+  step 760100 | loss 0.0761 | kl 0.0276 | val_kl 0.0364 | clus 0.3715 | sep 0.3703 | mse(diag) 0.1896 | eff_K 2000/2000 | dying 39
+  step 760200 | loss 0.0706 | kl 0.0226 | val_kl 0.0350 | clus 0.3588 | sep 0.3724 | mse(diag) 0.1905 | eff_K 2000/2000 | dying 61
+  step 760300 | loss 0.0774 | kl 0.0289 | val_kl 0.0361 | clus 0.3648 | sep 0.3733 | mse(diag) 0.1918 | eff_K 2000/2000 | dying 66
+  step 760400 | loss 0.0760 | kl 0.0264 | val_kl 0.0350 | clus 0.3711 | sep 0.3739 | mse(diag) 0.1967 | eff_K 2000/2000 | dying 65
+  step 760500 | loss 0.0681 | kl 0.0209 | val_kl 0.0356 | clus 0.3557 | sep 0.3714 | mse(diag) 0.1866 | eff_K 2000/2000 | dying 63
+  step 760600 | loss 0.0757 | kl 0.0283 | val_kl 0.0344 | clus 0.3518 | sep 0.3758 | mse(diag) 0.1888 | eff_K 2000/2000 | dying 66
+  step 760700 | loss 0.0752 | kl 0.0261 | val_kl 0.0356 | clus 0.3701 | sep 0.3707 | mse(diag) 0.1942 | eff_K 2000/2000 | dying 62
+  step 760800 | loss 0.0730 | kl 0.0249 | val_kl 0.0352 | clus 0.3650 | sep 0.3749 | mse(diag) 0.1892 | eff_K 2000/2000 | dying 62
+  step 760900 | loss 0.0706 | kl 0.0240 | val_kl 0.0356 | clus 0.3470 | sep 0.3724 | mse(diag) 0.1848 | eff_K 2000/2000 | dying 60
+  step 761000 | loss 0.0757 | kl 0.0266 | val_kl 0.0364 | clus 0.3622 | sep 0.3719 | mse(diag) 0.1967 | eff_K 2000/2000 | dying 64
+  [reinit] step 761000: 162 dead clusters
+  step 761100 | loss 0.0749 | kl 0.0259 | val_kl 0.0345 | clus 0.3786 | sep 0.3745 | mse(diag) 0.1903 | eff_K 2000/2000 | dying 47
+  step 761200 | loss 0.0780 | kl 0.0283 | val_kl 0.0349 | clus 0.3774 | sep 0.3760 | mse(diag) 0.1957 | eff_K 2000/2000 | dying 51
+  step 761300 | loss 0.0761 | kl 0.0274 | val_kl 0.0348 | clus 0.3786 | sep 0.3700 | mse(diag) 0.1891 | eff_K 2000/2000 | dying 46
+  step 761400 | loss 0.0715 | kl 0.0243 | val_kl 0.0356 | clus 0.3574 | sep 0.3698 | mse(diag) 0.1861 | eff_K 2000/2000 | dying 55
+  step 761500 | loss 0.0729 | kl 0.0256 | val_kl 0.0355 | clus 0.3533 | sep 0.3734 | mse(diag) 0.1877 | eff_K 2000/2000 | dying 52
+  step 761600 | loss 0.0715 | kl 0.0237 | val_kl 0.0354 | clus 0.3619 | sep 0.3747 | mse(diag) 0.1883 | eff_K 2000/2000 | dying 50
+  step 761700 | loss 0.0824 | kl 0.0339 | val_kl 0.0374 | clus 0.3662 | sep 0.3751 | mse(diag) 0.1913 | eff_K 2000/2000 | dying 47
+  step 761800 | loss 0.0695 | kl 0.0232 | val_kl 0.0360 | clus 0.3518 | sep 0.3695 | mse(diag) 0.1810 | eff_K 2000/2000 | dying 53
+  step 761900 | loss 0.0741 | kl 0.0267 | val_kl 0.0352 | clus 0.3534 | sep 0.3733 | mse(diag) 0.1885 | eff_K 2000/2000 | dying 47
+  step 762000 | loss 0.0730 | kl 0.0249 | val_kl 0.0360 | clus 0.3627 | sep 0.3684 | mse(diag) 0.1895 | eff_K 2000/2000 | dying 48
+  [reinit] step 762000: 157 dead clusters
+  step 762100 | loss 0.0776 | kl 0.0284 | val_kl 0.0351 | clus 0.3814 | sep 0.3719 | mse(diag) 0.1908 | eff_K 2000/2000 | dying 40
+  step 762200 | loss 0.0761 | kl 0.0278 | val_kl 0.0359 | clus 0.3680 | sep 0.3729 | mse(diag) 0.1889 | eff_K 2000/2000 | dying 55
+  step 762300 | loss 0.0709 | kl 0.0234 | val_kl 0.0349 | clus 0.3586 | sep 0.3699 | mse(diag) 0.1872 | eff_K 2000/2000 | dying 56
+  step 762400 | loss 0.0743 | kl 0.0253 | val_kl 0.0362 | clus 0.3733 | sep 0.3706 | mse(diag) 0.1923 | eff_K 2000/2000 | dying 50
+  step 762500 | loss 0.0820 | kl 0.0342 | val_kl 0.0356 | clus 0.3628 | sep 0.3683 | mse(diag) 0.1872 | eff_K 2000/2000 | dying 47
+  step 762600 | loss 0.0758 | kl 0.0259 | val_kl 0.0363 | clus 0.3742 | sep 0.3744 | mse(diag) 0.1979 | eff_K 2000/2000 | dying 51
+  step 762700 | loss 0.0737 | kl 0.0249 | val_kl 0.0366 | clus 0.3546 | sep 0.3743 | mse(diag) 0.1972 | eff_K 2000/2000 | dying 51
+  step 762800 | loss 0.0752 | kl 0.0262 | val_kl 0.0359 | clus 0.3752 | sep 0.3703 | mse(diag) 0.1920 | eff_K 2000/2000 | dying 55
+  step 762900 | loss 0.0720 | kl 0.0258 | val_kl 0.0354 | clus 0.3524 | sep 0.3723 | mse(diag) 0.1809 | eff_K 2000/2000 | dying 58
+  step 763000 | loss 0.0719 | kl 0.0254 | val_kl 0.0370 | clus 0.3484 | sep 0.3725 | mse(diag) 0.1837 | eff_K 2000/2000 | dying 59
+  [reinit] step 763000: 157 dead clusters
+  step 763100 | loss 0.0786 | kl 0.0315 | val_kl 0.0355 | clus 0.3683 | sep 0.3734 | mse(diag) 0.1808 | eff_K 2000/2000 | dying 36
+  step 763200 | loss 0.0694 | kl 0.0221 | val_kl 0.0345 | clus 0.3531 | sep 0.3758 | mse(diag) 0.1871 | eff_K 2000/2000 | dying 36
+  step 763300 | loss 0.0758 | kl 0.0282 | val_kl 0.0359 | clus 0.3635 | sep 0.3767 | mse(diag) 0.1861 | eff_K 2000/2000 | dying 41
+  step 763400 | loss 0.0722 | kl 0.0252 | val_kl 0.0358 | clus 0.3614 | sep 0.3713 | mse(diag) 0.1828 | eff_K 2000/2000 | dying 50
+  step 763500 | loss 0.0747 | kl 0.0257 | val_kl 0.0342 | clus 0.3734 | sep 0.3695 | mse(diag) 0.1924 | eff_K 2000/2000 | dying 47
+  step 763600 | loss 0.0692 | kl 0.0229 | val_kl 0.0367 | clus 0.3536 | sep 0.3697 | mse(diag) 0.1809 | eff_K 2000/2000 | dying 46
+  step 763700 | loss 0.0731 | kl 0.0249 | val_kl 0.0343 | clus 0.3690 | sep 0.3768 | mse(diag) 0.1884 | eff_K 2000/2000 | dying 51
+  step 763800 | loss 0.0720 | kl 0.0241 | val_kl 0.0335 | clus 0.3575 | sep 0.3680 | mse(diag) 0.1899 | eff_K 2000/2000 | dying 49
+  step 763900 | loss 0.0688 | kl 0.0222 | val_kl 0.0347 | clus 0.3546 | sep 0.3709 | mse(diag) 0.1821 | eff_K 2000/2000 | dying 57
+  step 764000 | loss 0.0700 | kl 0.0233 | val_kl 0.0339 | clus 0.3502 | sep 0.3708 | mse(diag) 0.1850 | eff_K 2000/2000 | dying 52
+  [reinit] step 764000: 158 dead clusters
+  step 764100 | loss 0.0701 | kl 0.0228 | val_kl 0.0348 | clus 0.3615 | sep 0.3688 | mse(diag) 0.1851 | eff_K 2000/2000 | dying 40
+  step 764200 | loss 0.0841 | kl 0.0363 | val_kl 0.0342 | clus 0.3730 | sep 0.3724 | mse(diag) 0.1845 | eff_K 2000/2000 | dying 29
+  step 764300 | loss 0.0709 | kl 0.0231 | val_kl 0.0362 | clus 0.3515 | sep 0.3750 | mse(diag) 0.1915 | eff_K 2000/2000 | dying 30
+  step 764400 | loss 0.0697 | kl 0.0231 | val_kl 0.0343 | clus 0.3611 | sep 0.3701 | mse(diag) 0.1802 | eff_K 2000/2000 | dying 31
+  step 764500 | loss 0.0759 | kl 0.0283 | val_kl 0.0355 | clus 0.3655 | sep 0.3748 | mse(diag) 0.1854 | eff_K 2000/2000 | dying 36
+  step 764600 | loss 0.0695 | kl 0.0228 | val_kl 0.0330 | clus 0.3578 | sep 0.3717 | mse(diag) 0.1815 | eff_K 2000/2000 | dying 33
+  step 764700 | loss 0.0710 | kl 0.0229 | val_kl 0.0363 | clus 0.3577 | sep 0.3706 | mse(diag) 0.1914 | eff_K 2000/2000 | dying 41
+  step 764800 | loss 0.0768 | kl 0.0288 | val_kl 0.0347 | clus 0.3613 | sep 0.3707 | mse(diag) 0.1901 | eff_K 2000/2000 | dying 44
+  step 764900 | loss 0.0734 | kl 0.0256 | val_kl 0.0346 | clus 0.3703 | sep 0.3711 | mse(diag) 0.1858 | eff_K 2000/2000 | dying 41
+  step 765000 | loss 0.0712 | kl 0.0226 | val_kl 0.0344 | clus 0.3558 | sep 0.3731 | mse(diag) 0.1951 | eff_K 2000/2000 | dying 47
+  [reinit] step 765000: 165 dead clusters
+  step 765100 | loss 0.0739 | kl 0.0254 | val_kl 0.0354 | clus 0.3782 | sep 0.3722 | mse(diag) 0.1869 | eff_K 2000/2000 | dying 37
+  step 765200 | loss 0.0715 | kl 0.0241 | val_kl 0.0363 | clus 0.3640 | sep 0.3717 | mse(diag) 0.1848 | eff_K 2000/2000 | dying 38
+  step 765300 | loss 0.0691 | kl 0.0199 | val_kl 0.0348 | clus 0.3742 | sep 0.3733 | mse(diag) 0.1936 | eff_K 2000/2000 | dying 42
+  step 765400 | loss 0.0683 | kl 0.0229 | val_kl 0.0370 | clus 0.3514 | sep 0.3724 | mse(diag) 0.1756 | eff_K 2000/2000 | dying 36
+  step 765500 | loss 0.0742 | kl 0.0255 | val_kl 0.0351 | clus 0.3670 | sep 0.3724 | mse(diag) 0.1922 | eff_K 2000/2000 | dying 52
+  step 765600 | loss 0.0772 | kl 0.0274 | val_kl 0.0338 | clus 0.3697 | sep 0.3735 | mse(diag) 0.1983 | eff_K 2000/2000 | dying 45
+  step 765700 | loss 0.0729 | kl 0.0257 | val_kl 0.0354 | clus 0.3543 | sep 0.3723 | mse(diag) 0.1863 | eff_K 2000/2000 | dying 40
+[train-e2e] Saved step_0765702.pt  val_kl=0.03417  val_mse=0.18229
+[train-e2e] New best val_kl=0.03417 -> best_val.pt
+[train-e2e] Epoch 42 done in 126.0 min
+
+[train-e2e] Epoch 43/50 | tau=0.254 | λ_c=0.050 λ_s=0.0041
+  step 765800 | loss 0.0765 | kl 0.0293 | val_kl 0.0371 | clus 0.3672 | sep 0.3723 | mse(diag) 0.1821 | eff_K 2000/2000 | dying 48
+  step 765900 | loss 0.0777 | kl 0.0296 | val_kl 0.0363 | clus 0.3654 | sep 0.3728 | mse(diag) 0.1886 | eff_K 2000/2000 | dying 52
+  step 766000 | loss 0.0716 | kl 0.0247 | val_kl 0.0360 | clus 0.3601 | sep 0.3752 | mse(diag) 0.1826 | eff_K 2000/2000 | dying 56
+  [reinit] step 766000: 163 dead clusters
+  step 766100 | loss 0.0845 | kl 0.0356 | val_kl 0.0355 | clus 0.3793 | sep 0.3721 | mse(diag) 0.1891 | eff_K 2000/2000 | dying 42
+  step 766200 | loss 0.0780 | kl 0.0293 | val_kl 0.0367 | clus 0.3796 | sep 0.3733 | mse(diag) 0.1880 | eff_K 2000/2000 | dying 44
+  step 766300 | loss 0.0769 | kl 0.0267 | val_kl 0.0361 | clus 0.3855 | sep 0.3734 | mse(diag) 0.1956 | eff_K 2000/2000 | dying 39
+  step 766400 | loss 0.0760 | kl 0.0284 | val_kl 0.0385 | clus 0.3616 | sep 0.3728 | mse(diag) 0.1864 | eff_K 2000/2000 | dying 42
+  step 766500 | loss 0.0697 | kl 0.0221 | val_kl 0.0366 | clus 0.3650 | sep 0.3744 | mse(diag) 0.1854 | eff_K 2000/2000 | dying 50
+  step 766600 | loss 0.0760 | kl 0.0284 | val_kl 0.0375 | clus 0.3746 | sep 0.3729 | mse(diag) 0.1823 | eff_K 2000/2000 | dying 45
+  step 766700 | loss 0.0706 | kl 0.0237 | val_kl 0.0376 | clus 0.3598 | sep 0.3725 | mse(diag) 0.1820 | eff_K 2000/2000 | dying 47
+  step 766800 | loss 0.0745 | kl 0.0272 | val_kl 0.0360 | clus 0.3688 | sep 0.3725 | mse(diag) 0.1822 | eff_K 2000/2000 | dying 49
+  step 766900 | loss 0.0740 | kl 0.0242 | val_kl 0.0364 | clus 0.3742 | sep 0.3704 | mse(diag) 0.1968 | eff_K 2000/2000 | dying 58
+  step 767000 | loss 0.0812 | kl 0.0336 | val_kl 0.0350 | clus 0.3593 | sep 0.3710 | mse(diag) 0.1877 | eff_K 2000/2000 | dying 49
+  [reinit] step 767000: 180 dead clusters
+  step 767100 | loss 0.0733 | kl 0.0248 | val_kl 0.0364 | clus 0.3801 | sep 0.3719 | mse(diag) 0.1863 | eff_K 2000/2000 | dying 33
+  step 767200 | loss 0.0840 | kl 0.0361 | val_kl 0.0362 | clus 0.3736 | sep 0.3685 | mse(diag) 0.1852 | eff_K 2000/2000 | dying 41
+  step 767300 | loss 0.0743 | kl 0.0264 | val_kl 0.0360 | clus 0.3722 | sep 0.3725 | mse(diag) 0.1852 | eff_K 2000/2000 | dying 43
+  step 767400 | loss 0.0808 | kl 0.0340 | val_kl 0.0366 | clus 0.3645 | sep 0.3730 | mse(diag) 0.1799 | eff_K 2000/2000 | dying 47
+  step 767500 | loss 0.0729 | kl 0.0242 | val_kl 0.0363 | clus 0.3640 | sep 0.3743 | mse(diag) 0.1928 | eff_K 2000/2000 | dying 37
+  step 767600 | loss 0.0730 | kl 0.0248 | val_kl 0.0351 | clus 0.3719 | sep 0.3732 | mse(diag) 0.1870 | eff_K 2000/2000 | dying 47
+  step 767700 | loss 0.0770 | kl 0.0296 | val_kl 0.0354 | clus 0.3739 | sep 0.3758 | mse(diag) 0.1811 | eff_K 2000/2000 | dying 54
+  step 767800 | loss 0.0760 | kl 0.0277 | val_kl 0.0357 | clus 0.3706 | sep 0.3728 | mse(diag) 0.1880 | eff_K 2000/2000 | dying 48
+  step 767900 | loss 0.0812 | kl 0.0342 | val_kl 0.0365 | clus 0.3697 | sep 0.3716 | mse(diag) 0.1797 | eff_K 2000/2000 | dying 51
+  step 768000 | loss 0.0820 | kl 0.0319 | val_kl 0.0368 | clus 0.3683 | sep 0.3683 | mse(diag) 0.2010 | eff_K 2000/2000 | dying 59
+  [reinit] step 768000: 150 dead clusters
+  step 768100 | loss 0.0799 | kl 0.0304 | val_kl 0.0367 | clus 0.3870 | sep 0.3714 | mse(diag) 0.1912 | eff_K 2000/2000 | dying 52
+  step 768200 | loss 0.0680 | kl 0.0206 | val_kl 0.0379 | clus 0.3662 | sep 0.3723 | mse(diag) 0.1837 | eff_K 2000/2000 | dying 52
+  step 768300 | loss 0.0696 | kl 0.0228 | val_kl 0.0336 | clus 0.3622 | sep 0.3718 | mse(diag) 0.1811 | eff_K 2000/2000 | dying 61
+  step 768400 | loss 0.0796 | kl 0.0314 | val_kl 0.0363 | clus 0.3719 | sep 0.3748 | mse(diag) 0.1870 | eff_K 2000/2000 | dying 51
+  step 768500 | loss 0.0756 | kl 0.0280 | val_kl 0.0356 | clus 0.3832 | sep 0.3733 | mse(diag) 0.1793 | eff_K 2000/2000 | dying 49
+  step 768600 | loss 0.0706 | kl 0.0237 | val_kl 0.0359 | clus 0.3683 | sep 0.3702 | mse(diag) 0.1797 | eff_K 2000/2000 | dying 54
+  step 768700 | loss 0.0726 | kl 0.0249 | val_kl 0.0347 | clus 0.3667 | sep 0.3740 | mse(diag) 0.1854 | eff_K 2000/2000 | dying 56
+  step 768800 | loss 0.0748 | kl 0.0282 | val_kl 0.0359 | clus 0.3793 | sep 0.3718 | mse(diag) 0.1739 | eff_K 2000/2000 | dying 63
+  step 768900 | loss 0.0741 | kl 0.0254 | val_kl 0.0366 | clus 0.3733 | sep 0.3706 | mse(diag) 0.1903 | eff_K 2000/2000 | dying 57
+  step 769000 | loss 0.0767 | kl 0.0295 | val_kl 0.0362 | clus 0.3771 | sep 0.3712 | mse(diag) 0.1785 | eff_K 2000/2000 | dying 49
+  [reinit] step 769000: 182 dead clusters
+  step 769100 | loss 0.0772 | kl 0.0296 | val_kl 0.0367 | clus 0.3846 | sep 0.3720 | mse(diag) 0.1788 | eff_K 2000/2000 | dying 35
+  step 769200 | loss 0.0734 | kl 0.0259 | val_kl 0.0362 | clus 0.3739 | sep 0.3711 | mse(diag) 0.1824 | eff_K 2000/2000 | dying 45
+  step 769300 | loss 0.0717 | kl 0.0251 | val_kl 0.0342 | clus 0.3625 | sep 0.3728 | mse(diag) 0.1796 | eff_K 2000/2000 | dying 50
+  step 769400 | loss 0.0753 | kl 0.0270 | val_kl 0.0361 | clus 0.3752 | sep 0.3717 | mse(diag) 0.1867 | eff_K 2000/2000 | dying 54
+  step 769500 | loss 0.0779 | kl 0.0297 | val_kl 0.0351 | clus 0.3768 | sep 0.3763 | mse(diag) 0.1851 | eff_K 2000/2000 | dying 57
+  step 769600 | loss 0.0840 | kl 0.0367 | val_kl 0.0360 | clus 0.3714 | sep 0.3723 | mse(diag) 0.1811 | eff_K 2000/2000 | dying 57
+  step 769700 | loss 0.0761 | kl 0.0276 | val_kl 0.0336 | clus 0.3805 | sep 0.3733 | mse(diag) 0.1862 | eff_K 2000/2000 | dying 58
+  step 769800 | loss 0.0696 | kl 0.0223 | val_kl 0.0369 | clus 0.3664 | sep 0.3692 | mse(diag) 0.1830 | eff_K 2000/2000 | dying 56
+  step 769900 | loss 0.0737 | kl 0.0256 | val_kl 0.0354 | clus 0.3691 | sep 0.3727 | mse(diag) 0.1876 | eff_K 2000/2000 | dying 64
+  step 770000 | loss 0.0762 | kl 0.0284 | val_kl 0.0365 | clus 0.3741 | sep 0.3722 | mse(diag) 0.1839 | eff_K 2000/2000 | dying 54
+  [reinit] step 770000: 170 dead clusters
+  step 770100 | loss 0.0714 | kl 0.0242 | val_kl 0.0362 | clus 0.3822 | sep 0.3741 | mse(diag) 0.1770 | eff_K 2000/2000 | dying 42
+  step 770200 | loss 0.0721 | kl 0.0259 | val_kl 0.0350 | clus 0.3627 | sep 0.3753 | mse(diag) 0.1762 | eff_K 2000/2000 | dying 41
+  step 770300 | loss 0.0743 | kl 0.0260 | val_kl 0.0358 | clus 0.3757 | sep 0.3722 | mse(diag) 0.1860 | eff_K 2000/2000 | dying 57
+  step 770400 | loss 0.0705 | kl 0.0238 | val_kl 0.0364 | clus 0.3757 | sep 0.3696 | mse(diag) 0.1762 | eff_K 2000/2000 | dying 55
+  step 770500 | loss 0.0742 | kl 0.0259 | val_kl 0.0363 | clus 0.3822 | sep 0.3760 | mse(diag) 0.1843 | eff_K 2000/2000 | dying 60
+  step 770600 | loss 0.0712 | kl 0.0240 | val_kl 0.0364 | clus 0.3733 | sep 0.3737 | mse(diag) 0.1797 | eff_K 2000/2000 | dying 56
+  step 770700 | loss 0.0692 | kl 0.0230 | val_kl 0.0364 | clus 0.3641 | sep 0.3685 | mse(diag) 0.1767 | eff_K 2000/2000 | dying 54
+  step 770800 | loss 0.0783 | kl 0.0319 | val_kl 0.0363 | clus 0.3626 | sep 0.3711 | mse(diag) 0.1786 | eff_K 2000/2000 | dying 55
+  step 770900 | loss 0.0788 | kl 0.0300 | val_kl 0.0363 | clus 0.3719 | sep 0.3717 | mse(diag) 0.1912 | eff_K 2000/2000 | dying 55
+  step 771000 | loss 0.0715 | kl 0.0246 | val_kl 0.0362 | clus 0.3698 | sep 0.3680 | mse(diag) 0.1792 | eff_K 2000/2000 | dying 60
+  [reinit] step 771000: 187 dead clusters
+  step 771100 | loss 0.0756 | kl 0.0276 | val_kl 0.0354 | clus 0.3899 | sep 0.3715 | mse(diag) 0.1794 | eff_K 2000/2000 | dying 50
+  step 771200 | loss 0.0710 | kl 0.0225 | val_kl 0.0364 | clus 0.3768 | sep 0.3731 | mse(diag) 0.1877 | eff_K 2000/2000 | dying 45
+  step 771300 | loss 0.0717 | kl 0.0243 | val_kl 0.0358 | clus 0.3771 | sep 0.3719 | mse(diag) 0.1799 | eff_K 2000/2000 | dying 40
+  step 771400 | loss 0.0724 | kl 0.0260 | val_kl 0.0358 | clus 0.3705 | sep 0.3709 | mse(diag) 0.1753 | eff_K 2000/2000 | dying 47
+  step 771500 | loss 0.0712 | kl 0.0239 | val_kl 0.0353 | clus 0.3742 | sep 0.3712 | mse(diag) 0.1808 | eff_K 2000/2000 | dying 55
+  step 771600 | loss 0.0742 | kl 0.0269 | val_kl 0.0354 | clus 0.3780 | sep 0.3693 | mse(diag) 0.1789 | eff_K 2000/2000 | dying 60
+  step 771700 | loss 0.0716 | kl 0.0236 | val_kl 0.0357 | clus 0.3742 | sep 0.3721 | mse(diag) 0.1853 | eff_K 2000/2000 | dying 61
+  step 771800 | loss 0.0755 | kl 0.0282 | val_kl 0.0346 | clus 0.3761 | sep 0.3733 | mse(diag) 0.1796 | eff_K 2000/2000 | dying 59
+  step 771900 | loss 0.0845 | kl 0.0363 | val_kl 0.0364 | clus 0.3860 | sep 0.3725 | mse(diag) 0.1827 | eff_K 2000/2000 | dying 61
+  step 772000 | loss 0.0707 | kl 0.0227 | val_kl 0.0367 | clus 0.3656 | sep 0.3753 | mse(diag) 0.1874 | eff_K 2000/2000 | dying 68
+  [reinit] step 772000: 169 dead clusters
+  step 772100 | loss 0.0719 | kl 0.0239 | val_kl 0.0356 | clus 0.3826 | sep 0.3748 | mse(diag) 0.1818 | eff_K 2000/2000 | dying 42
+  step 772200 | loss 0.0768 | kl 0.0276 | val_kl 0.0350 | clus 0.3874 | sep 0.3697 | mse(diag) 0.1891 | eff_K 2000/2000 | dying 55
+  step 772300 | loss 0.0809 | kl 0.0339 | val_kl 0.0369 | clus 0.3764 | sep 0.3724 | mse(diag) 0.1779 | eff_K 2000/2000 | dying 55
+  step 772400 | loss 0.0736 | kl 0.0271 | val_kl 0.0352 | clus 0.3633 | sep 0.3727 | mse(diag) 0.1787 | eff_K 2000/2000 | dying 61
+  step 772500 | loss 0.0738 | kl 0.0279 | val_kl 0.0352 | clus 0.3665 | sep 0.3721 | mse(diag) 0.1741 | eff_K 2000/2000 | dying 65
+  step 772600 | loss 0.0710 | kl 0.0239 | val_kl 0.0367 | clus 0.3612 | sep 0.3657 | mse(diag) 0.1835 | eff_K 2000/2000 | dying 61
+  step 772700 | loss 0.0707 | kl 0.0249 | val_kl 0.0331 | clus 0.3669 | sep 0.3723 | mse(diag) 0.1722 | eff_K 2000/2000 | dying 60
+  step 772800 | loss 0.0735 | kl 0.0264 | val_kl 0.0358 | clus 0.3688 | sep 0.3704 | mse(diag) 0.1809 | eff_K 2000/2000 | dying 54
+  step 772900 | loss 0.0697 | kl 0.0226 | val_kl 0.0351 | clus 0.3611 | sep 0.3744 | mse(diag) 0.1834 | eff_K 2000/2000 | dying 67
+  step 773000 | loss 0.0755 | kl 0.0281 | val_kl 0.0367 | clus 0.3694 | sep 0.3719 | mse(diag) 0.1828 | eff_K 2000/2000 | dying 65
+  [reinit] step 773000: 188 dead clusters
+  step 773100 | loss 0.0719 | kl 0.0236 | val_kl 0.0348 | clus 0.3708 | sep 0.3706 | mse(diag) 0.1879 | eff_K 2000/2000 | dying 40
+  step 773200 | loss 0.0711 | kl 0.0234 | val_kl 0.0349 | clus 0.3762 | sep 0.3735 | mse(diag) 0.1819 | eff_K 2000/2000 | dying 45
+  step 773300 | loss 0.0733 | kl 0.0250 | val_kl 0.0353 | clus 0.3791 | sep 0.3696 | mse(diag) 0.1857 | eff_K 2000/2000 | dying 46
+  step 773400 | loss 0.0754 | kl 0.0279 | val_kl 0.0355 | clus 0.3743 | sep 0.3739 | mse(diag) 0.1815 | eff_K 2000/2000 | dying 47
+  step 773500 | loss 0.0719 | kl 0.0247 | val_kl 0.0337 | clus 0.3810 | sep 0.3735 | mse(diag) 0.1774 | eff_K 2000/2000 | dying 37
+  step 773600 | loss 0.0732 | kl 0.0264 | val_kl 0.0345 | clus 0.3725 | sep 0.3734 | mse(diag) 0.1778 | eff_K 2000/2000 | dying 44
+  step 773700 | loss 0.0719 | kl 0.0248 | val_kl 0.0353 | clus 0.3654 | sep 0.3752 | mse(diag) 0.1815 | eff_K 2000/2000 | dying 55
+  step 773800 | loss 0.0715 | kl 0.0238 | val_kl 0.0337 | clus 0.3785 | sep 0.3691 | mse(diag) 0.1818 | eff_K 2000/2000 | dying 56
+  step 773900 | loss 0.0812 | kl 0.0328 | val_kl 0.0362 | clus 0.3677 | sep 0.3734 | mse(diag) 0.1900 | eff_K 2000/2000 | dying 55
+  step 774000 | loss 0.0775 | kl 0.0300 | val_kl 0.0356 | clus 0.3789 | sep 0.3732 | mse(diag) 0.1800 | eff_K 2000/2000 | dying 48
+  [reinit] step 774000: 170 dead clusters
+  step 774100 | loss 0.0741 | kl 0.0261 | val_kl 0.0348 | clus 0.3860 | sep 0.3734 | mse(diag) 0.1813 | eff_K 2000/2000 | dying 43
+  step 774200 | loss 0.0729 | kl 0.0263 | val_kl 0.0367 | clus 0.3738 | sep 0.3710 | mse(diag) 0.1758 | eff_K 2000/2000 | dying 49
+  step 774300 | loss 0.0683 | kl 0.0214 | val_kl 0.0349 | clus 0.3685 | sep 0.3773 | mse(diag) 0.1792 | eff_K 2000/2000 | dying 48
+  step 774400 | loss 0.0728 | kl 0.0256 | val_kl 0.0350 | clus 0.3835 | sep 0.3756 | mse(diag) 0.1767 | eff_K 2000/2000 | dying 38
+  step 774500 | loss 0.0789 | kl 0.0318 | val_kl 0.0356 | clus 0.3812 | sep 0.3699 | mse(diag) 0.1768 | eff_K 2000/2000 | dying 50
+  step 774600 | loss 0.0748 | kl 0.0261 | val_kl 0.0353 | clus 0.3923 | sep 0.3678 | mse(diag) 0.1838 | eff_K 2000/2000 | dying 53
+  step 774700 | loss 0.0706 | kl 0.0235 | val_kl 0.0358 | clus 0.3687 | sep 0.3724 | mse(diag) 0.1804 | eff_K 2000/2000 | dying 44
+  step 774800 | loss 0.0740 | kl 0.0267 | val_kl 0.0346 | clus 0.3772 | sep 0.3722 | mse(diag) 0.1795 | eff_K 2000/2000 | dying 50
+  step 774900 | loss 0.0737 | kl 0.0260 | val_kl 0.0345 | clus 0.3762 | sep 0.3730 | mse(diag) 0.1817 | eff_K 2000/2000 | dying 60
+  step 775000 | loss 0.0679 | kl 0.0214 | val_kl 0.0351 | clus 0.3686 | sep 0.3734 | mse(diag) 0.1766 | eff_K 2000/2000 | dying 51
+  [reinit] step 775000: 168 dead clusters
+  step 775100 | loss 0.0721 | kl 0.0254 | val_kl 0.0347 | clus 0.3731 | sep 0.3715 | mse(diag) 0.1770 | eff_K 2000/2000 | dying 37
+  step 775200 | loss 0.0726 | kl 0.0251 | val_kl 0.0360 | clus 0.3758 | sep 0.3727 | mse(diag) 0.1811 | eff_K 2000/2000 | dying 39
+  step 775300 | loss 0.0723 | kl 0.0234 | val_kl 0.0350 | clus 0.3960 | sep 0.3719 | mse(diag) 0.1834 | eff_K 2000/2000 | dying 39
+  step 775400 | loss 0.0695 | kl 0.0227 | val_kl 0.0341 | clus 0.3637 | sep 0.3733 | mse(diag) 0.1804 | eff_K 2000/2000 | dying 46
+  step 775500 | loss 0.0721 | kl 0.0243 | val_kl 0.0344 | clus 0.3685 | sep 0.3732 | mse(diag) 0.1856 | eff_K 2000/2000 | dying 42
+  step 775600 | loss 0.0719 | kl 0.0254 | val_kl 0.0373 | clus 0.3742 | sep 0.3677 | mse(diag) 0.1750 | eff_K 2000/2000 | dying 40
+  step 775700 | loss 0.0709 | kl 0.0257 | val_kl 0.0362 | clus 0.3687 | sep 0.3726 | mse(diag) 0.1679 | eff_K 2000/2000 | dying 55
+  step 775800 | loss 0.0709 | kl 0.0241 | val_kl 0.0350 | clus 0.3685 | sep 0.3729 | mse(diag) 0.1790 | eff_K 2000/2000 | dying 55
+  step 775900 | loss 0.0729 | kl 0.0256 | val_kl 0.0351 | clus 0.3705 | sep 0.3709 | mse(diag) 0.1815 | eff_K 2000/2000 | dying 49
+  step 776000 | loss 0.0746 | kl 0.0271 | val_kl 0.0346 | clus 0.3770 | sep 0.3724 | mse(diag) 0.1810 | eff_K 2000/2000 | dying 46
+  [reinit] step 776000: 174 dead clusters
+  step 776100 | loss 0.0772 | kl 0.0285 | val_kl 0.0356 | clus 0.3789 | sep 0.3724 | mse(diag) 0.1880 | eff_K 2000/2000 | dying 31
+  step 776200 | loss 0.0711 | kl 0.0252 | val_kl 0.0351 | clus 0.3643 | sep 0.3735 | mse(diag) 0.1741 | eff_K 2000/2000 | dying 24
+  step 776300 | loss 0.0705 | kl 0.0243 | val_kl 0.0344 | clus 0.3672 | sep 0.3736 | mse(diag) 0.1753 | eff_K 2000/2000 | dying 40
+  step 776400 | loss 0.0730 | kl 0.0241 | val_kl 0.0357 | clus 0.3897 | sep 0.3743 | mse(diag) 0.1860 | eff_K 2000/2000 | dying 40
+  step 776500 | loss 0.0701 | kl 0.0223 | val_kl 0.0348 | clus 0.3768 | sep 0.3716 | mse(diag) 0.1826 | eff_K 2000/2000 | dying 45
+  step 776600 | loss 0.0730 | kl 0.0262 | val_kl 0.0364 | clus 0.3773 | sep 0.3710 | mse(diag) 0.1760 | eff_K 2000/2000 | dying 47
+  step 776700 | loss 0.0717 | kl 0.0244 | val_kl 0.0359 | clus 0.3756 | sep 0.3718 | mse(diag) 0.1800 | eff_K 2000/2000 | dying 47
+  step 776800 | loss 0.0752 | kl 0.0277 | val_kl 0.0355 | clus 0.3855 | sep 0.3697 | mse(diag) 0.1781 | eff_K 2000/2000 | dying 47
+  step 776900 | loss 0.0750 | kl 0.0268 | val_kl 0.0353 | clus 0.3825 | sep 0.3699 | mse(diag) 0.1838 | eff_K 2000/2000 | dying 47
+  step 777000 | loss 0.0727 | kl 0.0262 | val_kl 0.0333 | clus 0.3751 | sep 0.3707 | mse(diag) 0.1744 | eff_K 2000/2000 | dying 52
+  [reinit] step 777000: 173 dead clusters
+  step 777100 | loss 0.0752 | kl 0.0267 | val_kl 0.0368 | clus 0.3878 | sep 0.3721 | mse(diag) 0.1840 | eff_K 2000/2000 | dying 36
+  step 777200 | loss 0.0739 | kl 0.0275 | val_kl 0.0352 | clus 0.3789 | sep 0.3686 | mse(diag) 0.1726 | eff_K 2000/2000 | dying 51
+  step 777300 | loss 0.0721 | kl 0.0248 | val_kl 0.0342 | clus 0.3730 | sep 0.3706 | mse(diag) 0.1810 | eff_K 2000/2000 | dying 51
+  step 777400 | loss 0.0786 | kl 0.0314 | val_kl 0.0360 | clus 0.3829 | sep 0.3745 | mse(diag) 0.1772 | eff_K 2000/2000 | dying 59
+  step 777500 | loss 0.0790 | kl 0.0316 | val_kl 0.0365 | clus 0.3827 | sep 0.3718 | mse(diag) 0.1783 | eff_K 2000/2000 | dying 54
+  step 777600 | loss 0.0748 | kl 0.0255 | val_kl 0.0348 | clus 0.3869 | sep 0.3692 | mse(diag) 0.1895 | eff_K 2000/2000 | dying 54
+  step 777700 | loss 0.0710 | kl 0.0237 | val_kl 0.0356 | clus 0.3781 | sep 0.3710 | mse(diag) 0.1794 | eff_K 2000/2000 | dying 61
+  step 777800 | loss 0.0730 | kl 0.0253 | val_kl 0.0345 | clus 0.3803 | sep 0.3737 | mse(diag) 0.1811 | eff_K 2000/2000 | dying 67
+  step 777900 | loss 0.0744 | kl 0.0261 | val_kl 0.0346 | clus 0.3919 | sep 0.3720 | mse(diag) 0.1811 | eff_K 2000/2000 | dying 53
+  step 778000 | loss 0.0731 | kl 0.0248 | val_kl 0.0356 | clus 0.3874 | sep 0.3743 | mse(diag) 0.1820 | eff_K 2000/2000 | dying 56
+  [reinit] step 778000: 164 dead clusters
+  step 778100 | loss 0.0713 | kl 0.0227 | val_kl 0.0341 | clus 0.3931 | sep 0.3710 | mse(diag) 0.1827 | eff_K 2000/2000 | dying 52
+  step 778200 | loss 0.0702 | kl 0.0236 | val_kl 0.0335 | clus 0.3778 | sep 0.3694 | mse(diag) 0.1747 | eff_K 2000/2000 | dying 56
+  step 778300 | loss 0.0680 | kl 0.0222 | val_kl 0.0354 | clus 0.3663 | sep 0.3704 | mse(diag) 0.1728 | eff_K 2000/2000 | dying 66
+  step 778400 | loss 0.0734 | kl 0.0267 | val_kl 0.0340 | clus 0.3762 | sep 0.3719 | mse(diag) 0.1754 | eff_K 2000/2000 | dying 70
+  step 778500 | loss 0.0683 | kl 0.0216 | val_kl 0.0357 | clus 0.3739 | sep 0.3707 | mse(diag) 0.1762 | eff_K 2000/2000 | dying 69
+  step 778600 | loss 0.0714 | kl 0.0249 | val_kl 0.0337 | clus 0.3759 | sep 0.3728 | mse(diag) 0.1743 | eff_K 2000/2000 | dying 74
+  step 778700 | loss 0.0750 | kl 0.0280 | val_kl 0.0332 | clus 0.3746 | sep 0.3723 | mse(diag) 0.1784 | eff_K 2000/2000 | dying 68
+  step 778800 | loss 0.0676 | kl 0.0219 | val_kl 0.0360 | clus 0.3631 | sep 0.3734 | mse(diag) 0.1735 | eff_K 2000/2000 | dying 75
+  step 778900 | loss 0.0768 | kl 0.0295 | val_kl 0.0356 | clus 0.3854 | sep 0.3746 | mse(diag) 0.1768 | eff_K 2000/2000 | dying 67
+  step 779000 | loss 0.0699 | kl 0.0243 | val_kl 0.0345 | clus 0.3703 | sep 0.3714 | mse(diag) 0.1704 | eff_K 2000/2000 | dying 60
+  [reinit] step 779000: 169 dead clusters
+  step 779100 | loss 0.0757 | kl 0.0266 | val_kl 0.0349 | clus 0.4071 | sep 0.3737 | mse(diag) 0.1814 | eff_K 2000/2000 | dying 40
+  step 779200 | loss 0.0713 | kl 0.0244 | val_kl 0.0338 | clus 0.3816 | sep 0.3704 | mse(diag) 0.1758 | eff_K 2000/2000 | dying 38
+  step 779300 | loss 0.0684 | kl 0.0232 | val_kl 0.0351 | clus 0.3778 | sep 0.3715 | mse(diag) 0.1652 | eff_K 2000/2000 | dying 46
+  step 779400 | loss 0.0702 | kl 0.0220 | val_kl 0.0342 | clus 0.3919 | sep 0.3739 | mse(diag) 0.1805 | eff_K 2000/2000 | dying 54
+  step 779500 | loss 0.0727 | kl 0.0267 | val_kl 0.0348 | clus 0.3770 | sep 0.3726 | mse(diag) 0.1709 | eff_K 2000/2000 | dying 58
+  step 779600 | loss 0.0716 | kl 0.0250 | val_kl 0.0334 | clus 0.3767 | sep 0.3716 | mse(diag) 0.1752 | eff_K 2000/2000 | dying 53
+  step 779700 | loss 0.0722 | kl 0.0258 | val_kl 0.0345 | clus 0.3831 | sep 0.3727 | mse(diag) 0.1713 | eff_K 2000/2000 | dying 51
+  step 779800 | loss 0.0752 | kl 0.0278 | val_kl 0.0363 | clus 0.3914 | sep 0.3701 | mse(diag) 0.1751 | eff_K 2000/2000 | dying 48
+  step 779900 | loss 0.0772 | kl 0.0293 | val_kl 0.0345 | clus 0.3798 | sep 0.3708 | mse(diag) 0.1827 | eff_K 2000/2000 | dying 49
+  step 780000 | loss 0.0722 | kl 0.0252 | val_kl 0.0350 | clus 0.3830 | sep 0.3752 | mse(diag) 0.1758 | eff_K 2000/2000 | dying 44
+  [reinit] step 780000: 183 dead clusters
+  step 780100 | loss 0.0726 | kl 0.0256 | val_kl 0.0349 | clus 0.3842 | sep 0.3727 | mse(diag) 0.1751 | eff_K 2000/2000 | dying 38
+  step 780200 | loss 0.0713 | kl 0.0240 | val_kl 0.0352 | clus 0.3877 | sep 0.3716 | mse(diag) 0.1761 | eff_K 2000/2000 | dying 52
+  step 780300 | loss 0.0699 | kl 0.0233 | val_kl 0.0329 | clus 0.3859 | sep 0.3742 | mse(diag) 0.1720 | eff_K 2000/2000 | dying 55
+  step 780400 | loss 0.0683 | kl 0.0210 | val_kl 0.0349 | clus 0.3720 | sep 0.3743 | mse(diag) 0.1812 | eff_K 2000/2000 | dying 58
+  step 780500 | loss 0.0689 | kl 0.0227 | val_kl 0.0353 | clus 0.3777 | sep 0.3736 | mse(diag) 0.1720 | eff_K 2000/2000 | dying 57
+  step 780600 | loss 0.0709 | kl 0.0244 | val_kl 0.0351 | clus 0.3788 | sep 0.3753 | mse(diag) 0.1736 | eff_K 2000/2000 | dying 60
+  step 780700 | loss 0.0745 | kl 0.0281 | val_kl 0.0350 | clus 0.3738 | sep 0.3704 | mse(diag) 0.1746 | eff_K 2000/2000 | dying 67
+  step 780800 | loss 0.0721 | kl 0.0261 | val_kl 0.0355 | clus 0.3808 | sep 0.3717 | mse(diag) 0.1694 | eff_K 2000/2000 | dying 62
+  step 780900 | loss 0.0815 | kl 0.0340 | val_kl 0.0339 | clus 0.3784 | sep 0.3673 | mse(diag) 0.1802 | eff_K 2000/2000 | dying 58
+  step 781000 | loss 0.0718 | kl 0.0252 | val_kl 0.0368 | clus 0.3732 | sep 0.3721 | mse(diag) 0.1760 | eff_K 2000/2000 | dying 67
+  [reinit] step 781000: 182 dead clusters
+  step 781100 | loss 0.0740 | kl 0.0251 | val_kl 0.0351 | clus 0.4069 | sep 0.3730 | mse(diag) 0.1803 | eff_K 2000/2000 | dying 43
+  step 781200 | loss 0.0728 | kl 0.0256 | val_kl 0.0360 | clus 0.3811 | sep 0.3706 | mse(diag) 0.1770 | eff_K 2000/2000 | dying 36
+  step 781300 | loss 0.0783 | kl 0.0308 | val_kl 0.0344 | clus 0.3942 | sep 0.3725 | mse(diag) 0.1749 | eff_K 2000/2000 | dying 42
+  step 781400 | loss 0.0698 | kl 0.0226 | val_kl 0.0341 | clus 0.3780 | sep 0.3713 | mse(diag) 0.1780 | eff_K 2000/2000 | dying 51
+  step 781500 | loss 0.0734 | kl 0.0245 | val_kl 0.0359 | clus 0.3905 | sep 0.3718 | mse(diag) 0.1859 | eff_K 2000/2000 | dying 60
+  step 781600 | loss 0.0746 | kl 0.0272 | val_kl 0.0343 | clus 0.3846 | sep 0.3684 | mse(diag) 0.1775 | eff_K 2000/2000 | dying 56
+  step 781700 | loss 0.0724 | kl 0.0253 | val_kl 0.0329 | clus 0.3831 | sep 0.3672 | mse(diag) 0.1764 | eff_K 2000/2000 | dying 48
+  step 781800 | loss 0.0726 | kl 0.0257 | val_kl 0.0343 | clus 0.3844 | sep 0.3686 | mse(diag) 0.1749 | eff_K 2000/2000 | dying 50
+  step 781900 | loss 0.0754 | kl 0.0276 | val_kl 0.0339 | clus 0.3939 | sep 0.3713 | mse(diag) 0.1770 | eff_K 2000/2000 | dying 50
+  step 782000 | loss 0.0679 | kl 0.0219 | val_kl 0.0351 | clus 0.3754 | sep 0.3706 | mse(diag) 0.1714 | eff_K 2000/2000 | dying 50
+  [reinit] step 782000: 153 dead clusters
+  step 782100 | loss 0.0696 | kl 0.0238 | val_kl 0.0350 | clus 0.3774 | sep 0.3733 | mse(diag) 0.1693 | eff_K 2000/2000 | dying 43
+  step 782200 | loss 0.0697 | kl 0.0224 | val_kl 0.0357 | clus 0.3815 | sep 0.3715 | mse(diag) 0.1781 | eff_K 2000/2000 | dying 50
+  step 782300 | loss 0.0723 | kl 0.0257 | val_kl 0.0345 | clus 0.3873 | sep 0.3706 | mse(diag) 0.1718 | eff_K 2000/2000 | dying 53
+  step 782400 | loss 0.0714 | kl 0.0242 | val_kl 0.0346 | clus 0.3819 | sep 0.3741 | mse(diag) 0.1770 | eff_K 2000/2000 | dying 48
+  step 782500 | loss 0.0678 | kl 0.0223 | val_kl 0.0340 | clus 0.3744 | sep 0.3717 | mse(diag) 0.1682 | eff_K 2000/2000 | dying 49
+  step 782600 | loss 0.0694 | kl 0.0216 | val_kl 0.0346 | clus 0.3829 | sep 0.3706 | mse(diag) 0.1805 | eff_K 2000/2000 | dying 57
+  step 782700 | loss 0.0729 | kl 0.0263 | val_kl 0.0331 | clus 0.3864 | sep 0.3722 | mse(diag) 0.1717 | eff_K 2000/2000 | dying 61
+  step 782800 | loss 0.0709 | kl 0.0236 | val_kl 0.0358 | clus 0.3817 | sep 0.3739 | mse(diag) 0.1778 | eff_K 2000/2000 | dying 59
+  step 782900 | loss 0.0708 | kl 0.0242 | val_kl 0.0354 | clus 0.3710 | sep 0.3731 | mse(diag) 0.1768 | eff_K 2000/2000 | dying 54
+  step 783000 | loss 0.0706 | kl 0.0242 | val_kl 0.0333 | clus 0.3776 | sep 0.3746 | mse(diag) 0.1732 | eff_K 2000/2000 | dying 54
+  [reinit] step 783000: 161 dead clusters
+  step 783100 | loss 0.0728 | kl 0.0251 | val_kl 0.0346 | clus 0.3950 | sep 0.3757 | mse(diag) 0.1760 | eff_K 2000/2000 | dying 42
+  step 783200 | loss 0.0735 | kl 0.0265 | val_kl 0.0362 | clus 0.3815 | sep 0.3734 | mse(diag) 0.1761 | eff_K 2000/2000 | dying 46
+  step 783300 | loss 0.0704 | kl 0.0246 | val_kl 0.0344 | clus 0.3770 | sep 0.3702 | mse(diag) 0.1689 | eff_K 2000/2000 | dying 54
+  step 783400 | loss 0.0767 | kl 0.0302 | val_kl 0.0339 | clus 0.3852 | sep 0.3731 | mse(diag) 0.1718 | eff_K 2000/2000 | dying 53
+  step 783500 | loss 0.0790 | kl 0.0318 | val_kl 0.0344 | clus 0.3831 | sep 0.3731 | mse(diag) 0.1768 | eff_K 2000/2000 | dying 52
+  step 783600 | loss 0.0694 | kl 0.0221 | val_kl 0.0347 | clus 0.3693 | sep 0.3713 | mse(diag) 0.1816 | eff_K 2000/2000 | dying 41
+  step 783700 | loss 0.0683 | kl 0.0220 | val_kl 0.0329 | clus 0.3804 | sep 0.3710 | mse(diag) 0.1711 | eff_K 2000/2000 | dying 46
+  step 783800 | loss 0.0670 | kl 0.0215 | val_kl 0.0329 | clus 0.3678 | sep 0.3730 | mse(diag) 0.1708 | eff_K 2000/2000 | dying 50
+  step 783900 | loss 0.0714 | kl 0.0242 | val_kl 0.0335 | clus 0.3777 | sep 0.3785 | mse(diag) 0.1783 | eff_K 2000/2000 | dying 50
+[train-e2e] Saved step_0783933.pt  val_kl=0.03429  val_mse=0.17354
+[train-e2e] Epoch 43 done in 125.0 min
+
+[train-e2e] Epoch 44/50 | tau=0.232 | λ_c=0.050 λ_s=0.0043
+  step 784000 | loss 0.0746 | kl 0.0271 | val_kl 0.0353 | clus 0.3822 | sep 0.3731 | mse(diag) 0.1783 | eff_K 2000/2000 | dying 51
+  [reinit] step 784000: 156 dead clusters
+  step 784100 | loss 0.0716 | kl 0.0229 | val_kl 0.0365 | clus 0.4014 | sep 0.3708 | mse(diag) 0.1808 | eff_K 2000/2000 | dying 44
+  step 784200 | loss 0.0855 | kl 0.0372 | val_kl 0.0370 | clus 0.3956 | sep 0.3704 | mse(diag) 0.1790 | eff_K 2000/2000 | dying 52
+  step 784300 | loss 0.0777 | kl 0.0295 | val_kl 0.0371 | clus 0.3941 | sep 0.3718 | mse(diag) 0.1791 | eff_K 2000/2000 | dying 47
+  step 784400 | loss 0.0760 | kl 0.0297 | val_kl 0.0372 | clus 0.3830 | sep 0.3672 | mse(diag) 0.1709 | eff_K 2000/2000 | dying 57
+  step 784500 | loss 0.0710 | kl 0.0247 | val_kl 0.0358 | clus 0.3901 | sep 0.3678 | mse(diag) 0.1677 | eff_K 2000/2000 | dying 60
+  step 784600 | loss 0.0780 | kl 0.0307 | val_kl 0.0352 | clus 0.3984 | sep 0.3741 | mse(diag) 0.1718 | eff_K 2000/2000 | dying 59
+  step 784700 | loss 0.0732 | kl 0.0256 | val_kl 0.0365 | clus 0.3899 | sep 0.3735 | mse(diag) 0.1770 | eff_K 2000/2000 | dying 61
+  step 784800 | loss 0.0764 | kl 0.0285 | val_kl 0.0359 | clus 0.3821 | sep 0.3750 | mse(diag) 0.1813 | eff_K 2000/2000 | dying 54
+  step 784900 | loss 0.0768 | kl 0.0290 | val_kl 0.0359 | clus 0.3922 | sep 0.3709 | mse(diag) 0.1772 | eff_K 2000/2000 | dying 61
+  step 785000 | loss 0.0802 | kl 0.0313 | val_kl 0.0356 | clus 0.3819 | sep 0.3716 | mse(diag) 0.1885 | eff_K 2000/2000 | dying 60
+  [reinit] step 785000: 159 dead clusters
+  step 785100 | loss 0.0748 | kl 0.0273 | val_kl 0.0369 | clus 0.4004 | sep 0.3719 | mse(diag) 0.1720 | eff_K 2000/2000 | dying 49
+  step 785200 | loss 0.0756 | kl 0.0275 | val_kl 0.0348 | clus 0.3987 | sep 0.3748 | mse(diag) 0.1772 | eff_K 2000/2000 | dying 58
+  step 785300 | loss 0.0711 | kl 0.0256 | val_kl 0.0371 | clus 0.3707 | sep 0.3706 | mse(diag) 0.1690 | eff_K 2000/2000 | dying 54
+  step 785400 | loss 0.0712 | kl 0.0241 | val_kl 0.0372 | clus 0.3906 | sep 0.3711 | mse(diag) 0.1732 | eff_K 2000/2000 | dying 55
+  step 785500 | loss 0.0730 | kl 0.0255 | val_kl 0.0384 | clus 0.3882 | sep 0.3703 | mse(diag) 0.1767 | eff_K 2000/2000 | dying 56
+  step 785600 | loss 0.0716 | kl 0.0263 | val_kl 0.0364 | clus 0.3717 | sep 0.3684 | mse(diag) 0.1675 | eff_K 2000/2000 | dying 58
+  step 785700 | loss 0.0728 | kl 0.0259 | val_kl 0.0360 | clus 0.3889 | sep 0.3726 | mse(diag) 0.1728 | eff_K 2000/2000 | dying 55
+  step 785800 | loss 0.0708 | kl 0.0223 | val_kl 0.0355 | clus 0.3979 | sep 0.3719 | mse(diag) 0.1797 | eff_K 2000/2000 | dying 57
+  step 785900 | loss 0.0691 | kl 0.0230 | val_kl 0.0346 | clus 0.3819 | sep 0.3703 | mse(diag) 0.1692 | eff_K 2000/2000 | dying 56
+  step 786000 | loss 0.0676 | kl 0.0220 | val_kl 0.0355 | clus 0.3667 | sep 0.3733 | mse(diag) 0.1709 | eff_K 2000/2000 | dying 57
+  [reinit] step 786000: 183 dead clusters
+  step 786100 | loss 0.0802 | kl 0.0322 | val_kl 0.0358 | clus 0.4015 | sep 0.3709 | mse(diag) 0.1754 | eff_K 2000/2000 | dying 45
+  step 786200 | loss 0.0743 | kl 0.0288 | val_kl 0.0360 | clus 0.3774 | sep 0.3707 | mse(diag) 0.1669 | eff_K 2000/2000 | dying 41
+  step 786300 | loss 0.0695 | kl 0.0237 | val_kl 0.0355 | clus 0.3899 | sep 0.3697 | mse(diag) 0.1645 | eff_K 2000/2000 | dying 42
+  step 786400 | loss 0.0726 | kl 0.0253 | val_kl 0.0365 | clus 0.3862 | sep 0.3723 | mse(diag) 0.1766 | eff_K 2000/2000 | dying 41
+  step 786500 | loss 0.0713 | kl 0.0245 | val_kl 0.0346 | clus 0.3951 | sep 0.3719 | mse(diag) 0.1703 | eff_K 2000/2000 | dying 46
+  step 786600 | loss 0.0734 | kl 0.0268 | val_kl 0.0358 | clus 0.3837 | sep 0.3701 | mse(diag) 0.1718 | eff_K 2000/2000 | dying 49
+  step 786700 | loss 0.0726 | kl 0.0255 | val_kl 0.0354 | clus 0.3862 | sep 0.3743 | mse(diag) 0.1744 | eff_K 2000/2000 | dying 48
+  step 786800 | loss 0.0726 | kl 0.0258 | val_kl 0.0346 | clus 0.3846 | sep 0.3725 | mse(diag) 0.1727 | eff_K 2000/2000 | dying 48
+  step 786900 | loss 0.0744 | kl 0.0272 | val_kl 0.0358 | clus 0.3862 | sep 0.3697 | mse(diag) 0.1757 | eff_K 2000/2000 | dying 45
+  step 787000 | loss 0.0745 | kl 0.0283 | val_kl 0.0348 | clus 0.3837 | sep 0.3669 | mse(diag) 0.1698 | eff_K 2000/2000 | dying 46
+  [reinit] step 787000: 181 dead clusters
+  step 787100 | loss 0.0746 | kl 0.0269 | val_kl 0.0351 | clus 0.4002 | sep 0.3693 | mse(diag) 0.1742 | eff_K 2000/2000 | dying 31
+  step 787200 | loss 0.0730 | kl 0.0275 | val_kl 0.0359 | clus 0.3808 | sep 0.3724 | mse(diag) 0.1654 | eff_K 2000/2000 | dying 26
+  step 787300 | loss 0.0723 | kl 0.0250 | val_kl 0.0341 | clus 0.3949 | sep 0.3705 | mse(diag) 0.1728 | eff_K 2000/2000 | dying 29
+  step 787400 | loss 0.0823 | kl 0.0361 | val_kl 0.0361 | clus 0.3785 | sep 0.3686 | mse(diag) 0.1715 | eff_K 2000/2000 | dying 39
+  step 787500 | loss 0.0700 | kl 0.0238 | val_kl 0.0341 | clus 0.3843 | sep 0.3703 | mse(diag) 0.1696 | eff_K 2000/2000 | dying 38
+  step 787600 | loss 0.0670 | kl 0.0213 | val_kl 0.0358 | clus 0.3767 | sep 0.3748 | mse(diag) 0.1686 | eff_K 2000/2000 | dying 45
+  step 787700 | loss 0.0845 | kl 0.0372 | val_kl 0.0342 | clus 0.3927 | sep 0.3732 | mse(diag) 0.1737 | eff_K 2000/2000 | dying 50
+  step 787800 | loss 0.0683 | kl 0.0221 | val_kl 0.0349 | clus 0.3809 | sep 0.3707 | mse(diag) 0.1708 | eff_K 2000/2000 | dying 48
+  step 787900 | loss 0.0747 | kl 0.0283 | val_kl 0.0374 | clus 0.3782 | sep 0.3696 | mse(diag) 0.1729 | eff_K 2000/2000 | dying 45
+  step 788000 | loss 0.0753 | kl 0.0282 | val_kl 0.0360 | clus 0.3933 | sep 0.3682 | mse(diag) 0.1727 | eff_K 2000/2000 | dying 45
+  [reinit] step 788000: 158 dead clusters
+  step 788100 | loss 0.0714 | kl 0.0222 | val_kl 0.0362 | clus 0.3975 | sep 0.3670 | mse(diag) 0.1847 | eff_K 2000/2000 | dying 35
+  step 788200 | loss 0.0736 | kl 0.0260 | val_kl 0.0334 | clus 0.3950 | sep 0.3684 | mse(diag) 0.1752 | eff_K 2000/2000 | dying 40
+  step 788300 | loss 0.0682 | kl 0.0225 | val_kl 0.0347 | clus 0.3783 | sep 0.3714 | mse(diag) 0.1682 | eff_K 2000/2000 | dying 50
+  step 788400 | loss 0.0718 | kl 0.0251 | val_kl 0.0350 | clus 0.3900 | sep 0.3710 | mse(diag) 0.1708 | eff_K 2000/2000 | dying 36
+  step 788500 | loss 0.0700 | kl 0.0245 | val_kl 0.0349 | clus 0.3813 | sep 0.3720 | mse(diag) 0.1659 | eff_K 2000/2000 | dying 55
+  step 788600 | loss 0.0769 | kl 0.0310 | val_kl 0.0344 | clus 0.3889 | sep 0.3699 | mse(diag) 0.1659 | eff_K 2000/2000 | dying 58
+  step 788700 | loss 0.0724 | kl 0.0265 | val_kl 0.0345 | clus 0.3789 | sep 0.3688 | mse(diag) 0.1694 | eff_K 2000/2000 | dying 56
+  step 788800 | loss 0.0724 | kl 0.0259 | val_kl 0.0350 | clus 0.3813 | sep 0.3700 | mse(diag) 0.1719 | eff_K 2000/2000 | dying 52
+  step 788900 | loss 0.0828 | kl 0.0362 | val_kl 0.0372 | clus 0.3817 | sep 0.3709 | mse(diag) 0.1724 | eff_K 2000/2000 | dying 55
+  step 789000 | loss 0.0724 | kl 0.0254 | val_kl 0.0341 | clus 0.3831 | sep 0.3732 | mse(diag) 0.1749 | eff_K 2000/2000 | dying 59
+  [reinit] step 789000: 177 dead clusters
+  step 789100 | loss 0.0739 | kl 0.0275 | val_kl 0.0350 | clus 0.3963 | sep 0.3694 | mse(diag) 0.1666 | eff_K 2000/2000 | dying 47
+  step 789200 | loss 0.0743 | kl 0.0276 | val_kl 0.0371 | clus 0.3963 | sep 0.3753 | mse(diag) 0.1687 | eff_K 2000/2000 | dying 51
+  step 789300 | loss 0.0706 | kl 0.0226 | val_kl 0.0343 | clus 0.3935 | sep 0.3704 | mse(diag) 0.1782 | eff_K 2000/2000 | dying 51
+  step 789400 | loss 0.0723 | kl 0.0256 | val_kl 0.0343 | clus 0.3908 | sep 0.3721 | mse(diag) 0.1701 | eff_K 2000/2000 | dying 58
+  step 789500 | loss 0.0720 | kl 0.0256 | val_kl 0.0343 | clus 0.3753 | sep 0.3788 | mse(diag) 0.1734 | eff_K 2000/2000 | dying 61
+  step 789600 | loss 0.0684 | kl 0.0218 | val_kl 0.0340 | clus 0.3807 | sep 0.3738 | mse(diag) 0.1732 | eff_K 2000/2000 | dying 60
+  step 789700 | loss 0.0716 | kl 0.0250 | val_kl 0.0340 | clus 0.3834 | sep 0.3705 | mse(diag) 0.1719 | eff_K 2000/2000 | dying 56
+  step 789800 | loss 0.0728 | kl 0.0252 | val_kl 0.0347 | clus 0.3874 | sep 0.3751 | mse(diag) 0.1775 | eff_K 2000/2000 | dying 47
+  step 789900 | loss 0.0752 | kl 0.0286 | val_kl 0.0343 | clus 0.3883 | sep 0.3725 | mse(diag) 0.1704 | eff_K 2000/2000 | dying 52
+  step 790000 | loss 0.0682 | kl 0.0225 | val_kl 0.0348 | clus 0.3701 | sep 0.3733 | mse(diag) 0.1710 | eff_K 2000/2000 | dying 58
+  [reinit] step 790000: 179 dead clusters
+  step 790100 | loss 0.0738 | kl 0.0260 | val_kl 0.0344 | clus 0.3945 | sep 0.3740 | mse(diag) 0.1764 | eff_K 2000/2000 | dying 47
+  step 790200 | loss 0.0744 | kl 0.0269 | val_kl 0.0351 | clus 0.3969 | sep 0.3722 | mse(diag) 0.1738 | eff_K 2000/2000 | dying 42
+  step 790300 | loss 0.0708 | kl 0.0240 | val_kl 0.0359 | clus 0.3903 | sep 0.3723 | mse(diag) 0.1714 | eff_K 2000/2000 | dying 40
+  step 790400 | loss 0.0737 | kl 0.0275 | val_kl 0.0348 | clus 0.3782 | sep 0.3751 | mse(diag) 0.1708 | eff_K 2000/2000 | dying 48
+  step 790500 | loss 0.0688 | kl 0.0221 | val_kl 0.0348 | clus 0.3913 | sep 0.3732 | mse(diag) 0.1708 | eff_K 2000/2000 | dying 45
+  step 790600 | loss 0.0690 | kl 0.0231 | val_kl 0.0355 | clus 0.3849 | sep 0.3708 | mse(diag) 0.1670 | eff_K 2000/2000 | dying 50
+  step 790700 | loss 0.0728 | kl 0.0250 | val_kl 0.0345 | clus 0.4005 | sep 0.3738 | mse(diag) 0.1743 | eff_K 2000/2000 | dying 54
+  step 790800 | loss 0.0702 | kl 0.0235 | val_kl 0.0353 | clus 0.3813 | sep 0.3714 | mse(diag) 0.1736 | eff_K 2000/2000 | dying 53
+  step 790900 | loss 0.0717 | kl 0.0240 | val_kl 0.0361 | clus 0.3941 | sep 0.3711 | mse(diag) 0.1757 | eff_K 2000/2000 | dying 55
+  step 791000 | loss 0.0706 | kl 0.0250 | val_kl 0.0352 | clus 0.3821 | sep 0.3703 | mse(diag) 0.1663 | eff_K 2000/2000 | dying 48
+  [reinit] step 791000: 175 dead clusters
+  step 791100 | loss 0.0710 | kl 0.0239 | val_kl 0.0353 | clus 0.4032 | sep 0.3727 | mse(diag) 0.1692 | eff_K 2000/2000 | dying 32
+  step 791200 | loss 0.0700 | kl 0.0237 | val_kl 0.0339 | clus 0.3821 | sep 0.3706 | mse(diag) 0.1705 | eff_K 2000/2000 | dying 43
+  step 791300 | loss 0.0686 | kl 0.0219 | val_kl 0.0339 | clus 0.3912 | sep 0.3699 | mse(diag) 0.1706 | eff_K 2000/2000 | dying 40
+  step 791400 | loss 0.0728 | kl 0.0257 | val_kl 0.0348 | clus 0.3915 | sep 0.3715 | mse(diag) 0.1734 | eff_K 2000/2000 | dying 48
+  step 791500 | loss 0.0707 | kl 0.0243 | val_kl 0.0361 | clus 0.3804 | sep 0.3741 | mse(diag) 0.1715 | eff_K 2000/2000 | dying 62
+  step 791600 | loss 0.0723 | kl 0.0258 | val_kl 0.0343 | clus 0.3948 | sep 0.3731 | mse(diag) 0.1681 | eff_K 2000/2000 | dying 57
+  step 791700 | loss 0.0715 | kl 0.0262 | val_kl 0.0334 | clus 0.3763 | sep 0.3724 | mse(diag) 0.1660 | eff_K 2000/2000 | dying 62
+  step 791800 | loss 0.0713 | kl 0.0253 | val_kl 0.0358 | clus 0.3875 | sep 0.3702 | mse(diag) 0.1670 | eff_K 2000/2000 | dying 63
+  step 791900 | loss 0.0740 | kl 0.0278 | val_kl 0.0332 | clus 0.3878 | sep 0.3722 | mse(diag) 0.1681 | eff_K 2000/2000 | dying 60
+  step 792000 | loss 0.0683 | kl 0.0233 | val_kl 0.0350 | clus 0.3835 | sep 0.3738 | mse(diag) 0.1616 | eff_K 2000/2000 | dying 64
+  [reinit] step 792000: 160 dead clusters
+  step 792100 | loss 0.0742 | kl 0.0249 | val_kl 0.0357 | clus 0.4233 | sep 0.3731 | mse(diag) 0.1767 | eff_K 2000/2000 | dying 44
+  step 792200 | loss 0.0702 | kl 0.0252 | val_kl 0.0338 | clus 0.3839 | sep 0.3703 | mse(diag) 0.1615 | eff_K 2000/2000 | dying 38
+  step 792300 | loss 0.0734 | kl 0.0264 | val_kl 0.0362 | clus 0.3910 | sep 0.3678 | mse(diag) 0.1726 | eff_K 2000/2000 | dying 42
+  step 792400 | loss 0.0763 | kl 0.0303 | val_kl 0.0344 | clus 0.3933 | sep 0.3706 | mse(diag) 0.1655 | eff_K 2000/2000 | dying 41
+  step 792500 | loss 0.0679 | kl 0.0225 | val_kl 0.0348 | clus 0.3795 | sep 0.3693 | mse(diag) 0.1652 | eff_K 2000/2000 | dying 51
+  step 792600 | loss 0.0736 | kl 0.0260 | val_kl 0.0343 | clus 0.3919 | sep 0.3707 | mse(diag) 0.1758 | eff_K 2000/2000 | dying 61
+  step 792700 | loss 0.0709 | kl 0.0245 | val_kl 0.0367 | clus 0.3826 | sep 0.3737 | mse(diag) 0.1708 | eff_K 2000/2000 | dying 57
+  step 792800 | loss 0.0719 | kl 0.0266 | val_kl 0.0351 | clus 0.3860 | sep 0.3703 | mse(diag) 0.1628 | eff_K 2000/2000 | dying 56
+  step 792900 | loss 0.0672 | kl 0.0208 | val_kl 0.0343 | clus 0.3795 | sep 0.3720 | mse(diag) 0.1721 | eff_K 2000/2000 | dying 60
+  step 793000 | loss 0.0727 | kl 0.0269 | val_kl 0.0362 | clus 0.3844 | sep 0.3724 | mse(diag) 0.1668 | eff_K 2000/2000 | dying 59
+  [reinit] step 793000: 172 dead clusters
+  step 793100 | loss 0.0704 | kl 0.0244 | val_kl 0.0367 | clus 0.3938 | sep 0.3716 | mse(diag) 0.1648 | eff_K 2000/2000 | dying 49
+  step 793200 | loss 0.0706 | kl 0.0244 | val_kl 0.0358 | clus 0.3933 | sep 0.3741 | mse(diag) 0.1669 | eff_K 2000/2000 | dying 51
+  step 793300 | loss 0.0702 | kl 0.0240 | val_kl 0.0331 | clus 0.3924 | sep 0.3740 | mse(diag) 0.1662 | eff_K 2000/2000 | dying 61
+  step 793400 | loss 0.0724 | kl 0.0254 | val_kl 0.0357 | clus 0.3901 | sep 0.3718 | mse(diag) 0.1725 | eff_K 2000/2000 | dying 67
+  step 793500 | loss 0.0689 | kl 0.0233 | val_kl 0.0339 | clus 0.3841 | sep 0.3729 | mse(diag) 0.1649 | eff_K 2000/2000 | dying 61
+  step 793600 | loss 0.0741 | kl 0.0261 | val_kl 0.0353 | clus 0.4013 | sep 0.3719 | mse(diag) 0.1759 | eff_K 2000/2000 | dying 58
+  step 793700 | loss 0.0707 | kl 0.0243 | val_kl 0.0350 | clus 0.3889 | sep 0.3707 | mse(diag) 0.1693 | eff_K 2000/2000 | dying 62
+  step 793800 | loss 0.0743 | kl 0.0263 | val_kl 0.0362 | clus 0.3951 | sep 0.3687 | mse(diag) 0.1778 | eff_K 2000/2000 | dying 68
+  step 793900 | loss 0.0698 | kl 0.0237 | val_kl 0.0333 | clus 0.3853 | sep 0.3692 | mse(diag) 0.1678 | eff_K 2000/2000 | dying 76
+  step 794000 | loss 0.0755 | kl 0.0288 | val_kl 0.0347 | clus 0.3898 | sep 0.3695 | mse(diag) 0.1704 | eff_K 2000/2000 | dying 67
+  [reinit] step 794000: 183 dead clusters
+  step 794100 | loss 0.0748 | kl 0.0268 | val_kl 0.0357 | clus 0.4056 | sep 0.3730 | mse(diag) 0.1738 | eff_K 2000/2000 | dying 44
+  step 794200 | loss 0.0747 | kl 0.0282 | val_kl 0.0340 | clus 0.3842 | sep 0.3738 | mse(diag) 0.1713 | eff_K 2000/2000 | dying 49
+  step 794300 | loss 0.0702 | kl 0.0240 | val_kl 0.0376 | clus 0.3905 | sep 0.3699 | mse(diag) 0.1676 | eff_K 2000/2000 | dying 51
+  step 794400 | loss 0.0752 | kl 0.0277 | val_kl 0.0347 | clus 0.4107 | sep 0.3713 | mse(diag) 0.1690 | eff_K 2000/2000 | dying 51
+  step 794500 | loss 0.0718 | kl 0.0249 | val_kl 0.0335 | clus 0.3948 | sep 0.3705 | mse(diag) 0.1708 | eff_K 2000/2000 | dying 50
+  step 794600 | loss 0.0682 | kl 0.0228 | val_kl 0.0349 | clus 0.3830 | sep 0.3740 | mse(diag) 0.1641 | eff_K 2000/2000 | dying 50
+  step 794700 | loss 0.0708 | kl 0.0247 | val_kl 0.0351 | clus 0.3939 | sep 0.3730 | mse(diag) 0.1652 | eff_K 2000/2000 | dying 52
+  step 794800 | loss 0.0731 | kl 0.0258 | val_kl 0.0353 | clus 0.3926 | sep 0.3718 | mse(diag) 0.1738 | eff_K 2000/2000 | dying 60
+  step 794900 | loss 0.0727 | kl 0.0263 | val_kl 0.0349 | clus 0.3914 | sep 0.3705 | mse(diag) 0.1683 | eff_K 2000/2000 | dying 63
+  step 795000 | loss 0.0690 | kl 0.0222 | val_kl 0.0344 | clus 0.3957 | sep 0.3683 | mse(diag) 0.1701 | eff_K 2000/2000 | dying 56
+  [reinit] step 795000: 173 dead clusters
+  step 795100 | loss 0.0722 | kl 0.0256 | val_kl 0.0346 | clus 0.3983 | sep 0.3709 | mse(diag) 0.1673 | eff_K 2000/2000 | dying 44
+  step 795200 | loss 0.0779 | kl 0.0312 | val_kl 0.0350 | clus 0.4054 | sep 0.3701 | mse(diag) 0.1656 | eff_K 2000/2000 | dying 60
+  step 795300 | loss 0.0703 | kl 0.0232 | val_kl 0.0356 | clus 0.3939 | sep 0.3682 | mse(diag) 0.1719 | eff_K 2000/2000 | dying 67
+  step 795400 | loss 0.0705 | kl 0.0239 | val_kl 0.0350 | clus 0.3828 | sep 0.3698 | mse(diag) 0.1724 | eff_K 2000/2000 | dying 67
+  step 795500 | loss 0.0748 | kl 0.0289 | val_kl 0.0348 | clus 0.3907 | sep 0.3713 | mse(diag) 0.1653 | eff_K 2000/2000 | dying 69
+  step 795600 | loss 0.0722 | kl 0.0266 | val_kl 0.0344 | clus 0.3913 | sep 0.3720 | mse(diag) 0.1632 | eff_K 2000/2000 | dying 74
+  step 795700 | loss 0.0820 | kl 0.0359 | val_kl 0.0346 | clus 0.3940 | sep 0.3740 | mse(diag) 0.1653 | eff_K 2000/2000 | dying 72
+  step 795800 | loss 0.0676 | kl 0.0218 | val_kl 0.0344 | clus 0.3850 | sep 0.3719 | mse(diag) 0.1662 | eff_K 2000/2000 | dying 70
+  step 795900 | loss 0.0702 | kl 0.0239 | val_kl 0.0331 | clus 0.4007 | sep 0.3704 | mse(diag) 0.1648 | eff_K 2000/2000 | dying 64
+  step 796000 | loss 0.0771 | kl 0.0285 | val_kl 0.0351 | clus 0.3960 | sep 0.3714 | mse(diag) 0.1811 | eff_K 2000/2000 | dying 70
+  [reinit] step 796000: 170 dead clusters
+  step 796100 | loss 0.0710 | kl 0.0239 | val_kl 0.0342 | clus 0.3926 | sep 0.3751 | mse(diag) 0.1722 | eff_K 2000/2000 | dying 46
+  step 796200 | loss 0.0751 | kl 0.0273 | val_kl 0.0348 | clus 0.4115 | sep 0.3723 | mse(diag) 0.1712 | eff_K 2000/2000 | dying 40
+  step 796300 | loss 0.0799 | kl 0.0337 | val_kl 0.0340 | clus 0.3941 | sep 0.3736 | mse(diag) 0.1659 | eff_K 2000/2000 | dying 43
+  step 796400 | loss 0.0765 | kl 0.0291 | val_kl 0.0346 | clus 0.4018 | sep 0.3714 | mse(diag) 0.1718 | eff_K 2000/2000 | dying 54
+  step 796500 | loss 0.0688 | kl 0.0231 | val_kl 0.0353 | clus 0.3939 | sep 0.3691 | mse(diag) 0.1632 | eff_K 2000/2000 | dying 52
+  step 796600 | loss 0.0730 | kl 0.0280 | val_kl 0.0334 | clus 0.3889 | sep 0.3704 | mse(diag) 0.1599 | eff_K 2000/2000 | dying 62
+  step 796700 | loss 0.0672 | kl 0.0206 | val_kl 0.0344 | clus 0.3888 | sep 0.3723 | mse(diag) 0.1703 | eff_K 2000/2000 | dying 55
+  step 796800 | loss 0.0698 | kl 0.0229 | val_kl 0.0356 | clus 0.3979 | sep 0.3737 | mse(diag) 0.1695 | eff_K 2000/2000 | dying 59
+  step 796900 | loss 0.0670 | kl 0.0219 | val_kl 0.0345 | clus 0.3855 | sep 0.3700 | mse(diag) 0.1615 | eff_K 2000/2000 | dying 64
+  step 797000 | loss 0.0738 | kl 0.0275 | val_kl 0.0333 | clus 0.3900 | sep 0.3719 | mse(diag) 0.1680 | eff_K 2000/2000 | dying 70
+  [reinit] step 797000: 191 dead clusters
+  step 797100 | loss 0.0696 | kl 0.0246 | val_kl 0.0343 | clus 0.3888 | sep 0.3733 | mse(diag) 0.1601 | eff_K 2000/2000 | dying 48
+  step 797200 | loss 0.0724 | kl 0.0261 | val_kl 0.0324 | clus 0.3968 | sep 0.3714 | mse(diag) 0.1660 | eff_K 2000/2000 | dying 62
+  step 797300 | loss 0.0674 | kl 0.0205 | val_kl 0.0333 | clus 0.3896 | sep 0.3693 | mse(diag) 0.1718 | eff_K 2000/2000 | dying 55
+  step 797400 | loss 0.0768 | kl 0.0308 | val_kl 0.0342 | clus 0.3912 | sep 0.3728 | mse(diag) 0.1657 | eff_K 2000/2000 | dying 61
+  step 797500 | loss 0.0703 | kl 0.0240 | val_kl 0.0341 | clus 0.3934 | sep 0.3720 | mse(diag) 0.1667 | eff_K 2000/2000 | dying 63
+  step 797600 | loss 0.0727 | kl 0.0257 | val_kl 0.0378 | clus 0.3899 | sep 0.3719 | mse(diag) 0.1729 | eff_K 2000/2000 | dying 61
+  step 797700 | loss 0.0794 | kl 0.0336 | val_kl 0.0348 | clus 0.3854 | sep 0.3738 | mse(diag) 0.1659 | eff_K 2000/2000 | dying 63
+  step 797800 | loss 0.0761 | kl 0.0286 | val_kl 0.0335 | clus 0.4012 | sep 0.3720 | mse(diag) 0.1724 | eff_K 2000/2000 | dying 59
+  step 797900 | loss 0.0720 | kl 0.0271 | val_kl 0.0330 | clus 0.3861 | sep 0.3725 | mse(diag) 0.1602 | eff_K 2000/2000 | dying 65
+  step 798000 | loss 0.0736 | kl 0.0285 | val_kl 0.0336 | clus 0.3984 | sep 0.3727 | mse(diag) 0.1574 | eff_K 2000/2000 | dying 55
+  [reinit] step 798000: 173 dead clusters
+  step 798100 | loss 0.0721 | kl 0.0253 | val_kl 0.0351 | clus 0.4062 | sep 0.3712 | mse(diag) 0.1658 | eff_K 2000/2000 | dying 31
+  step 798200 | loss 0.0690 | kl 0.0232 | val_kl 0.0347 | clus 0.3846 | sep 0.3724 | mse(diag) 0.1665 | eff_K 2000/2000 | dying 36
+  step 798300 | loss 0.0704 | kl 0.0243 | val_kl 0.0344 | clus 0.3942 | sep 0.3741 | mse(diag) 0.1653 | eff_K 2000/2000 | dying 45
+  step 798400 | loss 0.0741 | kl 0.0284 | val_kl 0.0337 | clus 0.3844 | sep 0.3740 | mse(diag) 0.1661 | eff_K 2000/2000 | dying 49
+  step 798500 | loss 0.0679 | kl 0.0226 | val_kl 0.0344 | clus 0.3901 | sep 0.3773 | mse(diag) 0.1616 | eff_K 2000/2000 | dying 59
+  step 798600 | loss 0.0753 | kl 0.0298 | val_kl 0.0339 | clus 0.3943 | sep 0.3719 | mse(diag) 0.1615 | eff_K 2000/2000 | dying 59
+  step 798700 | loss 0.0658 | kl 0.0210 | val_kl 0.0350 | clus 0.3725 | sep 0.3702 | mse(diag) 0.1634 | eff_K 2000/2000 | dying 67
+  step 798800 | loss 0.0742 | kl 0.0270 | val_kl 0.0345 | clus 0.4027 | sep 0.3707 | mse(diag) 0.1702 | eff_K 2000/2000 | dying 54
+  step 798900 | loss 0.0718 | kl 0.0239 | val_kl 0.0345 | clus 0.3991 | sep 0.3737 | mse(diag) 0.1758 | eff_K 2000/2000 | dying 54
+  step 799000 | loss 0.0755 | kl 0.0284 | val_kl 0.0346 | clus 0.3980 | sep 0.3703 | mse(diag) 0.1707 | eff_K 2000/2000 | dying 50
+  [reinit] step 799000: 163 dead clusters
+  step 799100 | loss 0.0747 | kl 0.0264 | val_kl 0.0339 | clus 0.4208 | sep 0.3742 | mse(diag) 0.1707 | eff_K 2000/2000 | dying 42
+  step 799200 | loss 0.0692 | kl 0.0233 | val_kl 0.0334 | clus 0.3983 | sep 0.3723 | mse(diag) 0.1623 | eff_K 2000/2000 | dying 60
+  step 799300 | loss 0.0753 | kl 0.0288 | val_kl 0.0340 | clus 0.4039 | sep 0.3695 | mse(diag) 0.1650 | eff_K 2000/2000 | dying 60
+  step 799400 | loss 0.0701 | kl 0.0226 | val_kl 0.0332 | clus 0.4059 | sep 0.3706 | mse(diag) 0.1707 | eff_K 2000/2000 | dying 66
+  step 799500 | loss 0.0712 | kl 0.0243 | val_kl 0.0349 | clus 0.3981 | sep 0.3680 | mse(diag) 0.1696 | eff_K 2000/2000 | dying 69
+  step 799600 | loss 0.0732 | kl 0.0256 | val_kl 0.0338 | clus 0.3999 | sep 0.3708 | mse(diag) 0.1731 | eff_K 2000/2000 | dying 70
+  step 799700 | loss 0.0738 | kl 0.0268 | val_kl 0.0331 | clus 0.4006 | sep 0.3750 | mse(diag) 0.1694 | eff_K 2000/2000 | dying 72
+  step 799800 | loss 0.0701 | kl 0.0235 | val_kl 0.0343 | clus 0.3952 | sep 0.3730 | mse(diag) 0.1689 | eff_K 2000/2000 | dying 62
+  step 799900 | loss 0.0706 | kl 0.0241 | val_kl 0.0364 | clus 0.3881 | sep 0.3747 | mse(diag) 0.1697 | eff_K 2000/2000 | dying 68
+  step 800000 | loss 0.0673 | kl 0.0211 | val_kl 0.0344 | clus 0.3867 | sep 0.3728 | mse(diag) 0.1683 | eff_K 2000/2000 | dying 64
+  [reinit] step 800000: 163 dead clusters
+  step 800100 | loss 0.0714 | kl 0.0245 | val_kl 0.0352 | clus 0.3997 | sep 0.3713 | mse(diag) 0.1688 | eff_K 2000/2000 | dying 56
+  step 800200 | loss 0.0699 | kl 0.0226 | val_kl 0.0337 | clus 0.3990 | sep 0.3758 | mse(diag) 0.1714 | eff_K 2000/2000 | dying 69
+  step 800300 | loss 0.0703 | kl 0.0241 | val_kl 0.0332 | clus 0.3967 | sep 0.3733 | mse(diag) 0.1654 | eff_K 2000/2000 | dying 56
+  step 800400 | loss 0.0799 | kl 0.0327 | val_kl 0.0350 | clus 0.3944 | sep 0.3706 | mse(diag) 0.1727 | eff_K 2000/2000 | dying 55
+  step 800500 | loss 0.0722 | kl 0.0252 | val_kl 0.0344 | clus 0.4038 | sep 0.3731 | mse(diag) 0.1682 | eff_K 2000/2000 | dying 63
+  step 800600 | loss 0.0667 | kl 0.0227 | val_kl 0.0341 | clus 0.3817 | sep 0.3724 | mse(diag) 0.1557 | eff_K 2000/2000 | dying 62
+  step 800700 | loss 0.0680 | kl 0.0224 | val_kl 0.0329 | clus 0.3839 | sep 0.3720 | mse(diag) 0.1656 | eff_K 2000/2000 | dying 54
+  step 800800 | loss 0.0777 | kl 0.0324 | val_kl 0.0336 | clus 0.3895 | sep 0.3711 | mse(diag) 0.1612 | eff_K 2000/2000 | dying 50
+  step 800900 | loss 0.0683 | kl 0.0231 | val_kl 0.0345 | clus 0.3884 | sep 0.3677 | mse(diag) 0.1616 | eff_K 2000/2000 | dying 55
+  step 801000 | loss 0.0710 | kl 0.0237 | val_kl 0.0330 | clus 0.4022 | sep 0.3725 | mse(diag) 0.1703 | eff_K 2000/2000 | dying 54
+  [reinit] step 801000: 160 dead clusters
+  step 801100 | loss 0.0715 | kl 0.0243 | val_kl 0.0349 | clus 0.4108 | sep 0.3732 | mse(diag) 0.1673 | eff_K 2000/2000 | dying 43
+  step 801200 | loss 0.0703 | kl 0.0235 | val_kl 0.0336 | clus 0.3907 | sep 0.3733 | mse(diag) 0.1712 | eff_K 2000/2000 | dying 53
+  step 801300 | loss 0.0670 | kl 0.0214 | val_kl 0.0338 | clus 0.3942 | sep 0.3727 | mse(diag) 0.1614 | eff_K 2000/2000 | dying 54
+  step 801400 | loss 0.0723 | kl 0.0256 | val_kl 0.0333 | clus 0.4059 | sep 0.3704 | mse(diag) 0.1657 | eff_K 2000/2000 | dying 59
+  step 801500 | loss 0.0668 | kl 0.0222 | val_kl 0.0330 | clus 0.3856 | sep 0.3727 | mse(diag) 0.1582 | eff_K 2000/2000 | dying 55
+  step 801600 | loss 0.0688 | kl 0.0220 | val_kl 0.0349 | clus 0.3937 | sep 0.3690 | mse(diag) 0.1700 | eff_K 2000/2000 | dying 54
+  step 801700 | loss 0.0668 | kl 0.0218 | val_kl 0.0342 | clus 0.3883 | sep 0.3667 | mse(diag) 0.1599 | eff_K 2000/2000 | dying 50
+  step 801800 | loss 0.0724 | kl 0.0268 | val_kl 0.0330 | clus 0.3929 | sep 0.3688 | mse(diag) 0.1628 | eff_K 2000/2000 | dying 53
+  step 801900 | loss 0.0682 | kl 0.0235 | val_kl 0.0344 | clus 0.3789 | sep 0.3737 | mse(diag) 0.1609 | eff_K 2000/2000 | dying 46
+  step 802000 | loss 0.0717 | kl 0.0250 | val_kl 0.0348 | clus 0.3987 | sep 0.3681 | mse(diag) 0.1683 | eff_K 2000/2000 | dying 61
+  [reinit] step 802000: 185 dead clusters
+  step 802100 | loss 0.0743 | kl 0.0273 | val_kl 0.0329 | clus 0.4111 | sep 0.3699 | mse(diag) 0.1657 | eff_K 2000/2000 | dying 44
+[train-e2e] Saved step_0802164.pt  val_kl=0.03566  val_mse=0.16437
+[train-e2e] Epoch 44 done in 128.1 min
+
+[train-e2e] Epoch 45/50 | tau=0.210 | λ_c=0.050 λ_s=0.0044
+  step 802200 | loss 0.0730 | kl 0.0266 | val_kl 0.0353 | clus 0.4024 | sep 0.3750 | mse(diag) 0.1645 | eff_K 2000/2000 | dying 47
+  step 802300 | loss 0.0734 | kl 0.0262 | val_kl 0.0355 | clus 0.4054 | sep 0.3734 | mse(diag) 0.1685 | eff_K 2000/2000 | dying 41
+  step 802400 | loss 0.0730 | kl 0.0264 | val_kl 0.0345 | clus 0.3996 | sep 0.3720 | mse(diag) 0.1664 | eff_K 2000/2000 | dying 43
+  step 802500 | loss 0.0762 | kl 0.0292 | val_kl 0.0366 | clus 0.3990 | sep 0.3678 | mse(diag) 0.1695 | eff_K 2000/2000 | dying 50
+  step 802600 | loss 0.0726 | kl 0.0257 | val_kl 0.0349 | clus 0.3917 | sep 0.3722 | mse(diag) 0.1710 | eff_K 2000/2000 | dying 58
+  step 802700 | loss 0.0683 | kl 0.0226 | val_kl 0.0354 | clus 0.3963 | sep 0.3743 | mse(diag) 0.1617 | eff_K 2000/2000 | dying 61
+  step 802800 | loss 0.0753 | kl 0.0283 | val_kl 0.0349 | clus 0.4002 | sep 0.3720 | mse(diag) 0.1688 | eff_K 2000/2000 | dying 61
+  step 802900 | loss 0.0696 | kl 0.0232 | val_kl 0.0345 | clus 0.3930 | sep 0.3723 | mse(diag) 0.1670 | eff_K 2000/2000 | dying 55
+  step 803000 | loss 0.0706 | kl 0.0250 | val_kl 0.0349 | clus 0.3937 | sep 0.3713 | mse(diag) 0.1622 | eff_K 2000/2000 | dying 52
+  [reinit] step 803000: 169 dead clusters
+  step 803100 | loss 0.0719 | kl 0.0263 | val_kl 0.0352 | clus 0.4004 | sep 0.3693 | mse(diag) 0.1600 | eff_K 2000/2000 | dying 40
+  step 803200 | loss 0.0730 | kl 0.0261 | val_kl 0.0359 | clus 0.4064 | sep 0.3736 | mse(diag) 0.1664 | eff_K 2000/2000 | dying 56
+  step 803300 | loss 0.0756 | kl 0.0295 | val_kl 0.0364 | clus 0.3984 | sep 0.3722 | mse(diag) 0.1635 | eff_K 2000/2000 | dying 55
+  step 803400 | loss 0.0744 | kl 0.0269 | val_kl 0.0348 | clus 0.4045 | sep 0.3706 | mse(diag) 0.1707 | eff_K 2000/2000 | dying 55
+  step 803500 | loss 0.0708 | kl 0.0249 | val_kl 0.0346 | clus 0.3960 | sep 0.3771 | mse(diag) 0.1628 | eff_K 2000/2000 | dying 55
+  step 803600 | loss 0.0736 | kl 0.0279 | val_kl 0.0346 | clus 0.3993 | sep 0.3747 | mse(diag) 0.1604 | eff_K 2000/2000 | dying 54
+  step 803700 | loss 0.0831 | kl 0.0368 | val_kl 0.0345 | clus 0.3922 | sep 0.3740 | mse(diag) 0.1672 | eff_K 2000/2000 | dying 57
+  step 803800 | loss 0.0756 | kl 0.0298 | val_kl 0.0352 | clus 0.3969 | sep 0.3717 | mse(diag) 0.1623 | eff_K 2000/2000 | dying 59
+  step 803900 | loss 0.0724 | kl 0.0281 | val_kl 0.0349 | clus 0.3894 | sep 0.3745 | mse(diag) 0.1547 | eff_K 2000/2000 | dying 59
+  step 804000 | loss 0.0736 | kl 0.0276 | val_kl 0.0343 | clus 0.4033 | sep 0.3727 | mse(diag) 0.1614 | eff_K 2000/2000 | dying 53
+  [reinit] step 804000: 167 dead clusters
+  step 804100 | loss 0.0723 | kl 0.0262 | val_kl 0.0338 | clus 0.4142 | sep 0.3710 | mse(diag) 0.1589 | eff_K 2000/2000 | dying 37
+  step 804200 | loss 0.0910 | kl 0.0443 | val_kl 0.0341 | clus 0.4048 | sep 0.3723 | mse(diag) 0.1653 | eff_K 2000/2000 | dying 53
+  step 804300 | loss 0.0710 | kl 0.0257 | val_kl 0.0345 | clus 0.3921 | sep 0.3677 | mse(diag) 0.1603 | eff_K 2000/2000 | dying 50
+  step 804400 | loss 0.0867 | kl 0.0392 | val_kl 0.0346 | clus 0.4125 | sep 0.3682 | mse(diag) 0.1681 | eff_K 2000/2000 | dying 54
+  step 804500 | loss 0.0768 | kl 0.0302 | val_kl 0.0368 | clus 0.4029 | sep 0.3705 | mse(diag) 0.1659 | eff_K 2000/2000 | dying 54
+  step 804600 | loss 0.0795 | kl 0.0324 | val_kl 0.0338 | clus 0.4084 | sep 0.3729 | mse(diag) 0.1670 | eff_K 2000/2000 | dying 57
+  step 804700 | loss 0.0718 | kl 0.0239 | val_kl 0.0342 | clus 0.4017 | sep 0.3683 | mse(diag) 0.1744 | eff_K 2000/2000 | dying 54
+  step 804800 | loss 0.0793 | kl 0.0336 | val_kl 0.0364 | clus 0.3953 | sep 0.3693 | mse(diag) 0.1621 | eff_K 2000/2000 | dying 53
+  step 804900 | loss 0.0660 | kl 0.0200 | val_kl 0.0351 | clus 0.3888 | sep 0.3749 | mse(diag) 0.1662 | eff_K 2000/2000 | dying 50
+  step 805000 | loss 0.0821 | kl 0.0365 | val_kl 0.0348 | clus 0.3927 | sep 0.3756 | mse(diag) 0.1621 | eff_K 2000/2000 | dying 50
+  [reinit] step 805000: 180 dead clusters
+  step 805100 | loss 0.0752 | kl 0.0279 | val_kl 0.0350 | clus 0.4149 | sep 0.3714 | mse(diag) 0.1661 | eff_K 2000/2000 | dying 25
+  step 805200 | loss 0.0738 | kl 0.0275 | val_kl 0.0369 | clus 0.4022 | sep 0.3691 | mse(diag) 0.1635 | eff_K 2000/2000 | dying 32
+  step 805300 | loss 0.0684 | kl 0.0236 | val_kl 0.0344 | clus 0.3894 | sep 0.3745 | mse(diag) 0.1582 | eff_K 2000/2000 | dying 38
+  step 805400 | loss 0.0689 | kl 0.0234 | val_kl 0.0336 | clus 0.3949 | sep 0.3715 | mse(diag) 0.1603 | eff_K 2000/2000 | dying 38
+  step 805500 | loss 0.0714 | kl 0.0260 | val_kl 0.0331 | clus 0.3909 | sep 0.3705 | mse(diag) 0.1615 | eff_K 2000/2000 | dying 49
+  step 805600 | loss 0.0733 | kl 0.0267 | val_kl 0.0346 | clus 0.4055 | sep 0.3752 | mse(diag) 0.1650 | eff_K 2000/2000 | dying 47
+  step 805700 | loss 0.0704 | kl 0.0258 | val_kl 0.0346 | clus 0.3894 | sep 0.3685 | mse(diag) 0.1562 | eff_K 2000/2000 | dying 42
+  step 805800 | loss 0.0659 | kl 0.0209 | val_kl 0.0345 | clus 0.3841 | sep 0.3694 | mse(diag) 0.1608 | eff_K 2000/2000 | dying 44
+  step 805900 | loss 0.0709 | kl 0.0245 | val_kl 0.0323 | clus 0.4040 | sep 0.3747 | mse(diag) 0.1637 | eff_K 2000/2000 | dying 39
+  step 806000 | loss 0.0711 | kl 0.0255 | val_kl 0.0353 | clus 0.3945 | sep 0.3709 | mse(diag) 0.1621 | eff_K 2000/2000 | dying 45
+  [reinit] step 806000: 166 dead clusters
+  step 806100 | loss 0.0682 | kl 0.0231 | val_kl 0.0326 | clus 0.3985 | sep 0.3714 | mse(diag) 0.1566 | eff_K 2000/2000 | dying 30
+  step 806200 | loss 0.0751 | kl 0.0281 | val_kl 0.0346 | clus 0.4112 | sep 0.3694 | mse(diag) 0.1657 | eff_K 2000/2000 | dying 42
+  step 806300 | loss 0.0662 | kl 0.0214 | val_kl 0.0332 | clus 0.3885 | sep 0.3676 | mse(diag) 0.1586 | eff_K 2000/2000 | dying 42
+  step 806400 | loss 0.0729 | kl 0.0274 | val_kl 0.0327 | clus 0.3902 | sep 0.3737 | mse(diag) 0.1621 | eff_K 2000/2000 | dying 48
+  step 806500 | loss 0.0745 | kl 0.0264 | val_kl 0.0356 | clus 0.4117 | sep 0.3681 | mse(diag) 0.1732 | eff_K 2000/2000 | dying 63
+  step 806600 | loss 0.0861 | kl 0.0398 | val_kl 0.0338 | clus 0.3998 | sep 0.3676 | mse(diag) 0.1644 | eff_K 2000/2000 | dying 57
+  step 806700 | loss 0.0729 | kl 0.0257 | val_kl 0.0369 | clus 0.4028 | sep 0.3730 | mse(diag) 0.1696 | eff_K 2000/2000 | dying 61
+  step 806800 | loss 0.0686 | kl 0.0225 | val_kl 0.0333 | clus 0.3958 | sep 0.3704 | mse(diag) 0.1646 | eff_K 2000/2000 | dying 58
+  step 806900 | loss 0.0735 | kl 0.0277 | val_kl 0.0333 | clus 0.4017 | sep 0.3724 | mse(diag) 0.1605 | eff_K 2000/2000 | dying 59
+  step 807000 | loss 0.0782 | kl 0.0297 | val_kl 0.0346 | clus 0.4213 | sep 0.3705 | mse(diag) 0.1721 | eff_K 2000/2000 | dying 58
+  [reinit] step 807000: 161 dead clusters
+  step 807100 | loss 0.0690 | kl 0.0218 | val_kl 0.0346 | clus 0.4094 | sep 0.3728 | mse(diag) 0.1674 | eff_K 2000/2000 | dying 46
+  step 807200 | loss 0.0728 | kl 0.0256 | val_kl 0.0344 | clus 0.4109 | sep 0.3696 | mse(diag) 0.1664 | eff_K 2000/2000 | dying 57
+  step 807300 | loss 0.0777 | kl 0.0321 | val_kl 0.0356 | clus 0.3940 | sep 0.3708 | mse(diag) 0.1621 | eff_K 2000/2000 | dying 64
+  step 807400 | loss 0.0738 | kl 0.0278 | val_kl 0.0359 | clus 0.3960 | sep 0.3698 | mse(diag) 0.1635 | eff_K 2000/2000 | dying 69
+  step 807500 | loss 0.0707 | kl 0.0260 | val_kl 0.0345 | clus 0.3984 | sep 0.3720 | mse(diag) 0.1541 | eff_K 2000/2000 | dying 64
+  step 807600 | loss 0.0728 | kl 0.0272 | val_kl 0.0345 | clus 0.3970 | sep 0.3731 | mse(diag) 0.1607 | eff_K 2000/2000 | dying 70
+  step 807700 | loss 0.0688 | kl 0.0226 | val_kl 0.0336 | clus 0.4078 | sep 0.3740 | mse(diag) 0.1609 | eff_K 2000/2000 | dying 73
+  step 807800 | loss 0.0735 | kl 0.0276 | val_kl 0.0364 | clus 0.4041 | sep 0.3733 | mse(diag) 0.1606 | eff_K 2000/2000 | dying 55
+  step 807900 | loss 0.0698 | kl 0.0224 | val_kl 0.0345 | clus 0.4082 | sep 0.3698 | mse(diag) 0.1688 | eff_K 2000/2000 | dying 47
+  step 808000 | loss 0.0709 | kl 0.0243 | val_kl 0.0340 | clus 0.4022 | sep 0.3738 | mse(diag) 0.1655 | eff_K 2000/2000 | dying 59
+  [reinit] step 808000: 186 dead clusters
+  step 808100 | loss 0.0715 | kl 0.0257 | val_kl 0.0331 | clus 0.4183 | sep 0.3726 | mse(diag) 0.1548 | eff_K 2000/2000 | dying 33
+  step 808200 | loss 0.0697 | kl 0.0233 | val_kl 0.0351 | clus 0.4098 | sep 0.3719 | mse(diag) 0.1615 | eff_K 2000/2000 | dying 45
+  step 808300 | loss 0.0747 | kl 0.0277 | val_kl 0.0342 | clus 0.4051 | sep 0.3720 | mse(diag) 0.1677 | eff_K 2000/2000 | dying 55
+  step 808400 | loss 0.0750 | kl 0.0291 | val_kl 0.0344 | clus 0.4008 | sep 0.3696 | mse(diag) 0.1617 | eff_K 2000/2000 | dying 57
+  step 808500 | loss 0.0684 | kl 0.0237 | val_kl 0.0353 | clus 0.3912 | sep 0.3702 | mse(diag) 0.1567 | eff_K 2000/2000 | dying 50
+  step 808600 | loss 0.0718 | kl 0.0258 | val_kl 0.0328 | clus 0.4044 | sep 0.3662 | mse(diag) 0.1613 | eff_K 2000/2000 | dying 54
+  step 808700 | loss 0.0761 | kl 0.0298 | val_kl 0.0334 | clus 0.4036 | sep 0.3718 | mse(diag) 0.1632 | eff_K 2000/2000 | dying 60
+  step 808800 | loss 0.0686 | kl 0.0236 | val_kl 0.0363 | clus 0.3951 | sep 0.3722 | mse(diag) 0.1576 | eff_K 2000/2000 | dying 72
+  step 808900 | loss 0.0736 | kl 0.0267 | val_kl 0.0336 | clus 0.3989 | sep 0.3700 | mse(diag) 0.1686 | eff_K 2000/2000 | dying 68
+  step 809000 | loss 0.0706 | kl 0.0257 | val_kl 0.0344 | clus 0.3919 | sep 0.3712 | mse(diag) 0.1578 | eff_K 2000/2000 | dying 67
+  [reinit] step 809000: 186 dead clusters
+  step 809100 | loss 0.0708 | kl 0.0236 | val_kl 0.0358 | clus 0.4171 | sep 0.3710 | mse(diag) 0.1649 | eff_K 2000/2000 | dying 46
+  step 809200 | loss 0.0682 | kl 0.0219 | val_kl 0.0342 | clus 0.4080 | sep 0.3718 | mse(diag) 0.1615 | eff_K 2000/2000 | dying 43
+  step 809300 | loss 0.0664 | kl 0.0217 | val_kl 0.0336 | clus 0.3906 | sep 0.3733 | mse(diag) 0.1568 | eff_K 2000/2000 | dying 47
+  step 809400 | loss 0.0663 | kl 0.0211 | val_kl 0.0340 | clus 0.3842 | sep 0.3713 | mse(diag) 0.1623 | eff_K 2000/2000 | dying 47
+  step 809500 | loss 0.0692 | kl 0.0233 | val_kl 0.0341 | clus 0.3943 | sep 0.3707 | mse(diag) 0.1636 | eff_K 2000/2000 | dying 52
+  step 809600 | loss 0.0714 | kl 0.0249 | val_kl 0.0330 | clus 0.4029 | sep 0.3737 | mse(diag) 0.1645 | eff_K 2000/2000 | dying 52
+  step 809700 | loss 0.0736 | kl 0.0266 | val_kl 0.0352 | clus 0.4057 | sep 0.3710 | mse(diag) 0.1671 | eff_K 2000/2000 | dying 52
+  step 809800 | loss 0.0697 | kl 0.0234 | val_kl 0.0336 | clus 0.4049 | sep 0.3692 | mse(diag) 0.1628 | eff_K 2000/2000 | dying 49
+  step 809900 | loss 0.0796 | kl 0.0328 | val_kl 0.0348 | clus 0.4181 | sep 0.3692 | mse(diag) 0.1618 | eff_K 2000/2000 | dying 54
+  step 810000 | loss 0.0719 | kl 0.0252 | val_kl 0.0346 | clus 0.4028 | sep 0.3724 | mse(diag) 0.1660 | eff_K 2000/2000 | dying 52
+  [reinit] step 810000: 166 dead clusters
+  step 810100 | loss 0.0678 | kl 0.0227 | val_kl 0.0327 | clus 0.4003 | sep 0.3699 | mse(diag) 0.1562 | eff_K 2000/2000 | dying 42
+  step 810200 | loss 0.0678 | kl 0.0212 | val_kl 0.0358 | clus 0.4044 | sep 0.3698 | mse(diag) 0.1650 | eff_K 2000/2000 | dying 61
+  step 810300 | loss 0.0734 | kl 0.0271 | val_kl 0.0331 | clus 0.4061 | sep 0.3716 | mse(diag) 0.1622 | eff_K 2000/2000 | dying 57
+  step 810400 | loss 0.0713 | kl 0.0272 | val_kl 0.0349 | clus 0.3942 | sep 0.3693 | mse(diag) 0.1518 | eff_K 2000/2000 | dying 60
+  step 810500 | loss 0.0663 | kl 0.0206 | val_kl 0.0341 | clus 0.4030 | sep 0.3712 | mse(diag) 0.1595 | eff_K 2000/2000 | dying 56
+  step 810600 | loss 0.0727 | kl 0.0271 | val_kl 0.0342 | clus 0.4001 | sep 0.3710 | mse(diag) 0.1594 | eff_K 2000/2000 | dying 60
+  step 810700 | loss 0.0705 | kl 0.0237 | val_kl 0.0353 | clus 0.4012 | sep 0.3721 | mse(diag) 0.1680 | eff_K 2000/2000 | dying 70
+  step 810800 | loss 0.0744 | kl 0.0273 | val_kl 0.0327 | clus 0.4042 | sep 0.3687 | mse(diag) 0.1688 | eff_K 2000/2000 | dying 65
+  step 810900 | loss 0.0712 | kl 0.0263 | val_kl 0.0343 | clus 0.3881 | sep 0.3675 | mse(diag) 0.1592 | eff_K 2000/2000 | dying 54
+  step 811000 | loss 0.0768 | kl 0.0294 | val_kl 0.0342 | clus 0.4122 | sep 0.3745 | mse(diag) 0.1676 | eff_K 2000/2000 | dying 65
+  [reinit] step 811000: 187 dead clusters
+  step 811100 | loss 0.0731 | kl 0.0257 | val_kl 0.0332 | clus 0.4188 | sep 0.3715 | mse(diag) 0.1654 | eff_K 2000/2000 | dying 49
+  step 811200 | loss 0.0701 | kl 0.0238 | val_kl 0.0357 | clus 0.4048 | sep 0.3783 | mse(diag) 0.1629 | eff_K 2000/2000 | dying 72
+  step 811300 | loss 0.0697 | kl 0.0248 | val_kl 0.0337 | clus 0.3977 | sep 0.3675 | mse(diag) 0.1556 | eff_K 2000/2000 | dying 75
+  step 811400 | loss 0.0714 | kl 0.0248 | val_kl 0.0323 | clus 0.4112 | sep 0.3722 | mse(diag) 0.1625 | eff_K 2000/2000 | dying 73
+  step 811500 | loss 0.0726 | kl 0.0255 | val_kl 0.0340 | clus 0.4084 | sep 0.3704 | mse(diag) 0.1670 | eff_K 2000/2000 | dying 73
+  step 811600 | loss 0.0696 | kl 0.0237 | val_kl 0.0330 | clus 0.3982 | sep 0.3725 | mse(diag) 0.1622 | eff_K 2000/2000 | dying 74
+  step 811700 | loss 0.0716 | kl 0.0252 | val_kl 0.0343 | clus 0.4136 | sep 0.3706 | mse(diag) 0.1604 | eff_K 2000/2000 | dying 71
+  step 811800 | loss 0.0729 | kl 0.0260 | val_kl 0.0344 | clus 0.4169 | sep 0.3736 | mse(diag) 0.1624 | eff_K 2000/2000 | dying 69
+  step 811900 | loss 0.0644 | kl 0.0213 | val_kl 0.0325 | clus 0.3805 | sep 0.3766 | mse(diag) 0.1500 | eff_K 2000/2000 | dying 67
+  step 812000 | loss 0.0677 | kl 0.0229 | val_kl 0.0364 | clus 0.3908 | sep 0.3731 | mse(diag) 0.1572 | eff_K 2000/2000 | dying 61
+  [reinit] step 812000: 182 dead clusters
+  step 812100 | loss 0.0713 | kl 0.0237 | val_kl 0.0345 | clus 0.4252 | sep 0.3736 | mse(diag) 0.1642 | eff_K 2000/2000 | dying 42
+  step 812200 | loss 0.0687 | kl 0.0242 | val_kl 0.0342 | clus 0.4001 | sep 0.3706 | mse(diag) 0.1522 | eff_K 2000/2000 | dying 56
+  step 812300 | loss 0.0668 | kl 0.0207 | val_kl 0.0351 | clus 0.4005 | sep 0.3703 | mse(diag) 0.1627 | eff_K 2000/2000 | dying 64
+  step 812400 | loss 0.0693 | kl 0.0230 | val_kl 0.0322 | clus 0.4115 | sep 0.3722 | mse(diag) 0.1607 | eff_K 2000/2000 | dying 58
+  step 812500 | loss 0.0763 | kl 0.0297 | val_kl 0.0339 | clus 0.4086 | sep 0.3669 | mse(diag) 0.1643 | eff_K 2000/2000 | dying 63
+  step 812600 | loss 0.0738 | kl 0.0286 | val_kl 0.0338 | clus 0.3912 | sep 0.3725 | mse(diag) 0.1602 | eff_K 2000/2000 | dying 71
+  step 812700 | loss 0.0705 | kl 0.0241 | val_kl 0.0340 | clus 0.4004 | sep 0.3705 | mse(diag) 0.1648 | eff_K 2000/2000 | dying 60
+  step 812800 | loss 0.0703 | kl 0.0239 | val_kl 0.0355 | clus 0.4093 | sep 0.3728 | mse(diag) 0.1624 | eff_K 2000/2000 | dying 60
+  step 812900 | loss 0.0705 | kl 0.0250 | val_kl 0.0340 | clus 0.4020 | sep 0.3721 | mse(diag) 0.1585 | eff_K 2000/2000 | dying 50
+  step 813000 | loss 0.0711 | kl 0.0271 | val_kl 0.0353 | clus 0.3849 | sep 0.3721 | mse(diag) 0.1541 | eff_K 2000/2000 | dying 63
+  [reinit] step 813000: 169 dead clusters
+  step 813100 | loss 0.0682 | kl 0.0231 | val_kl 0.0347 | clus 0.3947 | sep 0.3727 | mse(diag) 0.1580 | eff_K 2000/2000 | dying 45
+  step 813200 | loss 0.0725 | kl 0.0259 | val_kl 0.0326 | clus 0.4136 | sep 0.3726 | mse(diag) 0.1617 | eff_K 2000/2000 | dying 42
+  step 813300 | loss 0.0726 | kl 0.0266 | val_kl 0.0331 | clus 0.4015 | sep 0.3721 | mse(diag) 0.1620 | eff_K 2000/2000 | dying 44
+  step 813400 | loss 0.0725 | kl 0.0275 | val_kl 0.0359 | clus 0.3982 | sep 0.3674 | mse(diag) 0.1563 | eff_K 2000/2000 | dying 42
+  step 813500 | loss 0.0705 | kl 0.0247 | val_kl 0.0332 | clus 0.4062 | sep 0.3699 | mse(diag) 0.1593 | eff_K 2000/2000 | dying 53
+  step 813600 | loss 0.0712 | kl 0.0246 | val_kl 0.0327 | clus 0.4059 | sep 0.3720 | mse(diag) 0.1643 | eff_K 2000/2000 | dying 43
+  step 813700 | loss 0.0752 | kl 0.0283 | val_kl 0.0333 | clus 0.4115 | sep 0.3729 | mse(diag) 0.1646 | eff_K 2000/2000 | dying 43
+  step 813800 | loss 0.0769 | kl 0.0311 | val_kl 0.0340 | clus 0.4006 | sep 0.3707 | mse(diag) 0.1612 | eff_K 2000/2000 | dying 39
+  step 813900 | loss 0.0699 | kl 0.0249 | val_kl 0.0358 | clus 0.3923 | sep 0.3686 | mse(diag) 0.1580 | eff_K 2000/2000 | dying 45
+  step 814000 | loss 0.0656 | kl 0.0211 | val_kl 0.0335 | clus 0.3954 | sep 0.3688 | mse(diag) 0.1542 | eff_K 2000/2000 | dying 46
+  [reinit] step 814000: 172 dead clusters
+  step 814100 | loss 0.0735 | kl 0.0266 | val_kl 0.0333 | clus 0.4093 | sep 0.3756 | mse(diag) 0.1652 | eff_K 2000/2000 | dying 34
+  step 814200 | loss 0.0704 | kl 0.0238 | val_kl 0.0359 | clus 0.4104 | sep 0.3716 | mse(diag) 0.1627 | eff_K 2000/2000 | dying 26
+  step 814300 | loss 0.0735 | kl 0.0274 | val_kl 0.0324 | clus 0.3894 | sep 0.3720 | mse(diag) 0.1668 | eff_K 2000/2000 | dying 30
+  step 814400 | loss 0.0716 | kl 0.0254 | val_kl 0.0368 | clus 0.4028 | sep 0.3731 | mse(diag) 0.1625 | eff_K 2000/2000 | dying 35
+  step 814500 | loss 0.0699 | kl 0.0238 | val_kl 0.0344 | clus 0.4032 | sep 0.3745 | mse(diag) 0.1615 | eff_K 2000/2000 | dying 39
+  step 814600 | loss 0.0730 | kl 0.0281 | val_kl 0.0343 | clus 0.3971 | sep 0.3713 | mse(diag) 0.1561 | eff_K 2000/2000 | dying 42
+  step 814700 | loss 0.0697 | kl 0.0249 | val_kl 0.0331 | clus 0.3938 | sep 0.3702 | mse(diag) 0.1564 | eff_K 2000/2000 | dying 45
+  step 814800 | loss 0.0728 | kl 0.0269 | val_kl 0.0340 | clus 0.4032 | sep 0.3748 | mse(diag) 0.1604 | eff_K 2000/2000 | dying 36
+  step 814900 | loss 0.0731 | kl 0.0267 | val_kl 0.0330 | clus 0.4020 | sep 0.3726 | mse(diag) 0.1640 | eff_K 2000/2000 | dying 43
+  step 815000 | loss 0.0715 | kl 0.0271 | val_kl 0.0335 | clus 0.4004 | sep 0.3724 | mse(diag) 0.1515 | eff_K 2000/2000 | dying 41
+  [reinit] step 815000: 164 dead clusters
+  step 815100 | loss 0.0699 | kl 0.0227 | val_kl 0.0347 | clus 0.4242 | sep 0.3687 | mse(diag) 0.1621 | eff_K 2000/2000 | dying 26
+  step 815200 | loss 0.0721 | kl 0.0264 | val_kl 0.0359 | clus 0.4087 | sep 0.3762 | mse(diag) 0.1575 | eff_K 2000/2000 | dying 44
+  step 815300 | loss 0.0703 | kl 0.0250 | val_kl 0.0351 | clus 0.4032 | sep 0.3696 | mse(diag) 0.1572 | eff_K 2000/2000 | dying 56
+  step 815400 | loss 0.0767 | kl 0.0299 | val_kl 0.0335 | clus 0.4231 | sep 0.3762 | mse(diag) 0.1600 | eff_K 2000/2000 | dying 53
+  step 815500 | loss 0.0686 | kl 0.0237 | val_kl 0.0337 | clus 0.3890 | sep 0.3728 | mse(diag) 0.1588 | eff_K 2000/2000 | dying 54
+  step 815600 | loss 0.0697 | kl 0.0244 | val_kl 0.0337 | clus 0.4008 | sep 0.3683 | mse(diag) 0.1573 | eff_K 2000/2000 | dying 59
+  step 815700 | loss 0.0684 | kl 0.0219 | val_kl 0.0351 | clus 0.4078 | sep 0.3750 | mse(diag) 0.1632 | eff_K 2000/2000 | dying 47
+  step 815800 | loss 0.0665 | kl 0.0211 | val_kl 0.0341 | clus 0.3967 | sep 0.3714 | mse(diag) 0.1597 | eff_K 2000/2000 | dying 61
+  step 815900 | loss 0.0682 | kl 0.0230 | val_kl 0.0322 | clus 0.4069 | sep 0.3728 | mse(diag) 0.1550 | eff_K 2000/2000 | dying 60
+  step 816000 | loss 0.0754 | kl 0.0293 | val_kl 0.0335 | clus 0.4095 | sep 0.3720 | mse(diag) 0.1604 | eff_K 2000/2000 | dying 52
+  [reinit] step 816000: 186 dead clusters
+  step 816100 | loss 0.0718 | kl 0.0245 | val_kl 0.0332 | clus 0.4243 | sep 0.3700 | mse(diag) 0.1633 | eff_K 2000/2000 | dying 43
+  step 816200 | loss 0.0695 | kl 0.0228 | val_kl 0.0345 | clus 0.4209 | sep 0.3706 | mse(diag) 0.1607 | eff_K 2000/2000 | dying 55
+  step 816300 | loss 0.0730 | kl 0.0254 | val_kl 0.0348 | clus 0.4127 | sep 0.3714 | mse(diag) 0.1685 | eff_K 2000/2000 | dying 53
+  step 816400 | loss 0.0721 | kl 0.0245 | val_kl 0.0339 | clus 0.4173 | sep 0.3724 | mse(diag) 0.1668 | eff_K 2000/2000 | dying 51
+  step 816500 | loss 0.0679 | kl 0.0218 | val_kl 0.0337 | clus 0.4087 | sep 0.3748 | mse(diag) 0.1603 | eff_K 2000/2000 | dying 61
+  step 816600 | loss 0.0718 | kl 0.0246 | val_kl 0.0327 | clus 0.4135 | sep 0.3692 | mse(diag) 0.1657 | eff_K 2000/2000 | dying 67
+  step 816700 | loss 0.0692 | kl 0.0236 | val_kl 0.0338 | clus 0.4026 | sep 0.3711 | mse(diag) 0.1586 | eff_K 2000/2000 | dying 63
+  step 816800 | loss 0.0709 | kl 0.0246 | val_kl 0.0320 | clus 0.4100 | sep 0.3728 | mse(diag) 0.1610 | eff_K 2000/2000 | dying 63
+  step 816900 | loss 0.0736 | kl 0.0267 | val_kl 0.0328 | clus 0.4217 | sep 0.3709 | mse(diag) 0.1614 | eff_K 2000/2000 | dying 61
+  step 817000 | loss 0.0673 | kl 0.0198 | val_kl 0.0319 | clus 0.4043 | sep 0.3727 | mse(diag) 0.1714 | eff_K 2000/2000 | dying 64
+  [reinit] step 817000: 177 dead clusters
+  step 817100 | loss 0.0694 | kl 0.0233 | val_kl 0.0324 | clus 0.4183 | sep 0.3733 | mse(diag) 0.1569 | eff_K 2000/2000 | dying 49
+  step 817200 | loss 0.0731 | kl 0.0275 | val_kl 0.0325 | clus 0.4059 | sep 0.3729 | mse(diag) 0.1576 | eff_K 2000/2000 | dying 55
+  step 817300 | loss 0.0685 | kl 0.0238 | val_kl 0.0346 | clus 0.3869 | sep 0.3715 | mse(diag) 0.1576 | eff_K 2000/2000 | dying 72
+  step 817400 | loss 0.0724 | kl 0.0253 | val_kl 0.0327 | clus 0.4098 | sep 0.3725 | mse(diag) 0.1664 | eff_K 2000/2000 | dying 66
+  step 817500 | loss 0.0729 | kl 0.0277 | val_kl 0.0335 | clus 0.3995 | sep 0.3732 | mse(diag) 0.1573 | eff_K 2000/2000 | dying 59
+  step 817600 | loss 0.0720 | kl 0.0256 | val_kl 0.0326 | clus 0.4121 | sep 0.3707 | mse(diag) 0.1612 | eff_K 2000/2000 | dying 61
+  step 817700 | loss 0.0699 | kl 0.0243 | val_kl 0.0354 | clus 0.4057 | sep 0.3695 | mse(diag) 0.1586 | eff_K 2000/2000 | dying 58
+  step 817800 | loss 0.0691 | kl 0.0233 | val_kl 0.0340 | clus 0.4037 | sep 0.3750 | mse(diag) 0.1596 | eff_K 2000/2000 | dying 59
+  step 817900 | loss 0.0670 | kl 0.0227 | val_kl 0.0333 | clus 0.3947 | sep 0.3719 | mse(diag) 0.1530 | eff_K 2000/2000 | dying 55
+  step 818000 | loss 0.0719 | kl 0.0236 | val_kl 0.0324 | clus 0.4153 | sep 0.3744 | mse(diag) 0.1722 | eff_K 2000/2000 | dying 57
+  [reinit] step 818000: 176 dead clusters
+  step 818100 | loss 0.0709 | kl 0.0256 | val_kl 0.0335 | clus 0.4156 | sep 0.3707 | mse(diag) 0.1531 | eff_K 2000/2000 | dying 45
+  step 818200 | loss 0.0736 | kl 0.0280 | val_kl 0.0350 | clus 0.4081 | sep 0.3717 | mse(diag) 0.1568 | eff_K 2000/2000 | dying 48
+  step 818300 | loss 0.0694 | kl 0.0246 | val_kl 0.0320 | clus 0.3912 | sep 0.3756 | mse(diag) 0.1569 | eff_K 2000/2000 | dying 50
+  step 818400 | loss 0.0722 | kl 0.0273 | val_kl 0.0329 | clus 0.4187 | sep 0.3715 | mse(diag) 0.1492 | eff_K 2000/2000 | dying 57
+  step 818500 | loss 0.0717 | kl 0.0252 | val_kl 0.0340 | clus 0.4069 | sep 0.3731 | mse(diag) 0.1634 | eff_K 2000/2000 | dying 53
+  step 818600 | loss 0.0689 | kl 0.0237 | val_kl 0.0325 | clus 0.4039 | sep 0.3762 | mse(diag) 0.1556 | eff_K 2000/2000 | dying 53
+  step 818700 | loss 0.0686 | kl 0.0223 | val_kl 0.0328 | clus 0.4172 | sep 0.3714 | mse(diag) 0.1582 | eff_K 2000/2000 | dying 45
+  step 818800 | loss 0.0696 | kl 0.0236 | val_kl 0.0342 | clus 0.4016 | sep 0.3718 | mse(diag) 0.1618 | eff_K 2000/2000 | dying 51
+  step 818900 | loss 0.0679 | kl 0.0218 | val_kl 0.0328 | clus 0.4097 | sep 0.3725 | mse(diag) 0.1594 | eff_K 2000/2000 | dying 61
+  step 819000 | loss 0.0715 | kl 0.0244 | val_kl 0.0337 | clus 0.4109 | sep 0.3728 | mse(diag) 0.1665 | eff_K 2000/2000 | dying 56
+  [reinit] step 819000: 193 dead clusters
+  step 819100 | loss 0.0675 | kl 0.0226 | val_kl 0.0333 | clus 0.4053 | sep 0.3719 | mse(diag) 0.1530 | eff_K 2000/2000 | dying 46
+  step 819200 | loss 0.0697 | kl 0.0243 | val_kl 0.0341 | clus 0.4185 | sep 0.3725 | mse(diag) 0.1523 | eff_K 2000/2000 | dying 49
+  step 819300 | loss 0.0704 | kl 0.0251 | val_kl 0.0333 | clus 0.4071 | sep 0.3729 | mse(diag) 0.1554 | eff_K 2000/2000 | dying 53
+  step 819400 | loss 0.0704 | kl 0.0238 | val_kl 0.0343 | clus 0.4127 | sep 0.3726 | mse(diag) 0.1621 | eff_K 2000/2000 | dying 59
+  step 819500 | loss 0.0708 | kl 0.0241 | val_kl 0.0333 | clus 0.4080 | sep 0.3768 | mse(diag) 0.1642 | eff_K 2000/2000 | dying 63
+  step 819600 | loss 0.0699 | kl 0.0242 | val_kl 0.0337 | clus 0.4030 | sep 0.3743 | mse(diag) 0.1593 | eff_K 2000/2000 | dying 70
+  step 819700 | loss 0.0713 | kl 0.0260 | val_kl 0.0339 | clus 0.4179 | sep 0.3673 | mse(diag) 0.1521 | eff_K 2000/2000 | dying 63
+  step 819800 | loss 0.0682 | kl 0.0230 | val_kl 0.0340 | clus 0.3971 | sep 0.3726 | mse(diag) 0.1583 | eff_K 2000/2000 | dying 57
+  step 819900 | loss 0.0713 | kl 0.0261 | val_kl 0.0340 | clus 0.4051 | sep 0.3753 | mse(diag) 0.1554 | eff_K 2000/2000 | dying 55
+  step 820000 | loss 0.0714 | kl 0.0255 | val_kl 0.0334 | clus 0.4103 | sep 0.3723 | mse(diag) 0.1584 | eff_K 2000/2000 | dying 55
+  [reinit] step 820000: 185 dead clusters
+  step 820100 | loss 0.0662 | kl 0.0219 | val_kl 0.0347 | clus 0.4037 | sep 0.3740 | mse(diag) 0.1501 | eff_K 2000/2000 | dying 45
+  step 820200 | loss 0.0662 | kl 0.0206 | val_kl 0.0332 | clus 0.4078 | sep 0.3736 | mse(diag) 0.1576 | eff_K 2000/2000 | dying 46
+  step 820300 | loss 0.0675 | kl 0.0231 | val_kl 0.0334 | clus 0.4041 | sep 0.3751 | mse(diag) 0.1502 | eff_K 2000/2000 | dying 53
+[train-e2e] Saved step_0820395.pt  val_kl=0.03289  val_mse=0.15638
+[train-e2e] New best val_kl=0.03289 -> best_val.pt
+[train-e2e] Epoch 45 done in 123.6 min
+
+[train-e2e] Epoch 46/50 | tau=0.188 | λ_c=0.050 λ_s=0.0045
+  step 820400 | loss 0.0760 | kl 0.0297 | val_kl 0.0340 | clus 0.4141 | sep 0.3692 | mse(diag) 0.1594 | eff_K 2000/2000 | dying 61
+  step 820500 | loss 0.0792 | kl 0.0321 | val_kl 0.0351 | clus 0.4159 | sep 0.3695 | mse(diag) 0.1640 | eff_K 2000/2000 | dying 63
+  step 820600 | loss 0.0773 | kl 0.0302 | val_kl 0.0364 | clus 0.4168 | sep 0.3715 | mse(diag) 0.1640 | eff_K 2000/2000 | dying 70
+  step 820700 | loss 0.0701 | kl 0.0242 | val_kl 0.0341 | clus 0.4130 | sep 0.3726 | mse(diag) 0.1571 | eff_K 2000/2000 | dying 57
+  step 820800 | loss 0.0741 | kl 0.0276 | val_kl 0.0341 | clus 0.4142 | sep 0.3735 | mse(diag) 0.1610 | eff_K 2000/2000 | dying 58
+  step 820900 | loss 0.0722 | kl 0.0266 | val_kl 0.0337 | clus 0.4094 | sep 0.3671 | mse(diag) 0.1570 | eff_K 2000/2000 | dying 67
+  step 821000 | loss 0.0745 | kl 0.0291 | val_kl 0.0338 | clus 0.4031 | sep 0.3698 | mse(diag) 0.1572 | eff_K 2000/2000 | dying 69
+  [reinit] step 821000: 166 dead clusters
+  step 821100 | loss 0.0717 | kl 0.0255 | val_kl 0.0354 | clus 0.4125 | sep 0.3687 | mse(diag) 0.1590 | eff_K 2000/2000 | dying 45
+  step 821200 | loss 0.0738 | kl 0.0276 | val_kl 0.0343 | clus 0.4191 | sep 0.3723 | mse(diag) 0.1570 | eff_K 2000/2000 | dying 54
+  step 821300 | loss 0.0707 | kl 0.0252 | val_kl 0.0343 | clus 0.4052 | sep 0.3736 | mse(diag) 0.1571 | eff_K 2000/2000 | dying 55
+  step 821400 | loss 0.0694 | kl 0.0237 | val_kl 0.0352 | clus 0.3980 | sep 0.3723 | mse(diag) 0.1608 | eff_K 2000/2000 | dying 55
+  step 821500 | loss 0.0689 | kl 0.0231 | val_kl 0.0347 | clus 0.4094 | sep 0.3753 | mse(diag) 0.1576 | eff_K 2000/2000 | dying 62
+  step 821600 | loss 0.0740 | kl 0.0295 | val_kl 0.0335 | clus 0.4032 | sep 0.3722 | mse(diag) 0.1513 | eff_K 2000/2000 | dying 57
+  step 821700 | loss 0.0756 | kl 0.0280 | val_kl 0.0335 | clus 0.4176 | sep 0.3748 | mse(diag) 0.1667 | eff_K 2000/2000 | dying 64
+  step 821800 | loss 0.0757 | kl 0.0290 | val_kl 0.0346 | clus 0.4080 | sep 0.3730 | mse(diag) 0.1641 | eff_K 2000/2000 | dying 59
+  step 821900 | loss 0.0688 | kl 0.0231 | val_kl 0.0349 | clus 0.4075 | sep 0.3702 | mse(diag) 0.1579 | eff_K 2000/2000 | dying 61
+  step 822000 | loss 0.0732 | kl 0.0267 | val_kl 0.0341 | clus 0.4168 | sep 0.3744 | mse(diag) 0.1594 | eff_K 2000/2000 | dying 59
+  [reinit] step 822000: 183 dead clusters
+  step 822100 | loss 0.0758 | kl 0.0288 | val_kl 0.0323 | clus 0.4194 | sep 0.3710 | mse(diag) 0.1623 | eff_K 2000/2000 | dying 50
+  step 822200 | loss 0.0710 | kl 0.0240 | val_kl 0.0348 | clus 0.4190 | sep 0.3722 | mse(diag) 0.1624 | eff_K 2000/2000 | dying 57
+  step 822300 | loss 0.0720 | kl 0.0244 | val_kl 0.0350 | clus 0.4167 | sep 0.3729 | mse(diag) 0.1672 | eff_K 2000/2000 | dying 57
+  step 822400 | loss 0.0692 | kl 0.0241 | val_kl 0.0335 | clus 0.4006 | sep 0.3705 | mse(diag) 0.1558 | eff_K 2000/2000 | dying 58
+  step 822500 | loss 0.0715 | kl 0.0260 | val_kl 0.0355 | clus 0.4118 | sep 0.3703 | mse(diag) 0.1551 | eff_K 2000/2000 | dying 65
+  step 822600 | loss 0.0724 | kl 0.0272 | val_kl 0.0325 | clus 0.4061 | sep 0.3697 | mse(diag) 0.1543 | eff_K 2000/2000 | dying 62
+  step 822700 | loss 0.0710 | kl 0.0259 | val_kl 0.0325 | clus 0.4183 | sep 0.3734 | mse(diag) 0.1501 | eff_K 2000/2000 | dying 63
+  step 822800 | loss 0.0683 | kl 0.0242 | val_kl 0.0326 | clus 0.3909 | sep 0.3719 | mse(diag) 0.1521 | eff_K 2000/2000 | dying 59
+  step 822900 | loss 0.0668 | kl 0.0228 | val_kl 0.0345 | clus 0.3875 | sep 0.3687 | mse(diag) 0.1530 | eff_K 2000/2000 | dying 66
+  step 823000 | loss 0.0679 | kl 0.0219 | val_kl 0.0332 | clus 0.4019 | sep 0.3719 | mse(diag) 0.1616 | eff_K 2000/2000 | dying 58
+  [reinit] step 823000: 169 dead clusters
+  step 823100 | loss 0.0708 | kl 0.0250 | val_kl 0.0338 | clus 0.4162 | sep 0.3705 | mse(diag) 0.1552 | eff_K 2000/2000 | dying 45
+  step 823200 | loss 0.0739 | kl 0.0280 | val_kl 0.0320 | clus 0.4187 | sep 0.3713 | mse(diag) 0.1555 | eff_K 2000/2000 | dying 48
+  step 823300 | loss 0.0690 | kl 0.0230 | val_kl 0.0339 | clus 0.4079 | sep 0.3724 | mse(diag) 0.1592 | eff_K 2000/2000 | dying 48
+  step 823400 | loss 0.0730 | kl 0.0267 | val_kl 0.0327 | clus 0.4137 | sep 0.3727 | mse(diag) 0.1593 | eff_K 2000/2000 | dying 50
+  step 823500 | loss 0.0778 | kl 0.0310 | val_kl 0.0351 | clus 0.4110 | sep 0.3691 | mse(diag) 0.1641 | eff_K 2000/2000 | dying 57
+  step 823600 | loss 0.0712 | kl 0.0257 | val_kl 0.0346 | clus 0.4047 | sep 0.3710 | mse(diag) 0.1575 | eff_K 2000/2000 | dying 56
+  step 823700 | loss 0.0740 | kl 0.0277 | val_kl 0.0346 | clus 0.4059 | sep 0.3722 | mse(diag) 0.1619 | eff_K 2000/2000 | dying 58
+  step 823800 | loss 0.0709 | kl 0.0251 | val_kl 0.0332 | clus 0.4146 | sep 0.3725 | mse(diag) 0.1563 | eff_K 2000/2000 | dying 60
+  step 823900 | loss 0.0732 | kl 0.0268 | val_kl 0.0352 | clus 0.4151 | sep 0.3726 | mse(diag) 0.1596 | eff_K 2000/2000 | dying 53
+  step 824000 | loss 0.0744 | kl 0.0298 | val_kl 0.0327 | clus 0.4002 | sep 0.3720 | mse(diag) 0.1529 | eff_K 2000/2000 | dying 50
+  [reinit] step 824000: 181 dead clusters
+  step 824100 | loss 0.0711 | kl 0.0255 | val_kl 0.0351 | clus 0.4143 | sep 0.3721 | mse(diag) 0.1546 | eff_K 2000/2000 | dying 39
+  step 824200 | loss 0.0753 | kl 0.0298 | val_kl 0.0342 | clus 0.4095 | sep 0.3723 | mse(diag) 0.1554 | eff_K 2000/2000 | dying 55
+  step 824300 | loss 0.0721 | kl 0.0257 | val_kl 0.0341 | clus 0.4099 | sep 0.3709 | mse(diag) 0.1610 | eff_K 2000/2000 | dying 54
+  step 824400 | loss 0.0773 | kl 0.0308 | val_kl 0.0342 | clus 0.4149 | sep 0.3728 | mse(diag) 0.1603 | eff_K 2000/2000 | dying 59
+  step 824500 | loss 0.0729 | kl 0.0274 | val_kl 0.0346 | clus 0.4031 | sep 0.3700 | mse(diag) 0.1575 | eff_K 2000/2000 | dying 56
+  step 824600 | loss 0.0777 | kl 0.0315 | val_kl 0.0328 | clus 0.4119 | sep 0.3701 | mse(diag) 0.1592 | eff_K 2000/2000 | dying 50
+  step 824700 | loss 0.0700 | kl 0.0244 | val_kl 0.0338 | clus 0.4174 | sep 0.3713 | mse(diag) 0.1536 | eff_K 2000/2000 | dying 59
+  step 824800 | loss 0.0693 | kl 0.0225 | val_kl 0.0346 | clus 0.4136 | sep 0.3695 | mse(diag) 0.1629 | eff_K 2000/2000 | dying 62
+  step 824900 | loss 0.0695 | kl 0.0240 | val_kl 0.0331 | clus 0.4041 | sep 0.3700 | mse(diag) 0.1580 | eff_K 2000/2000 | dying 58
+  step 825000 | loss 0.0733 | kl 0.0277 | val_kl 0.0330 | clus 0.4076 | sep 0.3732 | mse(diag) 0.1564 | eff_K 2000/2000 | dying 63
+  [reinit] step 825000: 169 dead clusters
+  step 825100 | loss 0.0707 | kl 0.0243 | val_kl 0.0343 | clus 0.4235 | sep 0.3688 | mse(diag) 0.1575 | eff_K 2000/2000 | dying 44
+  step 825200 | loss 0.0762 | kl 0.0303 | val_kl 0.0331 | clus 0.4224 | sep 0.3719 | mse(diag) 0.1543 | eff_K 2000/2000 | dying 41
+  step 825300 | loss 0.0710 | kl 0.0257 | val_kl 0.0362 | clus 0.4065 | sep 0.3696 | mse(diag) 0.1551 | eff_K 2000/2000 | dying 53
+  step 825400 | loss 0.0686 | kl 0.0233 | val_kl 0.0345 | clus 0.4031 | sep 0.3699 | mse(diag) 0.1562 | eff_K 2000/2000 | dying 64
+  step 825500 | loss 0.0733 | kl 0.0272 | val_kl 0.0332 | clus 0.4184 | sep 0.3744 | mse(diag) 0.1567 | eff_K 2000/2000 | dying 58
+  step 825600 | loss 0.0869 | kl 0.0427 | val_kl 0.0337 | clus 0.3994 | sep 0.3733 | mse(diag) 0.1507 | eff_K 2000/2000 | dying 55
+  step 825700 | loss 0.0726 | kl 0.0271 | val_kl 0.0354 | clus 0.4111 | sep 0.3722 | mse(diag) 0.1554 | eff_K 2000/2000 | dying 57
+  step 825800 | loss 0.0726 | kl 0.0267 | val_kl 0.0336 | clus 0.4157 | sep 0.3717 | mse(diag) 0.1561 | eff_K 2000/2000 | dying 57
+  step 825900 | loss 0.0711 | kl 0.0243 | val_kl 0.0341 | clus 0.4110 | sep 0.3703 | mse(diag) 0.1636 | eff_K 2000/2000 | dying 58
+  step 826000 | loss 0.0677 | kl 0.0231 | val_kl 0.0341 | clus 0.4027 | sep 0.3717 | mse(diag) 0.1519 | eff_K 2000/2000 | dying 55
+  [reinit] step 826000: 183 dead clusters
+  step 826100 | loss 0.0724 | kl 0.0263 | val_kl 0.0312 | clus 0.4166 | sep 0.3692 | mse(diag) 0.1575 | eff_K 2000/2000 | dying 44
+  step 826200 | loss 0.0778 | kl 0.0303 | val_kl 0.0330 | clus 0.4221 | sep 0.3721 | mse(diag) 0.1644 | eff_K 2000/2000 | dying 51
+  step 826300 | loss 0.0748 | kl 0.0285 | val_kl 0.0336 | clus 0.4148 | sep 0.3722 | mse(diag) 0.1591 | eff_K 2000/2000 | dying 53
+  step 826400 | loss 0.0703 | kl 0.0244 | val_kl 0.0337 | clus 0.4166 | sep 0.3692 | mse(diag) 0.1559 | eff_K 2000/2000 | dying 60
+  step 826500 | loss 0.0718 | kl 0.0272 | val_kl 0.0333 | clus 0.4116 | sep 0.3741 | mse(diag) 0.1486 | eff_K 2000/2000 | dying 61
+  step 826600 | loss 0.0694 | kl 0.0237 | val_kl 0.0344 | clus 0.4049 | sep 0.3694 | mse(diag) 0.1585 | eff_K 2000/2000 | dying 58
+  step 826700 | loss 0.0704 | kl 0.0244 | val_kl 0.0330 | clus 0.4178 | sep 0.3702 | mse(diag) 0.1560 | eff_K 2000/2000 | dying 51
+  step 826800 | loss 0.0730 | kl 0.0268 | val_kl 0.0336 | clus 0.4154 | sep 0.3740 | mse(diag) 0.1583 | eff_K 2000/2000 | dying 54
+  step 826900 | loss 0.0712 | kl 0.0257 | val_kl 0.0343 | clus 0.4060 | sep 0.3726 | mse(diag) 0.1568 | eff_K 2000/2000 | dying 55
+  step 827000 | loss 0.0695 | kl 0.0241 | val_kl 0.0329 | clus 0.3984 | sep 0.3709 | mse(diag) 0.1585 | eff_K 2000/2000 | dying 57
+  [reinit] step 827000: 179 dead clusters
+  step 827100 | loss 0.0717 | kl 0.0259 | val_kl 0.0322 | clus 0.4296 | sep 0.3730 | mse(diag) 0.1508 | eff_K 2000/2000 | dying 32
+  step 827200 | loss 0.0686 | kl 0.0216 | val_kl 0.0339 | clus 0.4182 | sep 0.3712 | mse(diag) 0.1630 | eff_K 2000/2000 | dying 37
+  step 827300 | loss 0.0690 | kl 0.0229 | val_kl 0.0337 | clus 0.4175 | sep 0.3724 | mse(diag) 0.1569 | eff_K 2000/2000 | dying 36
+  step 827400 | loss 0.0708 | kl 0.0250 | val_kl 0.0338 | clus 0.4147 | sep 0.3741 | mse(diag) 0.1556 | eff_K 2000/2000 | dying 45
+  step 827500 | loss 0.0700 | kl 0.0241 | val_kl 0.0331 | clus 0.4206 | sep 0.3709 | mse(diag) 0.1548 | eff_K 2000/2000 | dying 57
+  step 827600 | loss 0.0685 | kl 0.0222 | val_kl 0.0324 | clus 0.4177 | sep 0.3704 | mse(diag) 0.1583 | eff_K 2000/2000 | dying 53
+  step 827700 | loss 0.0709 | kl 0.0261 | val_kl 0.0337 | clus 0.4160 | sep 0.3664 | mse(diag) 0.1490 | eff_K 2000/2000 | dying 48
+  step 827800 | loss 0.0741 | kl 0.0274 | val_kl 0.0337 | clus 0.4222 | sep 0.3722 | mse(diag) 0.1595 | eff_K 2000/2000 | dying 40
+  step 827900 | loss 0.0662 | kl 0.0207 | val_kl 0.0344 | clus 0.4057 | sep 0.3734 | mse(diag) 0.1571 | eff_K 2000/2000 | dying 50
+  step 828000 | loss 0.0723 | kl 0.0253 | val_kl 0.0314 | clus 0.4163 | sep 0.3729 | mse(diag) 0.1635 | eff_K 2000/2000 | dying 61
+  [reinit] step 828000: 162 dead clusters
+  step 828100 | loss 0.0672 | kl 0.0225 | val_kl 0.0335 | clus 0.4112 | sep 0.3721 | mse(diag) 0.1500 | eff_K 2000/2000 | dying 45
+  step 828200 | loss 0.0679 | kl 0.0222 | val_kl 0.0359 | clus 0.4124 | sep 0.3703 | mse(diag) 0.1561 | eff_K 2000/2000 | dying 40
+  step 828300 | loss 0.0705 | kl 0.0236 | val_kl 0.0342 | clus 0.4220 | sep 0.3708 | mse(diag) 0.1612 | eff_K 2000/2000 | dying 40
+  step 828400 | loss 0.0695 | kl 0.0237 | val_kl 0.0316 | clus 0.4234 | sep 0.3717 | mse(diag) 0.1529 | eff_K 2000/2000 | dying 46
+  step 828500 | loss 0.0675 | kl 0.0220 | val_kl 0.0341 | clus 0.4127 | sep 0.3692 | mse(diag) 0.1546 | eff_K 2000/2000 | dying 56
+  step 828600 | loss 0.0755 | kl 0.0294 | val_kl 0.0331 | clus 0.4245 | sep 0.3745 | mse(diag) 0.1542 | eff_K 2000/2000 | dying 65
+  step 828700 | loss 0.0686 | kl 0.0228 | val_kl 0.0326 | clus 0.4090 | sep 0.3695 | mse(diag) 0.1578 | eff_K 2000/2000 | dying 53
+  step 828800 | loss 0.0703 | kl 0.0245 | val_kl 0.0326 | clus 0.4226 | sep 0.3730 | mse(diag) 0.1536 | eff_K 2000/2000 | dying 49
+  step 828900 | loss 0.0704 | kl 0.0242 | val_kl 0.0343 | clus 0.4087 | sep 0.3744 | mse(diag) 0.1607 | eff_K 2000/2000 | dying 56
+  step 829000 | loss 0.0718 | kl 0.0262 | val_kl 0.0331 | clus 0.4126 | sep 0.3746 | mse(diag) 0.1553 | eff_K 2000/2000 | dying 47
+  [reinit] step 829000: 183 dead clusters
+  step 829100 | loss 0.0675 | kl 0.0222 | val_kl 0.0329 | clus 0.4114 | sep 0.3686 | mse(diag) 0.1540 | eff_K 2000/2000 | dying 40
+  step 829200 | loss 0.0670 | kl 0.0223 | val_kl 0.0329 | clus 0.4178 | sep 0.3720 | mse(diag) 0.1480 | eff_K 2000/2000 | dying 47
+  step 829300 | loss 0.0690 | kl 0.0229 | val_kl 0.0328 | clus 0.4220 | sep 0.3728 | mse(diag) 0.1560 | eff_K 2000/2000 | dying 60
+  step 829400 | loss 0.0715 | kl 0.0262 | val_kl 0.0331 | clus 0.4196 | sep 0.3711 | mse(diag) 0.1505 | eff_K 2000/2000 | dying 63
+  step 829500 | loss 0.0680 | kl 0.0229 | val_kl 0.0320 | clus 0.4098 | sep 0.3705 | mse(diag) 0.1523 | eff_K 2000/2000 | dying 51
+  step 829600 | loss 0.0718 | kl 0.0260 | val_kl 0.0335 | clus 0.4140 | sep 0.3750 | mse(diag) 0.1559 | eff_K 2000/2000 | dying 66
+  step 829700 | loss 0.0707 | kl 0.0247 | val_kl 0.0346 | clus 0.4145 | sep 0.3731 | mse(diag) 0.1574 | eff_K 2000/2000 | dying 70
+  step 829800 | loss 0.0723 | kl 0.0284 | val_kl 0.0333 | clus 0.4023 | sep 0.3738 | mse(diag) 0.1475 | eff_K 2000/2000 | dying 69
+  step 829900 | loss 0.0706 | kl 0.0251 | val_kl 0.0344 | clus 0.4153 | sep 0.3690 | mse(diag) 0.1540 | eff_K 2000/2000 | dying 66
+  step 830000 | loss 0.0710 | kl 0.0250 | val_kl 0.0329 | clus 0.4193 | sep 0.3713 | mse(diag) 0.1555 | eff_K 2000/2000 | dying 69
+  [reinit] step 830000: 176 dead clusters
+  step 830100 | loss 0.0735 | kl 0.0254 | val_kl 0.0331 | clus 0.4374 | sep 0.3744 | mse(diag) 0.1637 | eff_K 2000/2000 | dying 47
+  step 830200 | loss 0.0696 | kl 0.0246 | val_kl 0.0323 | clus 0.4166 | sep 0.3700 | mse(diag) 0.1496 | eff_K 2000/2000 | dying 54
+  step 830300 | loss 0.0675 | kl 0.0215 | val_kl 0.0338 | clus 0.4207 | sep 0.3704 | mse(diag) 0.1553 | eff_K 2000/2000 | dying 59
+  step 830400 | loss 0.0701 | kl 0.0247 | val_kl 0.0344 | clus 0.4259 | sep 0.3697 | mse(diag) 0.1497 | eff_K 2000/2000 | dying 60
+  step 830500 | loss 0.0701 | kl 0.0256 | val_kl 0.0329 | clus 0.4169 | sep 0.3726 | mse(diag) 0.1470 | eff_K 2000/2000 | dying 57
+  step 830600 | loss 0.0737 | kl 0.0284 | val_kl 0.0341 | clus 0.4093 | sep 0.3695 | mse(diag) 0.1546 | eff_K 2000/2000 | dying 59
+  step 830700 | loss 0.0690 | kl 0.0230 | val_kl 0.0329 | clus 0.4070 | sep 0.3700 | mse(diag) 0.1600 | eff_K 2000/2000 | dying 62
+  step 830800 | loss 0.0664 | kl 0.0210 | val_kl 0.0331 | clus 0.4097 | sep 0.3703 | mse(diag) 0.1551 | eff_K 2000/2000 | dying 68
+  step 830900 | loss 0.0755 | kl 0.0295 | val_kl 0.0340 | clus 0.4214 | sep 0.3719 | mse(diag) 0.1549 | eff_K 2000/2000 | dying 81
+  step 831000 | loss 0.0703 | kl 0.0253 | val_kl 0.0329 | clus 0.4097 | sep 0.3727 | mse(diag) 0.1522 | eff_K 2000/2000 | dying 72
+  [reinit] step 831000: 190 dead clusters
+  step 831100 | loss 0.0651 | kl 0.0202 | val_kl 0.0340 | clus 0.4139 | sep 0.3704 | mse(diag) 0.1503 | eff_K 2000/2000 | dying 45
+  step 831200 | loss 0.0702 | kl 0.0249 | val_kl 0.0325 | clus 0.4116 | sep 0.3738 | mse(diag) 0.1534 | eff_K 2000/2000 | dying 38
+  step 831300 | loss 0.0736 | kl 0.0276 | val_kl 0.0346 | clus 0.4101 | sep 0.3716 | mse(diag) 0.1585 | eff_K 2000/2000 | dying 40
+  step 831400 | loss 0.0734 | kl 0.0279 | val_kl 0.0337 | clus 0.4090 | sep 0.3697 | mse(diag) 0.1559 | eff_K 2000/2000 | dying 50
+  step 831500 | loss 0.0685 | kl 0.0243 | val_kl 0.0336 | clus 0.4116 | sep 0.3736 | mse(diag) 0.1464 | eff_K 2000/2000 | dying 53
+  step 831600 | loss 0.0678 | kl 0.0240 | val_kl 0.0340 | clus 0.4022 | sep 0.3658 | mse(diag) 0.1468 | eff_K 2000/2000 | dying 59
+  step 831700 | loss 0.0705 | kl 0.0244 | val_kl 0.0322 | clus 0.4249 | sep 0.3693 | mse(diag) 0.1544 | eff_K 2000/2000 | dying 63
+  step 831800 | loss 0.0798 | kl 0.0340 | val_kl 0.0314 | clus 0.4159 | sep 0.3721 | mse(diag) 0.1559 | eff_K 2000/2000 | dying 55
+  step 831900 | loss 0.0687 | kl 0.0242 | val_kl 0.0324 | clus 0.3986 | sep 0.3672 | mse(diag) 0.1524 | eff_K 2000/2000 | dying 60
+  step 832000 | loss 0.0736 | kl 0.0283 | val_kl 0.0331 | clus 0.4211 | sep 0.3705 | mse(diag) 0.1504 | eff_K 2000/2000 | dying 63
+  [reinit] step 832000: 191 dead clusters
+  step 832100 | loss 0.0680 | kl 0.0222 | val_kl 0.0322 | clus 0.4253 | sep 0.3718 | mse(diag) 0.1526 | eff_K 2000/2000 | dying 43
+  step 832200 | loss 0.0707 | kl 0.0253 | val_kl 0.0335 | clus 0.4080 | sep 0.3778 | mse(diag) 0.1559 | eff_K 2000/2000 | dying 49
+  step 832300 | loss 0.0674 | kl 0.0222 | val_kl 0.0333 | clus 0.4198 | sep 0.3725 | mse(diag) 0.1502 | eff_K 2000/2000 | dying 55
+  step 832400 | loss 0.0756 | kl 0.0297 | val_kl 0.0320 | clus 0.4214 | sep 0.3727 | mse(diag) 0.1541 | eff_K 2000/2000 | dying 50
+  step 832500 | loss 0.0705 | kl 0.0248 | val_kl 0.0345 | clus 0.4175 | sep 0.3697 | mse(diag) 0.1538 | eff_K 2000/2000 | dying 49
+  step 832600 | loss 0.0726 | kl 0.0257 | val_kl 0.0324 | clus 0.4214 | sep 0.3733 | mse(diag) 0.1607 | eff_K 2000/2000 | dying 51
+  step 832700 | loss 0.0710 | kl 0.0245 | val_kl 0.0337 | clus 0.4171 | sep 0.3724 | mse(diag) 0.1597 | eff_K 2000/2000 | dying 48
+  step 832800 | loss 0.0680 | kl 0.0227 | val_kl 0.0337 | clus 0.4118 | sep 0.3731 | mse(diag) 0.1539 | eff_K 2000/2000 | dying 51
+  step 832900 | loss 0.0707 | kl 0.0253 | val_kl 0.0343 | clus 0.4058 | sep 0.3712 | mse(diag) 0.1563 | eff_K 2000/2000 | dying 63
+  step 833000 | loss 0.0685 | kl 0.0221 | val_kl 0.0333 | clus 0.4162 | sep 0.3731 | mse(diag) 0.1593 | eff_K 2000/2000 | dying 61
+  [reinit] step 833000: 174 dead clusters
+  step 833100 | loss 0.0707 | kl 0.0244 | val_kl 0.0328 | clus 0.4317 | sep 0.3735 | mse(diag) 0.1534 | eff_K 2000/2000 | dying 43
+  step 833200 | loss 0.0728 | kl 0.0265 | val_kl 0.0326 | clus 0.4171 | sep 0.3738 | mse(diag) 0.1584 | eff_K 2000/2000 | dying 46
+  step 833300 | loss 0.0717 | kl 0.0273 | val_kl 0.0325 | clus 0.4114 | sep 0.3733 | mse(diag) 0.1474 | eff_K 2000/2000 | dying 53
+  step 833400 | loss 0.0653 | kl 0.0208 | val_kl 0.0328 | clus 0.4014 | sep 0.3720 | mse(diag) 0.1516 | eff_K 2000/2000 | dying 57
+  step 833500 | loss 0.0661 | kl 0.0210 | val_kl 0.0331 | clus 0.4079 | sep 0.3726 | mse(diag) 0.1531 | eff_K 2000/2000 | dying 72
+  step 833600 | loss 0.0691 | kl 0.0238 | val_kl 0.0322 | clus 0.4160 | sep 0.3702 | mse(diag) 0.1521 | eff_K 2000/2000 | dying 72
+  step 833700 | loss 0.0683 | kl 0.0223 | val_kl 0.0333 | clus 0.4156 | sep 0.3685 | mse(diag) 0.1569 | eff_K 2000/2000 | dying 68
+  step 833800 | loss 0.0669 | kl 0.0214 | val_kl 0.0343 | clus 0.4137 | sep 0.3718 | mse(diag) 0.1544 | eff_K 2000/2000 | dying 67
+  step 833900 | loss 0.0704 | kl 0.0267 | val_kl 0.0332 | clus 0.3920 | sep 0.3702 | mse(diag) 0.1496 | eff_K 2000/2000 | dying 77
+  step 834000 | loss 0.0678 | kl 0.0217 | val_kl 0.0326 | clus 0.4174 | sep 0.3701 | mse(diag) 0.1566 | eff_K 2000/2000 | dying 78
+  [reinit] step 834000: 187 dead clusters
+  step 834100 | loss 0.0691 | kl 0.0225 | val_kl 0.0327 | clus 0.4199 | sep 0.3714 | mse(diag) 0.1593 | eff_K 2000/2000 | dying 55
+  step 834200 | loss 0.0663 | kl 0.0221 | val_kl 0.0343 | clus 0.4072 | sep 0.3730 | mse(diag) 0.1480 | eff_K 2000/2000 | dying 54
+  step 834300 | loss 0.0683 | kl 0.0216 | val_kl 0.0334 | clus 0.4285 | sep 0.3739 | mse(diag) 0.1575 | eff_K 2000/2000 | dying 62
+  step 834400 | loss 0.0718 | kl 0.0272 | val_kl 0.0332 | clus 0.4244 | sep 0.3690 | mse(diag) 0.1445 | eff_K 2000/2000 | dying 65
+  step 834500 | loss 0.0664 | kl 0.0217 | val_kl 0.0330 | clus 0.4089 | sep 0.3733 | mse(diag) 0.1508 | eff_K 2000/2000 | dying 63
+  step 834600 | loss 0.0674 | kl 0.0233 | val_kl 0.0320 | clus 0.4079 | sep 0.3684 | mse(diag) 0.1473 | eff_K 2000/2000 | dying 65
+  step 834700 | loss 0.0667 | kl 0.0229 | val_kl 0.0338 | clus 0.4007 | sep 0.3703 | mse(diag) 0.1474 | eff_K 2000/2000 | dying 68
+  step 834800 | loss 0.0674 | kl 0.0211 | val_kl 0.0327 | clus 0.4167 | sep 0.3721 | mse(diag) 0.1587 | eff_K 2000/2000 | dying 73
+  step 834900 | loss 0.0744 | kl 0.0276 | val_kl 0.0315 | clus 0.4279 | sep 0.3707 | mse(diag) 0.1585 | eff_K 2000/2000 | dying 75
+  step 835000 | loss 0.0676 | kl 0.0228 | val_kl 0.0315 | clus 0.4111 | sep 0.3717 | mse(diag) 0.1505 | eff_K 2000/2000 | dying 65
+  [reinit] step 835000: 176 dead clusters
+  step 835100 | loss 0.0694 | kl 0.0236 | val_kl 0.0326 | clus 0.4286 | sep 0.3722 | mse(diag) 0.1512 | eff_K 2000/2000 | dying 48
+  step 835200 | loss 0.0760 | kl 0.0308 | val_kl 0.0326 | clus 0.4256 | sep 0.3679 | mse(diag) 0.1486 | eff_K 2000/2000 | dying 68
+  step 835300 | loss 0.0711 | kl 0.0253 | val_kl 0.0332 | clus 0.4171 | sep 0.3689 | mse(diag) 0.1552 | eff_K 2000/2000 | dying 66
+  step 835400 | loss 0.0668 | kl 0.0214 | val_kl 0.0332 | clus 0.4125 | sep 0.3699 | mse(diag) 0.1544 | eff_K 2000/2000 | dying 65
+  step 835500 | loss 0.0743 | kl 0.0278 | val_kl 0.0325 | clus 0.4244 | sep 0.3692 | mse(diag) 0.1570 | eff_K 2000/2000 | dying 74
+  step 835600 | loss 0.0691 | kl 0.0244 | val_kl 0.0332 | clus 0.4053 | sep 0.3713 | mse(diag) 0.1522 | eff_K 2000/2000 | dying 69
+  step 835700 | loss 0.0688 | kl 0.0237 | val_kl 0.0350 | clus 0.4167 | sep 0.3691 | mse(diag) 0.1505 | eff_K 2000/2000 | dying 55
+  step 835800 | loss 0.0705 | kl 0.0244 | val_kl 0.0327 | clus 0.4193 | sep 0.3692 | mse(diag) 0.1567 | eff_K 2000/2000 | dying 55
+  step 835900 | loss 0.0685 | kl 0.0221 | val_kl 0.0318 | clus 0.4188 | sep 0.3699 | mse(diag) 0.1592 | eff_K 2000/2000 | dying 59
+  step 836000 | loss 0.0663 | kl 0.0221 | val_kl 0.0327 | clus 0.4079 | sep 0.3712 | mse(diag) 0.1479 | eff_K 2000/2000 | dying 63
+  [reinit] step 836000: 185 dead clusters
+  step 836100 | loss 0.0722 | kl 0.0262 | val_kl 0.0337 | clus 0.4222 | sep 0.3728 | mse(diag) 0.1547 | eff_K 2000/2000 | dying 46
+  step 836200 | loss 0.0649 | kl 0.0196 | val_kl 0.0321 | clus 0.4240 | sep 0.3735 | mse(diag) 0.1491 | eff_K 2000/2000 | dying 50
+  step 836300 | loss 0.0720 | kl 0.0257 | val_kl 0.0331 | clus 0.4201 | sep 0.3689 | mse(diag) 0.1578 | eff_K 2000/2000 | dying 52
+  step 836400 | loss 0.0711 | kl 0.0254 | val_kl 0.0320 | clus 0.4216 | sep 0.3725 | mse(diag) 0.1529 | eff_K 2000/2000 | dying 47
+  step 836500 | loss 0.0714 | kl 0.0245 | val_kl 0.0337 | clus 0.4287 | sep 0.3758 | mse(diag) 0.1578 | eff_K 2000/2000 | dying 60
+  step 836600 | loss 0.0695 | kl 0.0237 | val_kl 0.0325 | clus 0.4144 | sep 0.3710 | mse(diag) 0.1554 | eff_K 2000/2000 | dying 56
+  step 836700 | loss 0.0699 | kl 0.0242 | val_kl 0.0327 | clus 0.4181 | sep 0.3721 | mse(diag) 0.1538 | eff_K 2000/2000 | dying 54
+  step 836800 | loss 0.0823 | kl 0.0380 | val_kl 0.0316 | clus 0.4073 | sep 0.3705 | mse(diag) 0.1485 | eff_K 2000/2000 | dying 49
+  step 836900 | loss 0.0676 | kl 0.0232 | val_kl 0.0324 | clus 0.4028 | sep 0.3688 | mse(diag) 0.1506 | eff_K 2000/2000 | dying 50
+  step 837000 | loss 0.0712 | kl 0.0244 | val_kl 0.0321 | clus 0.4269 | sep 0.3707 | mse(diag) 0.1584 | eff_K 2000/2000 | dying 54
+  [reinit] step 837000: 153 dead clusters
+  step 837100 | loss 0.0698 | kl 0.0236 | val_kl 0.0317 | clus 0.4307 | sep 0.3707 | mse(diag) 0.1536 | eff_K 2000/2000 | dying 45
+  step 837200 | loss 0.0697 | kl 0.0242 | val_kl 0.0316 | clus 0.4190 | sep 0.3727 | mse(diag) 0.1521 | eff_K 2000/2000 | dying 65
+  step 837300 | loss 0.0656 | kl 0.0205 | val_kl 0.0313 | clus 0.4125 | sep 0.3686 | mse(diag) 0.1520 | eff_K 2000/2000 | dying 67
+  step 837400 | loss 0.0699 | kl 0.0232 | val_kl 0.0326 | clus 0.4341 | sep 0.3729 | mse(diag) 0.1558 | eff_K 2000/2000 | dying 71
+  step 837500 | loss 0.0711 | kl 0.0253 | val_kl 0.0321 | clus 0.4118 | sep 0.3670 | mse(diag) 0.1567 | eff_K 2000/2000 | dying 72
+  step 837600 | loss 0.0717 | kl 0.0250 | val_kl 0.0340 | clus 0.4326 | sep 0.3770 | mse(diag) 0.1556 | eff_K 2000/2000 | dying 65
+  step 837700 | loss 0.0684 | kl 0.0237 | val_kl 0.0329 | clus 0.4066 | sep 0.3744 | mse(diag) 0.1513 | eff_K 2000/2000 | dying 63
+  step 837800 | loss 0.0657 | kl 0.0222 | val_kl 0.0338 | clus 0.4006 | sep 0.3690 | mse(diag) 0.1456 | eff_K 2000/2000 | dying 60
+  step 837900 | loss 0.0734 | kl 0.0276 | val_kl 0.0340 | clus 0.4212 | sep 0.3722 | mse(diag) 0.1534 | eff_K 2000/2000 | dying 60
+  step 838000 | loss 0.0656 | kl 0.0219 | val_kl 0.0322 | clus 0.4080 | sep 0.3718 | mse(diag) 0.1437 | eff_K 2000/2000 | dying 66
+  [reinit] step 838000: 173 dead clusters
+  step 838100 | loss 0.0748 | kl 0.0292 | val_kl 0.0309 | clus 0.4276 | sep 0.3716 | mse(diag) 0.1505 | eff_K 2000/2000 | dying 49
+  step 838200 | loss 0.0770 | kl 0.0314 | val_kl 0.0339 | clus 0.4284 | sep 0.3707 | mse(diag) 0.1499 | eff_K 2000/2000 | dying 56
+  step 838300 | loss 0.0646 | kl 0.0195 | val_kl 0.0332 | clus 0.4164 | sep 0.3714 | mse(diag) 0.1503 | eff_K 2000/2000 | dying 64
+  step 838400 | loss 0.0707 | kl 0.0242 | val_kl 0.0327 | clus 0.4308 | sep 0.3717 | mse(diag) 0.1552 | eff_K 2000/2000 | dying 65
+  step 838500 | loss 0.0677 | kl 0.0226 | val_kl 0.0332 | clus 0.4160 | sep 0.3695 | mse(diag) 0.1511 | eff_K 2000/2000 | dying 62
+  step 838600 | loss 0.0677 | kl 0.0239 | val_kl 0.0344 | clus 0.4081 | sep 0.3726 | mse(diag) 0.1453 | eff_K 2000/2000 | dying 70
+[train-e2e] Saved step_0838626.pt  val_kl=0.03298  val_mse=0.14998
+[train-e2e] Epoch 46 done in 122.5 min
+
+[train-e2e] Epoch 47/50 | tau=0.166 | λ_c=0.050 λ_s=0.0046
+  step 838700 | loss 0.0758 | kl 0.0306 | val_kl 0.0349 | clus 0.4071 | sep 0.3727 | mse(diag) 0.1540 | eff_K 2000/2000 | dying 70
+  step 838800 | loss 0.0701 | kl 0.0241 | val_kl 0.0344 | clus 0.4210 | sep 0.3726 | mse(diag) 0.1547 | eff_K 2000/2000 | dying 65
+  step 838900 | loss 0.0728 | kl 0.0269 | val_kl 0.0329 | clus 0.4264 | sep 0.3700 | mse(diag) 0.1519 | eff_K 2000/2000 | dying 66
+  step 839000 | loss 0.0682 | kl 0.0228 | val_kl 0.0334 | clus 0.4145 | sep 0.3680 | mse(diag) 0.1529 | eff_K 2000/2000 | dying 68
+  [reinit] step 839000: 184 dead clusters
+  step 839100 | loss 0.0679 | kl 0.0213 | val_kl 0.0340 | clus 0.4286 | sep 0.3711 | mse(diag) 0.1563 | eff_K 2000/2000 | dying 42
+  step 839200 | loss 0.0723 | kl 0.0276 | val_kl 0.0347 | clus 0.4150 | sep 0.3732 | mse(diag) 0.1486 | eff_K 2000/2000 | dying 44
+  step 839300 | loss 0.0767 | kl 0.0310 | val_kl 0.0343 | clus 0.4201 | sep 0.3699 | mse(diag) 0.1530 | eff_K 2000/2000 | dying 47
+  step 839400 | loss 0.0673 | kl 0.0222 | val_kl 0.0364 | clus 0.4130 | sep 0.3727 | mse(diag) 0.1516 | eff_K 2000/2000 | dying 54
+  step 839500 | loss 0.0687 | kl 0.0237 | val_kl 0.0332 | clus 0.4166 | sep 0.3733 | mse(diag) 0.1494 | eff_K 2000/2000 | dying 48
+  step 839600 | loss 0.0719 | kl 0.0264 | val_kl 0.0339 | clus 0.4194 | sep 0.3720 | mse(diag) 0.1523 | eff_K 2000/2000 | dying 55
+  step 839700 | loss 0.0742 | kl 0.0283 | val_kl 0.0348 | clus 0.4147 | sep 0.3701 | mse(diag) 0.1559 | eff_K 2000/2000 | dying 47
+  step 839800 | loss 0.0785 | kl 0.0335 | val_kl 0.0338 | clus 0.4213 | sep 0.3729 | mse(diag) 0.1477 | eff_K 2000/2000 | dying 52
+  step 839900 | loss 0.0715 | kl 0.0254 | val_kl 0.0341 | clus 0.4254 | sep 0.3681 | mse(diag) 0.1544 | eff_K 2000/2000 | dying 50
+  step 840000 | loss 0.0712 | kl 0.0257 | val_kl 0.0337 | clus 0.4203 | sep 0.3712 | mse(diag) 0.1517 | eff_K 2000/2000 | dying 47
+  [reinit] step 840000: 161 dead clusters
+  step 840100 | loss 0.0727 | kl 0.0274 | val_kl 0.0340 | clus 0.4254 | sep 0.3694 | mse(diag) 0.1484 | eff_K 2000/2000 | dying 46
+  step 840200 | loss 0.0660 | kl 0.0218 | val_kl 0.0317 | clus 0.4088 | sep 0.3700 | mse(diag) 0.1472 | eff_K 2000/2000 | dying 59
+  step 840300 | loss 0.0740 | kl 0.0284 | val_kl 0.0331 | clus 0.4184 | sep 0.3715 | mse(diag) 0.1532 | eff_K 2000/2000 | dying 57
+  step 840400 | loss 0.0655 | kl 0.0208 | val_kl 0.0352 | clus 0.4141 | sep 0.3704 | mse(diag) 0.1486 | eff_K 2000/2000 | dying 59
+  step 840500 | loss 0.0819 | kl 0.0357 | val_kl 0.0329 | clus 0.4277 | sep 0.3707 | mse(diag) 0.1536 | eff_K 2000/2000 | dying 64
+  step 840600 | loss 0.0762 | kl 0.0305 | val_kl 0.0353 | clus 0.4175 | sep 0.3754 | mse(diag) 0.1537 | eff_K 2000/2000 | dying 68
+  step 840700 | loss 0.0669 | kl 0.0213 | val_kl 0.0352 | clus 0.4059 | sep 0.3713 | mse(diag) 0.1572 | eff_K 2000/2000 | dying 66
+  step 840800 | loss 0.0689 | kl 0.0225 | val_kl 0.0335 | clus 0.4220 | sep 0.3745 | mse(diag) 0.1572 | eff_K 2000/2000 | dying 54
+  step 840900 | loss 0.0633 | kl 0.0195 | val_kl 0.0336 | clus 0.4006 | sep 0.3721 | mse(diag) 0.1467 | eff_K 2000/2000 | dying 57
+  step 841000 | loss 0.0708 | kl 0.0249 | val_kl 0.0333 | clus 0.4192 | sep 0.3711 | mse(diag) 0.1551 | eff_K 2000/2000 | dying 63
+  [reinit] step 841000: 185 dead clusters
+  step 841100 | loss 0.0719 | kl 0.0253 | val_kl 0.0336 | clus 0.4364 | sep 0.3724 | mse(diag) 0.1534 | eff_K 2000/2000 | dying 48
+  step 841200 | loss 0.0736 | kl 0.0285 | val_kl 0.0329 | clus 0.4316 | sep 0.3712 | mse(diag) 0.1455 | eff_K 2000/2000 | dying 52
+  step 841300 | loss 0.0654 | kl 0.0207 | val_kl 0.0349 | clus 0.4101 | sep 0.3717 | mse(diag) 0.1498 | eff_K 2000/2000 | dying 47
+  step 841400 | loss 0.0725 | kl 0.0267 | val_kl 0.0327 | clus 0.4194 | sep 0.3715 | mse(diag) 0.1541 | eff_K 2000/2000 | dying 53
+  step 841500 | loss 0.0678 | kl 0.0233 | val_kl 0.0344 | clus 0.4063 | sep 0.3699 | mse(diag) 0.1495 | eff_K 2000/2000 | dying 53
+  step 841600 | loss 0.0735 | kl 0.0270 | val_kl 0.0340 | clus 0.4241 | sep 0.3719 | mse(diag) 0.1571 | eff_K 2000/2000 | dying 49
+  step 841700 | loss 0.0674 | kl 0.0209 | val_kl 0.0344 | clus 0.4296 | sep 0.3706 | mse(diag) 0.1553 | eff_K 2000/2000 | dying 50
+  step 841800 | loss 0.0676 | kl 0.0226 | val_kl 0.0337 | clus 0.4095 | sep 0.3704 | mse(diag) 0.1518 | eff_K 2000/2000 | dying 53
+  step 841900 | loss 0.0678 | kl 0.0232 | val_kl 0.0334 | clus 0.4136 | sep 0.3710 | mse(diag) 0.1481 | eff_K 2000/2000 | dying 51
+  step 842000 | loss 0.0699 | kl 0.0249 | val_kl 0.0335 | clus 0.4175 | sep 0.3705 | mse(diag) 0.1497 | eff_K 2000/2000 | dying 60
+  [reinit] step 842000: 171 dead clusters
+  step 842100 | loss 0.0724 | kl 0.0260 | val_kl 0.0334 | clus 0.4309 | sep 0.3770 | mse(diag) 0.1538 | eff_K 2000/2000 | dying 39
+  step 842200 | loss 0.0696 | kl 0.0238 | val_kl 0.0323 | clus 0.4284 | sep 0.3752 | mse(diag) 0.1512 | eff_K 2000/2000 | dying 39
+  step 842300 | loss 0.0726 | kl 0.0262 | val_kl 0.0333 | clus 0.4254 | sep 0.3709 | mse(diag) 0.1555 | eff_K 2000/2000 | dying 41
+  step 842400 | loss 0.0690 | kl 0.0235 | val_kl 0.0340 | clus 0.4238 | sep 0.3739 | mse(diag) 0.1510 | eff_K 2000/2000 | dying 60
+  step 842500 | loss 0.0718 | kl 0.0263 | val_kl 0.0324 | clus 0.4230 | sep 0.3752 | mse(diag) 0.1503 | eff_K 2000/2000 | dying 54
+  step 842600 | loss 0.0709 | kl 0.0245 | val_kl 0.0337 | clus 0.4270 | sep 0.3739 | mse(diag) 0.1550 | eff_K 2000/2000 | dying 49
+  step 842700 | loss 0.0672 | kl 0.0219 | val_kl 0.0336 | clus 0.4167 | sep 0.3750 | mse(diag) 0.1517 | eff_K 2000/2000 | dying 49
+  step 842800 | loss 0.0714 | kl 0.0261 | val_kl 0.0334 | clus 0.4225 | sep 0.3704 | mse(diag) 0.1496 | eff_K 2000/2000 | dying 45
+  step 842900 | loss 0.0697 | kl 0.0243 | val_kl 0.0317 | clus 0.4226 | sep 0.3717 | mse(diag) 0.1501 | eff_K 2000/2000 | dying 49
+  step 843000 | loss 0.0669 | kl 0.0214 | val_kl 0.0330 | clus 0.4208 | sep 0.3720 | mse(diag) 0.1517 | eff_K 2000/2000 | dying 50
+  [reinit] step 843000: 161 dead clusters
+  step 843100 | loss 0.0725 | kl 0.0273 | val_kl 0.0333 | clus 0.4223 | sep 0.3728 | mse(diag) 0.1490 | eff_K 2000/2000 | dying 40
+  step 843200 | loss 0.0723 | kl 0.0266 | val_kl 0.0319 | clus 0.4233 | sep 0.3723 | mse(diag) 0.1524 | eff_K 2000/2000 | dying 45
+  step 843300 | loss 0.0693 | kl 0.0248 | val_kl 0.0351 | clus 0.4179 | sep 0.3723 | mse(diag) 0.1455 | eff_K 2000/2000 | dying 47
+  step 843400 | loss 0.0876 | kl 0.0412 | val_kl 0.0330 | clus 0.4285 | sep 0.3690 | mse(diag) 0.1550 | eff_K 2000/2000 | dying 56
+  step 843500 | loss 0.0662 | kl 0.0215 | val_kl 0.0332 | clus 0.4169 | sep 0.3698 | mse(diag) 0.1477 | eff_K 2000/2000 | dying 56
+  step 843600 | loss 0.0737 | kl 0.0281 | val_kl 0.0331 | clus 0.4158 | sep 0.3723 | mse(diag) 0.1534 | eff_K 2000/2000 | dying 54
+  step 843700 | loss 0.0687 | kl 0.0228 | val_kl 0.0331 | clus 0.4172 | sep 0.3741 | mse(diag) 0.1553 | eff_K 2000/2000 | dying 46
+  step 843800 | loss 0.0692 | kl 0.0248 | val_kl 0.0328 | clus 0.4137 | sep 0.3706 | mse(diag) 0.1462 | eff_K 2000/2000 | dying 48
+  step 843900 | loss 0.0642 | kl 0.0197 | val_kl 0.0329 | clus 0.4098 | sep 0.3718 | mse(diag) 0.1485 | eff_K 2000/2000 | dying 49
+  step 844000 | loss 0.0679 | kl 0.0223 | val_kl 0.0340 | clus 0.4188 | sep 0.3701 | mse(diag) 0.1527 | eff_K 2000/2000 | dying 49
+  [reinit] step 844000: 174 dead clusters
+  step 844100 | loss 0.0640 | kl 0.0200 | val_kl 0.0321 | clus 0.4198 | sep 0.3712 | mse(diag) 0.1422 | eff_K 2000/2000 | dying 41
+  step 844200 | loss 0.0682 | kl 0.0226 | val_kl 0.0332 | clus 0.4363 | sep 0.3729 | mse(diag) 0.1473 | eff_K 2000/2000 | dying 43
+  step 844300 | loss 0.0695 | kl 0.0238 | val_kl 0.0318 | clus 0.4277 | sep 0.3729 | mse(diag) 0.1506 | eff_K 2000/2000 | dying 56
+  step 844400 | loss 0.0692 | kl 0.0239 | val_kl 0.0328 | clus 0.4205 | sep 0.3715 | mse(diag) 0.1503 | eff_K 2000/2000 | dying 53
+  step 844500 | loss 0.0739 | kl 0.0289 | val_kl 0.0337 | clus 0.4134 | sep 0.3711 | mse(diag) 0.1506 | eff_K 2000/2000 | dying 50
+  step 844600 | loss 0.0681 | kl 0.0226 | val_kl 0.0340 | clus 0.4128 | sep 0.3680 | mse(diag) 0.1542 | eff_K 2000/2000 | dying 59
+  step 844700 | loss 0.0670 | kl 0.0220 | val_kl 0.0315 | clus 0.4136 | sep 0.3693 | mse(diag) 0.1506 | eff_K 2000/2000 | dying 58
+  step 844800 | loss 0.0685 | kl 0.0234 | val_kl 0.0336 | clus 0.4137 | sep 0.3741 | mse(diag) 0.1510 | eff_K 2000/2000 | dying 65
+  step 844900 | loss 0.0660 | kl 0.0217 | val_kl 0.0323 | clus 0.4062 | sep 0.3723 | mse(diag) 0.1483 | eff_K 2000/2000 | dying 63
+  step 845000 | loss 0.0656 | kl 0.0205 | val_kl 0.0333 | clus 0.4128 | sep 0.3737 | mse(diag) 0.1511 | eff_K 2000/2000 | dying 57
+  [reinit] step 845000: 184 dead clusters
+  step 845100 | loss 0.0812 | kl 0.0349 | val_kl 0.0334 | clus 0.4407 | sep 0.3726 | mse(diag) 0.1498 | eff_K 2000/2000 | dying 43
+  step 845200 | loss 0.0701 | kl 0.0248 | val_kl 0.0325 | clus 0.4305 | sep 0.3700 | mse(diag) 0.1470 | eff_K 2000/2000 | dying 52
+  step 845300 | loss 0.0709 | kl 0.0261 | val_kl 0.0329 | clus 0.4226 | sep 0.3734 | mse(diag) 0.1462 | eff_K 2000/2000 | dying 52
+  step 845400 | loss 0.0705 | kl 0.0252 | val_kl 0.0322 | clus 0.4309 | sep 0.3710 | mse(diag) 0.1471 | eff_K 2000/2000 | dying 53
+  step 845500 | loss 0.0682 | kl 0.0223 | val_kl 0.0335 | clus 0.4317 | sep 0.3709 | mse(diag) 0.1505 | eff_K 2000/2000 | dying 50
+  step 845600 | loss 0.0716 | kl 0.0257 | val_kl 0.0331 | clus 0.4253 | sep 0.3726 | mse(diag) 0.1521 | eff_K 2000/2000 | dying 67
+  step 845700 | loss 0.0723 | kl 0.0260 | val_kl 0.0339 | clus 0.4265 | sep 0.3711 | mse(diag) 0.1545 | eff_K 2000/2000 | dying 59
+  step 845800 | loss 0.0700 | kl 0.0249 | val_kl 0.0336 | clus 0.4188 | sep 0.3679 | mse(diag) 0.1500 | eff_K 2000/2000 | dying 63
+  step 845900 | loss 0.0704 | kl 0.0258 | val_kl 0.0322 | clus 0.4200 | sep 0.3720 | mse(diag) 0.1460 | eff_K 2000/2000 | dying 60
+  step 846000 | loss 0.0650 | kl 0.0217 | val_kl 0.0336 | clus 0.3966 | sep 0.3715 | mse(diag) 0.1452 | eff_K 2000/2000 | dying 64
+  [reinit] step 846000: 154 dead clusters
+  step 846100 | loss 0.0723 | kl 0.0276 | val_kl 0.0349 | clus 0.4134 | sep 0.3729 | mse(diag) 0.1485 | eff_K 2000/2000 | dying 51
+  step 846200 | loss 0.0673 | kl 0.0226 | val_kl 0.0320 | clus 0.4182 | sep 0.3690 | mse(diag) 0.1475 | eff_K 2000/2000 | dying 50
+  step 846300 | loss 0.0695 | kl 0.0260 | val_kl 0.0326 | clus 0.4001 | sep 0.3701 | mse(diag) 0.1450 | eff_K 2000/2000 | dying 50
+  step 846400 | loss 0.0713 | kl 0.0259 | val_kl 0.0329 | clus 0.4231 | sep 0.3707 | mse(diag) 0.1505 | eff_K 2000/2000 | dying 51
+  step 846500 | loss 0.0697 | kl 0.0235 | val_kl 0.0319 | clus 0.4347 | sep 0.3722 | mse(diag) 0.1520 | eff_K 2000/2000 | dying 49
+  step 846600 | loss 0.0698 | kl 0.0244 | val_kl 0.0322 | clus 0.4295 | sep 0.3728 | mse(diag) 0.1481 | eff_K 2000/2000 | dying 55
+  step 846700 | loss 0.0646 | kl 0.0210 | val_kl 0.0327 | clus 0.4118 | sep 0.3714 | mse(diag) 0.1423 | eff_K 2000/2000 | dying 52
+  step 846800 | loss 0.0676 | kl 0.0225 | val_kl 0.0324 | clus 0.4128 | sep 0.3700 | mse(diag) 0.1516 | eff_K 2000/2000 | dying 57
+  step 846900 | loss 0.0673 | kl 0.0230 | val_kl 0.0322 | clus 0.4083 | sep 0.3734 | mse(diag) 0.1474 | eff_K 2000/2000 | dying 48
+  step 847000 | loss 0.0682 | kl 0.0251 | val_kl 0.0310 | clus 0.4026 | sep 0.3714 | mse(diag) 0.1416 | eff_K 2000/2000 | dying 48
+  [reinit] step 847000: 168 dead clusters
+  step 847100 | loss 0.0681 | kl 0.0226 | val_kl 0.0312 | clus 0.4346 | sep 0.3701 | mse(diag) 0.1474 | eff_K 2000/2000 | dying 36
+  step 847200 | loss 0.0732 | kl 0.0276 | val_kl 0.0353 | clus 0.4209 | sep 0.3705 | mse(diag) 0.1522 | eff_K 2000/2000 | dying 29
+  step 847300 | loss 0.0697 | kl 0.0246 | val_kl 0.0360 | clus 0.4298 | sep 0.3725 | mse(diag) 0.1458 | eff_K 2000/2000 | dying 37
+  step 847400 | loss 0.0672 | kl 0.0223 | val_kl 0.0329 | clus 0.4195 | sep 0.3708 | mse(diag) 0.1480 | eff_K 2000/2000 | dying 39
+  step 847500 | loss 0.0689 | kl 0.0240 | val_kl 0.0333 | clus 0.4236 | sep 0.3747 | mse(diag) 0.1464 | eff_K 2000/2000 | dying 44
+  step 847600 | loss 0.0675 | kl 0.0234 | val_kl 0.0336 | clus 0.4065 | sep 0.3734 | mse(diag) 0.1467 | eff_K 2000/2000 | dying 47
+  step 847700 | loss 0.0701 | kl 0.0269 | val_kl 0.0343 | clus 0.4171 | sep 0.3694 | mse(diag) 0.1377 | eff_K 2000/2000 | dying 43
+  step 847800 | loss 0.0714 | kl 0.0269 | val_kl 0.0322 | clus 0.4092 | sep 0.3757 | mse(diag) 0.1482 | eff_K 2000/2000 | dying 35
+  step 847900 | loss 0.0687 | kl 0.0237 | val_kl 0.0324 | clus 0.4189 | sep 0.3720 | mse(diag) 0.1492 | eff_K 2000/2000 | dying 40
+  step 848000 | loss 0.0663 | kl 0.0221 | val_kl 0.0321 | clus 0.4231 | sep 0.3715 | mse(diag) 0.1426 | eff_K 2000/2000 | dying 50
+  [reinit] step 848000: 170 dead clusters
+  step 848100 | loss 0.0682 | kl 0.0228 | val_kl 0.0314 | clus 0.4346 | sep 0.3707 | mse(diag) 0.1463 | eff_K 2000/2000 | dying 42
+  step 848200 | loss 0.0698 | kl 0.0249 | val_kl 0.0334 | clus 0.4236 | sep 0.3678 | mse(diag) 0.1463 | eff_K 2000/2000 | dying 44
+  step 848300 | loss 0.0694 | kl 0.0231 | val_kl 0.0324 | clus 0.4385 | sep 0.3707 | mse(diag) 0.1505 | eff_K 2000/2000 | dying 43
+  step 848400 | loss 0.0691 | kl 0.0244 | val_kl 0.0322 | clus 0.4178 | sep 0.3686 | mse(diag) 0.1473 | eff_K 2000/2000 | dying 45
+  step 848500 | loss 0.0753 | kl 0.0284 | val_kl 0.0343 | clus 0.4396 | sep 0.3713 | mse(diag) 0.1545 | eff_K 2000/2000 | dying 48
+  step 848600 | loss 0.0696 | kl 0.0234 | val_kl 0.0326 | clus 0.4310 | sep 0.3710 | mse(diag) 0.1530 | eff_K 2000/2000 | dying 43
+  step 848700 | loss 0.0685 | kl 0.0243 | val_kl 0.0323 | clus 0.4083 | sep 0.3708 | mse(diag) 0.1473 | eff_K 2000/2000 | dying 46
+  step 848800 | loss 0.0657 | kl 0.0204 | val_kl 0.0312 | clus 0.4213 | sep 0.3731 | mse(diag) 0.1500 | eff_K 2000/2000 | dying 55
+  step 848900 | loss 0.0712 | kl 0.0260 | val_kl 0.0334 | clus 0.4253 | sep 0.3699 | mse(diag) 0.1479 | eff_K 2000/2000 | dying 55
+  step 849000 | loss 0.0649 | kl 0.0209 | val_kl 0.0323 | clus 0.3985 | sep 0.3709 | mse(diag) 0.1485 | eff_K 2000/2000 | dying 45
+  [reinit] step 849000: 186 dead clusters
+  step 849100 | loss 0.0704 | kl 0.0249 | val_kl 0.0331 | clus 0.4382 | sep 0.3719 | mse(diag) 0.1461 | eff_K 2000/2000 | dying 36
+  step 849200 | loss 0.0739 | kl 0.0286 | val_kl 0.0321 | clus 0.4272 | sep 0.3728 | mse(diag) 0.1485 | eff_K 2000/2000 | dying 35
+  step 849300 | loss 0.0697 | kl 0.0243 | val_kl 0.0321 | clus 0.4263 | sep 0.3730 | mse(diag) 0.1490 | eff_K 2000/2000 | dying 34
+  step 849400 | loss 0.0693 | kl 0.0249 | val_kl 0.0332 | clus 0.4231 | sep 0.3718 | mse(diag) 0.1433 | eff_K 2000/2000 | dying 41
+  step 849500 | loss 0.0678 | kl 0.0239 | val_kl 0.0330 | clus 0.4125 | sep 0.3703 | mse(diag) 0.1441 | eff_K 2000/2000 | dying 49
+  step 849600 | loss 0.0708 | kl 0.0248 | val_kl 0.0326 | clus 0.4343 | sep 0.3732 | mse(diag) 0.1501 | eff_K 2000/2000 | dying 53
+  step 849700 | loss 0.0703 | kl 0.0245 | val_kl 0.0322 | clus 0.4243 | sep 0.3720 | mse(diag) 0.1521 | eff_K 2000/2000 | dying 51
+  step 849800 | loss 0.0691 | kl 0.0244 | val_kl 0.0329 | clus 0.4171 | sep 0.3721 | mse(diag) 0.1479 | eff_K 2000/2000 | dying 50
+  step 849900 | loss 0.0697 | kl 0.0261 | val_kl 0.0325 | clus 0.4163 | sep 0.3696 | mse(diag) 0.1404 | eff_K 2000/2000 | dying 49
+  step 850000 | loss 0.0714 | kl 0.0269 | val_kl 0.0336 | clus 0.4146 | sep 0.3700 | mse(diag) 0.1469 | eff_K 2000/2000 | dying 50
+  [reinit] step 850000: 165 dead clusters
+  step 850100 | loss 0.0795 | kl 0.0334 | val_kl 0.0328 | clus 0.4345 | sep 0.3700 | mse(diag) 0.1510 | eff_K 2000/2000 | dying 41
+  step 850200 | loss 0.0772 | kl 0.0297 | val_kl 0.0323 | clus 0.4519 | sep 0.3718 | mse(diag) 0.1544 | eff_K 2000/2000 | dying 50
+  step 850300 | loss 0.0658 | kl 0.0211 | val_kl 0.0337 | clus 0.4167 | sep 0.3732 | mse(diag) 0.1480 | eff_K 2000/2000 | dying 52
+  step 850400 | loss 0.0664 | kl 0.0210 | val_kl 0.0335 | clus 0.4262 | sep 0.3727 | mse(diag) 0.1495 | eff_K 2000/2000 | dying 57
+  step 850500 | loss 0.0773 | kl 0.0311 | val_kl 0.0317 | clus 0.4293 | sep 0.3757 | mse(diag) 0.1528 | eff_K 2000/2000 | dying 58
+  step 850600 | loss 0.0703 | kl 0.0248 | val_kl 0.0323 | clus 0.4248 | sep 0.3691 | mse(diag) 0.1503 | eff_K 2000/2000 | dying 51
+  step 850700 | loss 0.0712 | kl 0.0264 | val_kl 0.0309 | clus 0.4212 | sep 0.3712 | mse(diag) 0.1465 | eff_K 2000/2000 | dying 53
+  step 850800 | loss 0.0701 | kl 0.0253 | val_kl 0.0338 | clus 0.4186 | sep 0.3725 | mse(diag) 0.1473 | eff_K 2000/2000 | dying 61
+  step 850900 | loss 0.0727 | kl 0.0277 | val_kl 0.0321 | clus 0.4221 | sep 0.3711 | mse(diag) 0.1477 | eff_K 2000/2000 | dying 56
+  step 851000 | loss 0.0697 | kl 0.0244 | val_kl 0.0322 | clus 0.4298 | sep 0.3670 | mse(diag) 0.1474 | eff_K 2000/2000 | dying 50
+  [reinit] step 851000: 156 dead clusters
+  step 851100 | loss 0.0719 | kl 0.0273 | val_kl 0.0340 | clus 0.4247 | sep 0.3722 | mse(diag) 0.1441 | eff_K 2000/2000 | dying 38
+  step 851200 | loss 0.0685 | kl 0.0246 | val_kl 0.0331 | clus 0.4210 | sep 0.3690 | mse(diag) 0.1409 | eff_K 2000/2000 | dying 32
+  step 851300 | loss 0.0659 | kl 0.0206 | val_kl 0.0312 | clus 0.4234 | sep 0.3745 | mse(diag) 0.1497 | eff_K 2000/2000 | dying 42
+  step 851400 | loss 0.0762 | kl 0.0311 | val_kl 0.0333 | clus 0.4205 | sep 0.3711 | mse(diag) 0.1493 | eff_K 2000/2000 | dying 41
+  step 851500 | loss 0.0656 | kl 0.0207 | val_kl 0.0311 | clus 0.4178 | sep 0.3754 | mse(diag) 0.1488 | eff_K 2000/2000 | dying 39
+  step 851600 | loss 0.0745 | kl 0.0291 | val_kl 0.0319 | clus 0.4166 | sep 0.3723 | mse(diag) 0.1523 | eff_K 2000/2000 | dying 47
+  step 851700 | loss 0.0653 | kl 0.0207 | val_kl 0.0335 | clus 0.4133 | sep 0.3702 | mse(diag) 0.1476 | eff_K 2000/2000 | dying 54

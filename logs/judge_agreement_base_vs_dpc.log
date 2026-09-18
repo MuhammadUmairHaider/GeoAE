@@ -1,0 +1,43 @@
+[judge] hard negatives from centroids of balanced_kmeans_k2000.npz
+[judge] ct_balanced_fullseq.json: 200 clusters, provider=openrouter model=google/gemini-2.5-flash-lite
+[agree] ct_balanced_fullseq.json | google/gemini-2.5-flash-lite: 200 clusters, 398 calls / 602 cached
+[judge] hard negatives from centroids of balanced_kmeans_k2000.npz
+[judge] ct_balanced_fullseq.json: 200 clusters, provider=openrouter model=openai/gpt-4o-mini
+[agree] ct_balanced_fullseq.json | openai/gpt-4o-mini: 200 clusters, 1000 calls / 0 cached
+[judge] hard negatives from centroids of balanced_kmeans_k2000.npz
+[judge] ct_balanced_fullseq.json: 200 clusters, provider=openrouter model=deepseek/deepseek-chat-v3.1
+[agree] ct_balanced_fullseq.json | deepseek/deepseek-chat-v3.1: 200 clusters, 1000 calls / 0 cached
+[agree] ct_balanced_fullseq.json: 200 clusters scored by all 3 judges
+
+=== ct_balanced_fullseq.json
+metric            gemini-2.5-flash       gpt-4o-mini  deepseek-chat-v3   Kendall W
+semantic_coh                 4.385             4.480             4.695       0.471
+generality                   3.445             3.520             3.860       0.465
+mono_llm                     3.945             4.160             4.705       0.491
+intruder_acc                 0.332             0.315             0.388       0.673
+  [chance W]                                                                 0.334
+
+  consensus intrusion pass-rate 0.58   resolved 100% of clusters (>=2/3 judges agree)
+
+[judge] hard negatives from centroids of best_val.pt
+[judge] ct_dpc_fullseq.json: 200 clusters, provider=openrouter model=google/gemini-2.5-flash-lite
+[agree] ct_dpc_fullseq.json | google/gemini-2.5-flash-lite: 200 clusters, 1000 calls / 0 cached
+[judge] hard negatives from centroids of best_val.pt
+[judge] ct_dpc_fullseq.json: 200 clusters, provider=openrouter model=openai/gpt-4o-mini
+[agree] ct_dpc_fullseq.json | openai/gpt-4o-mini: 200 clusters, 1000 calls / 0 cached
+[judge] hard negatives from centroids of best_val.pt
+[judge] ct_dpc_fullseq.json: 200 clusters, provider=openrouter model=deepseek/deepseek-chat-v3.1
+[agree] ct_dpc_fullseq.json | deepseek/deepseek-chat-v3.1: 200 clusters, 1000 calls / 0 cached
+[agree] ct_dpc_fullseq.json: 200 clusters scored by all 3 judges
+
+=== ct_dpc_fullseq.json
+metric            gemini-2.5-flash       gpt-4o-mini  deepseek-chat-v3   Kendall W
+semantic_coh                 4.490             4.480             4.665       0.448
+generality                   3.420             3.540             3.765       0.514
+mono_llm                     4.175             4.235             4.770       0.580
+intruder_acc                 0.267             0.308             0.365       0.637
+  [chance W]                                                                 0.334
+
+  consensus intrusion pass-rate 0.565   resolved 100% of clusters (>=2/3 judges agree)
+
+[agree] wrote results/judge_agreement_base_vs_dpc.json

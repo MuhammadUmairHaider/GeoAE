@@ -1,0 +1,83 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[bias] Loading activations from biasbios/activations/llama3.2-3B/last
+[bias] Train: (50000, 3072)  Test: (20000, 3072)  Professions: 28  Genders: 2
+[bias] Gender balance (train): male=27104 female=22896
+
+============================================================
+  Space: raw  (3072 dims)
+============================================================
+
+[bias] Training GENDER probe (2-class) ...
+[bias] Gender probe accuracy: 0.9878  (11 epochs)
+[bias] Training PROFESSION probe (28-class) ...
+[bias] Profession probe accuracy: 0.5753  (11 epochs)
+[bias] Gender active dims: 3043 / 3072
+[bias] Prof active dims:   3072 / 3072
+
+[bias] Cross-perturbation: zeroing GENDER-ranked dims ...
+  gender k@50%=3072  k@chance=3072  prof delta@k50=-0.2713
+[bias] Reverse cross: zeroing PROFESSION-ranked dims ...
+  prof k@50%: gender drops to 0.539 when all prof dims zeroed
+[bias] Random control sweep ...
+
+[bias] Per-profession delta at k=3072 (gender k@50%) ...
+  Profession                  N  Before   After   Delta
+  -------------------------------------------------------
+  professor                6080   0.894   1.000  +0.106
+  chiropractor              131   0.000   0.000  +0.000
+  comedian                  152   0.000   0.000  +0.000
+  dietitian                 218   0.000   0.000  +0.000
+  dj                         85   0.000   0.000  +0.000
+  ...
+  model                     364   0.464   0.000  -0.464
+  journalist                964   0.550   0.000  -0.550
+  attorney                 1624   0.800   0.000  -0.800
+  physician                2116   0.831   0.000  -0.831
+  photographer             1154   0.903   0.000  -0.903
+
+[bias] Dim overlap (gender ∩ prof):  @50=0.02  @100=0.03  @200=0.03  @500=0.13
+
+============================================================
+  Space: geoae  (3072 dims)
+============================================================
+
+[bias] Training GENDER probe (2-class) ...
+[bias] Gender probe accuracy: 0.9845  (11 epochs)
+[bias] Training PROFESSION probe (28-class) ...
+[bias] Profession probe accuracy: 0.4002  (11 epochs)
+[bias] Gender active dims: 3059 / 3072
+[bias] Prof active dims:   3072 / 3072
+
+[bias] Cross-perturbation: zeroing GENDER-ranked dims ...
+  gender k@50%=2903  k@chance=2749  prof delta@k50=+0.0055
+[bias] Reverse cross: zeroing PROFESSION-ranked dims ...
+  prof k@50%: gender drops to 0.461 when all prof dims zeroed
+[bias] Random control sweep ...
+
+[bias] Per-profession delta at k=2903 (gender k@50%) ...
+  Profession                  N  Before   After   Delta
+  -------------------------------------------------------
+  dentist                   726   0.000   0.466  +0.466
+  journalist                964   0.003   0.242  +0.239
+  photographer             1154   0.154   0.379  +0.224
+  nurse                     921   0.000   0.136  +0.136
+  architect                 513   0.000   0.037  +0.037
+  ...
+  software_engineer         332   0.000   0.000  +0.000
+  surgeon                   664   0.000   0.000  +0.000
+  yoga_teacher               73   0.000   0.000  +0.000
+  physician                2116   0.756   0.733  -0.024
+  professor                6080   1.000   0.862  -0.138
+
+[bias] Dim overlap (gender ∩ prof):  @50=0.00  @100=0.06  @200=0.14  @500=0.33
+[bias] Plots saved to plots/bias_probe/
+
+[bias] Results saved to results/bias_probe.json
+
+==========================================================================================
+  SUMMARY   lambda_l1=0.1  lambda_l2=0.01
+==========================================================================================
+Space        Dims  GendAcc  ProfAcc  G_k@50% G_k@50%%  G_k@ch  P_Δ@k50   Effic  Ovlp@100
+------------------------------------------------------------------------------------------
+raw          3072   0.9878   0.5753     3072  100.0%    3072  -0.2713     1.7     0.030
+geoae        3072   0.9845   0.4002     2903   94.5%    2749  +0.0055     inf     0.060

@@ -1,0 +1,55 @@
+[bias] fit=44979 val=4998 test=19981 dedup={'train_rows_removed': 23, 'test_rows_removed': 19}
+[bias] raw: 3072 dims
+[bias] fitting gender
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+  epoch=1 val CE=0.0452 acc=0.9894
+  epoch=10 val CE=0.0349 acc=0.9896
+  epoch=20 val CE=0.0384 acc=0.9888
+[bias] fitting profession
+[seed] seed=43 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+  epoch=1 val CE=0.7911 acc=0.8095
+  epoch=10 val CE=0.6716 acc=0.8115
+[bias] raw sweep gender_probe
+[bias] raw/gender_probe: val-selected half-excess k=2611 test={'task_accs': 0.5839046835899353, 'task_balanced_accs': 0.48550739884376526, 'spur_accs': 0.7496121525764465, 'spur_balanced_accs': 0.7412657141685486, 'task_kl': 1.7824853658676147, 'task_top1_change': 0.3784094750881195}
+[bias] raw sweep gender_dprime
+[bias] raw/gender_dprime: val-selected half-excess k=1720 test={'task_accs': 0.7496621608734131, 'task_balanced_accs': 0.666502058506012, 'spur_accs': 0.7336469888687134, 'spur_balanced_accs': 0.733352541923523, 'task_kl': 0.5488507151603699, 'task_top1_change': 0.17211350798606873}
+[bias] raw sweep profession_probe
+[bias] raw/profession_probe: val-selected half-excess k=3041 test={'task_accs': 0.2699064016342163, 'task_balanced_accs': 0.07675016671419144, 'spur_accs': 0.7226365208625793, 'spur_balanced_accs': 0.7172662615776062, 'task_kl': 2.771618604660034, 'task_top1_change': 0.7196837067604065}
+[bias] raw sweep random_0
+[bias] raw/random_0: val-selected half-excess k=3025 test={'task_accs': 0.22636504471302032, 'task_balanced_accs': 0.1296275407075882, 'spur_accs': 0.7346479296684265, 'spur_balanced_accs': 0.730047345161438, 'task_kl': 2.6918840408325195, 'task_top1_change': 0.7668284773826599}
+[bias] raw sweep random_1
+[bias] raw/random_1: val-selected half-excess k=3056 test={'task_accs': 0.15504729747772217, 'task_balanced_accs': 0.06231192126870155, 'spur_accs': 0.619738757610321, 'spur_balanced_accs': 0.6092638969421387, 'task_kl': 2.783844470977783, 'task_top1_change': 0.846704363822937}
+[bias] raw sweep random_2
+[bias] raw/random_2: val-selected half-excess k=3025 test={'task_accs': 0.23116961121559143, 'task_balanced_accs': 0.1033681258559227, 'spur_accs': 0.751764178276062, 'spur_balanced_accs': 0.748413622379303, 'task_kl': 2.6649627685546875, 'task_top1_change': 0.7584705352783203}
+[bias] raw sweep random_3
+[bias] raw/random_3: val-selected half-excess k=3025 test={'task_accs': 0.28487062454223633, 'task_balanced_accs': 0.13923726975917816, 'spur_accs': 0.7335468530654907, 'spur_balanced_accs': 0.7298083305358887, 'task_kl': 2.6695852279663086, 'task_top1_change': 0.7088233828544617}
+[bias] raw sweep random_4
+[bias] raw/random_4: val-selected half-excess k=3025 test={'task_accs': 0.2802162170410156, 'task_balanced_accs': 0.14897894859313965, 'spur_accs': 0.7324458360671997, 'spur_balanced_accs': 0.7278786301612854, 'task_kl': 2.6737139225006104, 'task_top1_change': 0.707622230052948}
+[bias] Encoding AE latents
+[bias] geoae: 6144 dims
+[bias] fitting gender
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+  epoch=1 val CE=0.0788 acc=0.9854
+  epoch=10 val CE=0.0574 acc=0.9872
+  epoch=20 val CE=0.0624 acc=0.9878
+[bias] fitting profession
+[seed] seed=43 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+  epoch=1 val CE=0.9733 acc=0.7899
+  epoch=10 val CE=0.8347 acc=0.8025
+[bias] geoae sweep gender_probe
+[bias] geoae/gender_probe: val-selected half-excess k=4669 test={'task_accs': 0.600070059299469, 'task_balanced_accs': 0.48345592617988586, 'spur_accs': 0.7496621608734131, 'spur_balanced_accs': 0.7474313974380493, 'task_kl': 1.358211636543274, 'task_top1_change': 0.3420749604701996}
+[bias] geoae sweep gender_dprime
+[bias] geoae/gender_dprime: val-selected half-excess k=2795 test={'task_accs': 0.7278414368629456, 'task_balanced_accs': 0.6352358460426331, 'spur_accs': 0.7480106353759766, 'spur_balanced_accs': 0.7491475343704224, 'task_kl': 0.43004634976387024, 'task_top1_change': 0.17801912128925323}
+[bias] geoae sweep profession_probe
+[bias] geoae/profession_probe: val-selected half-excess k=5437 test={'task_accs': 0.32505881786346436, 'task_balanced_accs': 0.17472508549690247, 'spur_accs': 0.7497122287750244, 'spur_balanced_accs': 0.7543803453445435, 'task_kl': 2.4094650745391846, 'task_top1_change': 0.6564736366271973}
+[bias] geoae sweep random_0
+[bias] geoae/random_0: val-selected half-excess k=6021 test={'task_accs': 0.2519393563270569, 'task_balanced_accs': 0.1453629732131958, 'spur_accs': 0.7470096349716187, 'spur_balanced_accs': 0.7462637424468994, 'task_kl': 2.7097434997558594, 'task_top1_change': 0.7364495992660522}
+[bias] geoae sweep random_1
+[bias] geoae/random_1: val-selected half-excess k=6113 test={'task_accs': 0.1205645352602005, 'task_balanced_accs': 0.06835483759641647, 'spur_accs': 0.7150292992591858, 'spur_balanced_accs': 0.7070155143737793, 'task_kl': 2.860896587371826, 'task_top1_change': 0.8806366324424744}
+[bias] geoae sweep random_2
+[bias] geoae/random_2: val-selected half-excess k=6082 test={'task_accs': 0.18682748079299927, 'task_balanced_accs': 0.11051485687494278, 'spur_accs': 0.6984635591506958, 'spur_balanced_accs': 0.6930614709854126, 'task_kl': 2.807929039001465, 'task_top1_change': 0.8102197051048279}
+[bias] geoae sweep random_3
+[bias] geoae/random_3: val-selected half-excess k=6051 test={'task_accs': 0.2580952048301697, 'task_balanced_accs': 0.13134150207042694, 'spur_accs': 0.7508132457733154, 'spur_balanced_accs': 0.7487483024597168, 'task_kl': 2.7461190223693848, 'task_top1_change': 0.7359992265701294}
+[bias] geoae sweep random_4
+[bias] geoae/random_4: val-selected half-excess k=6113 test={'task_accs': 0.16675841808319092, 'task_balanced_accs': 0.06965406984090805, 'spur_accs': 0.6920574307441711, 'spur_balanced_accs': 0.6837941408157349, 'task_kl': 2.851574659347534, 'task_top1_change': 0.8336920142173767}
+[bias] Complete: results/biasbios_dpc_audited.json

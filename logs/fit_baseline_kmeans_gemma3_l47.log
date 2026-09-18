@@ -1,0 +1,32 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[baseline-fit] Using AE norm from checkpoint (layer 47, google/gemma-3-12b-pt)
+[baseline-fit] Sampling 500,000/9,826,031 activations and normalising …
+reading:   0%|          | 0/5 [00:00<?, ?chunk/s]reading:  20%|██        | 1/5 [01:36<06:27, 96.93s/chunk]reading:  40%|████      | 2/5 [02:39<03:49, 76.64s/chunk]reading:  60%|██████    | 3/5 [04:11<02:47, 83.86s/chunk]reading:  80%|████████  | 4/5 [05:38<01:24, 84.85s/chunk]reading: 100%|██████████| 5/5 [06:52<00:00, 81.20s/chunk]reading: 100%|██████████| 5/5 [06:52<00:00, 82.58s/chunk]
+[baseline-fit] Fitting MiniBatchKMeans K=2000 (batch=128000, max_iter=300) …
+Init 1/3 with method k-means++
+Inertia for init 1/3: 1668685952.0
+Init 2/3 with method k-means++
+Inertia for init 2/3: 1675051520.0
+Init 3/3 with method k-means++
+Inertia for init 3/3: 1690118144.0
+[MiniBatchKMeans] Reassigning 1998 cluster centers.
+Minibatch step 1/1171: mean batch inertia: 4349.8405
+[MiniBatchKMeans] Reassigning 1998 cluster centers.
+Minibatch step 2/1171: mean batch inertia: 3742.863, ewa inertia: 3742.863
+Minibatch step 3/1171: mean batch inertia: 3743.3005, ewa inertia: 3743.0869995520006
+Minibatch step 4/1171: mean batch inertia: 3732.873, ewa inertia: 3737.857442240491
+[MiniBatchKMeans] Reassigning 1998 cluster centers.
+Minibatch step 5/1171: mean batch inertia: 3729.47875, ewa inertia: 3733.567560393123
+Minibatch step 6/1171: mean batch inertia: 3743.47275, ewa inertia: 3738.6390073289504
+Minibatch step 7/1171: mean batch inertia: 3742.0295, ewa inertia: 3740.3749361046703
+Minibatch step 8/1171: mean batch inertia: 3736.03925, ewa inertia: 3738.1550692588125
+Minibatch step 9/1171: mean batch inertia: 3744.87925, ewa inertia: 3741.5978429127535
+Minibatch step 10/1171: mean batch inertia: 3738.8935, ewa inertia: 3740.2132221106654
+Minibatch step 11/1171: mean batch inertia: 3744.54775, ewa inertia: 3742.432495951457
+Minibatch step 12/1171: mean batch inertia: 3738.831, ewa inertia: 3740.5885337122354
+Minibatch step 13/1171: mean batch inertia: 3740.671, ewa inertia: 3740.6307563671253
+Minibatch step 14/1171: mean batch inertia: 3738.334, ewa inertia: 3739.4548194590307
+Minibatch step 15/1171: mean batch inertia: 3733.78225, ewa inertia: 3736.5504697047063
+Converged (lack of improvement in inertia) at step 15/1171
+[baseline-fit] Fit done. 1994/2000 centroids win on a 500,000-token probe (final live count comes from collect_closest_tokens).
+[baseline-fit] Saved -> e2e/checkpoints/general/gemma3-12B/layer47/baseline_kmeans_k2000.npz

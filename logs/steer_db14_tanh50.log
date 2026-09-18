@@ -1,0 +1,139 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[steer] LM=meta-llama/Llama-3.2-3B layer=27 (AE target_layer=27)
+[eval] Splice sanity check PASSED (max logit diff = 0.00e+00)
+[steer] Computing wiki ppl slice + z-recon baseline hook …
+[steer] Loading db14 test split …
+[steer] Building joint base+recon correct set …
+[steer] Finding joint-correct predictions for class 0 (Company) ...
+  Found 130 joint-correct docs for class 0
+[steer] Finding joint-correct predictions for class 1 (EducationalInstitution) ...
+  Found 130 joint-correct docs for class 1
+[steer] Finding joint-correct predictions for class 2 (Artist) ...
+  Found 130 joint-correct docs for class 2
+[steer] Finding joint-correct predictions for class 3 (Athlete) ...
+  Found 130 joint-correct docs for class 3
+[steer] Finding joint-correct predictions for class 4 (OfficeHolder) ...
+  Found 130 joint-correct docs for class 4
+[steer] Finding joint-correct predictions for class 5 (MeanOfTransportation) ...
+  Found 17 joint-correct docs for class 5
+[steer] Finding joint-correct predictions for class 6 (Building) ...
+  Found 130 joint-correct docs for class 6
+[steer] Finding joint-correct predictions for class 7 (NaturalPlace) ...
+  Found 130 joint-correct docs for class 7
+[steer] Finding joint-correct predictions for class 8 (Village) ...
+  Found 47 joint-correct docs for class 8
+[steer] Finding joint-correct predictions for class 9 (Animal) ...
+  Found 130 joint-correct docs for class 9
+[steer] Finding joint-correct predictions for class 10 (Plant) ...
+  Found 130 joint-correct docs for class 10
+[steer] Finding joint-correct predictions for class 11 (Album) ...
+  Found 130 joint-correct docs for class 11
+[steer] Finding joint-correct predictions for class 12 (Film) ...
+  Found 130 joint-correct docs for class 12
+[steer] Finding joint-correct predictions for class 13 (WrittenWork) ...
+  Found 130 joint-correct docs for class 13
+[steer] joint-correct: 1624 docs (min/class=17, prompt_sha=e7f311cea65f, model=meta-llama/Llama-3.2-3B, ae=7799907ae8b1) -> dbpedia/joint_correct_db14_l27_dpc_tanh50.json
+[steer] Fit pass: capturing h,z for 998 docs …
+[steer] Clean eval over 626 docs …
+[steer] Re-filtered eval: 626 -> 615 jointly-correct docs
+[steer] base acc=1.000 ppl=5.8 | z-recon acc=1.000 ppl=6.5
+
+=== concept 0 (Company)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -0.398 (tgt 0.44, comp 0.84) | z sel -0.443 (tgt 0.52, comp 0.96)
+  a=1.0  | h sel -0.417 (tgt 0.12, comp 0.54) | z sel -0.552 (tgt 0.16, comp 0.71)
+  a=2.0  | h sel -0.250 (tgt 0.00, comp 0.25) | z sel -0.287 (tgt 0.00, comp 0.29)
+  a=4.0  | h sel -0.175 (tgt 0.00, comp 0.17) | z sel -0.175 (tgt 0.00, comp 0.17)
+  a=8.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.000 (tgt 0.00, comp 0.00)
+
+=== concept 1 (EducationalInstitution)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -0.893 (tgt 0.08, comp 0.97) | z sel -0.939 (tgt 0.06, comp 1.00)
+  a=1.0  | h sel -0.950 (tgt 0.00, comp 0.95) | z sel -0.975 (tgt 0.00, comp 0.97)
+  a=2.0  | h sel -0.800 (tgt 0.00, comp 0.80) | z sel -0.750 (tgt 0.00, comp 0.75)
+  a=4.0  | h sel -0.550 (tgt 0.00, comp 0.55) | z sel -0.562 (tgt 0.00, comp 0.56)
+  a=8.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.000 (tgt 0.00, comp 0.00)
+
+=== concept 2 (Artist)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -0.345 (tgt 0.18, comp 0.53) | z sel -0.255 (tgt 0.32, comp 0.57)
+  a=1.0  | h sel -0.338 (tgt 0.00, comp 0.34) | z sel -0.350 (tgt 0.00, comp 0.35)
+  a=2.0  | h sel -0.125 (tgt 0.00, comp 0.12) | z sel -0.125 (tgt 0.00, comp 0.12)
+  a=4.0  | h sel -0.037 (tgt 0.00, comp 0.04) | z sel -0.062 (tgt 0.00, comp 0.06)
+  a=8.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.000 (tgt 0.00, comp 0.00)
+
+=== concept 3 (Athlete)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -0.542 (tgt 0.02, comp 0.56) | z sel -0.479 (tgt 0.21, comp 0.69)
+  a=1.0  | h sel -0.475 (tgt 0.00, comp 0.47) | z sel -0.487 (tgt 0.00, comp 0.49)
+  a=2.0  | h sel -0.362 (tgt 0.00, comp 0.36) | z sel -0.350 (tgt 0.00, comp 0.35)
+  a=4.0  | h sel -0.275 (tgt 0.00, comp 0.28) | z sel -0.263 (tgt 0.00, comp 0.26)
+  a=8.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.000 (tgt 0.00, comp 0.00)
+
+=== concept 4 (OfficeHolder)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel +0.090 (tgt 0.64, comp 0.55) | z sel -0.048 (tgt 0.64, comp 0.69)
+  a=1.0  | h sel -0.292 (tgt 0.02, comp 0.31) | z sel -0.450 (tgt 0.00, comp 0.45)
+  a=2.0  | h sel -0.225 (tgt 0.00, comp 0.23) | z sel -0.237 (tgt 0.00, comp 0.24)
+  a=4.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.000 (tgt 0.00, comp 0.00)
+  a=8.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.000 (tgt 0.00, comp 0.00)
+
+=== concept 5 (MeanOfTransportation)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -0.446 (tgt 0.43, comp 0.88) | z sel -0.689 (tgt 0.29, comp 0.97)
+  a=1.0  | h sel -0.688 (tgt 0.00, comp 0.69) | z sel -0.863 (tgt 0.00, comp 0.86)
+  a=2.0  | h sel -0.425 (tgt 0.00, comp 0.42) | z sel -0.588 (tgt 0.00, comp 0.59)
+  a=4.0  | h sel -0.338 (tgt 0.00, comp 0.34) | z sel -0.375 (tgt 0.00, comp 0.38)
+  a=8.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.000 (tgt 0.00, comp 0.00)
+
+=== concept 6 (Building)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -0.043 (tgt 0.92, comp 0.96) | z sel -0.060 (tgt 0.94, comp 1.00)
+  a=1.0  | h sel -0.540 (tgt 0.36, comp 0.90) | z sel -0.647 (tgt 0.34, comp 0.99)
+  a=2.0  | h sel -0.675 (tgt 0.00, comp 0.68) | z sel -0.750 (tgt 0.00, comp 0.75)
+  a=4.0  | h sel -0.362 (tgt 0.00, comp 0.36) | z sel -0.512 (tgt 0.00, comp 0.51)
+  a=8.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.000 (tgt 0.00, comp 0.00)
+
+=== concept 7 (NaturalPlace)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -0.762 (tgt 0.12, comp 0.89) | z sel -0.838 (tgt 0.12, comp 0.96)
+  a=1.0  | h sel -0.725 (tgt 0.00, comp 0.72) | z sel -0.775 (tgt 0.00, comp 0.78)
+  a=2.0  | h sel -0.425 (tgt 0.00, comp 0.42) | z sel -0.438 (tgt 0.00, comp 0.44)
+  a=4.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel -0.075 (tgt 0.00, comp 0.07)
+  a=8.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.000 (tgt 0.00, comp 0.00)
+
+=== concept 8 (Village)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -0.912 (tgt 0.00, comp 0.91) | z sel -0.153 (tgt 0.72, comp 0.88)
+  a=1.0  | h sel -0.850 (tgt 0.00, comp 0.85) | z sel -0.732 (tgt 0.06, comp 0.79)
+  a=2.0  | h sel -0.550 (tgt 0.00, comp 0.55) | z sel -0.500 (tgt 0.00, comp 0.50)
+  a=4.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.000 (tgt 0.00, comp 0.00)
+  a=8.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.000 (tgt 0.00, comp 0.00)
+
+=== concept 9 (Animal)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -0.626 (tgt 0.06, comp 0.69) | z sel -0.596 (tgt 0.20, comp 0.80)
+  a=1.0  | h sel -0.600 (tgt 0.00, comp 0.60) | z sel -0.688 (tgt 0.00, comp 0.69)
+  a=2.0  | h sel -0.438 (tgt 0.00, comp 0.44) | z sel -0.487 (tgt 0.00, comp 0.49)
+  a=4.0  | h sel -0.263 (tgt 0.00, comp 0.26) | z sel -0.338 (tgt 0.00, comp 0.34)
+  a=8.0  | h sel -0.037 (tgt 0.00, comp 0.04) | z sel -0.087 (tgt 0.00, comp 0.09)
+
+=== concept 10 (Plant)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -0.713 (tgt 0.00, comp 0.71) | z sel -0.825 (tgt 0.00, comp 0.82)
+  a=1.0  | h sel -0.575 (tgt 0.00, comp 0.57) | z sel -0.700 (tgt 0.00, comp 0.70)
+  a=2.0  | h sel -0.362 (tgt 0.00, comp 0.36) | z sel -0.412 (tgt 0.00, comp 0.41)
+  a=4.0  | h sel -0.163 (tgt 0.00, comp 0.16) | z sel -0.250 (tgt 0.00, comp 0.25)
+  a=8.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.000 (tgt 0.00, comp 0.00)
+
+=== concept 11 (Album)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -0.438 (tgt 0.00, comp 0.44) | z sel -0.379 (tgt 0.21, comp 0.59)
+  a=1.0  | h sel -0.300 (tgt 0.00, comp 0.30) | z sel -0.325 (tgt 0.00, comp 0.33)
+  a=2.0  | h sel -0.237 (tgt 0.00, comp 0.24) | z sel -0.237 (tgt 0.00, comp 0.24)
+  a=4.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.000 (tgt 0.00, comp 0.00)
+  a=8.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.000 (tgt 0.00, comp 0.00)
+
+=== concept 12 (Film)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -0.733 (tgt 0.08, comp 0.81) | z sel -0.790 (tgt 0.16, comp 0.95)
+  a=1.0  | h sel -0.662 (tgt 0.00, comp 0.66) | z sel -0.800 (tgt 0.00, comp 0.80)
+  a=2.0  | h sel -0.338 (tgt 0.00, comp 0.34) | z sel -0.412 (tgt 0.00, comp 0.41)
+  a=4.0  | h sel -0.200 (tgt 0.00, comp 0.20) | z sel -0.237 (tgt 0.00, comp 0.24)
+  a=8.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.000 (tgt 0.00, comp 0.00)
+
+=== concept 13 (WrittenWork)  base tgt 1.00/comp 1.00 | z-recon tgt 1.00/comp 1.00 ===
+  a=0.5  | h sel -0.155 (tgt 0.62, comp 0.78) | z sel -0.258 (tgt 0.58, comp 0.84)
+  a=1.0  | h sel -0.585 (tgt 0.04, comp 0.62) | z sel -0.700 (tgt 0.00, comp 0.70)
+  a=2.0  | h sel -0.525 (tgt 0.00, comp 0.53) | z sel -0.525 (tgt 0.00, comp 0.53)
+  a=4.0  | h sel -0.287 (tgt 0.00, comp 0.29) | z sel -0.287 (tgt 0.00, comp 0.29)
+  a=8.0  | h sel +0.000 (tgt 0.00, comp 0.00) | z sel +0.000 (tgt 0.00, comp 0.00)
+
+[steer] Saved -> results/steer_db14_dpc_tanh50.json

@@ -1,0 +1,40 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[ccc] LM=meta-llama/Llama-3.2-3B layer=27 (AE target_layer=27) K=2000
+[eval] Splice sanity check PASSED (max logit diff = 0.00e+00)
+[ccc] Computing avg replacement from wiki …
+[ccc] MMLU: base vs AE-recon on 2000 questions …
+
+  MMLU base=0.562  AE-recon=0.529  delta=-0.033  (n=2000, random=0.25)
+  biggest per-subject movers (n>=5):
+    college_computer_science           n= 15 base=0.67 recon=0.27 d=-0.40
+    security_studies                   n= 36 base=0.69 recon=0.47 d=-0.22
+    high_school_computer_science       n= 18 base=0.67 recon=0.44 d=-0.22
+    high_school_government_and_politics n= 29 base=0.76 recon=0.55 d=-0.21
+    abstract_algebra                   n= 10 base=0.30 recon=0.10 d=-0.20
+    medical_genetics                   n= 16 base=0.94 recon=1.00 d=+0.06
+    business_ethics                    n= 11 base=0.45 recon=0.55 d=+0.09
+    computer_security                  n= 11 base=0.82 recon=0.91 d=+0.09
+    high_school_chemistry              n= 28 base=0.43 recon=0.54 d=+0.11
+    machine_learning                   n= 18 base=0.50 recon=0.61 d=+0.11
+
+[ccc] MMLU base=0.562  AE-recon=0.529  delta=-0.033  -> results_ccc_mmlu.json
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[ccc] LM=meta-llama/Llama-3.2-3B layer=27 (AE target_layer=27) K=2000
+[eval] Splice sanity check PASSED (max logit diff = 0.00e+00)
+[ccc] Computing avg replacement from wiki …
+[ccc] MMLU: base vs AE-recon on 2000 questions …
+
+  MMLU base=0.562  AE-recon=0.535  delta=-0.027  (n=2000, random=0.25)
+  biggest per-subject movers (n>=5):
+    college_computer_science           n= 15 base=0.67 recon=0.33 d=-0.33
+    security_studies                   n= 36 base=0.69 recon=0.53 d=-0.17
+    high_school_computer_science       n= 18 base=0.67 recon=0.50 d=-0.17
+    college_physics                    n= 19 base=0.32 recon=0.16 d=-0.16
+    high_school_government_and_politics n= 29 base=0.76 recon=0.62 d=-0.14
+    anatomy                            n= 16 base=0.44 recon=0.50 d=+0.06
+    medical_genetics                   n= 16 base=0.94 recon=1.00 d=+0.06
+    high_school_chemistry              n= 28 base=0.43 recon=0.50 d=+0.07
+    business_ethics                    n= 11 base=0.45 recon=0.55 d=+0.09
+    professional_medicine              n= 37 base=0.57 recon=0.68 d=+0.11
+
+[ccc] MMLU base=0.562  AE-recon=0.535  delta=-0.027  -> results_ccc_mmlu.json

@@ -177,6 +177,92 @@ def make_z_steer(r: np.ndarray, alpha: float, ae, mean: Tensor, std: Tensor, dev
 
 
 # ---------------------------------------------------------------------------
+# Range-conditioned edits, ONE operator shared by both substrates.
+#
+# make_h_edit / make_z_edit only differ in WHERE the edit runs (the residual
+# directly, or the AE latent between encode and decode). The edit itself is a
+# plain (N, D) -> (N, D) tensor function, so h and z are guaranteed to receive
+# the identical rule — which is the whole point of a base-vs-AE comparison.
+# ---------------------------------------------------------------------------
+
+def _row(a, device) -> Tensor:
+    return torch.as_tensor(a, dtype=torch.float32, device=device).view(1, -1)
+
+
+def make_h_edit(edit, device) -> "callable":
+    """Apply edit(a: (N, D)) -> (N, D) to the residual stream at every position."""
+    def fn(hs: Tensor) -> Tensor:
+        B, T, D = hs.shape
+        out = edit(hs.reshape(B * T, D).float())
+        return out.reshape(B, T, D).to(hs.dtype)
+    return fn
+
+
+def make_z_edit(edit, ae, mean: Tensor, std: Tensor, device) -> "callable":
+    """Encode -> edit(z) -> decode -> denormalise. edit=None is the pure AE-recon
+    splice, i.e. the z-substrate baseline every z delta must be read against."""
+    m = mean.to(device).float()
+    s = std.to(device).float()
+
+    @torch.no_grad()
+    def fn(hs: Tensor) -> Tensor:
+        B, T, D = hs.shape
+        z = ae.encoder((hs.reshape(B * T, D).float() - m) / s)
+        if edit is not None:
+            z = edit(z)
+        recon = (ae.decoder(z) * s + m).reshape(B, T, D)
+        return recon.to(hs.device).to(hs.dtype)
+    return fn
+
+
+def gate_edit(lo: np.ndarray, hi: np.ndarray, rep: np.ndarray, device):
+    """NeuronLens removal: where lo_j <= a_j <= hi_j, replace with rep_j.
+    Empty interval (lo=+inf, hi=-inf) on a dim = never touched."""
+    lo_t, hi_t, rep_t = _row(lo, device), _row(hi, device), _row(rep, device)
+    return lambda a: torch.where((a >= lo_t) & (a <= hi_t), rep_t, a)
+
+
+def shift_edit(r: np.ndarray, lo: np.ndarray, hi: np.ndarray, alpha: float, device):
+    """Mean-difference steering applied only where lo_j <= a_j <= hi_j:
+    a_j - alpha * r_j. With lo=-inf, hi=+inf on every dim this is exactly the
+    global steering of make_h_steer / make_z_steer (x - alpha * r)."""
+    r_t, lo_t, hi_t = _row(r, device), _row(lo, device), _row(hi, device)
+    return lambda a: a - float(alpha) * r_t * ((a >= lo_t) & (a <= hi_t)).to(a.dtype)
+
+
+def transport_edit(mu_c: np.ndarray, sd_c: np.ndarray, mu_o: np.ndarray, sd_o: np.ndarray,
+                   lo: np.ndarray, hi: np.ndarray, alpha: float, device):
+    """Range-to-range steering. For an in-range value, the per-dim Gaussian
+    transport from the concept's range onto the complement's range,
+        T(a_j) = mu_o_j + (a_j - mu_c_j) * sd_o_j / sd_c_j,
+    keeps the activation's standardised position but moves it into the range the
+    OTHER concepts occupy. a' = a + alpha * (T(a) - a) on in-range values only.
+    Inside [mu_c - tao*sd_c, mu_c + tao*sd_c] the standardised offset is bounded
+    by tao, so T(a) stays inside mu_o +- tao*sd_o; the clamp only guards sd_c == 0,
+    where the interval is a point and the offset is 0/0."""
+    mu_c_t, sd_c_t = _row(mu_c, device), _row(sd_c, device).clamp_min(1e-6)
+    mu_o_t, sd_o_t = _row(mu_o, device), _row(sd_o, device)
+    lo_t, hi_t = _row(lo, device), _row(hi, device)
+
+    def edit(a: Tensor) -> Tensor:
+        inside = ((a >= lo_t) & (a <= hi_t)).to(a.dtype)
+        target = mu_o_t + (a - mu_c_t) * (sd_o_t / sd_c_t)
+        return a + float(alpha) * (target - a) * inside
+    return edit
+
+
+def dprime_saliency(acts: np.ndarray, is_c: np.ndarray) -> np.ndarray:
+    """(D,) |mu_c - mu_rest| / pooled sigma — how far concept c's range sits from
+    everyone else's on each dim. Unlike mean |a|, this is invariant to a shared
+    per-dim offset: on L27 DB14, mean-|a| salient sets overlap 0.45 (Jaccard)
+    between concepts in BOTH h and z, d' sets 0.18-0.22, and d' roughly doubles
+    how much more often the range fires on target docs than on other docs."""
+    a_c, a_o = acts[is_c], acts[~is_c]
+    pooled = np.sqrt(0.5 * (a_c.var(axis=0) + a_o.var(axis=0)) + 1e-8)
+    return np.abs(a_c.mean(axis=0) - a_o.mean(axis=0)) / pooled
+
+
+# ---------------------------------------------------------------------------
 # Separability metrics (the user's hypothesis: z ranges more separable than h)
 # ---------------------------------------------------------------------------
 
