@@ -74,10 +74,27 @@ def davies_bouldin(z: np.ndarray, labels: np.ndarray) -> float:
 
 
 def calinski_harabasz(z: np.ndarray, labels: np.ndarray) -> float:
-    from sklearn.metrics import calinski_harabasz_score
-    if len(set(labels)) < 2:
+    """
+    sklearn's calinski_harabasz_score, without its full float64 copy.
+
+    sklearn upcasts the whole matrix to float64 before looping over clusters:
+    +24 GB at n=1M, d=3072 and +49 GB at d=6144. That pushed the eval into
+    memory pressure and systemd-oomd killed the tmux scope (2026-09-19). Same
+    formula and the same per-cluster float64 accumulation, one cluster at a time.
+    """
+    uniq, inv, counts = np.unique(labels, return_inverse=True, return_counts=True)
+    k, n = len(uniq), len(z)
+    if k < 2:
         return float("nan")
-    return float(calinski_harabasz_score(z, labels))
+    mean = z.mean(axis=0, dtype=np.float64)
+    order = np.argsort(inv, kind="stable")
+    extra = intra = 0.0
+    for idx in np.split(order, np.cumsum(counts)[:-1]):
+        ck = z[idx].astype(np.float64)
+        mk = ck.mean(axis=0)
+        extra += len(ck) * float(((mk - mean) ** 2).sum())
+        intra += float(((ck - mk) ** 2).sum())
+    return 1.0 if intra == 0.0 else float(extra * (n - k) / (intra * (k - 1.0)))
 
 
 def dunn_index(z: np.ndarray, labels: np.ndarray, max_samples: int = 5_000) -> float:

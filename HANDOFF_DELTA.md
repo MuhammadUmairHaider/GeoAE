@@ -1,4 +1,4 @@
-# GeoAE — handoff for NCSA Delta (2026-09-18)
+# GeoAE — handoff for NCSA Delta (2026-09-18, updated 2026-09-19)
 
 Moving off the Jetstream box (`circuits`, 484 GB disk, full) to NCSA Delta.
 **Nothing large is transferred.** Code, configs, small results and notes are in
@@ -47,6 +47,14 @@ new `geoae.interp.range_intervention_compare`:
   base is weakest, −0.03 where it is strongest. After controlling for dataset,
   base quality isn't significant, so there is a residual dataset effect.
   (`docs/notes/range-interventions-h-vs-z.md`, `docs/notes/biasbios-range-reversal.md`)
+
+**Latent width** (d3072 vs d6144, both at epoch 50). Going from 2x to 1x hidden
+size cost a lot of reconstruction (val MSE 0.095 vs 0.035; MMLU under
+reconstruction −0.066 vs −0.027) and tied on probes and kNN. On range
+interventions it amplified the effect in both directions: a bigger AE advantage
+on DBpedia, a bigger disadvantage on bias_in_bios, and a much steeper base-quality
+moderation (rho −0.77 vs −0.29). d6144 is still the better model.
+(`docs/notes/d3072-width-arm.md`)
 
 **Standing caveat** from earlier work: an encoder-free control (identity encoder
 + the same Sinkhorn balancing, `geoae.interp.fit_balanced_kmeans`) matches or
@@ -119,7 +127,8 @@ All are layer 27 unless noted. Status is as of the old box.
 | `l27_…_lam1_d6144` | done, ep 50 | k-means++ parent, init comparison |
 | `l27_…_lam1_d6144_seeded_atlas` | done, ep 50 | labelled-anchor init |
 | `l27_…_lam1_d6144_dpc_tanh` | done, ep 50 | tanh arm |
-| `l27_…_lam1_d3072_dpc` | **crashed at ep 30** (disk full) | first bottlenecked dpc arm — highest priority to rerun |
+| `l27_…_lam1_d3072_dpc` | done, ep 50, fully evaluated | width arm at 1x hidden. `best_val.pt` is epoch 10 (pre-clustering) — evaluate `step_0014200.pt` |
+| `l27_…_lam1_d12288_dpc` | never run | 4x hidden, completes the width series; ~17 h on one A100 40 GB, ~1 GB checkpoints. Eval sheet: `eval_out/run_d12288_evals.sh` |
 | `l27_…_lam1_d6144_seeded_peaks` | never run | anchors + density-peaks fill |
 | `l14_…_lam1_d6144*` | checkpoints exist; see `logs/` for completion | layer-14 track; needs the L14 dump |
 
@@ -137,8 +146,8 @@ in float32.
 | in git | not in git (regenerate) |
 |---|---|
 | all code, tests (180), configs, docs | activation dumps (`activations_*`) |
-| `results/*.json` < 2 MB — the evidence for every note | the 38 large closest-token dumps (`results/ct_*`, 539 MB) |
-| `dbpedia/joint_correct_*.json` — pins each eval's document set | checkpoints, `sweeps/`, `e2e/checkpoints/` |
+| `results/*.json` — the evidence for every note (tracked by default since 2026-09-19) | closest-token dumps `results/ct_*`, `results/closest_tokens_*` (~440 MB, regenerable) |
+| `dbpedia/joint_correct_*.json` — pins each eval's document set (tracked by default) | checkpoints, `sweeps/`, `e2e/checkpoints/` |
 | `eval_out/` result JSONs and command sheets | `cache/` concept caches, `wandb/` |
 | `docs/notes/` research notes; `logs/` training + eval logs (16 MB) | HF / uv caches |
 
@@ -147,6 +156,18 @@ retrained checkpoint gets a new one, so its set is rebuilt automatically. The
 committed sets only reproduce results for bit-identical checkpoints.
 
 ---
+
+## 5b. Multi-GPU: not built yet
+
+Extraction, training and evals are all single-GPU today (one GPU per sbatch job;
+Delta's scheduler runs independent jobs concurrently). To be designed on Delta:
+- **Extraction:** shard documents across a node's GPUs and merge into the same
+  single-file dump. Keep the merged row order deterministic — the last 5% of rows
+  is the validation split.
+- **Independent runs and evals:** one per GPU, packed onto a node.
+- **DDP for one run** would need Sinkhorn balancing, EMA centroid updates and
+  dead-cluster reinit synchronised across ranks; per-rank Sinkhorn on a sub-batch
+  changes the balancing, so results would stop being comparable to earlier runs.
 
 ## 6. Traps that cost real time
 
@@ -167,6 +188,10 @@ committed sets only reproduce results for bit-identical checkpoints.
 - **Disk.** Checkpoint saves are now atomic and check free space first, and
   `--resume latest` skips truncated files. Four 40-epoch d6144 runs are still
   80 GB, so watch the `/work/hdd` quota (`quota`).
+- **`clustering_quality` holds `n_sample × latent_dim` float32 latents in RAM**:
+  1M × 6144 = 25 GB, 1M × 12288 = 49 GB. Request `--mem` accordingly (eval.sbatch
+  asks for 64g, too little for d12288 at 1M). Its sklearn Calinski-Harabasz used to
+  add a full float64 copy on top, which got evals OOM-killed; that is fixed.
 - **b32k runs have transient collapses** (variance-hinge spike, dying clusters
   up) that self-heal. Don't kill a run for one. (`docs/notes/b32k-transient-collapse.md`)
 
@@ -174,9 +199,16 @@ committed sets only reproduce results for bit-identical checkpoints.
 
 ## 7. Open questions, in priority order
 
-1. **Finish `d3072_dpc`**, the first dpc arm with a real bottleneck (latent
-   smaller than hidden). Every result so far is at latent ≥ hidden, where the
-   encoder is near-invertible.
+1. **Width series: run `d12288_dpc`** (4x hidden). If compression drives the
+   help/hurt split, 4x should flatten it. Note that no run has a true bottleneck
+   yet: d3072 equals the hidden size, and the only sub-hidden run (`d768`) stopped
+   at epoch 2. Its "compression" comes from the cluster loss pulling latents
+   toward 2,000 centroids, not from a narrower code.
+1b. **Is the help/hurt split a training-sample artefact?** Candidate tests: per
+   concept, does coverage in the training dump or preservation of the concept's
+   class-mean direction predict the AE margin; an encoder-free PCA control; a
+   data-scale dose-response. The old box trained on 9.3M unique tokens × 50 epochs;
+   Delta can hold a much larger, more diverse dump.
 2. **Separate base quality from dataset** in the range results. That needs a
    dataset whose own concepts span a wide range of base-intervention quality.
    bias_in_bios sits near the ceiling. A GoEmotions-28 extractor exists

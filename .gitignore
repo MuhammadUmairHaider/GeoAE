@@ -8,11 +8,18 @@ build/
 # Experiment artifacts and caches
 phase_a/
 *.log
+# training/eval logs are evidence: track them. SLURM stdout duplicates the tee'd log.
+!logs/*.log
+logs/slurm-*
 activations/
 activations_*
 checkpoints/
 runs/
-results/
+# results/: small JSONs are the evidence for docs/notes, so track by default and
+# ignore only the big regenerable families. (A blanket results/ ignore plus
+# force-adds silently dropped every NEW result file.)
+results/ct_*
+results/closest_tokens_*
 plots/
 figures/
 sweeps/
@@ -25,7 +32,6 @@ clustering_quality_*.json
 clustering_quality_comparison.json
 concept_probe_*.json
 lambda_balance_*.json
-dbpedia/joint_correct_*.json
 dbpedia/steering_*.json
 
 wandb/

@@ -1,0 +1,20 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[ccc] LM=meta-llama/Llama-3.2-3B layer=27 (AE target_layer=27) K=2000
+[eval] Splice sanity check PASSED (max logit diff = 0.00e+00)
+[ccc] Computing avg replacement from wiki …
+[ccc] MMLU: base vs AE-recon on 2000 questions …
+
+  MMLU base=0.562  AE-recon=0.496  delta=-0.066  (n=2000, random=0.25)
+  biggest per-subject movers (n>=5):
+    college_computer_science           n= 15 base=0.67 recon=0.20 d=-0.47
+    high_school_computer_science       n= 18 base=0.67 recon=0.33 d=-0.33
+    high_school_government_and_politics n= 29 base=0.76 recon=0.48 d=-0.28
+    clinical_knowledge                 n= 33 base=0.79 recon=0.52 d=-0.27
+    human_sexuality                    n= 15 base=0.80 recon=0.53 d=-0.27
+    medical_genetics                   n= 16 base=0.94 recon=1.00 d=+0.06
+    high_school_us_history             n= 30 base=0.57 recon=0.63 d=+0.07
+    global_facts                       n= 11 base=0.27 recon=0.36 d=+0.09
+    econometrics                       n=  7 base=0.14 recon=0.29 d=+0.14
+    business_ethics                    n= 11 base=0.45 recon=0.64 d=+0.18
+
+[ccc] MMLU base=0.562  AE-recon=0.496  delta=-0.066  -> results_ccc_mmlu.json

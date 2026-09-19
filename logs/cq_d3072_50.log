@@ -1,0 +1,38 @@
+[seed] seed=0 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+
+[quality] Loading AE: checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d3072_dpc/step_0014200.pt
+[quality] Computing metrics for: d3072
+    silhouette … 0.0260
+    davies-bouldin … 3.1810
+    calinski-harabasz … 699.5
+    dunn index … 0.134338
+    separability ratio … 108.7508
+
+[quality] Loading AE: checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_dpc/step_0014200.pt
+[quality] Computing metrics for: d6144
+    silhouette … 0.0361
+    davies-bouldin … 2.9706
+    calinski-harabasz … 856.5
+    dunn index … 0.151216
+    separability ratio … 175.6556
+
+========================================================================
+  Metric                                     d3072               d6144
+------------------------------------------------------------------------
+  Silhouette ↑                            0.0260              0.0361 *
+  Davies-Bouldin ↓                        3.1810              2.9706 *
+  Calinski-Harabasz ↑                      699.5               856.5 *
+  Dunn Index ↑                          0.134338            0.151216 *
+  Separability Ratio ↑                  108.7508            175.6556 *
+  Inter-centroid Dist ↑                  65.9495             82.5382 *
+  Min Centroid Dist ↑                     8.4422              9.4888 *
+  Intra-cluster Var ↓                     0.4182              0.2745 *
+  Cluster Balance H ↑                     0.9646              0.9662 *
+  Empty Clusters ↓                             0 *                 0 *
+  Effective K ↑                             1995                1997 *
+  Effective Rank ↑                        180.23              216.67 *
+  Assignment Entropy                      0.0007              0.0005  
+========================================================================
+  * = best value for that metric
+
+[quality] Full results saved → eval_out/cq_d3072_50.json
