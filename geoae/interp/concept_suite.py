@@ -168,8 +168,9 @@ def cache_token_source(enc, out, name, sents, tags_of, bs=32, max_words=64):
 
 
 def cache_seq_source(enc, out, name, texts, labels, bs=16, max_len=192):
-    """Last-token AND mean-pooled activation per document."""
-    LAST, MEAN = [], []
+    """Last-token AND mean-pooled activation per document, plus the last token's id
+    (a token-bypass AE needs it to encode H_last)."""
+    LAST, MEAN, LAST_ID = [], [], []
     for s in tqdm(range(0, len(texts), bs), desc=f"[suite] {name}", leave=False):
         chunk = [enc.tok.encode(t, add_special_tokens=False)[:max_len] or [enc.tok.eos_token_id]
                  for t in texts[s : s + bs]]
@@ -177,10 +178,28 @@ def cache_seq_source(enc, out, name, texts, labels, bs=16, max_len=192):
         for i, ids in enumerate(chunk):
             n = len(ids)
             LAST.append(hs[i, n - 1].float().cpu().numpy())
+            LAST_ID.append(ids[-1])
             MEAN.append(hs[i, :n].float().mean(0).cpu().numpy())
     write(out, name, H_last=np.stack(LAST).astype(np.float32),
           H_mean=np.stack(MEAN).astype(np.float32),
+          last_token_id=np.array(LAST_ID, dtype=np.int64),
           label=np.array(labels, dtype=object))
+
+
+def sample_sequence_rows(hf, config, split, text_field, label_field, n, seed=0):
+    """Sample across the full split, including datasets sorted by class.
+
+    A streaming shuffle only mixes a bounded prefix. DBpedia has 40,000-row
+    class blocks, so a 20,000-row buffer still yields a single-class cache.
+    Map-style shuffling permutes indices across the complete dataset instead.
+    """
+    ds = load_dataset(hf, config, split=split, streaming=False).shuffle(seed=seed)
+    rows = list(itertools.islice((r for r in ds if r.get(text_field)), n))
+    if len(rows) != n:
+        raise ValueError(f"{hf}: expected {n} nonempty texts, got {len(rows)}")
+    if len({r[label_field] for r in rows}) < 2:
+        raise ValueError(f"{hf}: sampled fewer than two classes; refusing to encode")
+    return rows
 
 
 def main():
@@ -227,10 +246,7 @@ def main():
     for name, (hf, cfg, split, tf, lf, n) in SEQ_SOURCES.items():
         if not todo(name):
             continue
-        # MUST shuffle: several of these (dbpedia_14, imdb, ag_news) ship sorted
-        # by label, so taking the first N off a raw stream yields ONE class.
-        ds = load_dataset(hf, cfg, split=split, streaming=True).shuffle(seed=0, buffer_size=20000)
-        rows = [r for r in itertools.islice(iter(ds), n * 2) if r.get(tf)][:n]
+        rows = sample_sequence_rows(hf, cfg, split, tf, lf, n)
         cache_seq_source(enc, out, name, [r[tf] for r in rows], [r[lf] for r in rows])
 
     if todo("formality"):

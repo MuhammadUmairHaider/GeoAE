@@ -69,6 +69,8 @@ class GeoAE(nn.Module):
         ema_hard: bool = False,
         latent_norm: str = "none",
         dist_scale: str = "raw",
+        token_bias_rows: int = 0,
+        vocab_size: int = 0,
     ):
         super().__init__()
         self.dist_scale = dist_scale
@@ -144,6 +146,23 @@ class GeoAE(nn.Module):
         self.register_buffer("ema_cluster_size", torch.ones(n_clusters))
         # Persistent column dual for online (balance_eta < 1) Sinkhorn. Zero unless used.
         self.register_buffer("sinkhorn_g", torch.zeros(n_clusters))
+
+        # TOKEN BYPASS (design B; geoae/token_bias.py). A fixed per-token table b[t]
+        # of shrunk per-token means of the normalised residual: the encoder sees
+        # x - b[tok] and the reconstruction is decoder(z) + b[tok], so token identity
+        # goes AROUND the latent instead of shaping the clusters, while the splice
+        # stays faithful. Only the CURRENT token is bypassed: it is a fixed input,
+        # so a latent edit cannot be pulled back by it (a predicted-next-token
+        # bypass would be computed from the unedited activation). Buffers, not
+        # parameters: frozen, saved in the checkpoint, no optimizer state. Tokens
+        # absent from the table (tb_index -1) get a zero bias. Not constructed at
+        # all when token_bias_rows == 0, so every existing checkpoint is unchanged.
+        if token_bias_rows > 0:
+            if vocab_size <= 0:
+                raise ValueError("token_bias_rows > 0 needs vocab_size")
+            self.register_buffer("tb_index", torch.full((vocab_size,), -1, dtype=torch.long))
+            self.register_buffer("tb_table", torch.zeros(token_bias_rows, hidden_size,
+                                                          dtype=torch.float16))
 
         self._init_weights()
 
@@ -278,12 +297,54 @@ class GeoAE(nn.Module):
                               device=self.centroids.device, dtype=self.centroids.dtype)
         return lp.exp()
 
-    def forward(self, x: Tensor) -> AEOutput:
+    # ------------------------------------------------------------------
+    # Token bypass
+    # ------------------------------------------------------------------
+    @property
+    def has_token_bias(self) -> bool:
+        return hasattr(self, "tb_table")
+
+    @torch.no_grad()
+    def load_token_bias(self, token_ids: Tensor, table: Tensor) -> None:
+        """Fill the bypass table: row i of `table` is the bias of vocab id token_ids[i]."""
+        if not self.has_token_bias:
+            raise RuntimeError("model was built without a token bias (token_bias_rows=0)")
+        if table.shape != self.tb_table.shape:
+            raise ValueError(f"table {tuple(table.shape)} != buffer {tuple(self.tb_table.shape)}")
+        self.tb_index.fill_(-1)
+        self.tb_index[token_ids.to(self.tb_index.device).long()] = torch.arange(
+            len(token_ids), device=self.tb_index.device)
+        self.tb_table.copy_(table.to(self.tb_table))
+
+    def token_bias(self, tok: Tensor | None) -> Tensor | None:
+        """(..., D) bias for token ids `tok`, or None for a model without a bypass."""
+        if not self.has_token_bias:
+            return None
+        if tok is None:
+            raise ValueError("this GeoAE bypasses the current token: pass its token ids "
+                             "(encode(x, tok) / decode(z, tok) / forward(x, tok))")
+        idx = self.tb_index[tok.to(self.tb_index.device).long()]
+        return self.tb_table[idx.clamp_min(0)].float() * (idx >= 0).unsqueeze(-1)
+
+    def encode(self, x: Tensor, tok: Tensor | None = None) -> Tensor:
+        """Normalised activation -> latent. Use this, not `.encoder`, so the bypass applies."""
+        b = self.token_bias(tok)
+        return self.encoder(x if b is None else x - b)
+
+    def decode(self, z: Tensor, tok: Tensor | None = None) -> Tensor:
+        """Latent -> normalised activation, with the token bias added back."""
+        b = self.token_bias(tok)
+        x_hat = self.decoder(z)
+        return x_hat if b is None else x_hat + b
+
+    def forward(self, x: Tensor, tok: Tensor | None = None) -> AEOutput:
         """
         x: (B, D)  normalised activation
+        tok: (B,)  current token ids; required iff the model has a token bypass
         Returns AEOutput with x_hat, z, Q, dist2.
         """
-        z = self.encoder(x)                              # (B, L)
+        b = self.token_bias(tok)
+        z = self.encoder(x if b is None else x - b)      # (B, L)
         dist2 = pairwise_sq_dist(z, self.centroids, metric=self.metric)  # (B, K)
         # SCALE OF THE SINKHORN INPUT.
         #
@@ -327,6 +388,8 @@ class GeoAE(nn.Module):
         else:
             Q = torch.softmax(-dist2 / self.tau, dim=1)  # (B, K) unbalanced
         x_hat = self.decoder(z)                          # (B, D)
+        if b is not None:
+            x_hat = x_hat + b
         return AEOutput(x_hat=x_hat, z=z, Q=Q, dist2=dist2)
 
     @torch.no_grad()

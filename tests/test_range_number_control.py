@@ -107,8 +107,9 @@ def test_real_transformer_capture_and_last_token_patch():
             })
 
     tokenizer = Tokenizer()
-    base, captured = forward_prompts(lm, tokenizer, ["a", "abcd"], "cpu", 1, 2, capture=True)
+    base, captured, last_ids = forward_prompts(lm, tokenizer, ["a", "abcd"], "cpu", 1, 2, capture=True)
     assert captured.shape == (2, 16)
+    assert last_ids.tolist() == [2 + ord("a") % 25, 2 + ord("d") % 25]   # left-padded: col -1 is real
     replay = lambda hs: torch.cat((hs[:, :-1], captured[:, None].to(hs.dtype)), dim=1)
     same, _ = forward_prompts(lm, tokenizer, ["a", "abcd"], "cpu", 1, 2, patch=replay)
     torch.testing.assert_close(same, base)

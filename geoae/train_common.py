@@ -106,6 +106,11 @@ def lambda_schedule(epoch: int, cfg: Config) -> tuple[float, float]:
 
 def build_model(cfg: Config, device: torch.device, no_sinkhorn: bool = False) -> GeoAE:
     """Construct a GeoAE from config on `device` (single source of truth)."""
+    tb = None
+    if getattr(cfg.model, "token_bias", ""):
+        from geoae.paths import resolve_path
+        from geoae.token_bias import load_table
+        tb = load_table(resolve_path(cfg.model.token_bias))
     model = GeoAE(
         hidden_size=cfg.model.hidden_size,
         latent_dim=cfg.model.latent_dim,
@@ -122,7 +127,13 @@ def build_model(cfg: Config, device: torch.device, no_sinkhorn: bool = False) ->
         metric=cfg.model.metric,
         ema_hard=cfg.train.ema_hard,
         latent_norm=getattr(cfg.model, "latent_norm", "none"),
+        token_bias_rows=0 if tb is None else len(tb["token_ids"]),
+        vocab_size=0 if tb is None else int(tb["vocab_size"]),
     ).to(device)
+    if tb is not None:
+        model.load_token_bias(torch.as_tensor(tb["token_ids"]), torch.as_tensor(tb["table"]))
+        print(f"[model] token bypass: {len(tb['token_ids']):,} tokens from {cfg.model.token_bias} "
+              f"(shrink k={float(tb['shrink_k']):g}, min_count={int(tb['min_count'])})")
     if no_sinkhorn:
         model.use_sinkhorn = False
     return model
@@ -472,10 +483,14 @@ def encode_init_pool(model: GeoAE, train_loader, device, n_rows: int) -> torch.T
     than taking `next(iter(train_loader))`. Same accumulate-until-enough loop as
     the e2e k-means++ path (e2e/train.py), generalised to a row budget.
     """
+    from geoae.data import split_batch
     zs, have = [], 0
     for batch in train_loader:
-        x = batch["x"] if isinstance(batch, dict) else batch
-        z = model.encoder(x.to(device))[: n_rows - have]
+        if isinstance(batch, dict):
+            x, tok = batch["x"].to(device), None
+        else:
+            x, tok = split_batch(batch, device)
+        z = model.encode(x, tok)[: n_rows - have]
         zs.append(z)
         have += len(z)
         if have >= n_rows:

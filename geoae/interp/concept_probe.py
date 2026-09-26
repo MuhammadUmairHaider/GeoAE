@@ -109,6 +109,17 @@ def load_rung(cache_dir, fname, key, n_max):
     return np.asarray(H, dtype=np.float32), np.asarray(y)
 
 
+def load_rung_ids(cache_dir, fname):
+    """Current-token id per row of a rung (token_id, or last_token_id for H_last), or None.
+
+    A token-bypass AE cannot be scored on a rung without ids; it gets no entry there."""
+    d = np.load(Path(cache_dir) / fname, allow_pickle=True)
+    for k in ("token_id", "last_token_id"):
+        if k in d.files:
+            return np.asarray(d[k], dtype=np.int64)
+    return None
+
+
 def best_f1(lab, y, min_support=20):
     kc = Counter(lab.tolist())
     scores = []
@@ -129,17 +140,34 @@ def best_f1(lab, y, min_support=20):
 
 
 @torch.no_grad()
-def assign(H, model, dev, chunk=16384):
+def assign(H, model, dev, chunk=16384, ids=None):
+    """Nearest-centroid label per row, or None when a token-bypass AE has no ids for this rung."""
     kind, obj = model
+    if kind in ("ae", "aekm") and obj[0].has_token_bias and ids is None:
+        return None
+    if kind == "km" and len(obj) > 4 and obj[4] is not None and ids is None:
+        return None                       # token-bias k-means control needs token ids too
     out = []
     for i in range(0, len(H), chunk):
         h = torch.from_numpy(H[i : i + chunk]).to(dev).float()
+        tok = None if ids is None else torch.from_numpy(ids[i : i + chunk]).to(dev)
         if kind == "ae":
             ae, mean, std = obj
-            v, C = ae.encoder((h - mean) / std), ae.centroids
+            v, C = ae.encode((h - mean) / std, tok if ae.has_token_bias else None), ae.centroids
+        elif kind == "aekm":
+            # Centroids fitted in an AE's latent: encode with that AE, then assign
+            # to the supplied codebook instead of the AE's own trained one.
+            ae, mean, std, C = obj
+            v = ae.encode((h - mean) / std, tok if ae.has_token_bias else None)
         else:
-            C, mean, std = obj
+            C, mean, std, *rest = obj
             v = (h - mean) / std
+            U = rest[0] if rest else None       # token-erased codebook (fit_balanced_kmeans --erase)
+            tb = rest[1] if len(rest) > 1 else None   # x - b[tok] codebook (--token_bias)
+            if tb is not None:
+                v = v - tb(tok)
+            if U is not None:
+                v = v - (v @ U) @ U.T
         out.append(torch.cdist(v, C).argmin(1).cpu().numpy())
     return np.concatenate(out)
 
@@ -209,12 +237,27 @@ def main():
     models = {}
     for name, path, kind in specs:
         if kind == "ae":
-            ae, mean, std, _ = load_ae_checkpoint(path, dev)
+            ae, mean, std, _ = load_ae_checkpoint(path, dev, allow_token_bias=True)
             ae.eval()
             models[name] = ("ae", (ae, mean, std))
         else:
-            C, mean, std, K, *_ = load_baseline_kmeans(Path(path), dev)
-            models[name] = ("km", (C, mean, std))
+            C, mean, std, K, *_ = load_baseline_kmeans(Path(path), dev, allow_erasure=True)
+            meta = np.load(path, allow_pickle=True)
+            space = str(meta["space"]) if "space" in meta.files else "raw"
+            U = (torch.as_tensor(meta["erase_U"], dtype=torch.float32, device=dev)
+                 if "erase_U" in meta.files else None)
+            from geoae.token_bias import TokenBiasLookup
+            tbl = TokenBiasLookup(str(meta["token_bias"]), dev) if "token_bias" in meta.files else None
+            if space == "latent":
+                ck = str(meta["ae_checkpoint"])
+                bae, bmean, bstd, _ = load_ae_checkpoint(ck, dev, allow_token_bias=True)
+                bae.eval()
+                models[name] = ("aekm", (bae, bmean, bstd, C))
+                print(f"[probe] {name}: latent-space codebook, encoder from {ck}")
+            else:
+                models[name] = ("km", (C, mean, std, U, tbl))
+                if U is not None:
+                    print(f"[probe] {name}: {U.shape[1]} {meta['erase_basis']} directions erased before assignment")
         print(f"[probe] loaded {name}")
 
     res = defaultdict(dict)
@@ -225,19 +268,27 @@ def main():
         # Load FULL, drop anchor rows, THEN subsample — excluding after the
         # subsample would not line the indices up.
         H, y = load_rung(args.cache, fname, key, 0)
+        ids = load_rung_ids(args.cache, fname)
+        if ids is not None and len(ids) != len(H):
+            raise SystemExit(f"[probe] {fname}: {len(ids)} token ids for {len(H)} rows")
         if excl and rung in excl:
             keep = np.ones(len(y), dtype=bool)
             keep[excl[rung][excl[rung] < len(y)]] = False
             n_drop = int((~keep).sum())
             H, y = H[keep], y[keep]
+            ids = None if ids is None else ids[keep]
             print(f"[probe] {rung:<15} excluded {n_drop:,} anchor rows "
                   f"({100 * n_drop / (n_drop + len(y)):.1f}% of the rung)")
         cap = args.n_token if grain == "token" else 0
         if cap and len(H) > cap:
             sub = np.random.RandomState(0).choice(len(H), cap, replace=False)
             H, y = H[sub], y[sub]
+            ids = None if ids is None else ids[sub]
         for name, m in models.items():
-            lab = assign(H, m, dev)
+            lab = assign(H, m, dev, ids=ids)
+            if lab is None:
+                print(f"[probe]   {name}: no token ids in {fname} — not scored on {rung}")
+                continue
             res[rung][name] = dict(nmi=round(float(nmi_score(y, lab)), 4),
                                    f1=round(best_f1(lab, y), 4),
                                    live=int(len(set(lab.tolist()))))
@@ -251,7 +302,8 @@ def main():
         for rung, _f, _k, grain, desc in LADDER:
             if rung not in res:
                 continue
-            row = "".join(f"{res[rung][n][metric]:>14.4f}" for n in names)
+            row = "".join(f"{res[rung][n][metric]:>14.4f}" if n in res[rung] else f"{'—':>14s}"
+                          for n in names)
             print(f"{rung:<16}{grain:<10}{row}")
 
         # TOKEN vs SEQUENCE aggregate. These two groups move independently and
@@ -261,8 +313,10 @@ def main():
         # so it is never reported on its own.
         print(f"{'-' * (26 + 14 * len(names))}")
         for grp in ("token", "sequence"):
-            vals = [[res[r][n][metric] for r in res
-                     if dict((x[0], x[3]) for x in LADDER).get(r) == grp] for n in names]
+            # Only rungs every arm was scored on, so the means stay comparable.
+            common = [r for r in res if dict((x[0], x[3]) for x in LADDER).get(r) == grp
+                      and all(n in res[r] for n in names)]
+            vals = [[res[r][n][metric] for r in common] for n in names]
             if not vals[0]:
                 continue
             row = "".join(f"{sum(v) / len(v):>14.4f}" for v in vals)

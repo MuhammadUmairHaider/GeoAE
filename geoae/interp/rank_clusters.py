@@ -51,6 +51,11 @@ def dominant_domain(cluster: dict) -> str:
     return f"{best}:{100 * dom[best] / total:.0f}%"
 
 
+def top_titles(cluster: dict, n: int = 3) -> str:
+    """--doc_view files: the cluster's most frequent source documents."""
+    return " | ".join(f"{d['n']}x {d['title']}" for d in cluster.get("top_docs", [])[:n])
+
+
 def usage_summary(counts: np.ndarray, K: int) -> dict:
     """Zipf exponent, effective cluster count, and spread against uniform."""
     ranked = np.sort(counts)[::-1]
@@ -106,14 +111,20 @@ def main():
     with open(out_json, "w") as f:
         json.dump(payload, f, indent=2, ensure_ascii=False)
 
+    doc_view = "doc_view" in meta
     out_tsv = Path(args.out_tsv) if args.out_tsv else src.with_name(src.stem + "_freq.tsv")
     with open(out_tsv, "w") as f:
         f.write("rank\tcluster_id\tn_assigned\tusage_pct\tcum_pct\tmonosemanticity\t"
-                "dist_min\tdist_p50\tdomain\ttop_tokens\n")
+                "dist_min\tdist_p50\tdomain\ttop_tokens"
+                + ("\tn_docs\teff_docs\ttop_doc_share\tconf_median\thub\ttop_docs" if doc_view else "")
+                + "\n")
         for cid, r in records.items():
             f.write(f"{r['rank']}\t{cid}\t{r['n_assigned']}\t{r['usage_pct']}\t"
                     f"{r['cum_pct']}\t{r['monosemanticity']}\t{r['dist_min']}\t{r['dist_p50']}\t"
-                    f"{dominant_domain(r)}\t{top_tokens(r, args.n_tokens_col)}\n")
+                    f"{dominant_domain(r)}\t{top_tokens(r, args.n_tokens_col)}"
+                    + (f"\t{r['n_docs']}\t{r['eff_docs']}\t{r['top_doc_share']}\t{r['conf_median']}"
+                       f"\t{int(r['hub'])}\t{top_titles(r)}" if doc_view else "")
+                    + "\n")
 
     print(f"[rank] {src}")
     print(f"[rank] {len(records)} live clusters / K={K}, {meta['n_tokens']} tokens")
@@ -122,11 +133,20 @@ def main():
     print(f"[rank] top1 {summary['top1_pct']:.2f}%  top10 {summary['top10_pct']:.2f}%  "
           f"top100 {summary['top100_pct']:.1f}%  "
           f">5x uniform {summary['n_above_5x_uniform']}  <0.5x uniform {summary['n_below_half_uniform']}")
-    print(f"\n{'rank':>5} {'cid':>5} {'count':>7} {'use%':>6} {'cum%':>6} {'mono':>5}  {'domain':<10} tokens")
-    for cid, r in list(records.items())[: args.print_n]:
-        print(f"{r['rank']:>5} {cid:>5} {r['n_assigned']:>7} {r['usage_pct']:>6.3f} "
-              f"{r['cum_pct']:>6.2f} {r['monosemanticity']:>5.2f}  {dominant_domain(r):<10} "
-              f"{top_tokens(r, args.n_tokens_col)}")
+    if doc_view:
+        hubs = [r for r in records.values() if r["hub"]]
+        print(f"[rank] doc view: {len(hubs)} hub clusters holding "
+              f"{sum(r['usage_pct'] for r in hubs):.1f}% of tokens ({meta['doc_view']['hub_rule']})")
+        print(f"\n{'rank':>5} {'cid':>5} {'use%':>6} {'docs':>5} {'eff':>5} {'conf':>5} {'hub':>3}  top documents")
+        for cid, r in list(records.items())[: args.print_n]:
+            print(f"{r['rank']:>5} {cid:>5} {r['usage_pct']:>6.3f} {r['n_docs']:>5} {r['eff_docs']:>5.1f} "
+                  f"{r['conf_median']:>5.2f} {'H' if r['hub'] else '':>3}  {top_titles(r, 2)[:110]}")
+    else:
+        print(f"\n{'rank':>5} {'cid':>5} {'count':>7} {'use%':>6} {'cum%':>6} {'mono':>5}  {'domain':<10} tokens")
+        for cid, r in list(records.items())[: args.print_n]:
+            print(f"{r['rank']:>5} {cid:>5} {r['n_assigned']:>7} {r['usage_pct']:>6.3f} "
+                  f"{r['cum_pct']:>6.2f} {r['monosemanticity']:>5.2f}  {dominant_domain(r):<10} "
+                  f"{top_tokens(r, args.n_tokens_col)}")
     print(f"\n[rank] wrote {out_json}")
     print(f"[rank] wrote {out_tsv}")
 

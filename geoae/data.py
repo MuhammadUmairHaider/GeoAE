@@ -34,6 +34,7 @@ class ActivationBuffer(Dataset):
         split: str = "train",      # "train" or "val"
         norm_cache: str | Path | None = None,
         max_train_rows: int | None = None,
+        return_tokens: bool = False,
     ):
         self.activations_dir = Path(activations_dir)
         self.layer = layer
@@ -80,6 +81,17 @@ class ActivationBuffer(Dataset):
         # such inside; MADV_RANDOM is applied after it, for the training reads.
         self.mean, self.std = self._load_or_compute_norm(val_start)
         self._advise("random")
+
+        # Current token id per row (rows_tok.npy, written by the sampled extractor),
+        # for a token-bypass AE. Items become (x, token_id) pairs.
+        self._tok = None
+        if return_tokens:
+            tp = self.activations_dir / "rows_tok.npy"
+            if not tp.exists():
+                raise FileNotFoundError(f"return_tokens needs {tp} (sampled-mode dumps write it)")
+            self._tok = np.load(str(tp))
+            if len(self._tok) != N:
+                raise ValueError(f"{tp} has {len(self._tok):,} rows, layer file has {N:,}")
 
     def _advise(self, kind: str) -> None:
         """
@@ -137,10 +149,13 @@ class ActivationBuffer(Dataset):
     def __len__(self) -> int:
         return len(self._indices)
 
-    def __getitem__(self, i: int) -> Tensor:
-        raw = self._mmap[self._indices[i]].astype(np.float32)
-        normed = (raw - self.mean) / self.std
-        return torch.from_numpy(normed)
+    def __getitem__(self, i: int):
+        j = self._indices[i]
+        raw = self._mmap[j].astype(np.float32)
+        normed = torch.from_numpy((raw - self.mean) / self.std)
+        if self._tok is not None:
+            return normed, int(self._tok[j])
+        return normed
 
     def denormalize(self, x: Tensor) -> Tensor:
         """Convert normalised tensor back to raw activation space."""
@@ -181,3 +196,11 @@ class ShuffledActivationLoader:
 
     def __len__(self) -> int:
         return len(self._loader)
+
+
+def split_batch(batch, device) -> tuple[Tensor, Tensor | None]:
+    """(x, token_ids) on `device` from a loader batch; token_ids is None for plain buffers."""
+    if isinstance(batch, (list, tuple)):
+        x, tok = batch
+        return x.to(device, non_blocking=True), tok.to(device, non_blocking=True)
+    return batch.to(device, non_blocking=True), None

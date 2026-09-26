@@ -26,3 +26,6 @@ Three phases: recon-only epochs → +cluster loss → +sep loss with τ annealin
 ## Reproducibility
 
 `geoae.seeding.seed_everything(seed)` at all entry points.
+
+For the proposed comparison of original-data continuation and enriched-data
+adaptation, see the [fine-tuning implementation plan](enriched-finetuning-plan.md).

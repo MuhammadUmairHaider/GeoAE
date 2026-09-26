@@ -45,3 +45,38 @@ class SplicingHook:
         if isinstance(output, tuple):
             return (modified,) + output[1:]
         return modified
+
+
+class TokenIdTap:
+    """
+    Records the input_ids of the LM's current forward pass, for a token-bypass AE.
+
+    A forward PRE-hook on the input embedding sees exactly the ids whose hidden
+    states the layer hooks receive: (B, T) on a full forward, (B, 1) on a cached
+    generation step. `ids_for(hs)` checks that and returns them flattened in the
+    same row-major order the splice functions use for hs.reshape(B * T, D).
+
+        tap = TokenIdTap(lm)
+        hook.activate(neuronlens.make_z_gate(..., tap=tap))
+        lm(input_ids)          # the splice reads tap.ids_for(hs) inside the hook
+        tap.remove()
+    """
+
+    def __init__(self, model):
+        self._ids = None
+        emb = model.get_input_embeddings()
+        self._handle = emb.register_forward_pre_hook(self._pre, with_kwargs=True)
+
+    def _pre(self, module, args, kwargs):
+        self._ids = args[0] if args else kwargs.get("input")
+
+    def ids_for(self, hs: Tensor) -> Tensor:
+        if self._ids is None:
+            raise RuntimeError("TokenIdTap saw no forward pass (was the LM called with input_ids?)")
+        B, T = hs.shape[:2]
+        if tuple(self._ids.shape) != (B, T):
+            raise RuntimeError(f"TokenIdTap ids {tuple(self._ids.shape)} do not match hidden states {(B, T)}")
+        return self._ids.reshape(B * T).to(hs.device)
+
+    def remove(self) -> None:
+        self._handle.remove()

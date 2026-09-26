@@ -374,6 +374,22 @@ def main():
 
     out_dir = resolve_path(args.out_dir if args.out_dir else ex.activations_dir)
 
+    if ex.mode == "sampled":
+        from geoae.extract_sampled import extract_sampled
+        extract_sampled(
+            model_name=ex.model_name, layers=ex.layers, target_layer=ex.target_layer,
+            n_tokens=ex.n_tokens, hidden_size=ex.hidden_size, out_dir=out_dir,
+            sources=ex.sources, context_len=ex.context_len,
+            positions_per_doc=ex.positions_per_doc, skip_leading=ex.skip_leading,
+            min_doc_len=ex.min_doc_len, batch_docs=ex.batch_docs,
+            shuffle_buffer=ex.shuffle_buffer, outlier_norm_mult=ex.outlier_norm_mult,
+            dtype=ex.dtype, seed=args.seed, log_every=ex.log_every,
+            corpus_dir=resolve_path(ex.corpus_dir) if ex.corpus_dir else None,
+        )
+        return
+    if ex.mode != "prefix":
+        raise ValueError(f"extraction.mode must be 'prefix' or 'sampled', got {ex.mode!r}")
+
     extract(
         model_name=ex.model_name, layers=ex.layers, n_tokens=ex.n_tokens,
         hidden_size=ex.hidden_size, out_dir=out_dir,

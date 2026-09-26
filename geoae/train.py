@@ -17,12 +17,13 @@ import torch
 import torch.nn as nn
 
 from geoae.config import Config
-from geoae.data import ActivationBuffer, ShuffledActivationLoader
+from geoae.data import ActivationBuffer, ShuffledActivationLoader, split_batch
 from geoae.model import GeoAE
 from geoae.losses import total_loss
 from geoae.seeding import seed_everything
 from geoae import diagnostics as diag
 from geoae.seeded_init import format_peak_diag
+from geoae.supervised import LabelledPool, bn_eval, supcon_loss
 from geoae.train_common import (   # noqa: F401 — re-exported for compatibility
     tau_schedule, lambda_schedule, geometry_schedule, zipf_alpha_schedule,
     rotate_checkpoints, reinit_dead_clusters, encode_init_pool,
@@ -81,8 +82,8 @@ def run_validation(
     for i, batch in enumerate(val_loader):
         if i >= max_batches:
             break
-        x = batch.to(device)
-        out = model(x)
+        x, tok = split_batch(batch, device)
+        out = model(x, tok)
         mse = (out.x_hat - x).pow(2).mean().item()
         var_x = x.var(unbiased=False).item()
         fve = 1.0 - mse / (var_x + 1e-8)
@@ -162,12 +163,25 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
     from geoae.paths import resolve_path
     act_dir = resolve_path(cfg.data.activations_dir)
 
+    token_bias = bool(getattr(cfg.model, "token_bias", ""))
+    if token_bias:
+        # Every path below that encodes WITHOUT a token id would silently train or
+        # initialise the bypass model in the wrong space; refuse them up front.
+        bad = []
+        if cfg.train.centroid_init in ("semisup", "class_means", "seeded"):
+            bad.append(f"centroid_init={cfg.train.centroid_init}")
+        if getattr(cfg.train, "sup_frac", 0.0) > 0:
+            bad.append("sup_frac > 0")
+        if bad:
+            raise SystemExit(f"[train] model.token_bias is not wired for {', '.join(bad)} "
+                             f"(those paths encode cache rows without token ids)")
     train_buf = ActivationBuffer(act_dir, cfg.data.target_layer,
                                  val_frac=cfg.data.val_frac, split="train",
-                                 max_train_rows=max_train_rows)
+                                 max_train_rows=max_train_rows, return_tokens=token_bias)
     val_buf   = ActivationBuffer(act_dir, cfg.data.target_layer,
                                  val_frac=cfg.data.val_frac, split="val",
-                                 norm_cache=act_dir / f"norm_params_layer{cfg.data.target_layer}.npz")
+                                 norm_cache=act_dir / f"norm_params_layer{cfg.data.target_layer}.npz",
+                                 return_tokens=token_bias)
     train_loader = ShuffledActivationLoader(train_buf, batch_size=cfg.data.batch_size,
                                             num_workers=4, pin_memory=True)
     val_loader   = ShuffledActivationLoader(val_buf, batch_size=cfg.data.batch_size,
@@ -176,6 +190,12 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
 
     # Model
     model = build_model(cfg, device, no_sinkhorn=no_sinkhorn)
+    if token_bias:
+        from geoae.token_bias import load_table
+        tb = load_table(resolve_path(cfg.model.token_bias))
+        if not (np.allclose(tb["norm_mean"], train_buf.mean) and np.allclose(tb["norm_std"], train_buf.std)):
+            raise SystemExit(f"[train] {cfg.model.token_bias} was built under different norm stats "
+                             f"than {act_dir}: rebuild it with geoae.token_bias on this dump.")
     print(f"[train] Encoder: {cfg.model.nonlinearity}  "
           f"latent_dim={cfg.model.latent_dim}  n_clusters={cfg.model.n_clusters}"
           f"  metric={model.metric}"
@@ -196,6 +216,30 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
 
     global_step = 0
     Q_history: list[torch.Tensor] = []
+    # --- in-batch supervision (off unless sup_frac and lambda_sup are both > 0) ---
+    sup_pool, n_sup = None, 0
+    lam_sup = float(getattr(cfg.loss, "lambda_sup", 0.0))
+    if getattr(cfg.train, "sup_frac", 0.0) > 0 and lam_sup > 0:
+        n_sup = int(round(cfg.train.sup_frac * cfg.data.batch_size))
+        rungs = [r for r in cfg.train.sup_rungs.split(",") if r] or None
+        sup_pool = LabelledPool(
+            cfg.train.sup_cache, rungs, cfg.train.sup_per_class,
+            cfg.train.sup_holdout_classes, cfg.train.sup_holdout_rows,
+            cfg.train.seed, min_examples=cfg.train.sup_min_examples)
+        sup_pool.save_manifest(ckpt_dir / "sup_manifest.json")
+        replay = n_sup * (len(train_buf) // cfg.data.batch_size) / max(len(sup_pool), 1)
+        print(f"[sup] {n_sup:,} labelled rows/step ({100 * cfg.train.sup_frac:.0f}% of batch), "
+              f"lambda_sup {lam_sup}, each labelled row replayed ~{replay:.1f}x per epoch")
+    sup_mean = torch.as_tensor(train_buf.mean, dtype=torch.float32, device=device)
+    sup_std = torch.as_tensor(train_buf.std, dtype=torch.float32, device=device)
+
+    if getattr(cfg.train, "freeze", "none") == "decoder":
+        n_frozen = 0
+        for prm in model.decoder.parameters():
+            prm.requires_grad_(False)
+            n_frozen += prm.numel()
+        print(f"[train] decoder FROZEN ({n_frozen:,} params) — encoder-only fine-tune")
+
     anchor_pool = None          # populated by the "seeded" init; drives reinit_mode "anchor"
 
     start_epoch = 1
@@ -247,9 +291,9 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
                 # proportional to D^2, which chases OUTLIERS; on DBpedia-14 that
                 # cost ~38 points of purity against a few-shot labelled seeding.
                 from geoae.seeded_init import seeded_init
-                init_batch = next(iter(train_loader)).to(device)
+                init_x, init_tok = split_batch(next(iter(train_loader)), device)
                 with torch.no_grad():
-                    z_pool = model.encoder(init_batch)
+                    z_pool = model.encode(init_x, init_tok)
                 rungs = [r for r in cfg.train.anchor_rungs.split(",") if r] or None
                 C, names, anchor_pool, pk_diag = seeded_init(
                     model, cfg.train.anchor_cache, train_buf.mean, train_buf.std,
@@ -295,9 +339,10 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
                 print(f"[train]   {format_peak_diag(pk_diag)}")
             else:
                 # Default: k-means++ from unlabeled batch
-                init_batch = next(iter(train_loader)).to(device)
+                init_x, init_tok = split_batch(next(iter(train_loader)), device)
+                init_batch = init_x
                 with torch.no_grad():
-                    init_z = model.encoder(init_batch)
+                    init_z = model.encode(init_x, init_tok)
                 model.init_centroids_kmeans_plus_plus(init_z, seed=cfg.train.seed)
                 print(f"[train] Epoch {epoch}: k-means++ init of {model.n_clusters} "
                       f"centroids from {len(init_batch)} trained latents")
@@ -316,10 +361,10 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
         epoch_start = time.time()
 
         for batch in train_loader:
-            x = batch.to(device)
+            x, tok = split_batch(batch, device)
 
             # Forward
-            out = model(x)
+            out = model(x, tok)
 
             # Losses
             losses = total_loss(
@@ -338,6 +383,19 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
                 sep_margin=getattr(cfg.loss, "sep_margin", 2.0),
                 var_gamma=getattr(cfg.loss, "var_gamma", 1.0),
             )
+
+            # Supervised contrastive term on labelled rows. Added to the step
+            # rather than mixed into the batch, and forwarded with BatchNorm in
+            # eval mode so this off-distribution corpus never moves the running
+            # statistics the rest of the model depends on.
+            if sup_pool is not None:
+                xs, ys = sup_pool.batch(n_sup, cfg.train.sup_m_per_class)
+                xs = ((xs.to(device, non_blocking=True) - sup_mean) / sup_std)
+                with bn_eval(model):
+                    z_sup = model.encoder(xs)
+                l_sup = supcon_loss(z_sup, ys.to(device), cfg.train.sup_temperature)
+                losses["loss"] = losses["loss"] + lam_sup * l_sup
+                losses["sup"] = l_sup.detach()
 
             # Backward
             opt.zero_grad()
@@ -386,7 +444,7 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
                 metrics["step"] = global_step
                 # Only present when the corresponding lambda is > 0.
                 extra = ""
-                for key in ("var", "cov", "unif"):
+                for key in ("var", "cov", "unif", "sup"):
                     if key in losses:
                         metrics[f"train/{key}_loss"] = losses[key].item()
                         extra += f" | {key} {losses[key].item():.4f}"

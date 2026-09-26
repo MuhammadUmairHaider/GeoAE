@@ -38,8 +38,14 @@ def make_gemma3_multimodal():
     return Gemma3ForConditionalGeneration(cfg)
 
 
-BUILDERS = [make_llama, make_qwen3, make_gemma3_multimodal]
-IDS = ["llama", "qwen3", "gemma3-multimodal"]
+def make_gemma3_text():
+    """The text-only architecture used by google/gemma-3-1b-pt."""
+    from transformers import Gemma3TextConfig, Gemma3ForCausalLM
+    return Gemma3ForCausalLM(Gemma3TextConfig(**TEXT, sliding_window=8))
+
+
+BUILDERS = [make_llama, make_qwen3, make_gemma3_multimodal, make_gemma3_text]
+IDS = ["llama", "qwen3", "gemma3-multimodal", "gemma3-text"]
 
 
 @pytest.fixture(params=BUILDERS, ids=IDS)

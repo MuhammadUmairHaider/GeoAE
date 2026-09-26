@@ -22,7 +22,22 @@ class ExtractionConfig:
     activations_dir: str = "activations"
     log_every: int = 10           # batches between progress prints
 
-    # Data sources (easily swappable)
+    # --- mode "sampled" (geoae/extract_sampled.py); "prefix" = legacy extract.py ----
+    mode: str = "prefix"          # "prefix" | "sampled"
+    context_len: int = 2048       # sampled: forward each doc up to this many tokens
+    positions_per_doc: int = 64   # sampled: uniform random positions kept per doc
+    batch_docs: int = 16          # sampled: docs per padded forward batch
+    shuffle_buffer: int = 10000   # sampled: HF streaming shuffle buffer per source
+    outlier_norm_mult: float = 0.0  # sampled: drop rows with norm > mult x median (0 = keep all)
+    min_doc_len: int = 10
+    corpus_dir: str = ""          # sampled: frozen corpus written by geoae.build_corpus
+    corpus_margin: float = 1.3    # build_corpus: stream this x each source's row quota
+    # sampled: list of {domain, weight, kind: hf|structured, name, config, split,
+    # field, exclude: {key, values}, shuffle_buffer}. Weights are token shares (normalised).
+    sources: List[dict] = field(default_factory=list)
+
+    # LEGACY / UNUSED: the prefix extractor hardcodes its sources (extract.py
+    # DEFAULT_SOURCES) and never reads this list.
     data_sources: List[str] = field(default_factory=lambda: [
         "allenai/c4",
         "wikipedia",
@@ -53,6 +68,8 @@ class ModelConfig:
                                    # raw reproduces every run before 2026-09-04;
                                    # per_dim divides by latent_dim so `tau` is on the
                                    # same scale cluster_loss already uses. See model.py.      # "none" | "batch" (BatchNorm1d between linear and act)
+    token_bias: str = ""           # token-bypass table (.npz from geoae.token_bias); "" = off.
+                                   # Encoder sees x - b[tok], recon = dec(z) + b[tok].
 
 
 @dataclass
@@ -76,6 +93,7 @@ class LossConfig:
     zipf_alpha_end: float = 0.0
     tau_start: float = 1.0
     tau_end: float = 0.1
+    lambda_sup: float = 0.0   # supervised contrastive term on labelled rows (0 = off)
 
 
 @dataclass
@@ -122,6 +140,23 @@ class TrainConfig:
     peak_min_sep_frac: float = 0.25   # reject a peak within this x median pair distance of a kept one
     peak_refine_k: int = 8            # centroid = mean of this many NNs; 0 = the exact peak point
     peak_reinit_pool: int = 8192      # batch rows used by reinit_mode "peaks" (O(N^2) per cycle)
+    # --- in-batch supervision for a short fine-tune (see geoae/supervised.py) --
+    # All default to off, so an ordinary run is byte-identical to before.
+    sup_frac: float = 0.0             # labelled rows per step, as a fraction of batch_size.
+                                      #   They are ADDED to the step, not swapped into the
+                                      #   batch: the unsupervised stream and the Sinkhorn
+                                      #   marginals keep seeing exactly what they saw before.
+    sup_cache: str = "cache"          # concept cache; MUST match target_layer
+    sup_rungs: str = ""               # comma list; empty = every rung. Supervising a SUBSET
+                                      #   leaves the rest as an uncontaminated transfer test.
+    sup_per_class: int = 500          # cap on rows loaded per class (bounds pool memory)
+    sup_m_per_class: int = 8          # rows per class in a supervised draw (>=2 for positives)
+    sup_holdout_classes: float = 0.2  # fraction of classes never trained on
+    sup_holdout_rows: float = 0.2     # fraction of rows held out inside trained classes
+    sup_min_examples: int = 10        # skip classes smaller than this
+    sup_temperature: float = 0.1      # SupCon temperature
+    freeze: str = "none"              # "none" | "decoder" — decoder-frozen keeps the fine-tuned
+                                      #   encoder decodable by the parent's decoder
     teacher_mode: str = "cached"      # e2e only: "cached" (precomputed logits) |
                                       # "onfly" (teacher = head(norm(x)) in-loop, no cache)
     checkpoints_dir: str = "checkpoints"
@@ -140,6 +175,7 @@ _TRAIN_CHOICES = {
     "reinit_mode": {"loss", "anchor", "density", "peaks"},
     "fill_mode": {"coverage", "peaks"},
     "teacher_mode": {"cached", "onfly"},
+    "freeze": {"none", "decoder"},
 }
 
 

@@ -28,7 +28,7 @@ from transformers import AutoTokenizer
 from geoae.seeding import seed_everything
 from geoae.checkpoint import load_lm
 from geoae.evaluate import load_ae_from_checkpoint, sanity_check_splice
-from geoae.hooks import SplicingHook
+from geoae.hooks import SplicingHook, TokenIdTap
 from geoae.interp import neuronlens as nl
 from geoae.interp import _shared as shared
 
@@ -61,6 +61,11 @@ def main():
                     help="Batch size for the joint-correct build. Peak memory is "
                          "bs*seq*mlp_intermediate; lower it if the LM OOMs.")
     ap.add_argument("--smoke", action="store_true")
+    ap.add_argument("--hb_table", default="",
+                    help="token_bias .npz: add the MATCHED BASE arm hb (steer (h-mean)/std - b[tok], "
+                         "add b[tok] back) for a token-bypass AE")
+    ap.add_argument("--skip_z", action="store_true",
+                    help="skip the z arm (pair hb with an existing z file on the same doc set)")
     args = ap.parse_args()
 
     dataset_cfg = shared.set_dataset(args.dataset)
@@ -86,7 +91,7 @@ def main():
     concepts = list(range(len(shared.CLASSES))) if args.concepts == "all" else [int(x) for x in args.concepts.split(",")]
 
     ckpt = Path(args.checkpoint)
-    ae, norm, cfg = load_ae_from_checkpoint(ckpt, device)
+    ae, norm, cfg = load_ae_from_checkpoint(ckpt, device, allow_token_bias=True)
     mean_t, std_t = norm["mean"], norm["std"]
     model_name = cfg["extraction"]["model_name"]
     ckpt_layer = cfg["data"]["target_layer"]
@@ -105,6 +110,19 @@ def main():
     lm = load_lm(model_name, device_map="auto")
     sanity_check_splice(lm, args.layer, tokenizer, device)
     hook = SplicingHook(lm, args.layer)
+    # Token-bypass AE: splices read each position's current-token id off the input
+    # embedding, and every fit-time encode uses the id captured with the activation.
+    tap = TokenIdTap(lm) if (ae.has_token_bias or args.hb_table) else None
+    tb = None
+    if args.hb_table:
+        from geoae.token_bias import TokenBiasLookup
+        tb = TokenBiasLookup(args.hb_table, device)
+        if not (np.allclose(tb.norm_mean, mean_t.cpu().numpy()) and np.allclose(tb.norm_std, std_t.cpu().numpy())):
+            sys.exit(f"[steer] {args.hb_table} was built under different norm stats than {ckpt}")
+
+    def encode_np(h: np.ndarray, ids: np.ndarray) -> torch.Tensor:
+        tok = torch.from_numpy(ids).to(device) if ae.has_token_bias else None
+        return ae.encode((torch.from_numpy(h).to(device) - mean_t) / std_t, tok)
 
     print("[steer] Computing wiki ppl slice + z-recon baseline hook …")
     wiki = load_dataset("wikimedia/wikipedia", "20231101.en", split="train", streaming=True)
@@ -113,9 +131,9 @@ def main():
         wtxt.append(ex["text"][:1500])
         if len(wtxt) >= args.n_wiki:
             break
-    h_w = shared.capture_h(lm, tokenizer, wtxt, args.layer, device)
+    h_w, ids_w = shared.capture_h(lm, tokenizer, wtxt, args.layer, device, return_ids=True)
     with torch.no_grad():
-        avg_z = ae.encoder(((torch.from_numpy(h_w).to(device) - mean_t) / std_t)).mean(0).cpu().numpy()
+        avg_z = encode_np(h_w, ids_w).mean(0).cpu().numpy()
     ppl_txt = wtxt[: args.n_ppl]
     z_recon = nl.make_z_gate(
         np.full(len(avg_z), np.inf),
@@ -126,6 +144,7 @@ def main():
         std_t,
         device,
         gate=False,
+        tap=tap,
     )
 
     print(f"[steer] Loading {args.dataset} test split …")
@@ -157,9 +176,13 @@ def main():
     eval_lab = np.array(eval_lab)
 
     print(f"[steer] Fit pass: capturing h,z for {len(fit_txt)} docs …")
-    h_fit = shared.capture_h(lm, tokenizer, fit_txt, args.layer, device)
+    h_fit, ids_fit = shared.capture_h(lm, tokenizer, fit_txt, args.layer, device, return_ids=True)
     with torch.no_grad():
-        z_fit = ae.encoder(((torch.from_numpy(h_fit).to(device) - mean_t) / std_t)).cpu().numpy()
+        z_fit = encode_np(h_fit, ids_fit).cpu().numpy()
+        hb_fit = None
+        if tb is not None:
+            hb_fit = ((torch.from_numpy(h_fit).to(device) - mean_t) / std_t
+                      - tb(torch.from_numpy(ids_fit).to(device))).cpu().numpy()
 
     print(f"[steer] Clean eval over {len(eval_txt)} docs …")
     base = shared.predict(lm, tokenizer, eval_txt, eval_lab, device)
@@ -206,6 +229,7 @@ def main():
             "zrecon_acc": round(float(np.mean(zbase["correct"])), 4),
             "zrecon_ppl": round(zbase_ppl, 3),
             "summary_selectivity": {},
+            "hb_table": args.hb_table, "skip_z": bool(args.skip_z),
         },
         "concepts": {},
     }
@@ -214,7 +238,7 @@ def main():
         f"z-recon acc={results['meta']['zrecon_acc']:.3f} ppl={zbase_ppl:.1f}"
     )
 
-    r_h, r_z = {}, {}
+    r_h, r_z, r_hb = {}, {}, {}
     for c in concepts:
         c_h = h_fit[fit_lab == c]
         o_h = h_fit[fit_lab != c]
@@ -225,6 +249,8 @@ def main():
             continue
         r_h[c] = c_h.mean(axis=0) - o_h.mean(axis=0)
         r_z[c] = c_z.mean(axis=0) - o_z.mean(axis=0)
+        if hb_fit is not None:
+            r_hb[c] = hb_fit[fit_lab == c].mean(axis=0) - hb_fit[fit_lab != c].mean(axis=0)
 
     for c in concepts:
         if c not in r_h or c not in r_z:
@@ -259,7 +285,20 @@ def main():
                 "ppl": round(h_ppl, 3),
             }
 
-            z_fn = nl.make_z_steer(r_z[c], alpha, ae, mean_t, std_t, device)
+            if tb is not None:
+                hb_fn = nl.make_hb_steer(r_hb[c], alpha, tb, mean_t, std_t, device, tap)
+                b_t, b_c, b_conf, b_ppl = eval_steer(hb_fn, c, comp_idx)
+                rec[f"hb_a{atag}"] = {
+                    "alpha": float(alpha), "tgt_acc": round(b_t, 4), "tgt_conf": round(b_conf, 4),
+                    "comp_acc": round(b_c, 4), "tgt_acc_delta": round(b_t - b_tgt, 4),
+                    "comp_acc_delta": round(b_c - b_comp, 4),
+                    "selectivity": round((b_t - b_tgt) - (b_c - b_comp), 4), "ppl": round(b_ppl, 3),
+                }
+                print(f"  a={alpha:<4} | hb sel {rec[f'hb_a{atag}']['selectivity']:+.3f} "
+                      f"(tgt {b_t:.2f}, comp {b_c:.2f})")
+            if args.skip_z:
+                continue
+            z_fn = nl.make_z_steer(r_z[c], alpha, ae, mean_t, std_t, device, tap=tap)
             z_tgt, z_comp, z_conf, z_ppl = eval_steer(z_fn, c, comp_idx)
             z_td = z_tgt - zb_tgt
             z_cd = z_comp - zb_comp

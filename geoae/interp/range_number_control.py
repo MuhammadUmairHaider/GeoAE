@@ -148,21 +148,37 @@ def make_edit(stats, mode, alpha, device):
     return nl.shift_edit(stats["mu_c"] - stats["mu_o"], lo, hi, alpha, device)
 
 
-def make_last_patch(ae, mean, std, edit=None, rotation=None, raw=False):
-    """A local-position intervention; record its coordinate-space displacement."""
+def make_last_patch(ae, mean, std, edit=None, rotation=None, raw=False, tap=None, hb=None):
+    """A local-position intervention; record its coordinate-space displacement.
+    `tap` (TokenIdTap) supplies the last position's token id to a token-bypass AE.
+    `hb` (geoae.token_bias.TokenBiasLookup): the matched BASE arm for a token-bypass
+    AE — edit (h - mean)/std - b[tok] directly, no encoder, then add b[tok] back.
+    Its unedited patch is the identity, so it is read against the base model like h."""
     norms = []
 
     @torch.no_grad()
     def patch(hs):
         h = hs[:, -1, :].float()
-        a = h if raw else ae.encoder((h - mean) / std)
+        tok = None
+        if hb is not None or (not raw and ae.has_token_bias):
+            if tap is None:
+                raise ValueError("token-bias arm: make_last_patch needs tap=TokenIdTap(lm)")
+            tok = tap.ids_for(hs).view(hs.shape[0], hs.shape[1])[:, -1]
+        if hb is not None:
+            b = hb(tok)
+            a = (h - mean) / std - b
+        else:
+            a = h if raw else ae.encode((h - mean) / std, tok)
         if rotation is not None:
             a = rotation.forward(a)
         changed = a if edit is None else edit(a)
         norms.extend((changed - a).norm(dim=-1).cpu().tolist())
         if rotation is not None:
             changed = rotation.inverse(changed)
-        out_h = changed if raw else ae.decoder(changed) * std + mean
+        if hb is not None:
+            out_h = (changed + b) * std + mean
+        else:
+            out_h = changed if raw else ae.decode(changed, tok) * std + mean
         out = hs.clone()
         out[:, -1, :] = out_h.to(hs.dtype)
         return out
@@ -172,8 +188,9 @@ def make_last_patch(ae, mean, std, edit=None, rotation=None, raw=False):
 
 @torch.inference_mode()
 def forward_prompts(lm, tokenizer, prompts, device, layer, batch_size, patch=None, capture=False):
+    """Last-position logits; with capture, also last-position activations and their token ids."""
     from geoae.hooks import SplicingHook
-    logits, activations = [], []
+    logits, activations, last_ids = [], [], []
     hook = SplicingHook(lm, layer)
 
     def capture_fn(hs):
@@ -188,9 +205,12 @@ def forward_prompts(lm, tokenizer, prompts, device, layer, batch_size, patch=Non
                             return_tensors="pt").to(device)
             output = lm(**enc, use_cache=False).logits
             logits.append(output[:, -1, :].float().cpu())
+            last_ids.append(enc["input_ids"][:, -1].cpu())
     finally:
         hook.deactivate()
-    return torch.cat(logits), torch.cat(activations) if capture else None
+    if capture:
+        return torch.cat(logits), torch.cat(activations), torch.cat(last_ids)
+    return torch.cat(logits), None
 
 
 def outcome(logits, reference, labels, token_ids):
@@ -248,6 +268,9 @@ def main():
     ap.add_argument("--rotation_seeds", nargs="*", type=int, default=[0])
     ap.add_argument("--rotation_rounds", type=int, default=12)
     ap.add_argument("--shuffle_labels", action="store_true")
+    ap.add_argument("--hb_table", default="",
+                    help="token_bias .npz: add the matched base arm `hb` (edit (h-mean)/std - b[tok], "
+                         "add b[tok] back) — the fair base for a token-bypass AE")
     ap.add_argument("--batch_size", type=int, default=16)
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--dry_run", action="store_true", help="write the task manifest without loading models")
@@ -299,7 +322,7 @@ def main():
     from geoae.seeding import seed_everything
     seed_everything(args.seed)
     device = torch.device(args.device)
-    ae, mean, std, ck = load_ae_checkpoint(args.checkpoint, device)
+    ae, mean, std, ck = load_ae_checkpoint(args.checkpoint, device, allow_token_bias=True)
     layer = ck["config"]["data"]["target_layer"]
     model_name = ck["config"]["extraction"]["model_name"]
     tokenizer = AutoTokenizer.from_pretrained(model_name, local_files_only=True)
@@ -319,17 +342,29 @@ def main():
     test_labels = np.array([r["subject_number"] for r in test])
     n_test = len(test)
 
+    from geoae.hooks import TokenIdTap
+    tap = TokenIdTap(lm) if (ae.has_token_bias or args.hb_table) else None
+    hb = None
+    if args.hb_table:
+        from geoae.token_bias import TokenBiasLookup
+        hb = TokenBiasLookup(args.hb_table, device)
+        if not (np.allclose(hb.norm_mean, mean.cpu().numpy()) and np.allclose(hb.norm_std, std.cpu().numpy())):
+            raise SystemExit(f"{args.hb_table} was built under different norm stats than {args.checkpoint}")
+
     def run(texts, patch=None, capture=False):
         return forward_prompts(lm, tokenizer, texts, device, layer, args.batch_size, patch, capture)
 
+    def ids(t):
+        return t.to(device) if ae.has_token_bias else None
+
     print("Capturing fit and evaluation activations ...", flush=True)
-    fit_logits, h_fit = run(fit_prompts, capture=True)
-    base, h_eval = run(prompts, capture=True)
-    recon_patch, _ = make_last_patch(ae, mean, std)
+    fit_logits, h_fit, ids_fit = run(fit_prompts, capture=True)
+    base, h_eval, ids_eval = run(prompts, capture=True)
+    recon_patch, _ = make_last_patch(ae, mean, std, tap=tap)
     recon, _ = run(prompts, recon_patch)
     with torch.inference_mode():
-        z_fit = ae.encoder((h_fit.to(device) - mean) / std)
-        z_eval = ae.encoder((h_eval.to(device) - mean) / std)
+        z_fit = ae.encode((h_fit.to(device) - mean) / std, ids(ids_fit))
+        z_eval = ae.encode((h_eval.to(device) - mean) / std, ids(ids_eval))
     correct_base = outcome(base[:n_test], base[:n_test], test_labels, token_ids)["correct"]
     correct_recon = outcome(recon[:n_test], recon[:n_test], test_labels, token_ids)["correct"]
     joint = correct_base & correct_recon
@@ -345,8 +380,12 @@ def main():
             if k in ("top1_change", "kl")
         },
     }
-    spaces = [("h", h_fit.to(device), h_eval.to(device), None, True, False),
-              ("z", z_fit, z_eval, None, False, False)]
+    spaces = [("h", h_fit.to(device), h_eval.to(device), None, True, False)]
+    if hb is not None:
+        with torch.inference_mode():
+            spaces.append(("hb", (h_fit.to(device) - mean) / std - hb(ids_fit.to(device)),
+                           (h_eval.to(device) - mean) / std - hb(ids_eval.to(device)), None, False, False))
+    spaces.append(("z", z_fit, z_eval, None, False, False))
     for seed in args.rotation_seeds:
         rotation = OrthogonalMix(z_fit.shape[1], seed, args.rotation_rounds, device)
         spaces.append((f"z_rot{seed}", rotation.forward(z_fit), rotation.forward(z_eval),
@@ -357,7 +396,8 @@ def main():
     save()
 
     for name, a_fit, a_eval, rotation, raw, shuffle in spaces:
-        reference = base if raw else recon
+        is_hb = name == "hb"
+        reference = base if (raw or is_hb) else recon
         fit_array = a_fit.detach().cpu().numpy()
         for source in (0, 1):
             stats = fit_edits(fit_array, shuffled if shuffle else fit_labels, source,
@@ -368,7 +408,8 @@ def main():
                 for alpha in args.alphas:
                     key = f"{name}:suppress_{'plural' if source else 'singular'}:{mode}:a{alpha}"
                     edit = make_edit(stats, mode, alpha, device)
-                    patch, coordinate_norms = make_last_patch(ae, mean, std, edit, rotation, raw)
+                    patch, coordinate_norms = make_last_patch(ae, mean, std, edit, rotation, raw, tap=tap,
+                                                              hb=hb if is_hb else None)
                     edited, _ = run(prompts, patch)
                     values = outcome(edited[:n_test], reference[:n_test], test_labels, token_ids)
                     neutral = outcome(edited[n_test:], reference[n_test:], np.zeros(len(NEUTRAL)), token_ids)
@@ -376,7 +417,10 @@ def main():
                         delta = edit(a_eval) - a_eval
                         if rotation is not None:
                             delta = rotation.inverse(delta)
-                        raw_delta = delta if raw else ae.decoder(delta) * std
+                        # decoder only: a latent DIFFERENCE decodes without the token
+                        # bias (it cancels in decode(z + d, t) - decode(z, t)).
+                        raw_delta = (delta if raw else delta * std if is_hb
+                                     else ae.decoder(delta) * std)
                     all_summary = summarize(values, test_labels, source, np.ones(n_test, dtype=bool))
                     paired = summarize(values, test_labels, source, joint)
                     result["arms"][key] = {

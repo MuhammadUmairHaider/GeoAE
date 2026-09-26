@@ -64,7 +64,7 @@ from transformers import AutoTokenizer
 from geoae.seeding import seed_everything
 from geoae.checkpoint import load_lm
 from geoae.evaluate import load_ae_from_checkpoint, sanity_check_splice
-from geoae.hooks import SplicingHook
+from geoae.hooks import SplicingHook, TokenIdTap
 from geoae.interp import neuronlens as nl
 from geoae.interp import _shared as shared
 
@@ -102,6 +102,12 @@ def main():
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--jc_batch_size", type=int, default=16)
     ap.add_argument("--smoke", action="store_true")
+    ap.add_argument("--hb_table", default="",
+                    help="token_bias .npz: enables substrate hb, the MATCHED BASE for a token-bypass AE "
+                         "(edit (h-mean)/std - b[tok], add b[tok] back; h's saliency settings)")
+    ap.add_argument("--substrates", default="h,z",
+                    help="comma list of h, z, hb (hb needs --hb_table). Skipping z pairs hb with an "
+                         "existing z file on the same doc set.")
     args = ap.parse_args()
 
     removal_modes, replaces, steer_modes = _csv(args.removal_modes), _csv(args.replace), _csv(args.steer_modes)
@@ -132,7 +138,7 @@ def main():
                 else [int(x) for x in args.concepts.split(",")])
 
     ckpt = Path(args.checkpoint)
-    ae, norm, cfg = load_ae_from_checkpoint(ckpt, device)
+    ae, norm, cfg = load_ae_from_checkpoint(ckpt, device, allow_token_bias=True)
     mean_t, std_t = norm["mean"], norm["std"]
     model_name = cfg["extraction"]["model_name"]
     ckpt_layer = cfg["data"]["target_layer"]
@@ -148,10 +154,31 @@ def main():
     lm = load_lm(model_name, device_map="auto")
     sanity_check_splice(lm, args.layer, tokenizer, device)
     hook = SplicingHook(lm, args.layer)
+    # Token-bypass AE: splices read each position's current-token id off the input
+    # embedding, and every fit-time encode uses the id captured with the activation.
+    substrates = [x for x in args.substrates.split(",") if x]
+    if not set(substrates) <= {"h", "z", "hb"} or ("hb" in substrates and not args.hb_table):
+        sys.exit(f"[range] --substrates must be from h,z,hb (hb needs --hb_table); got {args.substrates}")
+    tap = TokenIdTap(lm) if (ae.has_token_bias or args.hb_table) else None
+    tb = None
+    if args.hb_table:
+        from geoae.token_bias import TokenBiasLookup
+        tb = TokenBiasLookup(args.hb_table, device)
+        if not (np.allclose(tb.norm_mean, mean_t.cpu().numpy()) and np.allclose(tb.norm_std, std_t.cpu().numpy())):
+            sys.exit(f"[range] {args.hb_table} was built under different norm stats than {ckpt}")
 
-    def encode(h: np.ndarray) -> np.ndarray:
+    def to_hb(h: np.ndarray, ids: np.ndarray) -> np.ndarray:
         with torch.no_grad():
-            return ae.encoder((torch.from_numpy(h).to(device) - mean_t) / std_t).cpu().numpy()
+            return ((torch.from_numpy(h).to(device) - mean_t) / std_t
+                    - tb(torch.from_numpy(ids).to(device))).cpu().numpy()
+
+    def encode(h: np.ndarray, ids: np.ndarray) -> np.ndarray:
+        tok = torch.from_numpy(ids).to(device) if ae.has_token_bias else None
+        with torch.no_grad():
+            return ae.encode((torch.from_numpy(h).to(device) - mean_t) / std_t, tok).cpu().numpy()
+
+    def capture(texts):
+        return shared.capture_h(lm, tokenizer, texts, args.layer, device, return_ids=True)
 
     print("[range] Wiki slice (ppl texts + wiki-mean replacement) …")
     wiki = load_dataset("wikimedia/wikipedia", "20231101.en", split="train", streaming=True)
@@ -160,10 +187,12 @@ def main():
         wtxt.append(ex["text"][:1500])
         if len(wtxt) >= args.n_wiki:
             break
-    h_w = shared.capture_h(lm, tokenizer, wtxt, args.layer, device)
-    wiki_mean = {"h": h_w.mean(0), "z": encode(h_w).mean(0)}
+    h_w, ids_w = capture(wtxt)
+    wiki_mean = {"h": h_w.mean(0), "z": encode(h_w, ids_w).mean(0)}
+    if tb is not None:
+        wiki_mean["hb"] = to_hb(h_w, ids_w).mean(0)
     ppl_txt = wtxt[:args.n_ppl]
-    z_recon = nl.make_z_edit(None, ae, mean_t, std_t, device)
+    z_recon = nl.make_z_edit(None, ae, mean_t, std_t, device, tap=tap)
 
     print(f"[range] Loading {args.dataset} test split …")
     ds = load_dataset(dataset_cfg["dataset_name"], split=dataset_cfg["dataset_split"]).shuffle(seed=args.seed)
@@ -191,8 +220,10 @@ def main():
     fit_lab, eval_lab = np.array(fit_lab), np.array(eval_lab)
 
     print(f"[range] Fit pass: capturing h for {len(fit_txt)} docs …")
-    acts_fit = {"h": shared.capture_h(lm, tokenizer, fit_txt, args.layer, device)}
-    acts_fit["z"] = encode(acts_fit["h"])
+    h_fit, ids_fit = capture(fit_txt)
+    acts_fit = {"h": h_fit, "z": encode(h_fit, ids_fit)}
+    if tb is not None:
+        acts_fit["hb"] = to_hb(h_fit, ids_fit)
     # Ranges, saliency, r and the comp mean come from docs the base model still gets
     # right at fit time (the NeuronLens reference fits on correct-only activations).
     fit_ok = np.array(shared.predict(lm, tokenizer, fit_txt, fit_lab, device)["correct"])
@@ -214,10 +245,12 @@ def main():
         zbase = {k: [v[i] for i in keep] for k, v in zbase.items()}
 
     # Last-token eval activations, only for the gate firing-rate diagnostic.
-    acts_eval = {"h": shared.capture_h(lm, tokenizer, eval_txt, args.layer, device)}
-    acts_eval["z"] = encode(acts_eval["h"])
+    h_ev, ids_ev = capture(eval_txt)
+    acts_eval = {"h": h_ev, "z": encode(h_ev, ids_ev)}
+    if tb is not None:
+        acts_eval["hb"] = to_hb(h_ev, ids_ev)
     idx_by_class = {c: np.where(eval_lab == c)[0] for c in range(len(shared.CLASSES))}
-    own = {"h": (base, base_ppl), "z": (zbase, zbase_ppl)}
+    own = {"h": (base, base_ppl), "z": (zbase, zbase_ppl), "hb": (base, base_ppl)}   # hb unedited == identity
 
     def run(fn, c, comp_idx):
         idx = np.concatenate([idx_by_class[c], comp_idx])
@@ -243,6 +276,7 @@ def main():
             "base_acc": round(float(np.mean(base["correct"])), 4), "base_ppl": round(base_ppl, 3),
             "zrecon_acc": round(float(np.mean(zbase["correct"])), 4), "zrecon_ppl": round(zbase_ppl, 3),
             "selectivity_sign": "tgt_drop - comp_drop; higher is better",
+            "substrates": substrates, "hb_table": args.hb_table,
         },
         "concepts": {},
     }
@@ -254,7 +288,7 @@ def main():
         comp_idx = rng.choice(comp_pool, min(args.n_comp, len(comp_pool)), replace=False)
         print(f"\n=== concept {c} ({shared.CLASSES[c]})  n_tgt={len(idx_by_class[c])} n_comp={len(comp_idx)} ===")
         rec = {"fire": {}}
-        for s in ("h", "z"):
+        for s in substrates:
             A = acts_fit[s][fit_ok]
             is_c = fit_lab[fit_ok] == c
             if is_c.sum() < 2 or (~is_c).sum() < 2:
@@ -264,7 +298,7 @@ def main():
             a_c, a_o = A[is_c], A[~is_c]
             mu_c, sd_c, mu_o, sd_o = a_c.mean(0), a_c.std(0), a_o.mean(0), a_o.std(0)
             score = np.abs(a_c).mean(0) if args.saliency == "abs" else nl.dprime_saliency(A, is_c)
-            if s == "h":
+            if s in ("h", "hb"):
                 sal = nl.select_top(score, **(dict(q=args.q) if args.q is not None else dict(p=args.percent)))
             else:
                 ae_q = args.ae_q if args.ae_q is not None else args.q
@@ -305,7 +339,9 @@ def main():
             b_tgt = float(np.mean([ref["correct"][i] for i in idx_by_class[c]]))
             b_comp = float(np.mean([ref["correct"][i] for i in comp_idx]))
             for key, e in edits.items():
-                fn = nl.make_h_edit(e, device) if s == "h" else nl.make_z_edit(e, ae, mean_t, std_t, device)
+                fn = (nl.make_h_edit(e, device) if s == "h"
+                      else nl.make_hb_edit(e, tb, mean_t, std_t, device, tap) if s == "hb"
+                      else nl.make_z_edit(e, ae, mean_t, std_t, device, tap=tap))
                 tgt, comp, pp = run(fn, c, comp_idx)
                 td, cd = b_tgt - tgt, b_comp - comp
                 rec[f"{s}_{key}"] = {

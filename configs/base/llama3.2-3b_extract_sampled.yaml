@@ -1,0 +1,52 @@
+# Llama-3.2-3B L27 — SAMPLED-POSITION extraction, pretraining-like mix (no structured).
+#
+# Replaces the legacy activations_diverse_10M recipe (every position 4..255 of
+# ~43k docs, equal 5-way mix with 43% code+math). See geoae/extract_sampled.py.
+#
+#   * full docs up to 2048 tokens, 64 uniform random positions kept per doc
+#     -> ~156k docs for 10M rows, positions spread over 4..2047
+#   * token-quota mix below, knowledge-weighted (edu web + wiki = 55%)
+#   * any source that fails to load ABORTS the run
+#   * row sidecars (rows_pos/doc/tok/src/norm.npy, docs.npy) for position analysis
+#
+# Disk: 10M x 3072 x fp16 = 61 GB (+ ~1 GB corpus). Two steps, seed 42 as legacy:
+#   python -u -m geoae.build_corpus --config configs/base/llama3.2-3b_extract_sampled.yaml \
+#     2>&1 | tee logs/corpus_extract_sampled.log
+#   python -u -m geoae.extract --config configs/base/llama3.2-3b_extract_sampled.yaml \
+#     2>&1 | tee logs/extract_sampled_10M.log
+#
+# Twin with 5% structured prompts: llama3.2-3b_extract_sampled_struct5.yaml.
+
+extraction:
+  model_name: "meta-llama/Llama-3.2-3B"
+  layers: [27]
+  target_layer: 27
+  hidden_size: 3072
+  n_tokens: 10000000
+  dtype: "float16"
+  activations_dir: "activations_sampled_10M"
+  corpus_dir: "corpus/sampled_v1"   # shared by the no-struct and struct5 configs
+  corpus_margin: 1.3
+  mode: "sampled"
+  context_len: 2048
+  positions_per_doc: 64
+  skip_leading: 4             # BOS + document-start flood, same as legacy
+  batch_docs: 16
+  shuffle_buffer: 2000        # per source; plus shard-order shuffle. Each open
+                              # stream costs ~3-5 GB RSS (Parquet row groups)
+  outlier_norm_mult: 0.0      # report only; set e.g. 10 to drop massive-norm rows
+  log_every: 2000
+  sources:
+    - {domain: edu_web,  weight: 40,  name: "HuggingFaceFW/fineweb-edu", config: "sample-10BT", field: text}
+    - {domain: web,      weight: 15,  name: "HuggingFaceFW/fineweb",     config: "sample-10BT", field: text}
+    - {domain: wiki,     weight: 15,  name: "wikimedia/wikipedia",       config: "20231101.en", field: text}
+    # Pile long tail (StackExchange, arXiv, PubMed, FreeLaw, USPTO, PG-19, ...);
+    # the slices already covered by other sources are excluded.
+    - {domain: pile,     weight: 10,  name: "monology/pile-uncopyrighted", field: text,
+       shuffle_buffer: 1000,   # docs can be whole books; bound RAM
+       exclude: {key: "meta.pile_set_name", values: ["Pile-CC", "Github", "DM Mathematics", "Wikipedia (en)"]}}
+    - {domain: code,     weight: 8,   name: "codeparrot/codeparrot-clean", field: content}
+    - {domain: math,     weight: 5,   name: "HuggingFaceTB/finemath",   config: "finemath-4plus", field: text}
+    - {domain: wiki_de,  weight: 3,   name: "wikimedia/wikipedia",       config: "20231101.de", field: text}
+    - {domain: wiki_fr,  weight: 2,   name: "wikimedia/wikipedia",       config: "20231101.fr", field: text}
+    - {domain: wiki_es,  weight: 2,   name: "wikimedia/wikipedia",       config: "20231101.es", field: text}

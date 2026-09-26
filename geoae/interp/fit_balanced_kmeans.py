@@ -64,9 +64,29 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
+from geoae.checkpoint import load_ae_checkpoint
 from geoae.losses import sinkhorn_log
-from geoae.seeded_init import density_peaks_select, format_peak_diag
+from geoae.seeded_init import density_peaks_select, format_peak_diag, seeded_init
 from geoae.seeding import seed_everything
+
+
+@torch.no_grad()
+def encode_sample(ae, sample: np.ndarray, device, chunk: int = 16384) -> torch.Tensor:
+    """Normalised activations -> AE latent, in chunks, straight onto the device.
+
+    The latent is wider than the activation (2x-4x here), so this is the memory
+    ceiling of a --space latent fit: n_sample x latent_dim x 4 bytes must fit on
+    the card. At latent_dim 12288 that is ~49 GB for 1M rows, so latent fits run
+    on a smaller sample than raw ones.
+    """
+    out = None
+    for i in tqdm(range(0, len(sample), chunk), desc="encoding", leave=False):
+        blk = torch.from_numpy(sample[i:i + chunk]).to(device)
+        z = ae.encoder(blk)
+        if out is None:
+            out = torch.empty((len(sample), z.shape[1]), dtype=z.dtype, device=device)
+        out[i:i + len(z)] = z
+    return out
 
 
 def kmeanspp_init(X: torch.Tensor, K: int, seed: int, chunk: int = 4096) -> torch.Tensor:
@@ -125,8 +145,22 @@ def main():
                     help="Steps between reinit of starved centroids (0 disables).")
     ap.add_argument("--init_sample", type=int, default=200_000,
                     help="Points used for k-means++ init (full sample is too slow).")
-    ap.add_argument("--init", default="kmeans++", choices=["kmeans++", "dpc"],
-                    help="Centroid init. dpc = density peaks, matching centroid_init: dpc.")
+    ap.add_argument("--init", default="kmeans++", choices=["kmeans++", "dpc", "seeded"],
+                    help="Centroid init. dpc = density peaks, matching centroid_init: dpc. "
+                         "seeded = labelled class means + density fill (requires --space latent).")
+    ap.add_argument("--space", default="raw", choices=["raw", "latent"],
+                    help="Where to cluster. raw = normalised activations (the encoder-free "
+                         "control). latent = the AE's own latent, which asks whether a better "
+                         "partition of the SAME representation recovers what the AE's trained "
+                         "centroids miss.")
+    # --init seeded: labelled anchors, same knobs as the trainer's centroid_init: seeded
+    ap.add_argument("--anchor_cache", default="cache")
+    ap.add_argument("--anchor_per_class", type=int, default=25)
+    ap.add_argument("--anchor_min_examples", type=int, default=5)
+    ap.add_argument("--anchor_rungs", default="", help="comma list; empty = every rung")
+    ap.add_argument("--atlas_last", default="", help="atlas last-token cache for doc concepts")
+    ap.add_argument("--atlas_min_examples", type=int, default=25)
+    ap.add_argument("--fill_mode", default="peaks", choices=["coverage", "peaks"])
     ap.add_argument("--reinit", default="farthest", choices=["farthest", "peaks"],
                     help="Starved-centroid reinit. farthest = batch points furthest from "
                          "every centroid (original); peaks = matching reinit_mode: peaks.")
@@ -139,9 +173,24 @@ def main():
     ap.add_argument("--peak_min_sep_frac", type=float, default=0.25)
     ap.add_argument("--peak_refine_k", type=int, default=8)
     ap.add_argument("--peak_reinit_pool", type=int, default=8192)
+    # Token erasure (geoae.interp.token_erasure): cluster the normalised activations
+    # with a fixed set of directions projected out. The basis is stored in the
+    # output, and only concept_probe applies it; other tools refuse the codebook.
+    ap.add_argument("--erase", default="", help="token_erasure .npz; empty = no erasure")
+    ap.add_argument("--erase_basis", default="token", choices=["token", "pca"],
+                    help="token = between-token directions; pca = same-rank control")
+    ap.add_argument("--erase_rank", type=int, default=128)
+    # Token-mean subtraction (geoae/token_bias.py): cluster x - b[current token] with the
+    # SAME table a token-bypass AE subtracts — the encoder-free control for that AE.
+    # Needs rows_tok.npy beside the activations. Only concept_probe-style tools apply it.
+    ap.add_argument("--token_bias", default="", help="token_bias .npz; empty = none")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
+    if (args.erase or args.token_bias) and args.space != "raw":
+        raise SystemExit("[balanced-fit] --erase / --token_bias act on the normalised activations: need --space raw")
+    if args.erase and args.token_bias:
+        raise SystemExit("[balanced-fit] pick one of --erase and --token_bias")
 
     seed_everything(args.seed)
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -149,12 +198,25 @@ def main():
         raise SystemExit(f"[balanced-fit] --batch_size {args.batch_size} < K {args.n_clusters}: "
                          f"Sinkhorn's column target B/K < 1 makes balancing meaningless.")
 
+    if args.init == "seeded" and args.space != "latent":
+        raise SystemExit("[balanced-fit] --init seeded needs --space latent: the class means "
+                         "are computed with the AE encoder.")
+
     ckpt = torch.load(args.checkpoint, map_location="cpu", weights_only=False)
     mean = np.asarray(ckpt["norm_mean"], dtype=np.float32)
     std = np.asarray(ckpt["norm_std"], dtype=np.float32)
     cfg = ckpt["config"]
     layer, model_name = cfg["data"]["target_layer"], cfg["extraction"]["model_name"]
     print(f"[balanced-fit] AE norm from checkpoint (layer {layer}, {model_name})")
+
+    ae = None
+    if args.space == "latent":
+        ae, _, _, _ = load_ae_checkpoint(args.checkpoint, dev)
+        ae.eval()
+        if args.init == "seeded" and ae.n_clusters != args.n_clusters:
+            raise SystemExit(f"[balanced-fit] --init seeded uses the AE's own K "
+                             f"({ae.n_clusters}) but --n_clusters is {args.n_clusters}.")
+        print(f"[balanced-fit] clustering in the AE LATENT (dim {ae.centroids.shape[1]})")
 
     mmap = np.load(args.activations, mmap_mode="r")
     N, D = mmap.shape
@@ -169,8 +231,61 @@ def main():
         raise SystemExit("[balanced-fit] non-finite values in the sample — check the "
                          "activation dump's dtype (fp16 overflows on large-magnitude layers).")
 
-    X = torch.from_numpy(sample).to(dev)
-    if args.init == "dpc":
+    if args.space == "latent":
+        X = encode_sample(ae, sample, dev)
+        del sample
+    else:
+        X = torch.from_numpy(sample).to(dev)
+    erase_U = None
+    if args.erase:
+        e = np.load(args.erase, allow_pickle=True)
+        if not (np.allclose(e["norm_mean"], mean) and np.allclose(e["norm_std"], std)):
+            raise SystemExit(f"[balanced-fit] {args.erase} was fit under different norm stats than "
+                             f"{args.checkpoint}; pass the checkpoint token_erasure used.")
+        erase_U = torch.from_numpy(e[f"U_{args.erase_basis}"][:, :args.erase_rank]).to(dev)
+        if erase_U.shape[1] < args.erase_rank:
+            raise SystemExit(f"[balanced-fit] basis has only {erase_U.shape[1]} directions")
+        for i in range(0, len(X), 65536):
+            X[i:i + 65536] -= (X[i:i + 65536] @ erase_U) @ erase_U.T
+        print(f"[balanced-fit] erased {args.erase_rank} {args.erase_basis} directions ({args.erase})")
+    if args.token_bias:
+        from geoae.token_bias import TokenBiasLookup
+        tb = TokenBiasLookup(args.token_bias, dev)
+        if not (np.allclose(tb.norm_mean, mean) and np.allclose(tb.norm_std, std)):
+            raise SystemExit(f"[balanced-fit] {args.token_bias} was built under different norm stats "
+                             f"than {args.checkpoint}")
+        tok_path = Path(args.activations).parent / "rows_tok.npy"
+        rows_tok = np.load(tok_path)[idx]
+        for i in range(0, len(X), 65536):
+            X[i:i + 65536] -= tb(torch.from_numpy(rows_tok[i:i + 65536]).to(dev))
+        print(f"[balanced-fit] subtracted b[current token] ({args.token_bias}, {tok_path})")
+    print(f"[balanced-fit] fitting on {tuple(X.shape)} ({X.numel() * 4 / 2**30:.1f} GB)")
+
+    if args.init == "seeded":
+        rungs = [r for r in args.anchor_rungs.split(",") if r] or None
+        # The fill's density estimate is pairwise over its pool, computed in row
+        # chunks against the WHOLE pool, so the pool must be a subsample and not
+        # the full sample: at 300k x 12288 one chunk alone asks for ~3.7 GB and
+        # the fit OOMs. The trainer sizes this pool at density_pool for the same
+        # reason, so use the same knob here.
+        pool_n = min(args.density_pool, len(X))
+        z_pool = X[torch.randperm(len(X), device=dev)[:pool_n]]
+        print(f"[balanced-fit] density fill pool: {pool_n:,} of {len(X):,} latents")
+        C, names, _pool, diag = seeded_init(
+            ae, args.anchor_cache, torch.from_numpy(mean).to(dev), torch.from_numpy(std).to(dev),
+            dev, z_pool, per_class=args.anchor_per_class, min_examples=args.anchor_min_examples,
+            rungs=rungs, density_power=args.density_power, seed=args.seed,
+            min_sep_frac=args.peak_min_sep_frac, atlas_last=args.atlas_last,
+            atlas_min_examples=args.atlas_min_examples, fill_mode=args.fill_mode,
+            knn_k=args.density_knn, refine_k=args.peak_refine_k)
+        C = C.clone()
+        n_anchor = sum(1 for n in names if not n.startswith("fill::"))
+        print(f"[balanced-fit] seeded init — {n_anchor} labelled class means + "
+              f"{args.n_clusters - n_anchor} {args.fill_mode} fill")
+        if diag is not None:
+            print(f"[balanced-fit]   {format_peak_diag(diag)}")
+        del z_pool
+    elif args.init == "dpc":
         pool_n = min(args.density_pool, len(X))
         print(f"[balanced-fit] density-peaks init on {pool_n:,} points "
               f"(density_power={args.density_power}, knn={args.density_knn}) …")
@@ -240,10 +355,17 @@ def main():
 
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
+    extra = {}
+    if erase_U is not None:
+        extra = dict(erase_U=erase_U.cpu().numpy(), erase_basis=args.erase_basis,
+                     erase_rank=args.erase_rank, erase_source=args.erase)
+    if args.token_bias:
+        extra = dict(token_bias=args.token_bias)
     np.savez(str(out), centroids=C.cpu().numpy().astype(np.float32),
              norm_mean=mean, norm_std=std, layer=layer,
              n_clusters=args.n_clusters, model_name=model_name,
-             init=args.init, reinit=args.reinit)
+             init=args.init, reinit=args.reinit, space=args.space,
+             ae_checkpoint=(args.checkpoint if args.space == "latent" else ""), **extra)
     print(f"[balanced-fit] Saved -> {out}")
 
 

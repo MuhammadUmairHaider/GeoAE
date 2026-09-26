@@ -130,13 +130,19 @@ def _tok(tokenizer, texts, device):
 
 
 @torch.no_grad()
-def capture_h(lm, tokenizer, texts, layer, device, batch_size=16):
-    """Post-layer (pre-norm) residual at orig_lens-1 — same point as reference mask_layer."""
-    H = []
+def capture_h(lm, tokenizer, texts, layer, device, batch_size=16, return_ids=False):
+    """Post-layer (pre-norm) residual at orig_lens-1 — same point as reference mask_layer.
+    With return_ids, also the token id at that position: (H, ids)."""
+    H, I = [], []
     for s in tqdm(range(0, len(texts), batch_size), desc="capture", leave=False):
         enc = _tok(tokenizer, texts[s:s + batch_size], device)
-        H.append(nl.capture_post_layer(lm, enc, layer))
-    return np.concatenate(H, axis=0)
+        if return_ids:
+            h, ids = nl.capture_post_layer(lm, enc, layer, return_ids=True)
+            H.append(h); I.append(ids)
+        else:
+            H.append(nl.capture_post_layer(lm, enc, layer))
+    H = np.concatenate(H, axis=0)
+    return (H, np.concatenate(I)) if return_ids else H
 
 
 @torch.no_grad()

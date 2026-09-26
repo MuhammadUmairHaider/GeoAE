@@ -40,8 +40,9 @@ from geoae.lm_arch import decoder_layers
 # ---------------------------------------------------------------------------
 
 @torch.no_grad()
-def capture_post_layer(lm, enc, layer: int) -> np.ndarray:
-    """(B, D) activations at orig_lens-1 from decoder layer `layer` output."""
+def capture_post_layer(lm, enc, layer: int, return_ids: bool = False):
+    """(B, D) activations at orig_lens-1 from decoder layer `layer` output; with
+    return_ids, also the (B,) token ids at those positions (for a token-bypass AE)."""
     captured: list[torch.Tensor] = []
 
     def _hook(_module, _inp, output):
@@ -58,7 +59,11 @@ def capture_post_layer(lm, enc, layer: int) -> np.ndarray:
     am = enc["attention_mask"]
     last_idx = (am.shape[1] - 1 - torch.flip(am, dims=[1]).argmax(dim=1)).to(hs.device)
     rows = torch.arange(hs.shape[0], device=hs.device)
-    return hs[rows, last_idx, :].cpu().numpy()
+    h = hs[rows, last_idx, :].cpu().numpy()
+    if return_ids:
+        ids = enc["input_ids"].to(hs.device)[rows, last_idx].cpu().numpy()
+        return h, ids
+    return h
 
 
 # ---------------------------------------------------------------------------
@@ -121,10 +126,20 @@ def make_h_gate(lo: np.ndarray, hi: np.ndarray, avg: np.ndarray, device) -> "cal
     return fn
 
 
+def _tap_ids(ae, tap, hs):
+    """Current-token ids for a token-bypass AE (via a geoae.hooks.TokenIdTap), else None."""
+    if not getattr(ae, "has_token_bias", False):
+        return None
+    if tap is None:
+        raise ValueError("token-bypass AE: pass tap=TokenIdTap(lm) to the splice factory")
+    return tap.ids_for(hs)
+
+
 def make_z_gate(lo: np.ndarray, hi: np.ndarray, avg_z: np.ndarray,
-                ae, mean: Tensor, std: Tensor, device, gate: bool = True) -> "callable":
+                ae, mean: Tensor, std: Tensor, device, gate: bool = True, tap=None) -> "callable":
     """Encode -> (optionally) gate z_j -> decode -> denormalise. With gate=False
-    this is the pure AE-reconstruction splice (the z-substrate baseline)."""
+    this is the pure AE-reconstruction splice (the z-substrate baseline).
+    `tap` (TokenIdTap) supplies current-token ids to a token-bypass AE."""
     lo_t = torch.as_tensor(lo, dtype=torch.float32, device=device).view(1, -1)
     hi_t = torch.as_tensor(hi, dtype=torch.float32, device=device).view(1, -1)
     avg_t = torch.as_tensor(avg_z, dtype=torch.float32, device=device).view(1, -1)
@@ -135,11 +150,12 @@ def make_z_gate(lo: np.ndarray, hi: np.ndarray, avg_z: np.ndarray,
     def fn(hs: Tensor) -> Tensor:
         B, T, D = hs.shape
         x = (hs.reshape(B * T, D).float() - m) / s
-        z = ae.encoder(x)
+        tok = _tap_ids(ae, tap, hs)
+        z = ae.encode(x, tok)
         if gate:
             mask = (z >= lo_t) & (z <= hi_t)
             z = torch.where(mask, avg_t, z)
-        x_hat = ae.decoder(z)
+        x_hat = ae.decode(z, tok)
         recon = (x_hat * s + m).reshape(B, T, D)
         return recon.to(hs.device).to(hs.dtype)
     return fn
@@ -157,8 +173,10 @@ def make_h_steer(r: np.ndarray, alpha: float, device) -> "callable":
     return fn
 
 
-def make_z_steer(r: np.ndarray, alpha: float, ae, mean: Tensor, std: Tensor, device) -> "callable":
-    """Linear steering in latent space: encode -> z' = z - alpha * r -> decode."""
+def make_z_steer(r: np.ndarray, alpha: float, ae, mean: Tensor, std: Tensor, device,
+                 tap=None) -> "callable":
+    """Linear steering in latent space: encode -> z' = z - alpha * r -> decode.
+    `tap` (TokenIdTap) supplies current-token ids to a token-bypass AE."""
     r_t = torch.as_tensor(r, dtype=torch.float32, device=device).view(1, -1)
     m = mean.to(device).float()
     s = std.to(device).float()
@@ -167,9 +185,10 @@ def make_z_steer(r: np.ndarray, alpha: float, ae, mean: Tensor, std: Tensor, dev
     def fn(hs: Tensor) -> Tensor:
         B, T, D = hs.shape
         x = (hs.reshape(B * T, D).float() - m) / s
-        z = ae.encoder(x)
+        tok = _tap_ids(ae, tap, hs)
+        z = ae.encode(x, tok)
         z = z - float(alpha) * r_t.to(z.device)
-        x_hat = ae.decoder(z)
+        x_hat = ae.decode(z, tok)
         recon = (x_hat * s + m).reshape(B, T, D)
         return recon.to(hs.device).to(hs.dtype)
 
@@ -198,21 +217,49 @@ def make_h_edit(edit, device) -> "callable":
     return fn
 
 
-def make_z_edit(edit, ae, mean: Tensor, std: Tensor, device) -> "callable":
+def make_z_edit(edit, ae, mean: Tensor, std: Tensor, device, tap=None) -> "callable":
     """Encode -> edit(z) -> decode -> denormalise. edit=None is the pure AE-recon
-    splice, i.e. the z-substrate baseline every z delta must be read against."""
+    splice, i.e. the z-substrate baseline every z delta must be read against.
+    `tap` (TokenIdTap) supplies current-token ids to a token-bypass AE."""
     m = mean.to(device).float()
     s = std.to(device).float()
 
     @torch.no_grad()
     def fn(hs: Tensor) -> Tensor:
         B, T, D = hs.shape
-        z = ae.encoder((hs.reshape(B * T, D).float() - m) / s)
+        tok = _tap_ids(ae, tap, hs)
+        z = ae.encode((hs.reshape(B * T, D).float() - m) / s, tok)
         if edit is not None:
             z = edit(z)
-        recon = (ae.decoder(z) * s + m).reshape(B, T, D)
+        recon = (ae.decode(z, tok) * s + m).reshape(B, T, D)
         return recon.to(hs.device).to(hs.dtype)
     return fn
+
+
+def make_hb_edit(edit, tb, mean: Tensor, std: Tensor, device, tap) -> "callable":
+    """MATCHED BASE for a token-bypass AE: the same edit, with no encoder.
+
+    a = (h - mean)/std - b[tok]  ->  a' = edit(a)  ->  h' = (a' + b[tok]) * std + mean,
+    at every position, with b the bypass AE's own table (geoae.token_bias.TokenBiasLookup)
+    and each position's token id from `tap` (TokenIdTap). edit=None is the identity."""
+    m = mean.to(device).float()
+    s = std.to(device).float()
+
+    @torch.no_grad()
+    def fn(hs: Tensor) -> Tensor:
+        B, T, D = hs.shape
+        b = tb(tap.ids_for(hs)).to(hs.device)
+        a = (hs.reshape(B * T, D).float() - m) / s - b
+        if edit is not None:
+            a = edit(a)
+        return ((a + b) * s + m).reshape(B, T, D).to(hs.dtype)
+    return fn
+
+
+def make_hb_steer(r: np.ndarray, alpha: float, tb, mean: Tensor, std: Tensor, device, tap) -> "callable":
+    """Global steering in the token-subtracted base space: a' = a - alpha * r (see make_hb_edit)."""
+    r_t = torch.as_tensor(r, dtype=torch.float32, device=device).view(1, -1)
+    return make_hb_edit(lambda a: a - float(alpha) * r_t.to(a.device), tb, mean, std, device, tap)
 
 
 def gate_edit(lo: np.ndarray, hi: np.ndarray, rep: np.ndarray, device):

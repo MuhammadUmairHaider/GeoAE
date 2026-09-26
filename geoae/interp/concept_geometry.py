@@ -116,8 +116,12 @@ def scatter_row(fig, axes, embs, y, classes, title_fmt, note):
     handles = [Line2D([], [], marker="o", ls="", ms=5, color=PAL[i % len(PAL)],
                       label=str(c)[:22]) for i, c in enumerate(classes)]
     fig.legend(handles=handles, loc="lower center", ncol=min(len(classes), 7),
-               frameon=False, fontsize=8, bbox_to_anchor=(0.5, -0.02))
-    fig.text(0.005, 0.985, note, fontsize=8, color="#5A646D", va="top")
+               frameon=False, fontsize=8, bbox_to_anchor=(0.5, 0.005))
+    fig.text(0.005, 0.995, note, fontsize=8, color="#5A646D", va="top")
+    # Reserve the strips the note and the legend live in. Without this the axes keep
+    # matplotlib's default top of 0.88, the two-line panel titles are drawn straight
+    # through the note, and the legend is anchored below the canvas edge.
+    fig.subplots_adjust(top=0.79, bottom=0.20, left=0.015, right=0.985, wspace=0.08)
 
 
 def do_rung(rung, cache, models, dev, outdir, n_points, perplexity, max_classes, want):
@@ -140,13 +144,18 @@ def do_rung(rung, cache, models, dev, outdir, n_points, perplexity, max_classes,
     # arbitrary rotation, scale and layout — so every panel is labelled with a
     # number that IS comparable. PCA-50 first so the score is measured in the same
     # way for a 3072-d baseline and a 6144-d latent.
+    # Sequence caches store integer labels as object arrays, which sklearn
+    # classifies as an unknown target type. Encode nominal IDs for the diagnostic
+    # while retaining the original labels for plot legends and return values.
+    class_index = {label: i for i, label in enumerate(classes)}
+    target = np.array([class_index[label] for label in y], dtype=np.int64)
     knn = {}
     for nm, R in reps:
         Rp = PCA(n_components=min(50, R.shape[1]), random_state=0).fit_transform(R)
         tr, te = train_test_split(np.arange(len(Rp)), test_size=0.4,
-                                  random_state=0, stratify=y)
-        km_ = KNeighborsClassifier(n_neighbors=10).fit(Rp[tr], y[tr])
-        knn[nm] = float(km_.score(Rp[te], y[te]))
+                                  random_state=0, stratify=target)
+        km_ = KNeighborsClassifier(n_neighbors=10).fit(Rp[tr], target[tr])
+        knn[nm] = float(km_.score(Rp[te], target[te]))
     order = sorted(knn, key=lambda k: -knn[k])
     print("[geo]   kNN-10 label agreement: " +
           "  ".join(f"{k} {knn[k]:.3f}" for k in order))

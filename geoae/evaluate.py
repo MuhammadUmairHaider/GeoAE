@@ -33,12 +33,14 @@ from geoae.hooks import SplicingHook  # noqa: F401
 from geoae.checkpoint import load_ae_checkpoint, load_lm
 
 
-def load_ae_from_checkpoint(ckpt_path: Path, device: torch.device) -> tuple[GeoAE, dict, dict]:
+def load_ae_from_checkpoint(ckpt_path: Path, device: torch.device,
+                            allow_token_bias: bool = False) -> tuple[GeoAE, dict, dict]:
     """
     Load GeoAE from a training checkpoint.
-    Returns (model, norm_params, cfg_dict).
+    Returns (model, norm_params, cfg_dict). See load_ae_checkpoint for allow_token_bias.
     """
-    model, norm_mean, norm_std, ckpt = load_ae_checkpoint(ckpt_path, device)
+    model, norm_mean, norm_std, ckpt = load_ae_checkpoint(ckpt_path, device,
+                                                          allow_token_bias=allow_token_bias)
     return model, {"mean": norm_mean, "std": norm_std}, ckpt["config"]
 
 

@@ -56,14 +56,23 @@ import torch
 # Metric helpers
 # ---------------------------------------------------------------------------
 
-def silhouette(z: np.ndarray, labels: np.ndarray, max_samples: int = 10_000) -> float:
+def silhouette(z: np.ndarray, labels: np.ndarray, max_samples: int = 10_000,
+               seed: int = 0) -> float:
+    """Silhouette on a seeded subsample.
+
+    Both draws here used to come from the unseeded global RNG — the subsample and
+    sklearn's own `sample_size` draw — so a run's numbers depended on how many
+    models had been encoded before it in the same process. Seeding both makes an
+    arm's value the same whatever position it holds in the run.
+    """
     from sklearn.metrics import silhouette_score
     if len(z) > max_samples:
-        idx = np.random.choice(len(z), max_samples, replace=False)
+        idx = np.random.default_rng(seed).choice(len(z), max_samples, replace=False)
         z, labels = z[idx], labels[idx]
     if len(set(labels)) < 2:
         return float("nan")
-    return float(silhouette_score(z, labels, metric="euclidean", sample_size=min(5000, len(z))))
+    return float(silhouette_score(z, labels, metric="euclidean",
+                                  sample_size=min(5000, len(z)), random_state=seed))
 
 
 def davies_bouldin(z: np.ndarray, labels: np.ndarray) -> float:
@@ -97,41 +106,32 @@ def calinski_harabasz(z: np.ndarray, labels: np.ndarray) -> float:
     return 1.0 if intra == 0.0 else float(extra * (n - k) / (intra * (k - 1.0)))
 
 
-def dunn_index(z: np.ndarray, labels: np.ndarray, max_samples: int = 5_000) -> float:
+def dunn_index(z: np.ndarray, labels: np.ndarray) -> float:
     """
-    Dunn index = min inter-cluster distance / max intra-cluster diameter.
-    Approximated on a subsample for speed.
+    Dunn index = min inter-centroid distance / max intra-cluster diameter,
+    with the diameter approximated as 2 x mean distance to the cluster mean.
+
+    Computed on ALL sampled rows, in one sorted pass. It used to run on an
+    unseeded 5k subsample, which at K=2000 left ~2.5 points per cluster: most
+    clusters got a diameter of 0 and the max came from whichever cluster happened
+    to draw several points. The same d3072 checkpoint scored 0.134 and 0.071 in
+    two runs over identical data (2026-09-20). Values from before that fix are
+    not comparable with values from after it.
     """
-    if len(z) > max_samples:
-        idx = np.random.choice(len(z), max_samples, replace=False)
-        z, labels = z[idx], labels[idx]
-    unique = np.unique(labels)
-    if len(unique) < 2:
+    uniq, inv, counts = np.unique(labels, return_inverse=True, return_counts=True)
+    if len(uniq) < 2:
         return float("nan")
 
-    # Per-cluster means and diameters
-    centroids = {k: z[labels == k].mean(axis=0) for k in unique if (labels == k).sum() > 0}
-    diameters = {}
-    for k in unique:
-        pts = z[labels == k]
-        if len(pts) < 2:
-            diameters[k] = 0.0
-        else:
-            # Approximate diameter as 2 * mean distance to centroid
-            dists = np.linalg.norm(pts - centroids[k], axis=1)
-            diameters[k] = float(2 * dists.mean())
+    order = np.argsort(inv, kind="stable")
+    centroids = np.empty((len(uniq), z.shape[1]), dtype=np.float64)
+    max_diam = 0.0
+    for i, idx in enumerate(np.split(order, np.cumsum(counts)[:-1])):
+        pts = z[idx].astype(np.float64)
+        centroids[i] = pts.mean(axis=0)
+        if len(pts) > 1:
+            max_diam = max(max_diam, 2.0 * float(np.linalg.norm(pts - centroids[i], axis=1).mean()))
 
-    max_diam = max(diameters.values()) if diameters else 1e-8
-
-    # Min inter-cluster centroid distance
-    keys = list(centroids.keys())
-    min_inter = float("inf")
-    for i in range(len(keys)):
-        for j in range(i + 1, len(keys)):
-            d = np.linalg.norm(centroids[keys[i]] - centroids[keys[j]])
-            if d < min_inter:
-                min_inter = d
-
+    _, min_inter, _ = inter_centroid_dist(centroids)
     return float(min_inter / max(max_diam, 1e-8))
 
 
@@ -272,6 +272,9 @@ def load_raw_baseline(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, str]:
     """Returns (latents, hard_labels, centroids, label_str)."""
     data = np.load(str(baseline_npz))
+    if "erase_U" in data.files or "token_bias" in data.files:
+        raise SystemExit(f"{baseline_npz} was fit in a token-erased space; clustering_quality "
+                         f"does not apply the projection.")
     centroids = data["centroids"]     # (K, D) normalised
     norm_mean = data["norm_mean"]
     norm_std  = data["norm_std"]
@@ -314,7 +317,7 @@ def load_ae_latents(
     Sinkhorn see identical inputs and every metric is unchanged.
     """
     from geoae.checkpoint import load_ae_checkpoint
-    ae, _, _, ckpt = load_ae_checkpoint(ckpt_path, device)
+    ae, _, _, ckpt = load_ae_checkpoint(ckpt_path, device, allow_token_bias=True)
     mc = ckpt["config"]["model"]
     nl = mc.get("nonlinearity", "linear")
 
@@ -334,6 +337,12 @@ def load_ae_latents(
     # the labels by construction and depend on batch composition. Q is still
     # used for the assignment-entropy diagnostic.
     batch = 4096
+    tok = None
+    if ae.has_token_bias:
+        tp = act_dir / "rows_tok.npy"
+        if not tp.exists():
+            raise SystemExit(f"{ckpt_path} is a token-bypass AE; {tp} is needed to encode {npy}")
+        tok = np.load(tp)[idx].astype(np.int64)
     n = len(idx)
     z = np.empty((n, mc["latent_dim"]), dtype=np.float32)
     labels = np.empty(n, dtype=np.int64)
@@ -341,7 +350,8 @@ def load_ae_latents(
     with torch.no_grad():
         for s in range(0, n, batch):
             x_np = (read_rows(npy, idx[s:s+batch]).astype(np.float32) - norm_mean) / norm_std
-            out = ae(torch.from_numpy(x_np).to(device))
+            t = None if tok is None else torch.from_numpy(tok[s:s+batch]).to(device)
+            out = ae(torch.from_numpy(x_np).to(device), t)
             e = s + len(x_np)
             z[s:e] = out.z.cpu().numpy()
             H[s:e] = row_entropy(out.Q.cpu().numpy())
@@ -386,10 +396,11 @@ def compute_metrics(
     Q: np.ndarray | None = None,
     functional: dict | None = None,
     assign_entropy: float | None = None,
+    seed: int = 0,
 ) -> dict:
     K = centroids.shape[0]
     print("    silhouette …", end=" ", flush=True)
-    sil = silhouette(z, labels)
+    sil = silhouette(z, labels, seed=seed)
     print(f"{sil:.4f}")
 
     print("    davies-bouldin …", end=" ", flush=True)
@@ -558,7 +569,7 @@ def main():
             label = args.names[ri]
         print(f"[quality] Computing metrics for: {label}")
         func = load_functional_metrics(results_paths[ri])
-        metrics = compute_metrics(z, labels, centroids, Q=None, functional=func)
+        metrics = compute_metrics(z, labels, centroids, Q=None, functional=func, seed=args.seed)
         all_labels.append(label)
         all_metrics.append(metrics)
         ri += 1
@@ -574,7 +585,7 @@ def main():
         print(f"[quality] Computing metrics for: {label}")
         func = load_functional_metrics(results_paths[ri])
         metrics = compute_metrics(z, labels, centroids, functional=func,
-                                  assign_entropy=float(H.mean()))
+                                  assign_entropy=float(H.mean()), seed=args.seed)
         # Free this model's 23 GB of latents BEFORE the next one is encoded;
         # rebinding `z` only releases it after the next load has finished.
         del z, labels, H
