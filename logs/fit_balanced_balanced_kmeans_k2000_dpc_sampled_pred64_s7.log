@@ -1,0 +1,18 @@
+[seed] seed=7 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[balanced-fit] AE norm from checkpoint (layer 27, meta-llama/Llama-3.2-3B)
+[balanced-fit] Sampling 1,500,000/10,000,000 activations and normalising …
+[balanced-fit] erased 64 token directions (e2e/checkpoints/general/llama3.2-3B/layer27/token_erasure_sampled_pred.npz)
+[balanced-fit] fitting on (1500000, 3072) (17.2 GB)
+[balanced-fit] density-peaks init on 32,768 points (density_power=1.0, knn=32) …
+[balanced-fit]   density pct of picks: 17th (pool median = 50th) | peaks: 2/2,000 | min sep: 0.15x typical
+[balanced-fit] 8 epochs x 366 steps, batch 4096
+  epoch 1: tau 0.888 | live 2000/2000 | top-10 share 8.5% | reinit so far 0
+  epoch 2: tau 0.775 | live 2000/2000 | top-10 share 8.5% | reinit so far 0
+  epoch 3: tau 0.663 | live 2000/2000 | top-10 share 8.6% | reinit so far 0
+  epoch 4: tau 0.550 | live 2000/2000 | top-10 share 8.7% | reinit so far 0
+  epoch 5: tau 0.438 | live 2000/2000 | top-10 share 8.7% | reinit so far 0
+  epoch 6: tau 0.325 | live 2000/2000 | top-10 share 8.8% | reinit so far 0
+  epoch 7: tau 0.213 | live 2000/2000 | top-10 share 8.8% | reinit so far 0
+  epoch 8: tau 0.100 | live 2000/2000 | top-10 share 8.9% | reinit so far 0
+[balanced-fit] Final on a 1,000,000-token probe: 2000/2000 live, top-10 share 9.0%
+[balanced-fit] Saved -> e2e/checkpoints/general/llama3.2-3B/layer27/balanced_kmeans_k2000_dpc_sampled_pred64_s7.npz

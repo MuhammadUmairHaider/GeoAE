@@ -1,0 +1,240 @@
+==========================================================================
+  L27 d6144 dpc — DATA ABLATION: old dump (prefix, 5-way) vs new dump (sampled)
+==========================================================================
+
+PROVENANCE — which file each column comes from
+--------------------------------------------------------------------------
+  d6144_old:
+    mmlu         ok  eval_out/mmlu_gelu50.json
+    cq           MISSING —
+    probe        ok  eval_out/probe_d6144_sampled.json
+    steer_db14   ok  results/steer_db14_d6144_50.json
+    range_db14   ok  results/range_intervention_db14_d6144_50_dprime.json
+    range_bios   ok  results/range_intervention_biasbios_d6144_50_dprime.json
+  d6144_new:
+    mmlu         ok  eval_out/mmlu_d6144_sampled.json
+    cq           MISSING —
+    probe        ok  eval_out/probe_d6144_sampled.json
+    steer_db14   ok  results/steer_db14_d6144_sampled.json
+    range_db14   ok  results/range_intervention_db14_d6144_sampled_dprime.json
+    range_bios   ok  results/range_intervention_biasbios_d6144_sampled_dprime.json
+
+RECONSTRUCTION COST — MMLU under the AE round-trip (n=2000, higher delta better)
+--------------------------------------------------------------------------------
+                             d6144_old d6144_new
+  base acc                      0.5620    0.5620
+  recon acc                     0.5355    0.5390
+  delta (recon - base)         -0.0265   -0.0230
+
+CONCEPT PROBE — cluster-label NMI per rung (up is better)
+--------------------------------------------------------------------------
+                                km_old    km_new d6144_old d6144_new
+  surface                       0.2371    0.2387    0.2691    0.2598
+  pos_coarse                    0.3453    0.3539    0.4180    0.4165
+  pos_fine                      0.3921    0.4048    0.4654    0.4660
+  ner_coarse                    0.1326    0.1341    0.1525    0.1488
+  ner_fine                      0.1606    0.1626    0.1799    0.1756
+  sentiment                     0.0030    0.0024    0.0052    0.0035
+  sentiment_long                0.0449    0.0534    0.0536    0.0648
+  subjectivity                  0.0333    0.0405    0.0618    0.0488
+  formality                     0.1302    0.1165    0.1193    0.1212
+  atlas_doc                     0.3384    0.3854    0.3124    0.3362
+  atlas_tone                    0.2705    0.3239    0.2507    0.2935
+  atlas_content                 0.3048    0.3673    0.2790    0.3166
+  language                      0.6331    0.6379    0.6700    0.5846
+  domain                        0.3397    0.3477    0.3229    0.3363
+  topic4                        0.0910    0.0875    0.1004    0.0867
+  topic14                       0.4183    0.4862    0.4430    0.3503
+  topic20                       0.2705    0.2710    0.2705    0.2777
+  ravel_country                 0.2524    0.3743    0.1956    0.2790
+  ravel_continent               0.1317    0.1918    0.0922    0.1417
+  ravel_language                0.2028    0.3338    0.1597    0.2240
+  ioi_role                      0.3994    0.3746    0.3585    0.4268
+  ioi_name                      0.1341    0.1608    0.1995    0.2047
+  MEAN over rungs               0.2394    0.2659    0.2445    0.2529
+
+>>> clustering quality measured on the NEW dump (activations_sampled_10M): eval_out/cq_d6144_sampled_newdump.json
+
+CLUSTERING QUALITY — 1M diverse tokens, seed 0 (scale-free metrics first)
+--------------------------------------------------------------------------
+  NB dunn is approximated on an UNSEEDED 5k subsample and is a min/max statistic:
+  it moved 0.134 -> 0.071 for the SAME d3072 checkpoint between two runs. Do not
+  read the dunn row. Silhouette (10k, averaged) is stable to ~0.0006.
+                                km_old    km_new d6144_old d6144_new
+  silhouette  (up)                   —   -0.0334    0.0229    0.0276
+  dunn  (up)                         —  0.040461  0.053656  0.053646
+  calinski-harabasz  (up)            —     199.8     876.2     803.2
+  davies-bouldin  (down)             —    4.5885    3.0142    3.1392
+  separability ratio  (up)           —   50.6418  174.4821  166.0395
+  min centroid dist  (up)            —    7.9144    9.4888    8.9776
+  intra-cluster var  (down)          —    0.7401    0.2751    0.2864
+  effective rank  (up)               —    161.22    216.67    196.71
+  effective K  (up)                  —      1997      1762      1999
+  empty clusters  (down)             —         0         0         0
+  balance H  (up)                    —    0.9689    0.9213    0.9671
+
+>>> clustering quality measured on the OLD dump (activations_diverse_10M): eval_out/cq_d6144_sampled_olddump.json
+
+CLUSTERING QUALITY — 1M diverse tokens, seed 0 (scale-free metrics first)
+--------------------------------------------------------------------------
+  NB dunn is approximated on an UNSEEDED 5k subsample and is a min/max statistic:
+  it moved 0.134 -> 0.071 for the SAME d3072 checkpoint between two runs. Do not
+  read the dunn row. Silhouette (10k, averaged) is stable to ~0.0006.
+                                km_old    km_new d6144_old d6144_new
+  silhouette  (up)             -0.0335         —    0.0337    0.0314
+  dunn  (up)                  0.036189         —  0.054515  0.051213
+  calinski-harabasz  (up)        225.7         —     856.5     841.3
+  davies-bouldin  (down)        4.3334         —    2.9706    3.1430
+  separability ratio  (up)     54.3692         —  175.6556  164.2130
+  min centroid dist  (up)       7.1187         —    9.4888    8.9776
+  intra-cluster var  (down)     0.7085         —    0.2745    0.2899
+  effective rank  (up)          159.91         —    216.67    195.87
+  effective K  (up)               1999         —      1997      1822
+  empty clusters  (down)             0         —         0         9
+  balance H  (up)               0.9667         —    0.9662    0.9312
+
+DB14 STEERING — paired z - h selectivity per alpha (NEGATIVE = AE better; * = p<.05)
+------------------------------------------------------------------------------------
+  NB steer selectivity is tgt_acc_delta - comp_acc_delta, both negative, so a MORE
+  NEGATIVE value is the cleaner steer. This is the opposite sign convention to the
+  range-intervention tables below (tgt_drop - comp_drop, higher better).
+                            d6144_old   d6144_new   
+  alpha 0.5                 -0.0275     -0.0150     
+  alpha 1.0                 -0.0384  *  -0.0511 **  
+  alpha 2.0                 -0.0116     -0.0277 **  
+  alpha 4.0                 -0.0286     -0.0250     
+  alpha 8.0                 -0.0054     -0.0009     
+  n concepts                14          14          
+
+RANGE INTERVENTIONS — DB14 (d' saliency, tao 2.0)
+--------------------------------------------------------------------------
+
+  z - h selectivity, paired over concepts (up = AE better; * p<.05 ** .01 *** .001)
+                            d6144_old         d6144_new         
+  rm_full_comp              +0.051     8/14   +0.010     8/14   
+  rm_full_zero              -0.365 **  3/14   -0.388 **  2/14   
+  rm_range_comp             +0.042     9/14   +0.012     7/14   
+  rm_range_zero             +0.075     7/14   +0.088     6/14   
+  st_global_a0.5            +0.033     8/14   +0.012     8/14   
+  st_global_a1.0            +0.037  *  9/14   +0.056 ** 11/14   
+  st_global_a2.0            +0.011     5/14   +0.027 ** 11/14   
+  st_range_a0.5             -0.051     8/14   +0.016     7/14   
+  st_range_a1.0             +0.069    11/14   +0.027    10/14   
+  st_range_a2.0             +0.035     7/14   +0.068  * 12/14   
+  st_salient_a0.5           -0.062     8/14   -0.015     6/14   
+  st_salient_a1.0           +0.013     6/14   +0.014     6/14   
+  st_salient_a2.0           +0.011     6/14   +0.009     8/14   
+  st_transport_a0.5         -0.042     8/14   +0.010     7/14   
+  st_transport_a1.0         +0.062     9/14   +0.045    10/14   
+  st_transport_a2.0         +0.052  * 10/14   +0.061  * 12/14   
+
+  collateral at MATCHED erasure, comp_drop(z) - comp_drop(h)  (NEGATIVE = AE better)
+                            d6144_old         d6144_new         
+  st_global                 -0.011     5/14   -0.027 ** 11/14   
+  st_salient                -0.011     6/14   -0.009     8/14   
+  st_range                  -0.035     7/14   -0.068  * 12/14   
+  st_transport              -0.053  * 10/14   -0.065  * 12/14   
+
+  target drop / collateral drop at the operator's own setting (h -> z)
+                            d6144_old               d6144_new               
+  rm_full_comp              0.90/0.39→0.89/0.33     0.91/0.38→0.88/0.35     
+  rm_full_zero              0.80/0.25→0.92/0.73     0.85/0.23→1.00/0.77     
+  rm_range_comp             0.87/0.18→0.88/0.15     0.89/0.18→0.87/0.14     
+  rm_range_zero             0.78/0.16→0.90/0.21     0.82/0.17→0.98/0.25     
+  st_global_a0.5            0.73/0.23→0.73/0.19     0.75/0.20→0.73/0.17     
+  st_global_a1.0            0.96/0.39→0.96/0.35     0.97/0.39→0.96/0.33     
+  st_global_a2.0            1.00/0.60→1.00/0.59     1.00/0.62→1.00/0.59     
+  st_range_a0.5             0.63/0.12→0.55/0.09     0.64/0.11→0.64/0.09     
+  st_range_a1.0             0.87/0.25→0.88/0.19     0.88/0.23→0.86/0.18     
+  st_range_a2.0             1.00/0.44→1.00/0.40     1.00/0.44→1.00/0.37     
+  st_salient_a0.5           0.66/0.18→0.58/0.16     0.68/0.15→0.66/0.14     
+  st_salient_a1.0           0.89/0.31→0.88/0.29     0.89/0.29→0.87/0.26     
+  st_salient_a2.0           1.00/0.53→1.00/0.52     1.00/0.51→1.00/0.50     
+  st_transport_a0.5         0.64/0.14→0.57/0.11     0.65/0.13→0.64/0.10     
+  st_transport_a1.0         0.86/0.30→0.84/0.22     0.87/0.27→0.85/0.21     
+  st_transport_a2.0         1.00/0.49→1.00/0.44     1.00/0.47→1.00/0.41     
+
+RANGE INTERVENTIONS — bias_in_bios (d' saliency, tao 2.0)
+--------------------------------------------------------------------------
+
+  z - h selectivity, paired over concepts (up = AE better; * p<.05 ** .01 *** .001)
+                            d6144_old         d6144_new         
+  rm_full_comp              -0.132***  1/27   -0.191***  2/27   
+  rm_full_zero              -0.375***  3/27   -0.528***  2/27   
+  rm_range_comp             -0.037  *  9/27   -0.035     8/27   
+  rm_range_zero             -0.082     7/27   -0.125  *  4/27   
+  st_global_a1.0            -0.011    10/27   -0.054 **  6/27   
+  st_global_a2.0            -0.019  *  6/27   +0.002    14/27   
+  st_range_a1.0             -0.022     9/27   -0.037     8/27   
+  st_range_a2.0             -0.032  *  8/27   -0.064***  5/27   
+  st_salient_a1.0           -0.012    11/27   -0.009    11/27   
+  st_salient_a2.0           -0.049***  7/27   -0.051***  3/27   
+  st_transport_a1.0         -0.014    15/27   -0.033     8/27   
+  st_transport_a2.0         -0.028  *  7/27   -0.055 **  6/27   
+
+  collateral at MATCHED erasure, comp_drop(z) - comp_drop(h)  (NEGATIVE = AE better)
+                            d6144_old         d6144_new         
+  st_global                 +0.019  *  6/27   -0.002    14/27   
+  st_salient                +0.049***  7/27   +0.053***  3/27   
+  st_range                  +0.033  *  7/27   +0.065***  5/27   
+  st_transport              +0.028  *  7/27   +0.055 **  6/27   
+
+  target drop / collateral drop at the operator's own setting (h -> z)
+                            d6144_old               d6144_new               
+  rm_full_comp              0.93/0.28→0.91/0.40     0.93/0.26→0.91/0.42     
+  rm_full_zero              0.90/0.26→0.97/0.71     0.91/0.24→0.92/0.78     
+  rm_range_comp             0.89/0.10→0.88/0.13     0.89/0.09→0.90/0.13     
+  rm_range_zero             0.85/0.13→0.90/0.27     0.86/0.11→0.90/0.28     
+  st_global_a1.0            0.97/0.20→0.97/0.21     0.98/0.20→0.95/0.23     
+  st_global_a2.0            1.00/0.47→1.00/0.49     1.00/0.48→1.00/0.47     
+  st_range_a1.0             0.87/0.13→0.86/0.14     0.87/0.11→0.89/0.16     
+  st_range_a2.0             1.00/0.33→1.00/0.36     1.00/0.32→1.00/0.38     
+  st_salient_a1.0           0.89/0.15→0.90/0.17     0.90/0.15→0.92/0.18     
+  st_salient_a2.0           1.00/0.35→1.00/0.40     1.00/0.35→1.00/0.41     
+  st_transport_a1.0         0.86/0.15→0.85/0.15     0.86/0.13→0.88/0.18     
+  st_transport_a2.0         1.00/0.39→1.00/0.42     1.00/0.37→1.00/0.42     
+
+PER-CONCEPT RELIABILITY — do per-concept effects replicate across arms?
+--------------------------------------------------------------------------
+  Binomial SE of ONE concept's z-h at n_eval=50 / n_comp=80: ~0.095 — the size of
+  the effects themselves, so only dataset-level means are interpretable.
+
+  DBpedia-14: n = 14 concepts — pairwise Spearman rho across runs
+  quantity                  d6144_old~d6144_new
+  h rm_range_comp                        +0.83
+  z rm_range_comp                        +0.72
+  h transport a1                         +0.95
+  z transport a1                         +0.84
+  z-h transport a1                       +0.33
+  ^ the base-side (h) rows replicate; the z-h differences are the ones that do not.
+
+  bias_in_bios: n = 27 concepts — pairwise Spearman rho across runs
+  quantity                  d6144_old~d6144_new
+  h rm_range_comp                        +0.88
+  z rm_range_comp                        +0.68
+  h transport a1                         +0.92
+  z transport a1                         +0.77
+  z-h transport a1                       +0.27
+  ^ the base-side (h) rows replicate; the z-h differences are the ones that do not.
+
+EFFECT SIZE vs SPREAD — mean |z-h| over all operators against its per-concept SD
+--------------------------------------------------------------------------------
+  dataset       arm         mean |z-h|   mean SD  effect/spread
+  DBpedia-14    d6144_old        0.063     0.153           0.41
+  DBpedia-14    d6144_new        0.054     0.124           0.43
+  bias_in_bios  d6144_old        0.068     0.105           0.65
+  bias_in_bios  d6144_new        0.099     0.133           0.74
+
+BASE-QUALITY MODERATION — st_transport_a1.0 (is a narrow latent a regulariser?)
+-------------------------------------------------------------------------------
+  x = that concept's BASE (h) rm_range_comp selectivity, averaged over the OTHER arms'
+      runs, so the moderator shares no noise with the y it explains.
+  y = z - h selectivity (positive = AE better). Negative rho = the AE helps where the
+      base is weak and hurts where it is strong.
+
+  arm          n     rho        p   terciles weak->strong          within DB14     within bios
+  d6144_old   41   -0.06   0.6947   +0.010 / +0.053 / -0.031      +0.16 (0.58)    -0.04 (0.83)
+  d6144_new   41   -0.02   0.9007   -0.029 / +0.026 / -0.017      +0.47 (0.09)    -0.06 (0.76)
+
+  number control: eval_out/number_d6144_sampled_review.json (old arm: eval_out/number_control_review.json)
+

@@ -1,0 +1,842 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[range] LM=meta-llama/Llama-3.2-3B layer=27 saliency=dprime tao=2.0
+[eval] Splice sanity check PASSED (max logit diff = 0.00e+00)
+[range] Wiki slice (ppl texts + wiki-mean replacement) …
+[range] Loading biasbios test split …
+[range] Building joint base+recon correct set …
+[range] Finding joint-correct predictions for class 0 (accountant) ...
+  Found 130 joint-correct docs for class 0
+[range] Finding joint-correct predictions for class 1 (architect) ...
+  Found 130 joint-correct docs for class 1
+[range] Finding joint-correct predictions for class 2 (attorney) ...
+  Found 130 joint-correct docs for class 2
+[range] Finding joint-correct predictions for class 3 (chiropractor) ...
+  Found 130 joint-correct docs for class 3
+[range] Finding joint-correct predictions for class 4 (comedian) ...
+  Found 130 joint-correct docs for class 4
+[range] Finding joint-correct predictions for class 5 (composer) ...
+  Found 130 joint-correct docs for class 5
+[range] Finding joint-correct predictions for class 6 (dentist) ...
+  Found 130 joint-correct docs for class 6
+[range] Finding joint-correct predictions for class 7 (dietitian) ...
+  Found 130 joint-correct docs for class 7
+[range] Finding joint-correct predictions for class 8 (dj) ...
+  Found 100 joint-correct docs for class 8
+[range] Finding joint-correct predictions for class 9 (filmmaker) ...
+  Found 130 joint-correct docs for class 9
+[range] Finding joint-correct predictions for class 10 (interior_designer) ...
+  Found 130 joint-correct docs for class 10
+[range] Finding joint-correct predictions for class 11 (journalist) ...
+  Found 130 joint-correct docs for class 11
+[range] Finding joint-correct predictions for class 12 (model) ...
+  Found 130 joint-correct docs for class 12
+[range] Finding joint-correct predictions for class 13 (nurse) ...
+  Found 130 joint-correct docs for class 13
+[range] Finding joint-correct predictions for class 14 (painter) ...
+  Found 130 joint-correct docs for class 14
+[range] Finding joint-correct predictions for class 15 (paralegal) ...
+  Found 130 joint-correct docs for class 15
+[range] Finding joint-correct predictions for class 16 (pastor) ...
+  Found 130 joint-correct docs for class 16
+[range] Finding joint-correct predictions for class 17 (personal_trainer) ...
+  Found 130 joint-correct docs for class 17
+[range] Finding joint-correct predictions for class 18 (photographer) ...
+  Found 130 joint-correct docs for class 18
+[range] Finding joint-correct predictions for class 19 (physician) ...
+  Found 130 joint-correct docs for class 19
+[range] Finding joint-correct predictions for class 20 (poet) ...
+  Found 130 joint-correct docs for class 20
+[range] Finding joint-correct predictions for class 21 (professor) ...
+  Found 130 joint-correct docs for class 21
+[range] Finding joint-correct predictions for class 22 (psychologist) ...
+  Found 130 joint-correct docs for class 22
+[range] Finding joint-correct predictions for class 23 (rapper) ...
+  Found 130 joint-correct docs for class 23
+[range] Finding joint-correct predictions for class 24 (software_engineer) ...
+  Found 130 joint-correct docs for class 24
+[range] Finding joint-correct predictions for class 25 (surgeon) ...
+  Found 130 joint-correct docs for class 25
+[range] Finding joint-correct predictions for class 27 (yoga_teacher) ...
+  Found 130 joint-correct docs for class 27
+[range] joint-correct: 3480 docs (min/class=0, prompt_sha=5d95d8b7ca94, model=meta-llama/Llama-3.2-3B, ae=e9dc9b5c05fe) -> dbpedia/joint_correct_biasbios_l27_d6144_tokbias.json
+[range] WARNING: class 26 has only 0 joint-correct docs; results will be noisy.
+[range] Fit pass: capturing h for 2140 docs …
+[range] Fit pass: 2137/2140 still predicted correctly
+[range] Clean + AE-recon eval over 1340 docs …
+[range] Re-filtered eval: 1340 -> 1336 jointly-correct docs
+[range] base acc=1.000 ppl=5.79 | AE-recon acc=1.000 ppl=6.04
+
+=== concept 0 (accountant)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.938 vs others 0.478
+  h rm_range_zero        tgt 0.00 comp 0.94  sel +0.938  ppl 6.05 (+0.26)
+  h rm_range_comp        tgt 0.00 comp 0.93  sel +0.925  ppl 6.05 (+0.26)
+  h rm_full_zero         tgt 0.00 comp 0.81  sel +0.812  ppl 7.64 (+1.85)
+  h rm_full_comp         tgt 0.00 comp 0.74  sel +0.738  ppl 14.60 (+8.81)
+  h st_global_a1.0       tgt 0.00 comp 0.60  sel +0.600  ppl 6.63 (+0.84)
+  h st_salient_a1.0      tgt 0.00 comp 0.74  sel +0.738  ppl 6.45 (+0.67)
+  h st_range_a1.0        tgt 0.00 comp 0.85  sel +0.850  ppl 6.01 (+0.23)
+  h st_transport_a1.0    tgt 0.00 comp 0.82  sel +0.825  ppl 6.06 (+0.27)
+  h st_global_a2.0       tgt 0.00 comp 0.15  sel +0.150  ppl 13.80 (+8.01)
+  h st_salient_a2.0      tgt 0.00 comp 0.33  sel +0.325  ppl 10.23 (+4.45)
+  h st_range_a2.0        tgt 0.00 comp 0.51  sel +0.512  ppl 6.89 (+1.11)
+  h st_transport_a2.0    tgt 0.00 comp 0.46  sel +0.463  ppl 7.13 (+1.34)
+  [z] 1843 salient dims; range fires on target 0.944 vs others 0.534
+  z rm_range_zero        tgt 0.00 comp 0.66  sel +0.662  ppl 7.20 (+1.16)
+  z rm_range_comp        tgt 0.00 comp 0.90  sel +0.900  ppl 6.67 (+0.63)
+  z rm_full_zero         tgt 0.00 comp 0.03  sel +0.025  ppl 16.74 (+10.70)
+  z rm_full_comp         tgt 0.00 comp 0.71  sel +0.713  ppl 30.59 (+24.55)
+  z st_global_a1.0       tgt 0.00 comp 0.61  sel +0.613  ppl 6.87 (+0.82)
+  z st_salient_a1.0      tgt 0.00 comp 0.72  sel +0.725  ppl 6.65 (+0.61)
+  z st_range_a1.0        tgt 0.00 comp 0.84  sel +0.838  ppl 6.50 (+0.46)
+  z st_transport_a1.0    tgt 0.00 comp 0.82  sel +0.825  ppl 6.45 (+0.41)
+  z st_global_a2.0       tgt 0.00 comp 0.14  sel +0.137  ppl 12.74 (+6.70)
+  z st_salient_a2.0      tgt 0.00 comp 0.19  sel +0.188  ppl 10.20 (+4.15)
+  z st_range_a2.0        tgt 0.00 comp 0.47  sel +0.475  ppl 7.69 (+1.65)
+  z st_transport_a2.0    tgt 0.00 comp 0.40  sel +0.400  ppl 7.59 (+1.55)
+
+=== concept 1 (architect)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.955 vs others 0.519
+  h rm_range_zero        tgt 0.00 comp 0.89  sel +0.887  ppl 6.07 (+0.28)
+  h rm_range_comp        tgt 0.00 comp 0.93  sel +0.925  ppl 5.99 (+0.21)
+  h rm_full_zero         tgt 0.00 comp 0.81  sel +0.812  ppl 7.73 (+1.95)
+  h rm_full_comp         tgt 0.00 comp 0.71  sel +0.713  ppl 12.88 (+7.09)
+  h st_global_a1.0       tgt 0.00 comp 0.71  sel +0.713  ppl 6.72 (+0.93)
+  h st_salient_a1.0      tgt 0.00 comp 0.79  sel +0.787  ppl 6.45 (+0.66)
+  h st_range_a1.0        tgt 0.00 comp 0.86  sel +0.863  ppl 5.97 (+0.19)
+  h st_transport_a1.0    tgt 0.00 comp 0.80  sel +0.800  ppl 6.02 (+0.23)
+  h st_global_a2.0       tgt 0.00 comp 0.50  sel +0.500  ppl 12.26 (+6.48)
+  h st_salient_a2.0      tgt 0.00 comp 0.61  sel +0.613  ppl 9.54 (+3.76)
+  h st_range_a2.0        tgt 0.00 comp 0.65  sel +0.650  ppl 6.65 (+0.86)
+  h st_transport_a2.0    tgt 0.00 comp 0.55  sel +0.550  ppl 6.90 (+1.11)
+  [z] 1843 salient dims; range fires on target 0.955 vs others 0.539
+  z rm_range_zero        tgt 0.00 comp 0.66  sel +0.662  ppl 7.05 (+1.01)
+  z rm_range_comp        tgt 0.00 comp 0.86  sel +0.863  ppl 6.62 (+0.58)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 15.72 (+9.68)
+  z rm_full_comp         tgt 0.00 comp 0.76  sel +0.762  ppl 37.33 (+31.29)
+  z st_global_a1.0       tgt 0.00 comp 0.72  sel +0.725  ppl 6.79 (+0.75)
+  z st_salient_a1.0      tgt 0.00 comp 0.80  sel +0.800  ppl 6.62 (+0.58)
+  z st_range_a1.0        tgt 0.00 comp 0.85  sel +0.850  ppl 6.49 (+0.45)
+  z st_transport_a1.0    tgt 0.00 comp 0.82  sel +0.825  ppl 6.48 (+0.43)
+  z st_global_a2.0       tgt 0.00 comp 0.50  sel +0.500  ppl 11.31 (+5.27)
+  z st_salient_a2.0      tgt 0.00 comp 0.53  sel +0.525  ppl 9.25 (+3.20)
+  z st_range_a2.0        tgt 0.00 comp 0.65  sel +0.650  ppl 7.56 (+1.52)
+  z st_transport_a2.0    tgt 0.00 comp 0.55  sel +0.550  ppl 7.58 (+1.54)
+
+=== concept 2 (attorney)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.957 vs others 0.595
+  h rm_range_zero        tgt 0.00 comp 0.86  sel +0.863  ppl 6.10 (+0.31)
+  h rm_range_comp        tgt 0.14 comp 0.90  sel +0.760  ppl 6.02 (+0.24)
+  h rm_full_zero         tgt 0.00 comp 0.86  sel +0.863  ppl 7.67 (+1.88)
+  h rm_full_comp         tgt 0.08 comp 0.76  sel +0.682  ppl 12.32 (+6.53)
+  h st_global_a1.0       tgt 0.02 comp 0.79  sel +0.767  ppl 6.47 (+0.68)
+  h st_salient_a1.0      tgt 0.26 comp 0.84  sel +0.578  ppl 6.30 (+0.51)
+  h st_range_a1.0        tgt 0.28 comp 0.91  sel +0.632  ppl 5.98 (+0.19)
+  h st_transport_a1.0    tgt 0.32 comp 0.84  sel +0.517  ppl 6.01 (+0.23)
+  h st_global_a2.0       tgt 0.00 comp 0.45  sel +0.450  ppl 10.01 (+4.22)
+  h st_salient_a2.0      tgt 0.00 comp 0.57  sel +0.575  ppl 8.45 (+2.66)
+  h st_range_a2.0        tgt 0.00 comp 0.61  sel +0.613  ppl 6.66 (+0.88)
+  h st_transport_a2.0    tgt 0.00 comp 0.53  sel +0.525  ppl 6.85 (+1.07)
+  [z] 1843 salient dims; range fires on target 0.960 vs others 0.619
+  z rm_range_zero        tgt 0.00 comp 0.84  sel +0.838  ppl 7.22 (+1.18)
+  z rm_range_comp        tgt 0.04 comp 0.90  sel +0.860  ppl 6.46 (+0.42)
+  z rm_full_zero         tgt 0.00 comp 0.17  sel +0.175  ppl 16.98 (+10.94)
+  z rm_full_comp         tgt 0.00 comp 0.09  sel +0.088  ppl 26.95 (+20.91)
+  z st_global_a1.0       tgt 0.00 comp 0.79  sel +0.787  ppl 6.66 (+0.62)
+  z st_salient_a1.0      tgt 0.20 comp 0.88  sel +0.675  ppl 6.49 (+0.45)
+  z st_range_a1.0        tgt 0.20 comp 0.88  sel +0.675  ppl 6.38 (+0.34)
+  z st_transport_a1.0    tgt 0.24 comp 0.86  sel +0.623  ppl 6.36 (+0.32)
+  z st_global_a2.0       tgt 0.00 comp 0.50  sel +0.500  ppl 9.87 (+3.83)
+  z st_salient_a2.0      tgt 0.00 comp 0.66  sel +0.662  ppl 8.55 (+2.51)
+  z st_range_a2.0        tgt 0.00 comp 0.66  sel +0.662  ppl 7.24 (+1.20)
+  z st_transport_a2.0    tgt 0.00 comp 0.65  sel +0.650  ppl 7.26 (+1.22)
+
+=== concept 3 (chiropractor)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.949 vs others 0.394
+  h rm_range_zero        tgt 0.06 comp 0.89  sel +0.827  ppl 5.99 (+0.20)
+  h rm_range_comp        tgt 0.08 comp 0.91  sel +0.833  ppl 5.91 (+0.12)
+  h rm_full_zero         tgt 0.02 comp 0.71  sel +0.693  ppl 7.41 (+1.63)
+  h rm_full_comp         tgt 0.02 comp 0.68  sel +0.655  ppl 19.30 (+13.51)
+  h st_global_a1.0       tgt 0.00 comp 0.71  sel +0.713  ppl 6.47 (+0.69)
+  h st_salient_a1.0      tgt 0.06 comp 0.81  sel +0.752  ppl 6.30 (+0.51)
+  h st_range_a1.0        tgt 0.08 comp 0.85  sel +0.770  ppl 5.91 (+0.12)
+  h st_transport_a1.0    tgt 0.14 comp 0.82  sel +0.685  ppl 5.97 (+0.19)
+  h st_global_a2.0       tgt 0.00 comp 0.47  sel +0.475  ppl 10.22 (+4.43)
+  h st_salient_a2.0      tgt 0.00 comp 0.56  sel +0.562  ppl 8.48 (+2.70)
+  h st_range_a2.0        tgt 0.00 comp 0.62  sel +0.625  ppl 6.39 (+0.60)
+  h st_transport_a2.0    tgt 0.00 comp 0.55  sel +0.550  ppl 6.66 (+0.87)
+  [z] 1843 salient dims; range fires on target 0.947 vs others 0.421
+  z rm_range_zero        tgt 0.00 comp 0.69  sel +0.688  ppl 6.78 (+0.74)
+  z rm_range_comp        tgt 0.04 comp 0.94  sel +0.897  ppl 6.27 (+0.23)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 20.08 (+14.04)
+  z rm_full_comp         tgt 0.02 comp 0.60  sel +0.580  ppl 25.43 (+19.39)
+  z st_global_a1.0       tgt 0.00 comp 0.80  sel +0.800  ppl 6.64 (+0.60)
+  z st_salient_a1.0      tgt 0.08 comp 0.85  sel +0.770  ppl 6.51 (+0.47)
+  z st_range_a1.0        tgt 0.12 comp 0.91  sel +0.792  ppl 6.22 (+0.18)
+  z st_transport_a1.0    tgt 0.18 comp 0.89  sel +0.708  ppl 6.25 (+0.21)
+  z st_global_a2.0       tgt 0.00 comp 0.51  sel +0.512  ppl 9.86 (+3.82)
+  z st_salient_a2.0      tgt 0.00 comp 0.57  sel +0.575  ppl 8.84 (+2.80)
+  z st_range_a2.0        tgt 0.00 comp 0.78  sel +0.775  ppl 6.74 (+0.70)
+  z st_transport_a2.0    tgt 0.00 comp 0.72  sel +0.725  ppl 6.92 (+0.88)
+
+=== concept 4 (comedian)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.936 vs others 0.436
+  h rm_range_zero        tgt 0.34 comp 0.88  sel +0.535  ppl 6.04 (+0.25)
+  h rm_range_comp        tgt 0.04 comp 0.93  sel +0.885  ppl 5.99 (+0.21)
+  h rm_full_zero         tgt 0.26 comp 0.68  sel +0.415  ppl 7.80 (+2.01)
+  h rm_full_comp         tgt 0.04 comp 0.81  sel +0.772  ppl 15.46 (+9.68)
+  h st_global_a1.0       tgt 0.02 comp 0.78  sel +0.755  ppl 6.70 (+0.92)
+  h st_salient_a1.0      tgt 0.08 comp 0.84  sel +0.758  ppl 6.43 (+0.64)
+  h st_range_a1.0        tgt 0.10 comp 0.86  sel +0.763  ppl 5.97 (+0.18)
+  h st_transport_a1.0    tgt 0.22 comp 0.80  sel +0.580  ppl 6.02 (+0.23)
+  h st_global_a2.0       tgt 0.00 comp 0.47  sel +0.475  ppl 12.40 (+6.61)
+  h st_salient_a2.0      tgt 0.00 comp 0.57  sel +0.575  ppl 9.77 (+3.98)
+  h st_range_a2.0        tgt 0.00 comp 0.65  sel +0.650  ppl 6.69 (+0.90)
+  h st_transport_a2.0    tgt 0.00 comp 0.59  sel +0.588  ppl 6.96 (+1.17)
+  [z] 1843 salient dims; range fires on target 0.941 vs others 0.483
+  z rm_range_zero        tgt 0.00 comp 0.74  sel +0.738  ppl 7.02 (+0.98)
+  z rm_range_comp        tgt 0.18 comp 0.90  sel +0.720  ppl 6.47 (+0.43)
+  z rm_full_zero         tgt 0.00 comp 0.04  sel +0.037  ppl 20.03 (+13.99)
+  z rm_full_comp         tgt 0.08 comp 0.70  sel +0.620  ppl 28.31 (+22.26)
+  z st_global_a1.0       tgt 0.04 comp 0.71  sel +0.672  ppl 6.81 (+0.77)
+  z st_salient_a1.0      tgt 0.14 comp 0.79  sel +0.647  ppl 6.73 (+0.69)
+  z st_range_a1.0        tgt 0.16 comp 0.89  sel +0.727  ppl 6.38 (+0.34)
+  z st_transport_a1.0    tgt 0.22 comp 0.85  sel +0.630  ppl 6.41 (+0.37)
+  z st_global_a2.0       tgt 0.00 comp 0.45  sel +0.450  ppl 10.89 (+4.84)
+  z st_salient_a2.0      tgt 0.00 comp 0.45  sel +0.450  ppl 10.01 (+3.97)
+  z st_range_a2.0        tgt 0.00 comp 0.53  sel +0.525  ppl 7.32 (+1.28)
+  z st_transport_a2.0    tgt 0.00 comp 0.49  sel +0.488  ppl 7.54 (+1.50)
+
+=== concept 5 (composer)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.961 vs others 0.616
+  h rm_range_zero        tgt 0.00 comp 0.91  sel +0.912  ppl 6.10 (+0.32)
+  h rm_range_comp        tgt 0.00 comp 0.95  sel +0.950  ppl 5.99 (+0.21)
+  h rm_full_zero         tgt 0.00 comp 0.70  sel +0.700  ppl 7.49 (+1.70)
+  h rm_full_comp         tgt 0.00 comp 0.79  sel +0.787  ppl 16.40 (+10.61)
+  h st_global_a1.0       tgt 0.00 comp 0.89  sel +0.887  ppl 6.45 (+0.66)
+  h st_salient_a1.0      tgt 0.02 comp 0.94  sel +0.917  ppl 6.24 (+0.45)
+  h st_range_a1.0        tgt 0.02 comp 0.93  sel +0.905  ppl 5.94 (+0.15)
+  h st_transport_a1.0    tgt 0.04 comp 0.91  sel +0.872  ppl 5.98 (+0.20)
+  h st_global_a2.0       tgt 0.00 comp 0.65  sel +0.650  ppl 9.36 (+3.57)
+  h st_salient_a2.0      tgt 0.00 comp 0.79  sel +0.787  ppl 8.11 (+2.32)
+  h st_range_a2.0        tgt 0.00 comp 0.76  sel +0.762  ppl 6.53 (+0.75)
+  h st_transport_a2.0    tgt 0.00 comp 0.71  sel +0.713  ppl 6.75 (+0.97)
+  [z] 1843 salient dims; range fires on target 0.958 vs others 0.636
+  z rm_range_zero        tgt 0.00 comp 0.64  sel +0.637  ppl 7.66 (+1.62)
+  z rm_range_comp        tgt 0.00 comp 0.90  sel +0.900  ppl 6.40 (+0.36)
+  z rm_full_zero         tgt 0.00 comp 0.01  sel +0.012  ppl 24.38 (+18.34)
+  z rm_full_comp         tgt 0.00 comp 0.64  sel +0.637  ppl 19.14 (+13.09)
+  z st_global_a1.0       tgt 0.00 comp 0.86  sel +0.863  ppl 6.65 (+0.61)
+  z st_salient_a1.0      tgt 0.00 comp 0.93  sel +0.925  ppl 6.51 (+0.46)
+  z st_range_a1.0        tgt 0.00 comp 0.91  sel +0.912  ppl 6.31 (+0.27)
+  z st_transport_a1.0    tgt 0.02 comp 0.90  sel +0.880  ppl 6.30 (+0.26)
+  z st_global_a2.0       tgt 0.00 comp 0.65  sel +0.650  ppl 9.12 (+3.08)
+  z st_salient_a2.0      tgt 0.00 comp 0.69  sel +0.688  ppl 8.45 (+2.41)
+  z st_range_a2.0        tgt 0.00 comp 0.76  sel +0.762  ppl 7.06 (+1.02)
+  z st_transport_a2.0    tgt 0.00 comp 0.72  sel +0.725  ppl 7.10 (+1.06)
+
+=== concept 6 (dentist)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.947 vs others 0.356
+  h rm_range_zero        tgt 0.00 comp 0.91  sel +0.912  ppl 6.04 (+0.25)
+  h rm_range_comp        tgt 0.02 comp 0.86  sel +0.843  ppl 6.00 (+0.21)
+  h rm_full_zero         tgt 0.00 comp 0.68  sel +0.675  ppl 7.83 (+2.04)
+  h rm_full_comp         tgt 0.00 comp 0.57  sel +0.575  ppl 14.56 (+8.78)
+  h st_global_a1.0       tgt 0.00 comp 0.79  sel +0.787  ppl 7.14 (+1.36)
+  h st_salient_a1.0      tgt 0.00 comp 0.81  sel +0.812  ppl 6.81 (+1.02)
+  h st_range_a1.0        tgt 0.00 comp 0.85  sel +0.850  ppl 5.99 (+0.20)
+  h st_transport_a1.0    tgt 0.02 comp 0.82  sel +0.805  ppl 6.05 (+0.27)
+  h st_global_a2.0       tgt 0.00 comp 0.50  sel +0.500  ppl 18.26 (+12.48)
+  h st_salient_a2.0      tgt 0.00 comp 0.65  sel +0.650  ppl 13.05 (+7.27)
+  h st_range_a2.0        tgt 0.00 comp 0.70  sel +0.700  ppl 6.78 (+0.99)
+  h st_transport_a2.0    tgt 0.00 comp 0.66  sel +0.662  ppl 7.12 (+1.34)
+  [z] 1843 salient dims; range fires on target 0.948 vs others 0.377
+  z rm_range_zero        tgt 0.00 comp 0.85  sel +0.850  ppl 6.77 (+0.72)
+  z rm_range_comp        tgt 0.02 comp 0.95  sel +0.930  ppl 6.41 (+0.37)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 14.12 (+8.08)
+  z rm_full_comp         tgt 0.00 comp 0.64  sel +0.637  ppl 21.71 (+15.67)
+  z st_global_a1.0       tgt 0.00 comp 0.76  sel +0.762  ppl 7.15 (+1.11)
+  z st_salient_a1.0      tgt 0.00 comp 0.80  sel +0.800  ppl 6.86 (+0.82)
+  z st_range_a1.0        tgt 0.02 comp 0.90  sel +0.880  ppl 6.34 (+0.29)
+  z st_transport_a1.0    tgt 0.02 comp 0.91  sel +0.892  ppl 6.35 (+0.31)
+  z st_global_a2.0       tgt 0.00 comp 0.44  sel +0.438  ppl 15.94 (+9.90)
+  z st_salient_a2.0      tgt 0.00 comp 0.64  sel +0.637  ppl 12.24 (+6.20)
+  z st_range_a2.0        tgt 0.00 comp 0.75  sel +0.750  ppl 7.21 (+1.16)
+  z st_transport_a2.0    tgt 0.00 comp 0.70  sel +0.700  ppl 7.36 (+1.32)
+
+=== concept 7 (dietitian)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.963 vs others 0.483
+  h rm_range_zero        tgt 0.84 comp 0.89  sel +0.047  ppl 6.01 (+0.23)
+  h rm_range_comp        tgt 0.64 comp 0.86  sel +0.223  ppl 5.98 (+0.19)
+  h rm_full_zero         tgt 0.00 comp 0.68  sel +0.675  ppl 7.40 (+1.62)
+  h rm_full_comp         tgt 0.00 comp 0.75  sel +0.750  ppl 14.31 (+8.52)
+  h st_global_a1.0       tgt 0.00 comp 0.81  sel +0.812  ppl 6.44 (+0.66)
+  h st_salient_a1.0      tgt 0.38 comp 0.81  sel +0.432  ppl 6.28 (+0.49)
+  h st_range_a1.0        tgt 0.64 comp 0.85  sel +0.210  ppl 5.94 (+0.16)
+  h st_transport_a1.0    tgt 0.64 comp 0.81  sel +0.172  ppl 5.98 (+0.20)
+  h st_global_a2.0       tgt 0.00 comp 0.53  sel +0.525  ppl 9.80 (+4.02)
+  h st_salient_a2.0      tgt 0.00 comp 0.64  sel +0.637  ppl 8.27 (+2.49)
+  h st_range_a2.0        tgt 0.00 comp 0.68  sel +0.675  ppl 6.52 (+0.74)
+  h st_transport_a2.0    tgt 0.00 comp 0.60  sel +0.600  ppl 6.72 (+0.93)
+  [z] 1843 salient dims; range fires on target 0.964 vs others 0.521
+  z rm_range_zero        tgt 0.00 comp 0.85  sel +0.850  ppl 6.96 (+0.91)
+  z rm_range_comp        tgt 0.46 comp 0.94  sel +0.478  ppl 6.52 (+0.48)
+  z rm_full_zero         tgt 0.00 comp 0.04  sel +0.037  ppl 14.93 (+8.89)
+  z rm_full_comp         tgt 0.00 comp 0.71  sel +0.713  ppl 26.01 (+19.97)
+  z st_global_a1.0       tgt 0.08 comp 0.79  sel +0.708  ppl 6.67 (+0.63)
+  z st_salient_a1.0      tgt 0.22 comp 0.88  sel +0.655  ppl 6.52 (+0.48)
+  z st_range_a1.0        tgt 0.54 comp 0.94  sel +0.397  ppl 6.41 (+0.37)
+  z st_transport_a1.0    tgt 0.58 comp 0.93  sel +0.345  ppl 6.38 (+0.34)
+  z st_global_a2.0       tgt 0.00 comp 0.54  sel +0.537  ppl 9.56 (+3.52)
+  z st_salient_a2.0      tgt 0.00 comp 0.68  sel +0.675  ppl 8.60 (+2.56)
+  z st_range_a2.0        tgt 0.00 comp 0.71  sel +0.713  ppl 7.29 (+1.25)
+  z st_transport_a2.0    tgt 0.00 comp 0.62  sel +0.625  ppl 7.28 (+1.23)
+
+=== concept 8 (dj)  n_tgt=39 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.970 vs others 0.397
+  h rm_range_zero        tgt 0.08 comp 0.95  sel +0.873  ppl 6.07 (+0.29)
+  h rm_range_comp        tgt 0.36 comp 0.95  sel +0.591  ppl 6.04 (+0.25)
+  h rm_full_zero         tgt 0.08 comp 0.82  sel +0.748  ppl 7.57 (+1.79)
+  h rm_full_comp         tgt 0.28 comp 0.79  sel +0.505  ppl 34.20 (+28.42)
+  h st_global_a1.0       tgt 0.08 comp 0.68  sel +0.598  ppl 7.00 (+1.21)
+  h st_salient_a1.0      tgt 0.28 comp 0.80  sel +0.518  ppl 6.75 (+0.97)
+  h st_range_a1.0        tgt 0.36 comp 0.93  sel +0.566  ppl 6.00 (+0.22)
+  h st_transport_a1.0    tgt 0.33 comp 0.84  sel +0.504  ppl 6.04 (+0.26)
+  h st_global_a2.0       tgt 0.00 comp 0.59  sel +0.588  ppl 17.57 (+11.79)
+  h st_salient_a2.0      tgt 0.00 comp 0.57  sel +0.575  ppl 13.42 (+7.64)
+  h st_range_a2.0        tgt 0.00 comp 0.61  sel +0.613  ppl 6.95 (+1.17)
+  h st_transport_a2.0    tgt 0.00 comp 0.60  sel +0.600  ppl 7.23 (+1.44)
+  [z] 1843 salient dims; range fires on target 0.967 vs others 0.410
+  z rm_range_zero        tgt 0.00 comp 0.80  sel +0.800  ppl 7.03 (+0.99)
+  z rm_range_comp        tgt 0.38 comp 0.95  sel +0.565  ppl 6.53 (+0.49)
+  z rm_full_zero         tgt 0.00 comp 0.03  sel +0.025  ppl 17.16 (+11.12)
+  z rm_full_comp         tgt 0.26 comp 0.74  sel +0.481  ppl 25.72 (+19.68)
+  z st_global_a1.0       tgt 0.10 comp 0.71  sel +0.610  ppl 7.01 (+0.97)
+  z st_salient_a1.0      tgt 0.26 comp 0.79  sel +0.531  ppl 6.90 (+0.86)
+  z st_range_a1.0        tgt 0.26 comp 0.90  sel +0.644  ppl 6.45 (+0.41)
+  z st_transport_a1.0    tgt 0.26 comp 0.88  sel +0.619  ppl 6.49 (+0.45)
+  z st_global_a2.0       tgt 0.00 comp 0.55  sel +0.550  ppl 15.47 (+9.43)
+  z st_salient_a2.0      tgt 0.00 comp 0.59  sel +0.588  ppl 13.08 (+7.04)
+  z st_range_a2.0        tgt 0.00 comp 0.74  sel +0.738  ppl 7.90 (+1.86)
+  z st_transport_a2.0    tgt 0.00 comp 0.68  sel +0.675  ppl 8.13 (+2.09)
+
+=== concept 9 (filmmaker)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.941 vs others 0.565
+  h rm_range_zero        tgt 0.00 comp 0.91  sel +0.912  ppl 6.08 (+0.30)
+  h rm_range_comp        tgt 0.00 comp 0.95  sel +0.950  ppl 5.98 (+0.20)
+  h rm_full_zero         tgt 0.00 comp 0.65  sel +0.650  ppl 8.14 (+2.36)
+  h rm_full_comp         tgt 0.00 comp 0.74  sel +0.738  ppl 50.46 (+44.68)
+  h st_global_a1.0       tgt 0.00 comp 0.93  sel +0.925  ppl 6.49 (+0.71)
+  h st_salient_a1.0      tgt 0.02 comp 0.96  sel +0.943  ppl 6.26 (+0.48)
+  h st_range_a1.0        tgt 0.02 comp 0.95  sel +0.930  ppl 5.94 (+0.15)
+  h st_transport_a1.0    tgt 0.04 comp 0.95  sel +0.910  ppl 5.98 (+0.20)
+  h st_global_a2.0       tgt 0.00 comp 0.70  sel +0.700  ppl 9.86 (+4.07)
+  h st_salient_a2.0      tgt 0.00 comp 0.81  sel +0.812  ppl 8.33 (+2.54)
+  h st_range_a2.0        tgt 0.00 comp 0.78  sel +0.775  ppl 6.58 (+0.79)
+  h st_transport_a2.0    tgt 0.00 comp 0.71  sel +0.713  ppl 6.82 (+1.04)
+  [z] 1843 salient dims; range fires on target 0.946 vs others 0.579
+  z rm_range_zero        tgt 0.00 comp 0.64  sel +0.637  ppl 6.98 (+0.94)
+  z rm_range_comp        tgt 0.00 comp 0.96  sel +0.963  ppl 6.42 (+0.38)
+  z rm_full_zero         tgt 0.00 comp 0.19  sel +0.188  ppl 18.33 (+12.29)
+  z rm_full_comp         tgt 0.00 comp 0.84  sel +0.838  ppl 22.06 (+16.02)
+  z st_global_a1.0       tgt 0.00 comp 0.91  sel +0.912  ppl 6.74 (+0.70)
+  z st_salient_a1.0      tgt 0.00 comp 0.94  sel +0.938  ppl 6.64 (+0.60)
+  z st_range_a1.0        tgt 0.00 comp 0.96  sel +0.963  ppl 6.36 (+0.32)
+  z st_transport_a1.0    tgt 0.06 comp 0.95  sel +0.890  ppl 6.38 (+0.33)
+  z st_global_a2.0       tgt 0.00 comp 0.70  sel +0.700  ppl 9.69 (+3.65)
+  z st_salient_a2.0      tgt 0.00 comp 0.80  sel +0.800  ppl 8.73 (+2.69)
+  z st_range_a2.0        tgt 0.00 comp 0.82  sel +0.825  ppl 7.21 (+1.17)
+  z st_transport_a2.0    tgt 0.00 comp 0.79  sel +0.787  ppl 7.30 (+1.26)
+
+=== concept 10 (interior_designer)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.938 vs others 0.450
+  h rm_range_zero        tgt 0.02 comp 0.78  sel +0.755  ppl 6.07 (+0.28)
+  h rm_range_comp        tgt 0.04 comp 0.90  sel +0.860  ppl 6.01 (+0.22)
+  h rm_full_zero         tgt 0.00 comp 0.61  sel +0.613  ppl 8.37 (+2.58)
+  h rm_full_comp         tgt 0.00 comp 0.64  sel +0.637  ppl 21.37 (+15.58)
+  h st_global_a1.0       tgt 0.00 comp 0.70  sel +0.700  ppl 6.94 (+1.16)
+  h st_salient_a1.0      tgt 0.06 comp 0.76  sel +0.702  ppl 6.58 (+0.79)
+  h st_range_a1.0        tgt 0.10 comp 0.85  sel +0.750  ppl 5.98 (+0.20)
+  h st_transport_a1.0    tgt 0.12 comp 0.80  sel +0.680  ppl 6.03 (+0.24)
+  h st_global_a2.0       tgt 0.00 comp 0.44  sel +0.438  ppl 15.71 (+9.92)
+  h st_salient_a2.0      tgt 0.00 comp 0.56  sel +0.562  ppl 11.07 (+5.29)
+  h st_range_a2.0        tgt 0.00 comp 0.53  sel +0.525  ppl 6.79 (+1.00)
+  h st_transport_a2.0    tgt 0.00 comp 0.47  sel +0.475  ppl 7.02 (+1.24)
+  [z] 1843 salient dims; range fires on target 0.941 vs others 0.466
+  z rm_range_zero        tgt 0.00 comp 0.71  sel +0.713  ppl 7.03 (+0.98)
+  z rm_range_comp        tgt 0.02 comp 0.94  sel +0.917  ppl 6.49 (+0.45)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 14.32 (+8.28)
+  z rm_full_comp         tgt 0.00 comp 0.33  sel +0.325  ppl 25.88 (+19.84)
+  z st_global_a1.0       tgt 0.00 comp 0.68  sel +0.675  ppl 6.95 (+0.91)
+  z st_salient_a1.0      tgt 0.00 comp 0.72  sel +0.725  ppl 6.78 (+0.74)
+  z st_range_a1.0        tgt 0.04 comp 0.79  sel +0.747  ppl 6.43 (+0.39)
+  z st_transport_a1.0    tgt 0.08 comp 0.78  sel +0.695  ppl 6.45 (+0.41)
+  z st_global_a2.0       tgt 0.00 comp 0.41  sel +0.412  ppl 14.32 (+8.28)
+  z st_salient_a2.0      tgt 0.00 comp 0.47  sel +0.475  ppl 12.06 (+6.02)
+  z st_range_a2.0        tgt 0.00 comp 0.47  sel +0.475  ppl 7.50 (+1.46)
+  z st_transport_a2.0    tgt 0.00 comp 0.41  sel +0.412  ppl 7.62 (+1.58)
+
+=== concept 11 (journalist)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.938 vs others 0.592
+  h rm_range_zero        tgt 0.16 comp 0.88  sel +0.715  ppl 6.08 (+0.30)
+  h rm_range_comp        tgt 0.02 comp 0.91  sel +0.892  ppl 6.03 (+0.24)
+  h rm_full_zero         tgt 0.14 comp 0.81  sel +0.672  ppl 8.11 (+2.32)
+  h rm_full_comp         tgt 0.00 comp 0.74  sel +0.738  ppl 23.16 (+17.37)
+  h st_global_a1.0       tgt 0.00 comp 0.84  sel +0.838  ppl 6.43 (+0.64)
+  h st_salient_a1.0      tgt 0.06 comp 0.88  sel +0.815  ppl 6.27 (+0.48)
+  h st_range_a1.0        tgt 0.08 comp 0.86  sel +0.783  ppl 5.97 (+0.18)
+  h st_transport_a1.0    tgt 0.10 comp 0.85  sel +0.750  ppl 6.01 (+0.22)
+  h st_global_a2.0       tgt 0.00 comp 0.60  sel +0.600  ppl 9.66 (+3.87)
+  h st_salient_a2.0      tgt 0.00 comp 0.74  sel +0.738  ppl 8.42 (+2.63)
+  h st_range_a2.0        tgt 0.00 comp 0.72  sel +0.725  ppl 6.68 (+0.89)
+  h st_transport_a2.0    tgt 0.00 comp 0.70  sel +0.700  ppl 6.86 (+1.08)
+  [z] 1843 salient dims; range fires on target 0.946 vs others 0.612
+  z rm_range_zero        tgt 0.00 comp 0.76  sel +0.762  ppl 7.28 (+1.24)
+  z rm_range_comp        tgt 0.00 comp 0.94  sel +0.938  ppl 6.42 (+0.38)
+  z rm_full_zero         tgt 0.00 comp 0.01  sel +0.012  ppl 17.39 (+11.35)
+  z rm_full_comp         tgt 0.00 comp 0.65  sel +0.650  ppl 19.10 (+13.06)
+  z st_global_a1.0       tgt 0.00 comp 0.90  sel +0.900  ppl 6.60 (+0.56)
+  z st_salient_a1.0      tgt 0.04 comp 0.90  sel +0.860  ppl 6.52 (+0.47)
+  z st_range_a1.0        tgt 0.06 comp 0.96  sel +0.902  ppl 6.30 (+0.26)
+  z st_transport_a1.0    tgt 0.10 comp 0.95  sel +0.850  ppl 6.30 (+0.25)
+  z st_global_a2.0       tgt 0.00 comp 0.62  sel +0.625  ppl 8.98 (+2.94)
+  z st_salient_a2.0      tgt 0.00 comp 0.70  sel +0.700  ppl 8.32 (+2.28)
+  z st_range_a2.0        tgt 0.00 comp 0.82  sel +0.825  ppl 7.02 (+0.97)
+  z st_transport_a2.0    tgt 0.00 comp 0.79  sel +0.787  ppl 7.13 (+1.09)
+
+=== concept 12 (model)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.956 vs others 0.522
+  h rm_range_zero        tgt 0.22 comp 0.90  sel +0.680  ppl 6.08 (+0.29)
+  h rm_range_comp        tgt 0.32 comp 0.82  sel +0.505  ppl 6.05 (+0.26)
+  h rm_full_zero         tgt 0.16 comp 0.80  sel +0.640  ppl 7.63 (+1.84)
+  h rm_full_comp         tgt 0.32 comp 0.80  sel +0.480  ppl 14.10 (+8.32)
+  h st_global_a1.0       tgt 0.08 comp 0.66  sel +0.583  ppl 6.71 (+0.93)
+  h st_salient_a1.0      tgt 0.36 comp 0.70  sel +0.340  ppl 6.45 (+0.67)
+  h st_range_a1.0        tgt 0.34 comp 0.78  sel +0.435  ppl 5.99 (+0.21)
+  h st_transport_a1.0    tgt 0.34 comp 0.75  sel +0.410  ppl 6.02 (+0.24)
+  h st_global_a2.0       tgt 0.00 comp 0.28  sel +0.275  ppl 12.14 (+6.35)
+  h st_salient_a2.0      tgt 0.00 comp 0.51  sel +0.512  ppl 9.91 (+4.13)
+  h st_range_a2.0        tgt 0.00 comp 0.54  sel +0.537  ppl 6.89 (+1.10)
+  h st_transport_a2.0    tgt 0.00 comp 0.49  sel +0.488  ppl 7.09 (+1.30)
+  [z] 1843 salient dims; range fires on target 0.961 vs others 0.551
+  z rm_range_zero        tgt 0.00 comp 0.36  sel +0.363  ppl 7.25 (+1.21)
+  z rm_range_comp        tgt 0.42 comp 0.84  sel +0.418  ppl 6.58 (+0.54)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 17.84 (+11.80)
+  z rm_full_comp         tgt 0.34 comp 0.59  sel +0.247  ppl 21.03 (+14.98)
+  z st_global_a1.0       tgt 0.14 comp 0.64  sel +0.497  ppl 6.87 (+0.83)
+  z st_salient_a1.0      tgt 0.36 comp 0.65  sel +0.290  ppl 6.76 (+0.72)
+  z st_range_a1.0        tgt 0.38 comp 0.76  sel +0.382  ppl 6.46 (+0.42)
+  z st_transport_a1.0    tgt 0.44 comp 0.78  sel +0.335  ppl 6.45 (+0.41)
+  z st_global_a2.0       tgt 0.00 comp 0.34  sel +0.338  ppl 11.13 (+5.09)
+  z st_salient_a2.0      tgt 0.00 comp 0.34  sel +0.338  ppl 10.36 (+4.32)
+  z st_range_a2.0        tgt 0.00 comp 0.36  sel +0.363  ppl 7.67 (+1.63)
+  z st_transport_a2.0    tgt 0.00 comp 0.33  sel +0.325  ppl 7.76 (+1.72)
+
+=== concept 13 (nurse)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.948 vs others 0.422
+  h rm_range_zero        tgt 0.36 comp 0.86  sel +0.503  ppl 6.04 (+0.26)
+  h rm_range_comp        tgt 0.00 comp 0.91  sel +0.912  ppl 6.01 (+0.22)
+  h rm_full_zero         tgt 0.24 comp 0.68  sel +0.435  ppl 7.65 (+1.86)
+  h rm_full_comp         tgt 0.00 comp 0.70  sel +0.700  ppl 12.98 (+7.19)
+  h st_global_a1.0       tgt 0.00 comp 0.79  sel +0.787  ppl 6.55 (+0.77)
+  h st_salient_a1.0      tgt 0.00 comp 0.90  sel +0.900  ppl 6.34 (+0.55)
+  h st_range_a1.0        tgt 0.00 comp 0.93  sel +0.925  ppl 5.98 (+0.19)
+  h st_transport_a1.0    tgt 0.00 comp 0.94  sel +0.938  ppl 6.02 (+0.23)
+  h st_global_a2.0       tgt 0.00 comp 0.55  sel +0.550  ppl 10.10 (+4.31)
+  h st_salient_a2.0      tgt 0.00 comp 0.72  sel +0.725  ppl 8.61 (+2.82)
+  h st_range_a2.0        tgt 0.00 comp 0.82  sel +0.825  ppl 6.64 (+0.86)
+  h st_transport_a2.0    tgt 0.00 comp 0.80  sel +0.800  ppl 6.87 (+1.08)
+  [z] 1843 salient dims; range fires on target 0.951 vs others 0.433
+  z rm_range_zero        tgt 0.00 comp 0.80  sel +0.800  ppl 6.97 (+0.93)
+  z rm_range_comp        tgt 0.00 comp 0.97  sel +0.975  ppl 6.39 (+0.34)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 17.04 (+11.00)
+  z rm_full_comp         tgt 0.00 comp 0.70  sel +0.700  ppl 20.23 (+14.19)
+  z st_global_a1.0       tgt 0.00 comp 0.90  sel +0.900  ppl 6.87 (+0.82)
+  z st_salient_a1.0      tgt 0.00 comp 0.97  sel +0.975  ppl 6.66 (+0.61)
+  z st_range_a1.0        tgt 0.00 comp 0.97  sel +0.975  ppl 6.30 (+0.26)
+  z st_transport_a1.0    tgt 0.00 comp 0.97  sel +0.975  ppl 6.31 (+0.27)
+  z st_global_a2.0       tgt 0.00 comp 0.47  sel +0.475  ppl 9.89 (+3.85)
+  z st_salient_a2.0      tgt 0.00 comp 0.62  sel +0.625  ppl 8.80 (+2.76)
+  z st_range_a2.0        tgt 0.00 comp 0.90  sel +0.900  ppl 6.93 (+0.89)
+  z st_transport_a2.0    tgt 0.00 comp 0.80  sel +0.800  ppl 7.04 (+1.00)
+
+=== concept 14 (painter)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.953 vs others 0.530
+  h rm_range_zero        tgt 0.00 comp 0.91  sel +0.912  ppl 6.01 (+0.22)
+  h rm_range_comp        tgt 0.00 comp 0.89  sel +0.887  ppl 5.97 (+0.19)
+  h rm_full_zero         tgt 0.00 comp 0.78  sel +0.775  ppl 7.67 (+1.88)
+  h rm_full_comp         tgt 0.00 comp 0.70  sel +0.700  ppl 13.21 (+7.42)
+  h st_global_a1.0       tgt 0.00 comp 0.85  sel +0.850  ppl 6.46 (+0.67)
+  h st_salient_a1.0      tgt 0.00 comp 0.86  sel +0.863  ppl 6.27 (+0.49)
+  h st_range_a1.0        tgt 0.00 comp 0.89  sel +0.887  ppl 5.93 (+0.15)
+  h st_transport_a1.0    tgt 0.00 comp 0.89  sel +0.887  ppl 5.98 (+0.20)
+  h st_global_a2.0       tgt 0.00 comp 0.54  sel +0.537  ppl 10.19 (+4.41)
+  h st_salient_a2.0      tgt 0.00 comp 0.55  sel +0.550  ppl 8.70 (+2.92)
+  h st_range_a2.0        tgt 0.00 comp 0.62  sel +0.625  ppl 6.57 (+0.78)
+  h st_transport_a2.0    tgt 0.00 comp 0.54  sel +0.537  ppl 6.83 (+1.05)
+  [z] 1843 salient dims; range fires on target 0.957 vs others 0.539
+  z rm_range_zero        tgt 0.00 comp 0.54  sel +0.537  ppl 7.16 (+1.12)
+  z rm_range_comp        tgt 0.00 comp 0.89  sel +0.887  ppl 6.39 (+0.35)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 18.24 (+12.20)
+  z rm_full_comp         tgt 0.00 comp 0.39  sel +0.387  ppl 22.37 (+16.33)
+  z st_global_a1.0       tgt 0.00 comp 0.84  sel +0.838  ppl 6.59 (+0.55)
+  z st_salient_a1.0      tgt 0.00 comp 0.86  sel +0.863  ppl 6.53 (+0.49)
+  z st_range_a1.0        tgt 0.00 comp 0.86  sel +0.863  ppl 6.33 (+0.28)
+  z st_transport_a1.0    tgt 0.00 comp 0.82  sel +0.825  ppl 6.34 (+0.30)
+  z st_global_a2.0       tgt 0.00 comp 0.49  sel +0.488  ppl 9.80 (+3.76)
+  z st_salient_a2.0      tgt 0.00 comp 0.57  sel +0.575  ppl 8.56 (+2.51)
+  z st_range_a2.0        tgt 0.00 comp 0.69  sel +0.688  ppl 7.05 (+1.01)
+  z st_transport_a2.0    tgt 0.00 comp 0.56  sel +0.562  ppl 7.16 (+1.12)
+
+=== concept 15 (paralegal)  n_tgt=49 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.945 vs others 0.479
+  h rm_range_zero        tgt 0.27 comp 0.84  sel +0.572  ppl 6.04 (+0.25)
+  h rm_range_comp        tgt 0.02 comp 0.84  sel +0.817  ppl 6.06 (+0.27)
+  h rm_full_zero         tgt 0.20 comp 0.82  sel +0.621  ppl 7.60 (+1.81)
+  h rm_full_comp         tgt 0.00 comp 0.69  sel +0.688  ppl 12.67 (+6.88)
+  h st_global_a1.0       tgt 0.00 comp 0.68  sel +0.675  ppl 6.65 (+0.86)
+  h st_salient_a1.0      tgt 0.02 comp 0.76  sel +0.742  ppl 6.44 (+0.66)
+  h st_range_a1.0        tgt 0.02 comp 0.80  sel +0.780  ppl 6.01 (+0.23)
+  h st_transport_a1.0    tgt 0.04 comp 0.79  sel +0.747  ppl 6.05 (+0.27)
+  h st_global_a2.0       tgt 0.00 comp 0.30  sel +0.300  ppl 11.71 (+5.93)
+  h st_salient_a2.0      tgt 0.00 comp 0.50  sel +0.500  ppl 9.95 (+4.16)
+  h st_range_a2.0        tgt 0.00 comp 0.61  sel +0.613  ppl 6.91 (+1.12)
+  h st_transport_a2.0    tgt 0.00 comp 0.56  sel +0.562  ppl 7.13 (+1.35)
+  [z] 1843 salient dims; range fires on target 0.949 vs others 0.538
+  z rm_range_zero        tgt 0.00 comp 0.69  sel +0.688  ppl 7.43 (+1.39)
+  z rm_range_comp        tgt 0.00 comp 0.84  sel +0.838  ppl 6.51 (+0.47)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 20.84 (+14.80)
+  z rm_full_comp         tgt 0.00 comp 0.28  sel +0.275  ppl 30.97 (+24.93)
+  z st_global_a1.0       tgt 0.00 comp 0.62  sel +0.625  ppl 6.86 (+0.82)
+  z st_salient_a1.0      tgt 0.00 comp 0.72  sel +0.725  ppl 6.68 (+0.63)
+  z st_range_a1.0        tgt 0.00 comp 0.80  sel +0.800  ppl 6.42 (+0.38)
+  z st_transport_a1.0    tgt 0.00 comp 0.80  sel +0.800  ppl 6.43 (+0.39)
+  z st_global_a2.0       tgt 0.00 comp 0.31  sel +0.312  ppl 11.48 (+5.44)
+  z st_salient_a2.0      tgt 0.00 comp 0.39  sel +0.387  ppl 10.00 (+3.96)
+  z st_range_a2.0        tgt 0.00 comp 0.57  sel +0.575  ppl 7.40 (+1.36)
+  z st_transport_a2.0    tgt 0.00 comp 0.55  sel +0.550  ppl 7.51 (+1.47)
+
+=== concept 16 (pastor)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.933 vs others 0.540
+  h rm_range_zero        tgt 0.02 comp 0.88  sel +0.855  ppl 6.08 (+0.30)
+  h rm_range_comp        tgt 0.12 comp 1.00  sel +0.880  ppl 6.05 (+0.26)
+  h rm_full_zero         tgt 0.06 comp 0.80  sel +0.740  ppl 7.59 (+1.81)
+  h rm_full_comp         tgt 0.10 comp 0.61  sel +0.513  ppl 19.59 (+13.80)
+  h st_global_a1.0       tgt 0.04 comp 0.96  sel +0.922  ppl 6.81 (+1.03)
+  h st_salient_a1.0      tgt 0.16 comp 0.96  sel +0.802  ppl 6.54 (+0.76)
+  h st_range_a1.0        tgt 0.16 comp 0.97  sel +0.815  ppl 6.00 (+0.21)
+  h st_transport_a1.0    tgt 0.20 comp 0.96  sel +0.763  ppl 6.03 (+0.25)
+  h st_global_a2.0       tgt 0.00 comp 0.81  sel +0.812  ppl 12.78 (+7.00)
+  h st_salient_a2.0      tgt 0.00 comp 0.89  sel +0.887  ppl 10.38 (+4.60)
+  h st_range_a2.0        tgt 0.00 comp 0.85  sel +0.850  ppl 6.93 (+1.14)
+  h st_transport_a2.0    tgt 0.00 comp 0.80  sel +0.800  ppl 7.16 (+1.38)
+  [z] 1843 salient dims; range fires on target 0.938 vs others 0.551
+  z rm_range_zero        tgt 0.00 comp 0.81  sel +0.812  ppl 7.08 (+1.04)
+  z rm_range_comp        tgt 0.06 comp 0.97  sel +0.915  ppl 6.53 (+0.49)
+  z rm_full_zero         tgt 0.00 comp 0.07  sel +0.075  ppl 18.58 (+12.54)
+  z rm_full_comp         tgt 0.04 comp 0.78  sel +0.735  ppl 27.81 (+21.77)
+  z st_global_a1.0       tgt 0.00 comp 0.91  sel +0.912  ppl 6.81 (+0.77)
+  z st_salient_a1.0      tgt 0.10 comp 0.91  sel +0.812  ppl 6.71 (+0.66)
+  z st_range_a1.0        tgt 0.12 comp 0.95  sel +0.830  ppl 6.40 (+0.36)
+  z st_transport_a1.0    tgt 0.12 comp 0.94  sel +0.818  ppl 6.39 (+0.34)
+  z st_global_a2.0       tgt 0.00 comp 0.81  sel +0.812  ppl 11.23 (+5.19)
+  z st_salient_a2.0      tgt 0.00 comp 0.88  sel +0.875  ppl 9.74 (+3.70)
+  z st_range_a2.0        tgt 0.00 comp 0.79  sel +0.787  ppl 7.41 (+1.37)
+  z st_transport_a2.0    tgt 0.00 comp 0.70  sel +0.700  ppl 7.42 (+1.38)
+
+=== concept 17 (personal_trainer)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.946 vs others 0.476
+  h rm_range_zero        tgt 0.00 comp 0.95  sel +0.950  ppl 6.05 (+0.27)
+  h rm_range_comp        tgt 0.00 comp 0.95  sel +0.950  ppl 6.06 (+0.28)
+  h rm_full_zero         tgt 0.00 comp 0.84  sel +0.838  ppl 7.49 (+1.70)
+  h rm_full_comp         tgt 0.00 comp 0.81  sel +0.812  ppl 13.33 (+7.55)
+  h st_global_a1.0       tgt 0.00 comp 0.85  sel +0.850  ppl 6.64 (+0.85)
+  h st_salient_a1.0      tgt 0.00 comp 0.90  sel +0.900  ppl 6.43 (+0.65)
+  h st_range_a1.0        tgt 0.00 comp 0.95  sel +0.950  ppl 6.01 (+0.23)
+  h st_transport_a1.0    tgt 0.02 comp 0.93  sel +0.905  ppl 6.05 (+0.26)
+  h st_global_a2.0       tgt 0.00 comp 0.51  sel +0.512  ppl 11.56 (+5.77)
+  h st_salient_a2.0      tgt 0.00 comp 0.59  sel +0.588  ppl 9.74 (+3.96)
+  h st_range_a2.0        tgt 0.00 comp 0.64  sel +0.637  ppl 6.87 (+1.08)
+  h st_transport_a2.0    tgt 0.00 comp 0.59  sel +0.588  ppl 7.09 (+1.30)
+  [z] 1843 salient dims; range fires on target 0.948 vs others 0.512
+  z rm_range_zero        tgt 0.00 comp 0.86  sel +0.863  ppl 7.47 (+1.43)
+  z rm_range_comp        tgt 0.00 comp 0.94  sel +0.938  ppl 6.49 (+0.45)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 22.47 (+16.43)
+  z rm_full_comp         tgt 0.00 comp 0.07  sel +0.075  ppl 33.12 (+27.08)
+  z st_global_a1.0       tgt 0.00 comp 0.86  sel +0.863  ppl 6.76 (+0.72)
+  z st_salient_a1.0      tgt 0.00 comp 0.86  sel +0.863  ppl 6.65 (+0.61)
+  z st_range_a1.0        tgt 0.02 comp 0.91  sel +0.892  ppl 6.39 (+0.35)
+  z st_transport_a1.0    tgt 0.08 comp 0.90  sel +0.820  ppl 6.41 (+0.37)
+  z st_global_a2.0       tgt 0.00 comp 0.51  sel +0.512  ppl 10.72 (+4.68)
+  z st_salient_a2.0      tgt 0.00 comp 0.64  sel +0.637  ppl 9.39 (+3.35)
+  z st_range_a2.0        tgt 0.00 comp 0.74  sel +0.738  ppl 7.35 (+1.31)
+  z st_transport_a2.0    tgt 0.00 comp 0.64  sel +0.637  ppl 7.47 (+1.43)
+
+=== concept 18 (photographer)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.952 vs others 0.603
+  h rm_range_zero        tgt 0.18 comp 0.91  sel +0.733  ppl 6.09 (+0.30)
+  h rm_range_comp        tgt 0.02 comp 0.95  sel +0.930  ppl 6.01 (+0.22)
+  h rm_full_zero         tgt 0.06 comp 0.74  sel +0.677  ppl 7.56 (+1.77)
+  h rm_full_comp         tgt 0.00 comp 0.82  sel +0.825  ppl 16.08 (+10.29)
+  h st_global_a1.0       tgt 0.00 comp 0.85  sel +0.850  ppl 6.40 (+0.62)
+  h st_salient_a1.0      tgt 0.08 comp 0.90  sel +0.820  ppl 6.29 (+0.50)
+  h st_range_a1.0        tgt 0.08 comp 0.91  sel +0.833  ppl 5.96 (+0.17)
+  h st_transport_a1.0    tgt 0.12 comp 0.91  sel +0.792  ppl 6.00 (+0.21)
+  h st_global_a2.0       tgt 0.00 comp 0.57  sel +0.575  ppl 9.83 (+4.04)
+  h st_salient_a2.0      tgt 0.00 comp 0.71  sel +0.713  ppl 8.89 (+3.11)
+  h st_range_a2.0        tgt 0.00 comp 0.75  sel +0.750  ppl 6.69 (+0.91)
+  h st_transport_a2.0    tgt 0.00 comp 0.69  sel +0.688  ppl 6.94 (+1.15)
+  [z] 1843 salient dims; range fires on target 0.953 vs others 0.640
+  z rm_range_zero        tgt 0.02 comp 0.51  sel +0.492  ppl 7.45 (+1.41)
+  z rm_range_comp        tgt 0.00 comp 0.89  sel +0.887  ppl 6.59 (+0.55)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 21.06 (+15.01)
+  z rm_full_comp         tgt 0.00 comp 0.01  sel +0.012  ppl 42.03 (+35.99)
+  z st_global_a1.0       tgt 0.00 comp 0.88  sel +0.875  ppl 6.52 (+0.48)
+  z st_salient_a1.0      tgt 0.00 comp 0.88  sel +0.875  ppl 6.50 (+0.46)
+  z st_range_a1.0        tgt 0.02 comp 0.91  sel +0.892  ppl 6.39 (+0.35)
+  z st_transport_a1.0    tgt 0.02 comp 0.89  sel +0.867  ppl 6.36 (+0.32)
+  z st_global_a2.0       tgt 0.00 comp 0.66  sel +0.662  ppl 9.17 (+3.13)
+  z st_salient_a2.0      tgt 0.00 comp 0.71  sel +0.713  ppl 8.24 (+2.20)
+  z st_range_a2.0        tgt 0.00 comp 0.71  sel +0.713  ppl 7.28 (+1.23)
+  z st_transport_a2.0    tgt 0.00 comp 0.66  sel +0.662  ppl 7.25 (+1.21)
+
+=== concept 19 (physician)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.970 vs others 0.488
+  h rm_range_zero        tgt 0.06 comp 0.94  sel +0.877  ppl 6.08 (+0.29)
+  h rm_range_comp        tgt 0.00 comp 0.84  sel +0.838  ppl 6.02 (+0.23)
+  h rm_full_zero         tgt 0.00 comp 0.90  sel +0.900  ppl 7.74 (+1.95)
+  h rm_full_comp         tgt 0.00 comp 0.60  sel +0.600  ppl 13.42 (+7.63)
+  h st_global_a1.0       tgt 0.00 comp 0.72  sel +0.725  ppl 6.73 (+0.94)
+  h st_salient_a1.0      tgt 0.00 comp 0.76  sel +0.762  ppl 6.47 (+0.68)
+  h st_range_a1.0        tgt 0.00 comp 0.79  sel +0.787  ppl 6.00 (+0.21)
+  h st_transport_a1.0    tgt 0.00 comp 0.79  sel +0.787  ppl 6.06 (+0.27)
+  h st_global_a2.0       tgt 0.00 comp 0.50  sel +0.500  ppl 12.42 (+6.64)
+  h st_salient_a2.0      tgt 0.00 comp 0.59  sel +0.588  ppl 9.67 (+3.89)
+  h st_range_a2.0        tgt 0.00 comp 0.59  sel +0.588  ppl 6.77 (+0.98)
+  h st_transport_a2.0    tgt 0.00 comp 0.53  sel +0.525  ppl 7.09 (+1.30)
+  [z] 1843 salient dims; range fires on target 0.973 vs others 0.513
+  z rm_range_zero        tgt 0.00 comp 0.75  sel +0.750  ppl 6.90 (+0.85)
+  z rm_range_comp        tgt 0.00 comp 0.91  sel +0.912  ppl 6.44 (+0.40)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 16.26 (+10.22)
+  z rm_full_comp         tgt 0.00 comp 0.70  sel +0.700  ppl 19.63 (+13.59)
+  z st_global_a1.0       tgt 0.00 comp 0.80  sel +0.800  ppl 6.89 (+0.85)
+  z st_salient_a1.0      tgt 0.00 comp 0.84  sel +0.838  ppl 6.67 (+0.63)
+  z st_range_a1.0        tgt 0.04 comp 0.91  sel +0.872  ppl 6.36 (+0.31)
+  z st_transport_a1.0    tgt 0.04 comp 0.91  sel +0.872  ppl 6.38 (+0.33)
+  z st_global_a2.0       tgt 0.00 comp 0.53  sel +0.525  ppl 11.66 (+5.62)
+  z st_salient_a2.0      tgt 0.00 comp 0.62  sel +0.625  ppl 9.93 (+3.89)
+  z st_range_a2.0        tgt 0.00 comp 0.69  sel +0.688  ppl 7.21 (+1.17)
+  z st_transport_a2.0    tgt 0.00 comp 0.61  sel +0.613  ppl 7.38 (+1.34)
+
+=== concept 20 (poet)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.941 vs others 0.595
+  h rm_range_zero        tgt 0.00 comp 0.82  sel +0.825  ppl 6.06 (+0.27)
+  h rm_range_comp        tgt 0.00 comp 0.84  sel +0.838  ppl 5.97 (+0.19)
+  h rm_full_zero         tgt 0.00 comp 0.62  sel +0.625  ppl 7.62 (+1.84)
+  h rm_full_comp         tgt 0.00 comp 0.65  sel +0.650  ppl 20.41 (+14.62)
+  h st_global_a1.0       tgt 0.00 comp 0.86  sel +0.863  ppl 6.51 (+0.72)
+  h st_salient_a1.0      tgt 0.00 comp 0.89  sel +0.887  ppl 6.29 (+0.50)
+  h st_range_a1.0        tgt 0.00 comp 0.88  sel +0.875  ppl 5.95 (+0.16)
+  h st_transport_a1.0    tgt 0.00 comp 0.88  sel +0.875  ppl 5.99 (+0.21)
+  h st_global_a2.0       tgt 0.00 comp 0.57  sel +0.575  ppl 9.92 (+4.13)
+  h st_salient_a2.0      tgt 0.00 comp 0.59  sel +0.588  ppl 8.51 (+2.73)
+  h st_range_a2.0        tgt 0.00 comp 0.64  sel +0.637  ppl 6.53 (+0.74)
+  h st_transport_a2.0    tgt 0.00 comp 0.56  sel +0.562  ppl 6.75 (+0.96)
+  [z] 1843 salient dims; range fires on target 0.939 vs others 0.622
+  z rm_range_zero        tgt 0.00 comp 0.45  sel +0.450  ppl 7.15 (+1.11)
+  z rm_range_comp        tgt 0.00 comp 0.88  sel +0.875  ppl 6.46 (+0.42)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 18.67 (+12.62)
+  z rm_full_comp         tgt 0.00 comp 0.69  sel +0.688  ppl 25.13 (+19.09)
+  z st_global_a1.0       tgt 0.00 comp 0.79  sel +0.787  ppl 6.71 (+0.67)
+  z st_salient_a1.0      tgt 0.00 comp 0.88  sel +0.875  ppl 6.58 (+0.54)
+  z st_range_a1.0        tgt 0.00 comp 0.86  sel +0.863  ppl 6.34 (+0.29)
+  z st_transport_a1.0    tgt 0.00 comp 0.84  sel +0.838  ppl 6.32 (+0.28)
+  z st_global_a2.0       tgt 0.00 comp 0.51  sel +0.512  ppl 9.36 (+3.32)
+  z st_salient_a2.0      tgt 0.00 comp 0.60  sel +0.600  ppl 8.54 (+2.50)
+  z st_range_a2.0        tgt 0.00 comp 0.62  sel +0.625  ppl 7.04 (+1.00)
+  z st_transport_a2.0    tgt 0.00 comp 0.61  sel +0.613  ppl 7.09 (+1.05)
+
+=== concept 21 (professor)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.956 vs others 0.722
+  h rm_range_zero        tgt 0.56 comp 0.89  sel +0.327  ppl 6.18 (+0.39)
+  h rm_range_comp        tgt 0.92 comp 0.91  sel -0.008  ppl 6.06 (+0.27)
+  h rm_full_zero         tgt 0.66 comp 0.80  sel +0.140  ppl 7.76 (+1.98)
+  h rm_full_comp         tgt 0.94 comp 0.80  sel -0.140  ppl 14.63 (+8.85)
+  h st_global_a1.0       tgt 0.30 comp 0.88  sel +0.575  ppl 6.33 (+0.55)
+  h st_salient_a1.0      tgt 0.68 comp 0.93  sel +0.245  ppl 6.18 (+0.39)
+  h st_range_a1.0        tgt 0.74 comp 0.91  sel +0.172  ppl 5.96 (+0.18)
+  h st_transport_a1.0    tgt 0.58 comp 0.93  sel +0.345  ppl 5.98 (+0.20)
+  h st_global_a2.0       tgt 0.00 comp 0.69  sel +0.688  ppl 8.28 (+2.49)
+  h st_salient_a2.0      tgt 0.04 comp 0.80  sel +0.760  ppl 7.47 (+1.68)
+  h st_range_a2.0        tgt 0.10 comp 0.78  sel +0.675  ppl 6.52 (+0.73)
+  h st_transport_a2.0    tgt 0.10 comp 0.78  sel +0.675  ppl 6.62 (+0.83)
+  [z] 1843 salient dims; range fires on target 0.957 vs others 0.713
+  z rm_range_zero        tgt 0.00 comp 0.39  sel +0.387  ppl 7.71 (+1.67)
+  z rm_range_comp        tgt 0.80 comp 0.95  sel +0.150  ppl 6.75 (+0.71)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 18.53 (+12.49)
+  z rm_full_comp         tgt 0.80 comp 0.59  sel -0.213  ppl 25.93 (+19.89)
+  z st_global_a1.0       tgt 0.24 comp 0.89  sel +0.647  ppl 6.63 (+0.59)
+  z st_salient_a1.0      tgt 0.38 comp 0.94  sel +0.557  ppl 6.54 (+0.50)
+  z st_range_a1.0        tgt 0.40 comp 0.91  sel +0.512  ppl 6.48 (+0.44)
+  z st_transport_a1.0    tgt 0.36 comp 0.93  sel +0.565  ppl 6.45 (+0.40)
+  z st_global_a2.0       tgt 0.00 comp 0.69  sel +0.688  ppl 8.26 (+2.22)
+  z st_salient_a2.0      tgt 0.00 comp 0.74  sel +0.738  ppl 7.88 (+1.84)
+  z st_range_a2.0        tgt 0.00 comp 0.69  sel +0.688  ppl 7.46 (+1.41)
+  z st_transport_a2.0    tgt 0.04 comp 0.70  sel +0.660  ppl 7.36 (+1.32)
+
+=== concept 22 (psychologist)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.952 vs others 0.564
+  h rm_range_zero        tgt 0.00 comp 0.95  sel +0.950  ppl 6.06 (+0.28)
+  h rm_range_comp        tgt 0.00 comp 0.93  sel +0.925  ppl 6.02 (+0.23)
+  h rm_full_zero         tgt 0.00 comp 0.81  sel +0.812  ppl 7.61 (+1.82)
+  h rm_full_comp         tgt 0.00 comp 0.76  sel +0.762  ppl 24.02 (+18.23)
+  h st_global_a1.0       tgt 0.00 comp 0.88  sel +0.875  ppl 6.40 (+0.62)
+  h st_salient_a1.0      tgt 0.00 comp 0.88  sel +0.875  ppl 6.22 (+0.43)
+  h st_range_a1.0        tgt 0.00 comp 0.90  sel +0.900  ppl 5.96 (+0.17)
+  h st_transport_a1.0    tgt 0.00 comp 0.89  sel +0.887  ppl 5.99 (+0.21)
+  h st_global_a2.0       tgt 0.00 comp 0.72  sel +0.725  ppl 9.92 (+4.14)
+  h st_salient_a2.0      tgt 0.00 comp 0.78  sel +0.775  ppl 8.37 (+2.59)
+  h st_range_a2.0        tgt 0.00 comp 0.78  sel +0.775  ppl 6.62 (+0.83)
+  h st_transport_a2.0    tgt 0.00 comp 0.76  sel +0.762  ppl 6.82 (+1.04)
+  [z] 1843 salient dims; range fires on target 0.953 vs others 0.573
+  z rm_range_zero        tgt 0.00 comp 0.74  sel +0.738  ppl 7.22 (+1.18)
+  z rm_range_comp        tgt 0.00 comp 0.95  sel +0.950  ppl 6.41 (+0.37)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 19.26 (+13.22)
+  z rm_full_comp         tgt 0.00 comp 0.78  sel +0.775  ppl 17.23 (+11.19)
+  z st_global_a1.0       tgt 0.00 comp 0.88  sel +0.875  ppl 6.57 (+0.53)
+  z st_salient_a1.0      tgt 0.00 comp 0.91  sel +0.912  ppl 6.46 (+0.42)
+  z st_range_a1.0        tgt 0.00 comp 0.95  sel +0.950  ppl 6.30 (+0.25)
+  z st_transport_a1.0    tgt 0.00 comp 0.94  sel +0.938  ppl 6.29 (+0.25)
+  z st_global_a2.0       tgt 0.00 comp 0.70  sel +0.700  ppl 9.22 (+3.18)
+  z st_salient_a2.0      tgt 0.00 comp 0.79  sel +0.787  ppl 8.54 (+2.50)
+  z st_range_a2.0        tgt 0.00 comp 0.86  sel +0.863  ppl 7.04 (+0.99)
+  z st_transport_a2.0    tgt 0.00 comp 0.79  sel +0.787  ppl 7.10 (+1.05)
+
+=== concept 23 (rapper)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.966 vs others 0.460
+  h rm_range_zero        tgt 0.06 comp 0.96  sel +0.902  ppl 6.03 (+0.24)
+  h rm_range_comp        tgt 0.00 comp 0.86  sel +0.863  ppl 6.03 (+0.25)
+  h rm_full_zero         tgt 0.04 comp 0.78  sel +0.735  ppl 7.43 (+1.65)
+  h rm_full_comp         tgt 0.00 comp 0.59  sel +0.588  ppl 14.34 (+8.55)
+  h st_global_a1.0       tgt 0.00 comp 0.75  sel +0.750  ppl 6.91 (+1.13)
+  h st_salient_a1.0      tgt 0.04 comp 0.82  sel +0.785  ppl 6.57 (+0.79)
+  h st_range_a1.0        tgt 0.06 comp 0.82  sel +0.765  ppl 6.00 (+0.22)
+  h st_transport_a1.0    tgt 0.10 comp 0.78  sel +0.675  ppl 6.05 (+0.26)
+  h st_global_a2.0       tgt 0.00 comp 0.51  sel +0.512  ppl 14.83 (+9.05)
+  h st_salient_a2.0      tgt 0.00 comp 0.68  sel +0.675  ppl 11.24 (+5.46)
+  h st_range_a2.0        tgt 0.00 comp 0.51  sel +0.512  ppl 6.93 (+1.15)
+  h st_transport_a2.0    tgt 0.00 comp 0.46  sel +0.463  ppl 7.21 (+1.42)
+  [z] 1843 salient dims; range fires on target 0.963 vs others 0.490
+  z rm_range_zero        tgt 0.00 comp 0.54  sel +0.537  ppl 7.21 (+1.17)
+  z rm_range_comp        tgt 0.00 comp 0.85  sel +0.850  ppl 6.61 (+0.57)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 21.14 (+15.10)
+  z rm_full_comp         tgt 0.00 comp 0.57  sel +0.575  ppl 35.74 (+29.70)
+  z st_global_a1.0       tgt 0.00 comp 0.75  sel +0.750  ppl 6.98 (+0.94)
+  z st_salient_a1.0      tgt 0.04 comp 0.80  sel +0.760  ppl 6.79 (+0.74)
+  z st_range_a1.0        tgt 0.10 comp 0.74  sel +0.638  ppl 6.50 (+0.46)
+  z st_transport_a1.0    tgt 0.20 comp 0.71  sel +0.513  ppl 6.49 (+0.45)
+  z st_global_a2.0       tgt 0.00 comp 0.50  sel +0.500  ppl 12.79 (+6.75)
+  z st_salient_a2.0      tgt 0.00 comp 0.57  sel +0.575  ppl 11.06 (+5.02)
+  z st_range_a2.0        tgt 0.00 comp 0.45  sel +0.450  ppl 7.97 (+1.93)
+  z st_transport_a2.0    tgt 0.00 comp 0.45  sel +0.450  ppl 8.03 (+1.98)
+
+=== concept 24 (software_engineer)  n_tgt=49 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.943 vs others 0.516
+  h rm_range_zero        tgt 0.06 comp 0.84  sel +0.776  ppl 6.05 (+0.26)
+  h rm_range_comp        tgt 0.00 comp 0.89  sel +0.887  ppl 6.07 (+0.28)
+  h rm_full_zero         tgt 0.02 comp 0.74  sel +0.717  ppl 7.61 (+1.82)
+  h rm_full_comp         tgt 0.00 comp 0.65  sel +0.650  ppl 16.09 (+10.31)
+  h st_global_a1.0       tgt 0.00 comp 0.88  sel +0.875  ppl 6.67 (+0.88)
+  h st_salient_a1.0      tgt 0.00 comp 0.91  sel +0.912  ppl 6.50 (+0.71)
+  h st_range_a1.0        tgt 0.00 comp 0.86  sel +0.863  ppl 6.02 (+0.23)
+  h st_transport_a1.0    tgt 0.02 comp 0.85  sel +0.830  ppl 6.06 (+0.27)
+  h st_global_a2.0       tgt 0.00 comp 0.76  sel +0.762  ppl 10.72 (+4.94)
+  h st_salient_a2.0      tgt 0.00 comp 0.79  sel +0.787  ppl 9.30 (+3.52)
+  h st_range_a2.0        tgt 0.00 comp 0.78  sel +0.775  ppl 6.88 (+1.09)
+  h st_transport_a2.0    tgt 0.00 comp 0.71  sel +0.713  ppl 7.07 (+1.29)
+  [z] 1843 salient dims; range fires on target 0.945 vs others 0.530
+  z rm_range_zero        tgt 0.00 comp 0.61  sel +0.613  ppl 7.17 (+1.13)
+  z rm_range_comp        tgt 0.00 comp 0.90  sel +0.900  ppl 6.62 (+0.58)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 16.67 (+10.63)
+  z rm_full_comp         tgt 0.00 comp 0.64  sel +0.637  ppl 22.00 (+15.96)
+  z st_global_a1.0       tgt 0.00 comp 0.90  sel +0.900  ppl 6.95 (+0.91)
+  z st_salient_a1.0      tgt 0.00 comp 0.94  sel +0.938  ppl 6.65 (+0.60)
+  z st_range_a1.0        tgt 0.00 comp 0.95  sel +0.950  ppl 6.52 (+0.48)
+  z st_transport_a1.0    tgt 0.02 comp 0.96  sel +0.942  ppl 6.52 (+0.48)
+  z st_global_a2.0       tgt 0.00 comp 0.72  sel +0.725  ppl 10.45 (+4.41)
+  z st_salient_a2.0      tgt 0.00 comp 0.81  sel +0.812  ppl 9.23 (+3.19)
+  z st_range_a2.0        tgt 0.00 comp 0.84  sel +0.838  ppl 7.74 (+1.70)
+  z st_transport_a2.0    tgt 0.00 comp 0.82  sel +0.825  ppl 7.78 (+1.73)
+
+=== concept 25 (surgeon)  n_tgt=49 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.953 vs others 0.493
+  h rm_range_zero        tgt 0.02 comp 0.85  sel +0.830  ppl 6.06 (+0.28)
+  h rm_range_comp        tgt 0.00 comp 0.84  sel +0.838  ppl 6.06 (+0.28)
+  h rm_full_zero         tgt 0.00 comp 0.74  sel +0.738  ppl 7.49 (+1.70)
+  h rm_full_comp         tgt 0.00 comp 0.65  sel +0.650  ppl 14.11 (+8.33)
+  h st_global_a1.0       tgt 0.00 comp 0.82  sel +0.825  ppl 7.09 (+1.30)
+  h st_salient_a1.0      tgt 0.00 comp 0.84  sel +0.838  ppl 6.72 (+0.93)
+  h st_range_a1.0        tgt 0.02 comp 0.81  sel +0.792  ppl 6.05 (+0.26)
+  h st_transport_a1.0    tgt 0.02 comp 0.80  sel +0.780  ppl 6.11 (+0.32)
+  h st_global_a2.0       tgt 0.00 comp 0.50  sel +0.500  ppl 16.96 (+11.18)
+  h st_salient_a2.0      tgt 0.00 comp 0.60  sel +0.600  ppl 12.27 (+6.48)
+  h st_range_a2.0        tgt 0.00 comp 0.64  sel +0.637  ppl 7.18 (+1.39)
+  h st_transport_a2.0    tgt 0.00 comp 0.59  sel +0.588  ppl 7.55 (+1.76)
+  [z] 1843 salient dims; range fires on target 0.952 vs others 0.502
+  z rm_range_zero        tgt 0.00 comp 0.62  sel +0.625  ppl 7.17 (+1.13)
+  z rm_range_comp        tgt 0.00 comp 0.90  sel +0.900  ppl 6.50 (+0.46)
+  z rm_full_zero         tgt 0.00 comp 0.00  sel +0.000  ppl 18.45 (+12.41)
+  z rm_full_comp         tgt 0.00 comp 0.00  sel +0.000  ppl 18.36 (+12.31)
+  z st_global_a1.0       tgt 0.00 comp 0.80  sel +0.800  ppl 7.07 (+1.03)
+  z st_salient_a1.0      tgt 0.00 comp 0.82  sel +0.825  ppl 6.86 (+0.82)
+  z st_range_a1.0        tgt 0.00 comp 0.85  sel +0.850  ppl 6.39 (+0.35)
+  z st_transport_a1.0    tgt 0.00 comp 0.85  sel +0.850  ppl 6.41 (+0.37)
+  z st_global_a2.0       tgt 0.00 comp 0.54  sel +0.537  ppl 15.33 (+9.29)
+  z st_salient_a2.0      tgt 0.00 comp 0.66  sel +0.662  ppl 12.38 (+6.34)
+  z st_range_a2.0        tgt 0.00 comp 0.71  sel +0.713  ppl 7.70 (+1.66)
+  z st_transport_a2.0    tgt 0.00 comp 0.64  sel +0.637  ppl 7.84 (+1.80)
+
+=== concept 27 (yoga_teacher)  n_tgt=50 n_comp=80 ===
+  [h] 922 salient dims; range fires on target 0.946 vs others 0.518
+  h rm_range_zero        tgt 0.76 comp 0.94  sel +0.177  ppl 6.06 (+0.27)
+  h rm_range_comp        tgt 0.18 comp 0.90  sel +0.720  ppl 6.04 (+0.25)
+  h rm_full_zero         tgt 0.72 comp 0.72  sel +0.005  ppl 7.48 (+1.70)
+  h rm_full_comp         tgt 0.14 comp 0.72  sel +0.585  ppl 14.50 (+8.72)
+  h st_global_a1.0       tgt 0.00 comp 0.79  sel +0.787  ppl 6.59 (+0.81)
+  h st_salient_a1.0      tgt 0.26 comp 0.93  sel +0.665  ppl 6.39 (+0.61)
+  h st_range_a1.0        tgt 0.26 comp 0.90  sel +0.640  ppl 5.99 (+0.20)
+  h st_transport_a1.0    tgt 0.28 comp 0.89  sel +0.607  ppl 6.02 (+0.24)
+  h st_global_a2.0       tgt 0.00 comp 0.41  sel +0.412  ppl 11.53 (+5.74)
+  h st_salient_a2.0      tgt 0.00 comp 0.70  sel +0.700  ppl 9.82 (+4.04)
+  h st_range_a2.0        tgt 0.00 comp 0.68  sel +0.675  ppl 6.84 (+1.05)
+  h st_transport_a2.0    tgt 0.00 comp 0.56  sel +0.562  ppl 7.06 (+1.27)
+  [z] 1843 salient dims; range fires on target 0.950 vs others 0.556
+  z rm_range_zero        tgt 0.00 comp 0.64  sel +0.637  ppl 7.24 (+1.20)
+  z rm_range_comp        tgt 0.02 comp 0.86  sel +0.843  ppl 6.66 (+0.62)
+  z rm_full_zero         tgt 0.00 comp 0.21  sel +0.213  ppl 15.91 (+9.87)
+  z rm_full_comp         tgt 0.00 comp 0.54  sel +0.537  ppl 26.76 (+20.72)
+  z st_global_a1.0       tgt 0.00 comp 0.81  sel +0.812  ppl 6.82 (+0.78)
+  z st_salient_a1.0      tgt 0.00 comp 0.85  sel +0.850  ppl 6.72 (+0.68)
+  z st_range_a1.0        tgt 0.20 comp 0.89  sel +0.688  ppl 6.48 (+0.44)
+  z st_transport_a1.0    tgt 0.28 comp 0.82  sel +0.545  ppl 6.45 (+0.41)
+  z st_global_a2.0       tgt 0.00 comp 0.33  sel +0.325  ppl 10.94 (+4.90)
+  z st_salient_a2.0      tgt 0.00 comp 0.54  sel +0.537  ppl 9.77 (+3.72)
+  z st_range_a2.0        tgt 0.00 comp 0.49  sel +0.488  ppl 7.60 (+1.55)
+  z st_transport_a2.0    tgt 0.00 comp 0.46  sel +0.463  ppl 7.60 (+1.56)
+
+=== summary over concepts (selectivity: higher = better; ppl_rise vs own baseline) ===
+intervention           |  h sel  z sel |     z-h   +-se  z wins | h tgt/comp drop z tgt/comp drop |  h ppl+  z ppl+
+rm_full_comp           | +0.643 +0.488 |  -0.155  0.052   7/19  |   +0.93/ +0.29   +0.94/ +0.46 |  +12.08  +19.76
+rm_full_zero           | +0.656 +0.030 |  -0.627  0.044   1/26  |   +0.90/ +0.24   +1.00/ +0.97 |   +1.88  +12.15
+rm_range_comp          | +0.793 +0.821 |  +0.028  0.016  17/9   |   +0.89/ +0.10   +0.91/ +0.09 |   +0.23   +0.46
+rm_range_zero          | +0.743 +0.671 |  -0.071  0.052   7/20  |   +0.85/ +0.11   +1.00/ +0.33 |   +0.28   +1.13
+st_global_a1.0         | +0.774 +0.774 |  +0.001  0.010  13/12  |   +0.98/ +0.21   +0.98/ +0.20 |   +0.86   +0.75
+st_global_a2.0         | +0.529 +0.523 |  -0.006  0.008   9/12  |   +1.00/ +0.47   +1.00/ +0.48 |   +6.13   +5.04
+st_range_a1.0          | +0.751 +0.788 |  +0.037  0.017  18/9   |   +0.88/ +0.12   +0.90/ +0.11 |   +0.19   +0.35
+st_range_a2.0          | +0.664 +0.677 |  +0.013  0.017  15/10  |   +1.00/ +0.33   +1.00/ +0.32 |   +0.95   +1.31
+st_salient_a1.0        | +0.744 +0.778 |  +0.034  0.017  16/10  |   +0.90/ +0.15   +0.93/ +0.15 |   +0.63   +0.61
+st_salient_a2.0        | +0.643 +0.609 |  -0.034  0.014  11/15  |   +1.00/ +0.36   +1.00/ +0.39 |   +3.84   +3.62
+st_transport_a1.0      | +0.716 +0.751 |  +0.035  0.016  19/7   |   +0.86/ +0.15   +0.88/ +0.13 |   +0.24   +0.35
+st_transport_a2.0      | +0.609 +0.623 |  +0.013  0.015  15/10  |   +1.00/ +0.39   +1.00/ +0.38 |   +1.19   +1.39
+range gate firing [h]: target 0.950  others 0.511  gap +0.439
+range gate firing [z]: target 0.952  others 0.536  gap +0.416
+
+[range] Saved -> results/range_intervention_biasbios_d6144_tokbias_dprime.json

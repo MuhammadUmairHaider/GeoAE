@@ -58,6 +58,24 @@ Equal alpha or edited coordinate fractions need not imply equal perturbation siz
 use the saved decoded norms to inspect that confound. Variation across prompts is
 not independent of subject noun: any bootstrap should group by subject lemma.
 
+## Completed d12288 replication
+
+The epoch-50 `d12288` DPC checkpoint was evaluated with d-prime saliency on
+2026-09-22 using the same 30% coordinate fraction, tao 2, alpha sweep, three
+rotations and shuffled-label control. The full result is
+`results/range_number_d12288_50_dprime.json`; the audited summary is
+`eval_out/number_d12288_50_review.json` and the figure prefix is
+`figures/number_control/d12288_50_review`.
+
+At alpha 1, strict target flips were 80.6% base versus 95.1% AE for the range
+edit (paired difference +14.6 percentage points, noun-bootstrap 95% interval
+[+10.4, +18.8]) and 81.9% versus 95.8% for transport (+13.9 points,
+[+10.4, +17.4]). All 144 test prompts were correct under both unedited
+baselines, every raw-base arm reproduced the earlier run exactly, and the
+shuffled-label arm produced no strict flips. Thirty percent selects 922 raw
+coordinates but 3,686 d12288 latent coordinates, so this is a matched-fraction
+rather than matched-count or matched-norm comparison.
+
 ## Commands
 
 The launcher refuses to overwrite existing result files. The current GPU training
@@ -76,6 +94,6 @@ NUMBER_OUTPUT=results/range_number_dpc_smoke.json \
 bash eval_out/run_number_control.sh
 ```
 
-No learned-coordinate advantage or token-control outcome is established until the
-LM evaluation has run. The setup checks validate the experimental invariants and
-task construction; they do not substitute for that result.
+The completed result above applies only to its stated checkpoint and protocol.
+For future variants, setup checks validate the experimental invariants and task
+construction but do not substitute for running the LM evaluation.

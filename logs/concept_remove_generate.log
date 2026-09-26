@@ -1,0 +1,278 @@
+[remove] LM=meta-llama/Llama-3.2-3B layer=27 z_mode=delta tao=2.0 percent=0.3
+Loading weights:   0%|          | 0/254 [00:00<?, ?it/s]Loading weights: 100%|██████████| 254/254 [00:00<00:00, 3068.82it/s]
+[remove] 14 working classes; 14 target concepts: ['Company', 'EducationalInstitution', 'Artist', 'Athlete', 'OfficeHolder', 'MeanOfTransportation', 'Building', 'NaturalPlace', 'Village', 'Animal', 'Plant', 'Album', 'Film', 'WrittenWork']
+
+[remove] calibrating position-gate thresholds (target rate 0.8) ...
+  Company                  thresh h=-23.375  z=+223.389
+  EducationalInstitution   thresh h=-17.227  z=+224.411
+  Artist                   thresh h=-15.564  z=+177.088
+  Athlete                  thresh h=+0.878  z=+196.864
+  OfficeHolder             thresh h=-16.788  z=+203.246
+  MeanOfTransportation     thresh h=+1.562  z=+275.715
+  Building                 thresh h=-18.265  z=+212.968
+  NaturalPlace             thresh h=-13.063  z=+235.066
+  Village                  thresh h=+31.064  z=+204.339
+  Animal                   thresh h=+40.800  z=+275.738
+  Plant                    thresh h=+18.101  z=+321.719
+  Album                    thresh h=-21.168  z=+338.633
+  Film                     thresh h=+2.917  z=+250.037
+  WrittenWork              thresh h=-21.676  z=+327.587
+
+[remove] HELD-document gate diagnostic (no generation)
+[remove] 10 held docs/class -> 9834 total held h-positions across 14 working classes
+  h Company                  coord-gate tgt 0.953 / comp 0.949  d' med 0.28 max 0.70 (n_salient 922)  AUROC 0.890  pos-gate[fixed](thr +0.00) tgt 0.773 / comp 0.143  pos-gate[calibrated](thr -23.38) tgt 0.843 / comp 0.259
+  z Company                  coord-gate tgt 0.958 / comp 0.946  d' med 0.22 max 0.88 (n_salient 1843)  AUROC 0.878  pos-gate[fixed](thr +0.00) tgt 0.905 / comp 0.424  pos-gate[calibrated](thr +223.39) tgt 0.763 / comp 0.187
+  h EducationalInstitution   coord-gate tgt 0.957 / comp 0.941  d' med 0.32 max 0.80 (n_salient 922)  AUROC 0.921  pos-gate[fixed](thr +0.00) tgt 0.726 / comp 0.064  pos-gate[calibrated](thr -17.23) tgt 0.805 / comp 0.106
+  z EducationalInstitution   coord-gate tgt 0.961 / comp 0.935  d' med 0.29 max 1.40 (n_salient 1843)  AUROC 0.910  pos-gate[fixed](thr +0.00) tgt 0.893 / comp 0.316  pos-gate[calibrated](thr +224.41) tgt 0.734 / comp 0.077
+  h Artist                   coord-gate tgt 0.950 / comp 0.948  d' med 0.24 max 0.55 (n_salient 922)  AUROC 0.848  pos-gate[fixed](thr +0.00) tgt 0.689 / comp 0.172  pos-gate[calibrated](thr -15.56) tgt 0.767 / comp 0.261
+  z Artist                   coord-gate tgt 0.961 / comp 0.946  d' med 0.21 max 0.74 (n_salient 1843)  AUROC 0.840  pos-gate[fixed](thr +0.00) tgt 0.947 / comp 0.480  pos-gate[calibrated](thr +177.09) tgt 0.779 / comp 0.270
+  h Athlete                  coord-gate tgt 0.952 / comp 0.939  d' med 0.31 max 0.85 (n_salient 922)  AUROC 0.914  pos-gate[fixed](thr +0.00) tgt 0.735 / comp 0.090  pos-gate[calibrated](thr +0.88) tgt 0.734 / comp 0.089
+  z Athlete                  coord-gate tgt 0.956 / comp 0.941  d' med 0.26 max 1.38 (n_salient 1843)  AUROC 0.942  pos-gate[fixed](thr +0.00) tgt 0.884 / comp 0.184  pos-gate[calibrated](thr +196.86) tgt 0.768 / comp 0.055
+  h OfficeHolder             coord-gate tgt 0.952 / comp 0.939  d' med 0.31 max 0.81 (n_salient 922)  AUROC 0.855  pos-gate[fixed](thr +0.00) tgt 0.662 / comp 0.116  pos-gate[calibrated](thr -16.79) tgt 0.726 / comp 0.165
+  z OfficeHolder             coord-gate tgt 0.956 / comp 0.938  d' med 0.26 max 1.20 (n_salient 1843)  AUROC 0.862  pos-gate[fixed](thr +0.00) tgt 0.805 / comp 0.278  pos-gate[calibrated](thr +203.25) tgt 0.672 / comp 0.087
+  h MeanOfTransportation     coord-gate tgt 0.955 / comp 0.934  d' med 0.35 max 0.88 (n_salient 922)  AUROC 0.958  pos-gate[fixed](thr +0.00) tgt 0.775 / comp 0.005  pos-gate[calibrated](thr +1.56) tgt 0.769 / comp 0.004
+  z MeanOfTransportation     coord-gate tgt 0.965 / comp 0.935  d' med 0.28 max 1.94 (n_salient 1843)  AUROC 0.959  pos-gate[fixed](thr +0.00) tgt 0.928 / comp 0.208  pos-gate[calibrated](thr +275.71) tgt 0.763 / comp 0.014
+  h Building                 coord-gate tgt 0.957 / comp 0.943  d' med 0.27 max 0.77 (n_salient 922)  AUROC 0.930  pos-gate[fixed](thr +0.00) tgt 0.741 / comp 0.069  pos-gate[calibrated](thr -18.27) tgt 0.852 / comp 0.131
+  z Building                 coord-gate tgt 0.962 / comp 0.936  d' med 0.26 max 1.41 (n_salient 1843)  AUROC 0.927  pos-gate[fixed](thr +0.00) tgt 0.953 / comp 0.359  pos-gate[calibrated](thr +212.97) tgt 0.808 / comp 0.122
+  h NaturalPlace             coord-gate tgt 0.961 / comp 0.936  d' med 0.34 max 0.82 (n_salient 922)  AUROC 0.958  pos-gate[fixed](thr +0.00) tgt 0.758 / comp 0.042  pos-gate[calibrated](thr -13.06) tgt 0.810 / comp 0.071
+  z NaturalPlace             coord-gate tgt 0.968 / comp 0.932  d' med 0.31 max 1.50 (n_salient 1843)  AUROC 0.948  pos-gate[fixed](thr +0.00) tgt 0.975 / comp 0.326  pos-gate[calibrated](thr +235.07) tgt 0.803 / comp 0.084
+  h Village                  coord-gate tgt 0.959 / comp 0.932  d' med 0.40 max 0.97 (n_salient 922)  AUROC 0.966  pos-gate[fixed](thr +0.00) tgt 0.940 / comp 0.145  pos-gate[calibrated](thr +31.06) tgt 0.857 / comp 0.060
+  z Village                  coord-gate tgt 0.961 / comp 0.940  d' med 0.32 max 1.26 (n_salient 1843)  AUROC 0.972  pos-gate[fixed](thr +0.00) tgt 0.986 / comp 0.251  pos-gate[calibrated](thr +204.34) tgt 0.845 / comp 0.043
+  h Animal                   coord-gate tgt 0.948 / comp 0.913  d' med 0.40 max 1.05 (n_salient 922)  AUROC 0.855  pos-gate[fixed](thr +0.00) tgt 0.760 / comp 0.164  pos-gate[calibrated](thr +40.80) tgt 0.664 / comp 0.060
+  z Animal                   coord-gate tgt 0.956 / comp 0.925  d' med 0.30 max 1.64 (n_salient 1843)  AUROC 0.915  pos-gate[fixed](thr +0.00) tgt 0.854 / comp 0.208  pos-gate[calibrated](thr +275.74) tgt 0.680 / comp 0.049
+  h Plant                    coord-gate tgt 0.952 / comp 0.917  d' med 0.45 max 1.04 (n_salient 922)  AUROC 0.967  pos-gate[fixed](thr +0.00) tgt 0.869 / comp 0.040  pos-gate[calibrated](thr +18.10) tgt 0.800 / comp 0.034
+  z Plant                    coord-gate tgt 0.958 / comp 0.926  d' med 0.32 max 1.74 (n_salient 1843)  AUROC 0.966  pos-gate[fixed](thr +0.00) tgt 0.943 / comp 0.147  pos-gate[calibrated](thr +321.72) tgt 0.772 / comp 0.028
+  h Album                    coord-gate tgt 0.955 / comp 0.928  d' med 0.38 max 1.02 (n_salient 922)  AUROC 0.943  pos-gate[fixed](thr +0.00) tgt 0.782 / comp 0.068  pos-gate[calibrated](thr -21.17) tgt 0.834 / comp 0.098
+  z Album                    coord-gate tgt 0.962 / comp 0.924  d' med 0.28 max 1.93 (n_salient 1843)  AUROC 0.945  pos-gate[fixed](thr +0.00) tgt 0.955 / comp 0.302  pos-gate[calibrated](thr +338.63) tgt 0.804 / comp 0.064
+  h Film                     coord-gate tgt 0.960 / comp 0.928  d' med 0.30 max 0.79 (n_salient 922)  AUROC 0.929  pos-gate[fixed](thr +0.00) tgt 0.848 / comp 0.178  pos-gate[calibrated](thr +2.92) tgt 0.844 / comp 0.161
+  z Film                     coord-gate tgt 0.962 / comp 0.934  d' med 0.24 max 1.40 (n_salient 1843)  AUROC 0.932  pos-gate[fixed](thr +0.00) tgt 0.941 / comp 0.337  pos-gate[calibrated](thr +250.04) tgt 0.842 / comp 0.112
+  h WrittenWork              coord-gate tgt 0.953 / comp 0.941  d' med 0.25 max 0.69 (n_salient 922)  AUROC 0.839  pos-gate[fixed](thr +0.00) tgt 0.648 / comp 0.145  pos-gate[calibrated](thr -21.68) tgt 0.753 / comp 0.249
+  z WrittenWork              coord-gate tgt 0.959 / comp 0.933  d' med 0.23 max 0.95 (n_salient 1843)  AUROC 0.891  pos-gate[fixed](thr +0.00) tgt 0.952 / comp 0.407  pos-gate[calibrated](thr +327.59) tgt 0.768 / comp 0.170
+  [fixed] h: coord-gate tgt 0.95 / comp 0.94; pos-gate tgt 0.76 / comp 0.10, AUROC 0.91 | z: coord-gate tgt 0.96 / comp 0.94; pos-gate tgt 0.92 / comp 0.30, AUROC 0.92
+  [calibrated] h: coord-gate tgt 0.95 / comp 0.94; pos-gate tgt 0.79 / comp 0.12, AUROC 0.91 | z: coord-gate tgt 0.96 / comp 0.94; pos-gate tgt 0.77 / comp 0.10, AUROC 0.92
+
+=== concept 0 (Company) -- complement classes: ['EducationalInstitution', 'Artist', 'Athlete', 'OfficeHolder', 'MeanOfTransportation', 'Building', 'NaturalPlace', 'Village', 'Animal', 'Plant', 'Album', 'Film', 'WrittenWork'] ===
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+[remove] h rm_range_comp        Company              ppl x1.17  distinct2 tgt 0.83 comp 0.89  coord_gate 0.949  pos_gate(tgt/comp) 0.867/0.306  edit_norm 14.514
+[remove] h st_range_a0.5        Company              ppl x0.98  distinct2 tgt 0.82 comp 0.87  coord_gate 0.950  pos_gate(tgt/comp) 0.880/0.324  edit_norm 2.455
+[remove] h st_range_a1.0        Company              ppl x1.06  distinct2 tgt 0.81 comp 0.87  coord_gate 0.949  pos_gate(tgt/comp) 0.882/0.349  edit_norm 5.041
+[remove] h st_range_a2.0        Company              ppl x1.12  distinct2 tgt 0.75 comp 0.90  coord_gate 0.948  pos_gate(tgt/comp) 0.882/0.327  edit_norm 9.870
+[remove] h st_transport_a0.5    Company              ppl x0.98  distinct2 tgt 0.82 comp 0.87  coord_gate 0.950  pos_gate(tgt/comp) 0.875/0.324  edit_norm 2.477
+[remove] h st_transport_a1.0    Company              ppl x1.03  distinct2 tgt 0.82 comp 0.88  coord_gate 0.950  pos_gate(tgt/comp) 0.882/0.341  edit_norm 5.062
+[remove] h st_transport_a2.0    Company              ppl x1.09  distinct2 tgt 0.72 comp 0.88  coord_gate 0.949  pos_gate(tgt/comp) 0.892/0.339  edit_norm 10.182
+[remove] z rm_range_comp        Company              ppl x1.23  distinct2 tgt 0.77 comp 0.85  coord_gate 0.946  pos_gate(tgt/comp) 0.782/0.211  edit_norm 9.979
+[remove] z st_range_a0.5        Company              ppl x0.96  distinct2 tgt 0.81 comp 0.86  coord_gate 0.949  pos_gate(tgt/comp) 0.790/0.156  edit_norm 1.623
+[remove] z st_range_a1.0        Company              ppl x0.98  distinct2 tgt 0.79 comp 0.86  coord_gate 0.949  pos_gate(tgt/comp) 0.772/0.146  edit_norm 3.150
+[remove] z st_range_a2.0        Company              ppl x1.00  distinct2 tgt 0.76 comp 0.88  coord_gate 0.951  pos_gate(tgt/comp) 0.822/0.146  edit_norm 6.629
+[remove] z st_transport_a0.5    Company              ppl x0.99  distinct2 tgt 0.81 comp 0.86  coord_gate 0.949  pos_gate(tgt/comp) 0.795/0.156  edit_norm 2.280
+[remove] z st_transport_a1.0    Company              ppl x0.97  distinct2 tgt 0.72 comp 0.87  coord_gate 0.949  pos_gate(tgt/comp) 0.757/0.186  edit_norm 4.583
+[remove] z st_transport_a2.0    Company              ppl x1.08  distinct2 tgt 0.78 comp 0.88  coord_gate 0.948  pos_gate(tgt/comp) 0.805/0.152  edit_norm 9.279
+
+=== concept 1 (EducationalInstitution) -- complement classes: ['Company', 'Artist', 'Athlete', 'OfficeHolder', 'MeanOfTransportation', 'Building', 'NaturalPlace', 'Village', 'Animal', 'Plant', 'Album', 'Film', 'WrittenWork'] ===
+[remove] h rm_range_comp        EducationalInstitution ppl x1.23  distinct2 tgt 0.72 comp 0.86  coord_gate 0.944  pos_gate(tgt/comp) 0.883/0.093  edit_norm 11.506
+[remove] h st_range_a0.5        EducationalInstitution ppl x1.02  distinct2 tgt 0.85 comp 0.84  coord_gate 0.948  pos_gate(tgt/comp) 0.816/0.104  edit_norm 2.101
+[remove] h st_range_a1.0        EducationalInstitution ppl x1.04  distinct2 tgt 0.78 comp 0.85  coord_gate 0.944  pos_gate(tgt/comp) 0.826/0.096  edit_norm 4.188
+[remove] h st_range_a2.0        EducationalInstitution ppl x1.16  distinct2 tgt 0.74 comp 0.85  coord_gate 0.945  pos_gate(tgt/comp) 0.753/0.085  edit_norm 7.601
+[remove] h st_transport_a0.5    EducationalInstitution ppl x1.03  distinct2 tgt 0.86 comp 0.84  coord_gate 0.947  pos_gate(tgt/comp) 0.808/0.102  edit_norm 2.110
+[remove] h st_transport_a1.0    EducationalInstitution ppl x1.06  distinct2 tgt 0.76 comp 0.88  coord_gate 0.942  pos_gate(tgt/comp) 0.823/0.093  edit_norm 4.208
+[remove] h st_transport_a2.0    EducationalInstitution ppl x1.11  distinct2 tgt 0.70 comp 0.85  coord_gate 0.946  pos_gate(tgt/comp) 0.788/0.085  edit_norm 8.002
+[remove] z rm_range_comp        EducationalInstitution ppl x1.43  distinct2 tgt 0.79 comp 0.85  coord_gate 0.943  pos_gate(tgt/comp) 0.744/0.083  edit_norm 8.614
+[remove] z st_range_a0.5        EducationalInstitution ppl x1.01  distinct2 tgt 0.83 comp 0.82  coord_gate 0.945  pos_gate(tgt/comp) 0.716/0.073  edit_norm 1.635
+[remove] z st_range_a1.0        EducationalInstitution ppl x1.02  distinct2 tgt 0.78 comp 0.80  coord_gate 0.945  pos_gate(tgt/comp) 0.736/0.093  edit_norm 3.451
+[remove] z st_range_a2.0        EducationalInstitution ppl x1.23  distinct2 tgt 0.71 comp 0.80  coord_gate 0.946  pos_gate(tgt/comp) 0.816/0.093  edit_norm 7.538
+[remove] z st_transport_a0.5    EducationalInstitution ppl x1.14  distinct2 tgt 0.85 comp 0.84  coord_gate 0.945  pos_gate(tgt/comp) 0.704/0.066  edit_norm 2.363
+[remove] z st_transport_a1.0    EducationalInstitution ppl x1.03  distinct2 tgt 0.72 comp 0.85  coord_gate 0.944  pos_gate(tgt/comp) 0.691/0.066  edit_norm 4.704
+[remove] z st_transport_a2.0    EducationalInstitution ppl x1.51  distinct2 tgt 0.88 comp 0.85  coord_gate 0.944  pos_gate(tgt/comp) 0.696/0.072  edit_norm 9.575
+
+=== concept 2 (Artist) -- complement classes: ['Company', 'EducationalInstitution', 'Athlete', 'OfficeHolder', 'MeanOfTransportation', 'Building', 'NaturalPlace', 'Village', 'Animal', 'Plant', 'Album', 'Film', 'WrittenWork'] ===
+[remove] h rm_range_comp        Artist               ppl x1.59  distinct2 tgt 0.66 comp 0.88  coord_gate 0.942  pos_gate(tgt/comp) 0.727/0.370  edit_norm 13.357
+[remove] h st_range_a0.5        Artist               ppl x1.14  distinct2 tgt 0.89 comp 0.86  coord_gate 0.949  pos_gate(tgt/comp) 0.804/0.341  edit_norm 2.022
+[remove] h st_range_a1.0        Artist               ppl x1.17  distinct2 tgt 0.87 comp 0.90  coord_gate 0.948  pos_gate(tgt/comp) 0.839/0.374  edit_norm 4.291
+[remove] h st_range_a2.0        Artist               ppl x1.17  distinct2 tgt 0.87 comp 0.88  coord_gate 0.948  pos_gate(tgt/comp) 0.827/0.349  edit_norm 8.294
+[remove] h st_transport_a0.5    Artist               ppl x1.16  distinct2 tgt 0.89 comp 0.86  coord_gate 0.949  pos_gate(tgt/comp) 0.817/0.343  edit_norm 2.079
+[remove] h st_transport_a1.0    Artist               ppl x1.12  distinct2 tgt 0.88 comp 0.89  coord_gate 0.948  pos_gate(tgt/comp) 0.829/0.375  edit_norm 4.335
+[remove] h st_transport_a2.0    Artist               ppl x1.17  distinct2 tgt 0.89 comp 0.88  coord_gate 0.947  pos_gate(tgt/comp) 0.832/0.364  edit_norm 8.581
+[remove] z rm_range_comp        Artist               ppl x1.62  distinct2 tgt 0.84 comp 0.88  coord_gate 0.948  pos_gate(tgt/comp) 0.756/0.322  edit_norm 11.080
+[remove] z st_range_a0.5        Artist               ppl x1.15  distinct2 tgt 0.90 comp 0.86  coord_gate 0.950  pos_gate(tgt/comp) 0.796/0.297  edit_norm 1.758
+[remove] z st_range_a1.0        Artist               ppl x1.29  distinct2 tgt 0.87 comp 0.86  coord_gate 0.950  pos_gate(tgt/comp) 0.826/0.316  edit_norm 3.678
+[remove] z st_range_a2.0        Artist               ppl x1.14  distinct2 tgt 0.88 comp 0.88  coord_gate 0.949  pos_gate(tgt/comp) 0.774/0.326  edit_norm 7.128
+[remove] z st_transport_a0.5    Artist               ppl x1.21  distinct2 tgt 0.91 comp 0.85  coord_gate 0.950  pos_gate(tgt/comp) 0.711/0.327  edit_norm 2.646
+[remove] z st_transport_a1.0    Artist               ppl x1.16  distinct2 tgt 0.92 comp 0.88  coord_gate 0.949  pos_gate(tgt/comp) 0.741/0.316  edit_norm 5.388
+[remove] z st_transport_a2.0    Artist               ppl x1.15  distinct2 tgt 0.86 comp 0.85  coord_gate 0.948  pos_gate(tgt/comp) 0.706/0.345  edit_norm 10.794
+
+=== concept 3 (Athlete) -- complement classes: ['Company', 'EducationalInstitution', 'Artist', 'OfficeHolder', 'MeanOfTransportation', 'Building', 'NaturalPlace', 'Village', 'Animal', 'Plant', 'Album', 'Film', 'WrittenWork'] ===
+[remove] h rm_range_comp        Athlete              ppl x1.15  distinct2 tgt 0.81 comp 0.84  coord_gate 0.939  pos_gate(tgt/comp) 0.797/0.159  edit_norm 11.322
+[remove] h st_range_a0.5        Athlete              ppl x1.05  distinct2 tgt 0.88 comp 0.86  coord_gate 0.944  pos_gate(tgt/comp) 0.734/0.156  edit_norm 1.932
+[remove] h st_range_a1.0        Athlete              ppl x1.26  distinct2 tgt 0.84 comp 0.84  coord_gate 0.942  pos_gate(tgt/comp) 0.747/0.154  edit_norm 3.897
+[remove] h st_range_a2.0        Athlete              ppl x1.30  distinct2 tgt 0.80 comp 0.81  coord_gate 0.942  pos_gate(tgt/comp) 0.754/0.146  edit_norm 7.774
+[remove] h st_transport_a0.5    Athlete              ppl x1.02  distinct2 tgt 0.89 comp 0.86  coord_gate 0.945  pos_gate(tgt/comp) 0.734/0.156  edit_norm 1.957
+[remove] h st_transport_a1.0    Athlete              ppl x0.94  distinct2 tgt 0.86 comp 0.86  coord_gate 0.942  pos_gate(tgt/comp) 0.769/0.152  edit_norm 4.029
+[remove] h st_transport_a2.0    Athlete              ppl x1.31  distinct2 tgt 0.74 comp 0.82  coord_gate 0.942  pos_gate(tgt/comp) 0.769/0.159  edit_norm 8.159
+[remove] z rm_range_comp        Athlete              ppl x1.65  distinct2 tgt 0.84 comp 0.87  coord_gate 0.945  pos_gate(tgt/comp) 0.796/0.104  edit_norm 9.506
+[remove] z st_range_a0.5        Athlete              ppl x1.02  distinct2 tgt 0.89 comp 0.86  coord_gate 0.948  pos_gate(tgt/comp) 0.721/0.096  edit_norm 1.599
+[remove] z st_range_a1.0        Athlete              ppl x1.04  distinct2 tgt 0.85 comp 0.86  coord_gate 0.946  pos_gate(tgt/comp) 0.721/0.123  edit_norm 3.322
+[remove] z st_range_a2.0        Athlete              ppl x1.26  distinct2 tgt 0.87 comp 0.85  coord_gate 0.947  pos_gate(tgt/comp) 0.756/0.092  edit_norm 6.602
+[remove] z st_transport_a0.5    Athlete              ppl x1.04  distinct2 tgt 0.86 comp 0.85  coord_gate 0.946  pos_gate(tgt/comp) 0.721/0.105  edit_norm 2.713
+[remove] z st_transport_a1.0    Athlete              ppl x1.47  distinct2 tgt 0.82 comp 0.85  coord_gate 0.946  pos_gate(tgt/comp) 0.666/0.100  edit_norm 4.950
+[remove] z st_transport_a2.0    Athlete              ppl x1.51  distinct2 tgt 0.86 comp 0.84  coord_gate 0.945  pos_gate(tgt/comp) 0.616/0.094  edit_norm 9.247
+
+=== concept 4 (OfficeHolder) -- complement classes: ['Company', 'EducationalInstitution', 'Artist', 'Athlete', 'MeanOfTransportation', 'Building', 'NaturalPlace', 'Village', 'Animal', 'Plant', 'Album', 'Film', 'WrittenWork'] ===
+[remove] h rm_range_comp        OfficeHolder         ppl x1.24  distinct2 tgt 0.79 comp 0.87  coord_gate 0.940  pos_gate(tgt/comp) 0.782/0.192  edit_norm 11.460
+[remove] h st_range_a0.5        OfficeHolder         ppl x1.04  distinct2 tgt 0.88 comp 0.84  coord_gate 0.943  pos_gate(tgt/comp) 0.775/0.186  edit_norm 2.106
+[remove] h st_range_a1.0        OfficeHolder         ppl x1.04  distinct2 tgt 0.89 comp 0.86  coord_gate 0.943  pos_gate(tgt/comp) 0.762/0.196  edit_norm 4.211
+[remove] h st_range_a2.0        OfficeHolder         ppl x1.69  distinct2 tgt 0.81 comp 0.83  coord_gate 0.944  pos_gate(tgt/comp) 0.707/0.228  edit_norm 8.328
+[remove] h st_transport_a0.5    OfficeHolder         ppl x1.04  distinct2 tgt 0.88 comp 0.85  coord_gate 0.943  pos_gate(tgt/comp) 0.775/0.188  edit_norm 2.136
+[remove] h st_transport_a1.0    OfficeHolder         ppl x1.13  distinct2 tgt 0.90 comp 0.86  coord_gate 0.943  pos_gate(tgt/comp) 0.752/0.196  edit_norm 4.218
+[remove] h st_transport_a2.0    OfficeHolder         ppl x1.71  distinct2 tgt 0.78 comp 0.82  coord_gate 0.944  pos_gate(tgt/comp) 0.715/0.227  edit_norm 8.475
+[remove] z rm_range_comp        OfficeHolder         ppl x1.16  distinct2 tgt 0.60 comp 0.84  coord_gate 0.946  pos_gate(tgt/comp) 0.747/0.111  edit_norm 8.811
+[remove] z st_range_a0.5        OfficeHolder         ppl x1.00  distinct2 tgt 0.87 comp 0.86  coord_gate 0.944  pos_gate(tgt/comp) 0.672/0.146  edit_norm 1.630
+[remove] z st_range_a1.0        OfficeHolder         ppl x1.04  distinct2 tgt 0.89 comp 0.86  coord_gate 0.944  pos_gate(tgt/comp) 0.682/0.144  edit_norm 3.298
+[remove] z st_range_a2.0        OfficeHolder         ppl x1.09  distinct2 tgt 0.84 comp 0.85  coord_gate 0.944  pos_gate(tgt/comp) 0.682/0.109  edit_norm 6.229
+[remove] z st_transport_a0.5    OfficeHolder         ppl x1.03  distinct2 tgt 0.85 comp 0.84  coord_gate 0.945  pos_gate(tgt/comp) 0.734/0.146  edit_norm 2.811
+[remove] z st_transport_a1.0    OfficeHolder         ppl x1.07  distinct2 tgt 0.86 comp 0.85  coord_gate 0.943  pos_gate(tgt/comp) 0.639/0.096  edit_norm 4.651
+[remove] z st_transport_a2.0    OfficeHolder         ppl x1.09  distinct2 tgt 0.94 comp 0.88  coord_gate 0.943  pos_gate(tgt/comp) 0.597/0.088  edit_norm 8.711
+
+=== concept 5 (MeanOfTransportation) -- complement classes: ['Company', 'EducationalInstitution', 'Artist', 'Athlete', 'OfficeHolder', 'Building', 'NaturalPlace', 'Village', 'Animal', 'Plant', 'Album', 'Film', 'WrittenWork'] ===
+[remove] h rm_range_comp        MeanOfTransportation ppl x1.18  distinct2 tgt 0.82 comp 0.82  coord_gate 0.939  pos_gate(tgt/comp) 0.877/0.000  edit_norm 10.314
+[remove] h st_range_a0.5        MeanOfTransportation ppl x1.13  distinct2 tgt 0.84 comp 0.82  coord_gate 0.939  pos_gate(tgt/comp) 0.782/0.000  edit_norm 1.855
+[remove] h st_range_a1.0        MeanOfTransportation ppl x1.11  distinct2 tgt 0.91 comp 0.82  coord_gate 0.940  pos_gate(tgt/comp) 0.824/0.000  edit_norm 3.909
+[remove] h st_range_a2.0        MeanOfTransportation ppl x1.03  distinct2 tgt 0.83 comp 0.82  coord_gate 0.939  pos_gate(tgt/comp) 0.812/0.000  edit_norm 7.694
+[remove] h st_transport_a0.5    MeanOfTransportation ppl x1.12  distinct2 tgt 0.88 comp 0.82  coord_gate 0.940  pos_gate(tgt/comp) 0.787/0.000  edit_norm 1.881
+[remove] h st_transport_a1.0    MeanOfTransportation ppl x0.98  distinct2 tgt 0.88 comp 0.82  coord_gate 0.939  pos_gate(tgt/comp) 0.827/0.000  edit_norm 3.950
+[remove] h st_transport_a2.0    MeanOfTransportation ppl x1.04  distinct2 tgt 0.83 comp 0.82  coord_gate 0.938  pos_gate(tgt/comp) 0.769/0.000  edit_norm 7.347
+[remove] z rm_range_comp        MeanOfTransportation ppl x1.33  distinct2 tgt 0.78 comp 0.82  coord_gate 0.942  pos_gate(tgt/comp) 0.873/0.000  edit_norm 9.838
+[remove] z st_range_a0.5        MeanOfTransportation ppl x0.97  distinct2 tgt 0.90 comp 0.82  coord_gate 0.943  pos_gate(tgt/comp) 0.823/0.000  edit_norm 2.024
+[remove] z st_range_a1.0        MeanOfTransportation ppl x1.00  distinct2 tgt 0.85 comp 0.82  coord_gate 0.942  pos_gate(tgt/comp) 0.868/0.000  edit_norm 4.276
+[remove] z st_range_a2.0        MeanOfTransportation ppl x1.06  distinct2 tgt 0.81 comp 0.82  coord_gate 0.942  pos_gate(tgt/comp) 0.860/0.000  edit_norm 8.470
+[remove] z st_transport_a0.5    MeanOfTransportation ppl x0.98  distinct2 tgt 0.94 comp 0.82  coord_gate 0.943  pos_gate(tgt/comp) 0.793/0.000  edit_norm 2.980
+[remove] z st_transport_a1.0    MeanOfTransportation ppl x1.00  distinct2 tgt 0.89 comp 0.82  coord_gate 0.941  pos_gate(tgt/comp) 0.825/0.000  edit_norm 6.282
+[remove] z st_transport_a2.0    MeanOfTransportation ppl x1.13  distinct2 tgt 0.89 comp 0.82  coord_gate 0.944  pos_gate(tgt/comp) 0.838/0.000  edit_norm 12.481
+
+=== concept 6 (Building) -- complement classes: ['Company', 'EducationalInstitution', 'Artist', 'Athlete', 'OfficeHolder', 'MeanOfTransportation', 'NaturalPlace', 'Village', 'Animal', 'Plant', 'Album', 'Film', 'WrittenWork'] ===
+[remove] h rm_range_comp        Building             ppl x1.25  distinct2 tgt 0.85 comp 0.84  coord_gate 0.949  pos_gate(tgt/comp) 0.887/0.146  edit_norm 12.146
+[remove] h st_range_a0.5        Building             ppl x0.97  distinct2 tgt 0.94 comp 0.84  coord_gate 0.949  pos_gate(tgt/comp) 0.842/0.179  edit_norm 2.032
+[remove] h st_range_a1.0        Building             ppl x0.98  distinct2 tgt 0.87 comp 0.84  coord_gate 0.948  pos_gate(tgt/comp) 0.872/0.171  edit_norm 4.131
+[remove] h st_range_a2.0        Building             ppl x1.09  distinct2 tgt 0.92 comp 0.79  coord_gate 0.949  pos_gate(tgt/comp) 0.827/0.186  edit_norm 8.088
+[remove] h st_transport_a0.5    Building             ppl x0.97  distinct2 tgt 0.94 comp 0.85  coord_gate 0.951  pos_gate(tgt/comp) 0.834/0.179  edit_norm 2.043
+[remove] h st_transport_a1.0    Building             ppl x1.00  distinct2 tgt 0.91 comp 0.84  coord_gate 0.948  pos_gate(tgt/comp) 0.864/0.171  edit_norm 4.150
+[remove] h st_transport_a2.0    Building             ppl x1.03  distinct2 tgt 0.86 comp 0.79  coord_gate 0.950  pos_gate(tgt/comp) 0.877/0.186  edit_norm 8.572
+[remove] z rm_range_comp        Building             ppl x1.31  distinct2 tgt 0.90 comp 0.81  coord_gate 0.941  pos_gate(tgt/comp) 0.878/0.162  edit_norm 11.299
+[remove] z st_range_a0.5        Building             ppl x0.97  distinct2 tgt 0.94 comp 0.84  coord_gate 0.946  pos_gate(tgt/comp) 0.870/0.137  edit_norm 1.973
+[remove] z st_range_a1.0        Building             ppl x0.99  distinct2 tgt 0.94 comp 0.84  coord_gate 0.946  pos_gate(tgt/comp) 0.865/0.139  edit_norm 3.940
+[remove] z st_range_a2.0        Building             ppl x1.22  distinct2 tgt 0.93 comp 0.84  coord_gate 0.946  pos_gate(tgt/comp) 0.815/0.146  edit_norm 7.596
+[remove] z st_transport_a0.5    Building             ppl x0.99  distinct2 tgt 0.96 comp 0.84  coord_gate 0.945  pos_gate(tgt/comp) 0.780/0.139  edit_norm 3.024
+[remove] z st_transport_a1.0    Building             ppl x1.02  distinct2 tgt 0.94 comp 0.83  coord_gate 0.945  pos_gate(tgt/comp) 0.823/0.118  edit_norm 6.161
+[remove] z st_transport_a2.0    Building             ppl x1.56  distinct2 tgt 0.89 comp 0.84  coord_gate 0.946  pos_gate(tgt/comp) 0.773/0.143  edit_norm 11.966
+
+=== concept 7 (NaturalPlace) -- complement classes: ['Company', 'EducationalInstitution', 'Artist', 'Athlete', 'OfficeHolder', 'MeanOfTransportation', 'Building', 'Village', 'Animal', 'Plant', 'Album', 'Film', 'WrittenWork'] ===
+[remove] h rm_range_comp        NaturalPlace         ppl x1.08  distinct2 tgt 0.87 comp 0.80  coord_gate 0.931  pos_gate(tgt/comp) 0.858/0.108  edit_norm 11.182
+[remove] h st_range_a0.5        NaturalPlace         ppl x0.90  distinct2 tgt 0.87 comp 0.82  coord_gate 0.941  pos_gate(tgt/comp) 0.803/0.092  edit_norm 2.101
+[remove] h st_range_a1.0        NaturalPlace         ppl x0.91  distinct2 tgt 0.86 comp 0.82  coord_gate 0.940  pos_gate(tgt/comp) 0.793/0.090  edit_norm 4.142
+[remove] h st_range_a2.0        NaturalPlace         ppl x0.80  distinct2 tgt 0.84 comp 0.82  coord_gate 0.939  pos_gate(tgt/comp) 0.820/0.096  edit_norm 8.608
+[remove] h st_transport_a0.5    NaturalPlace         ppl x0.89  distinct2 tgt 0.86 comp 0.82  coord_gate 0.942  pos_gate(tgt/comp) 0.788/0.092  edit_norm 2.095
+[remove] h st_transport_a1.0    NaturalPlace         ppl x0.90  distinct2 tgt 0.85 comp 0.82  coord_gate 0.940  pos_gate(tgt/comp) 0.800/0.092  edit_norm 4.228
+[remove] h st_transport_a2.0    NaturalPlace         ppl x0.77  distinct2 tgt 0.83 comp 0.82  coord_gate 0.940  pos_gate(tgt/comp) 0.803/0.083  edit_norm 8.377
+[remove] z rm_range_comp        NaturalPlace         ppl x1.55  distinct2 tgt 0.83 comp 0.83  coord_gate 0.944  pos_gate(tgt/comp) 0.803/0.128  edit_norm 10.059
+[remove] z st_range_a0.5        NaturalPlace         ppl x0.98  distinct2 tgt 0.88 comp 0.81  coord_gate 0.944  pos_gate(tgt/comp) 0.773/0.115  edit_norm 2.048
+[remove] z st_range_a1.0        NaturalPlace         ppl x1.02  distinct2 tgt 0.84 comp 0.82  coord_gate 0.943  pos_gate(tgt/comp) 0.778/0.096  edit_norm 4.020
+[remove] z st_range_a2.0        NaturalPlace         ppl x1.40  distinct2 tgt 0.81 comp 0.82  coord_gate 0.943  pos_gate(tgt/comp) 0.741/0.084  edit_norm 7.520
+[remove] z st_transport_a0.5    NaturalPlace         ppl x0.98  distinct2 tgt 0.85 comp 0.82  coord_gate 0.944  pos_gate(tgt/comp) 0.761/0.101  edit_norm 2.933
+[remove] z st_transport_a1.0    NaturalPlace         ppl x1.29  distinct2 tgt 0.85 comp 0.80  coord_gate 0.943  pos_gate(tgt/comp) 0.731/0.107  edit_norm 5.698
+[remove] z st_transport_a2.0    NaturalPlace         ppl x1.47  distinct2 tgt 0.86 comp 0.83  coord_gate 0.943  pos_gate(tgt/comp) 0.691/0.084  edit_norm 10.388
+
+=== concept 8 (Village) -- complement classes: ['Company', 'EducationalInstitution', 'Artist', 'Athlete', 'OfficeHolder', 'MeanOfTransportation', 'Building', 'NaturalPlace', 'Animal', 'Plant', 'Album', 'Film', 'WrittenWork'] ===
+[remove] h rm_range_comp        Village              ppl x1.27  distinct2 tgt 0.65 comp 0.84  coord_gate 0.932  pos_gate(tgt/comp) 0.854/0.093  edit_norm 11.888
+[remove] h st_range_a0.5        Village              ppl x1.03  distinct2 tgt 0.88 comp 0.83  coord_gate 0.940  pos_gate(tgt/comp) 0.936/0.068  edit_norm 2.734
+[remove] h st_range_a1.0        Village              ppl x1.06  distinct2 tgt 0.83 comp 0.83  coord_gate 0.937  pos_gate(tgt/comp) 0.854/0.068  edit_norm 5.005
+[remove] h st_range_a2.0        Village              ppl x1.31  distinct2 tgt 0.71 comp 0.83  coord_gate 0.932  pos_gate(tgt/comp) 0.851/0.070  edit_norm 9.944
+[remove] h st_transport_a0.5    Village              ppl x1.03  distinct2 tgt 0.89 comp 0.83  coord_gate 0.940  pos_gate(tgt/comp) 0.934/0.068  edit_norm 2.806
+[remove] h st_transport_a1.0    Village              ppl x1.07  distinct2 tgt 0.86 comp 0.83  coord_gate 0.939  pos_gate(tgt/comp) 0.866/0.068  edit_norm 5.230
+[remove] h st_transport_a2.0    Village              ppl x1.28  distinct2 tgt 0.72 comp 0.83  coord_gate 0.933  pos_gate(tgt/comp) 0.821/0.070  edit_norm 9.964
+[remove] z rm_range_comp        Village              ppl x1.36  distinct2 tgt 0.72 comp 0.79  coord_gate 0.942  pos_gate(tgt/comp) 0.867/0.085  edit_norm 10.809
+[remove] z st_range_a0.5        Village              ppl x1.00  distinct2 tgt 0.91 comp 0.83  coord_gate 0.947  pos_gate(tgt/comp) 0.887/0.021  edit_norm 2.113
+[remove] z st_range_a1.0        Village              ppl x1.04  distinct2 tgt 0.90 comp 0.83  coord_gate 0.945  pos_gate(tgt/comp) 0.887/0.021  edit_norm 4.215
+[remove] z st_range_a2.0        Village              ppl x1.16  distinct2 tgt 0.77 comp 0.83  coord_gate 0.940  pos_gate(tgt/comp) 0.864/0.021  edit_norm 8.126
+[remove] z st_transport_a0.5    Village              ppl x1.02  distinct2 tgt 0.92 comp 0.83  coord_gate 0.947  pos_gate(tgt/comp) 0.887/0.021  edit_norm 3.030
+[remove] z st_transport_a1.0    Village              ppl x1.05  distinct2 tgt 0.90 comp 0.83  coord_gate 0.947  pos_gate(tgt/comp) 0.894/0.021  edit_norm 6.106
+[remove] z st_transport_a2.0    Village              ppl x1.24  distinct2 tgt 0.83 comp 0.83  coord_gate 0.941  pos_gate(tgt/comp) 0.892/0.021  edit_norm 12.474
+
+=== concept 9 (Animal) -- complement classes: ['Company', 'EducationalInstitution', 'Artist', 'Athlete', 'OfficeHolder', 'MeanOfTransportation', 'Building', 'NaturalPlace', 'Village', 'Plant', 'Album', 'Film', 'WrittenWork'] ===
+[remove] h rm_range_comp        Animal               ppl x1.15  distinct2 tgt 0.67 comp 0.85  coord_gate 0.919  pos_gate(tgt/comp) 0.633/0.038  edit_norm 7.599
+[remove] h st_range_a0.5        Animal               ppl x1.11  distinct2 tgt 0.84 comp 0.85  coord_gate 0.930  pos_gate(tgt/comp) 0.806/0.061  edit_norm 2.370
+[remove] h st_range_a1.0        Animal               ppl x1.35  distinct2 tgt 0.71 comp 0.85  coord_gate 0.925  pos_gate(tgt/comp) 0.746/0.033  edit_norm 4.213
+[remove] h st_range_a2.0        Animal               ppl x1.06  distinct2 tgt 0.69 comp 0.85  coord_gate 0.926  pos_gate(tgt/comp) 0.721/0.054  edit_norm 8.457
+[remove] h st_transport_a0.5    Animal               ppl x1.06  distinct2 tgt 0.83 comp 0.85  coord_gate 0.928  pos_gate(tgt/comp) 0.796/0.050  edit_norm 2.327
+[remove] h st_transport_a1.0    Animal               ppl x1.38  distinct2 tgt 0.77 comp 0.86  coord_gate 0.927  pos_gate(tgt/comp) 0.796/0.069  edit_norm 4.783
+[remove] h st_transport_a2.0    Animal               ppl x1.04  distinct2 tgt 0.71 comp 0.85  coord_gate 0.926  pos_gate(tgt/comp) 0.733/0.054  edit_norm 8.724
+[remove] z rm_range_comp        Animal               ppl x0.71  distinct2 tgt 0.69 comp 0.85  coord_gate 0.935  pos_gate(tgt/comp) 0.838/0.024  edit_norm 9.435
+[remove] z st_range_a0.5        Animal               ppl x0.88  distinct2 tgt 0.83 comp 0.85  coord_gate 0.938  pos_gate(tgt/comp) 0.688/0.059  edit_norm 1.847
+[remove] z st_range_a1.0        Animal               ppl x0.96  distinct2 tgt 0.77 comp 0.86  coord_gate 0.935  pos_gate(tgt/comp) 0.671/0.063  edit_norm 3.634
+[remove] z st_range_a2.0        Animal               ppl x0.76  distinct2 tgt 0.84 comp 0.85  coord_gate 0.935  pos_gate(tgt/comp) 0.751/0.045  edit_norm 7.839
+[remove] z st_transport_a0.5    Animal               ppl x1.53  distinct2 tgt 0.77 comp 0.85  coord_gate 0.937  pos_gate(tgt/comp) 0.586/0.041  edit_norm 2.303
+[remove] z st_transport_a1.0    Animal               ppl x1.17  distinct2 tgt 0.77 comp 0.82  coord_gate 0.937  pos_gate(tgt/comp) 0.666/0.072  edit_norm 5.528
+[remove] z st_transport_a2.0    Animal               ppl x1.48  distinct2 tgt 0.68 comp 0.83  coord_gate 0.935  pos_gate(tgt/comp) 0.658/0.034  edit_norm 10.441
+
+=== concept 10 (Plant) -- complement classes: ['Company', 'EducationalInstitution', 'Artist', 'Athlete', 'OfficeHolder', 'MeanOfTransportation', 'Building', 'NaturalPlace', 'Village', 'Animal', 'Album', 'Film', 'WrittenWork'] ===
+[remove] h rm_range_comp        Plant                ppl x1.10  distinct2 tgt 0.71 comp 0.80  coord_gate 0.926  pos_gate(tgt/comp) 0.791/0.017  edit_norm 9.781
+[remove] h st_range_a0.5        Plant                ppl x0.97  distinct2 tgt 0.91 comp 0.82  coord_gate 0.932  pos_gate(tgt/comp) 0.836/0.032  edit_norm 2.589
+[remove] h st_range_a1.0        Plant                ppl x1.00  distinct2 tgt 0.91 comp 0.82  coord_gate 0.930  pos_gate(tgt/comp) 0.831/0.034  edit_norm 5.152
+[remove] h st_range_a2.0        Plant                ppl x1.44  distinct2 tgt 0.71 comp 0.80  coord_gate 0.928  pos_gate(tgt/comp) 0.769/0.040  edit_norm 9.646
+[remove] h st_transport_a0.5    Plant                ppl x0.97  distinct2 tgt 0.91 comp 0.82  coord_gate 0.930  pos_gate(tgt/comp) 0.819/0.032  edit_norm 2.544
+[remove] h st_transport_a1.0    Plant                ppl x0.97  distinct2 tgt 0.86 comp 0.82  coord_gate 0.931  pos_gate(tgt/comp) 0.846/0.034  edit_norm 5.273
+[remove] h st_transport_a2.0    Plant                ppl x1.74  distinct2 tgt 0.72 comp 0.79  coord_gate 0.929  pos_gate(tgt/comp) 0.771/0.017  edit_norm 9.378
+[remove] z rm_range_comp        Plant                ppl x0.80  distinct2 tgt 0.59 comp 0.79  coord_gate 0.937  pos_gate(tgt/comp) 0.840/0.043  edit_norm 10.639
+[remove] z st_range_a0.5        Plant                ppl x1.03  distinct2 tgt 0.90 comp 0.82  coord_gate 0.937  pos_gate(tgt/comp) 0.760/0.024  edit_norm 2.294
+[remove] z st_range_a1.0        Plant                ppl x1.07  distinct2 tgt 0.87 comp 0.82  coord_gate 0.937  pos_gate(tgt/comp) 0.805/0.026  edit_norm 4.864
+[remove] z st_range_a2.0        Plant                ppl x1.45  distinct2 tgt 0.65 comp 0.82  coord_gate 0.934  pos_gate(tgt/comp) 0.765/0.026  edit_norm 9.177
+[remove] z st_transport_a0.5    Plant                ppl x1.01  distinct2 tgt 0.90 comp 0.82  coord_gate 0.937  pos_gate(tgt/comp) 0.770/0.026  edit_norm 3.293
+[remove] z st_transport_a1.0    Plant                ppl x1.08  distinct2 tgt 0.90 comp 0.82  coord_gate 0.937  pos_gate(tgt/comp) 0.818/0.026  edit_norm 7.069
+[remove] z st_transport_a2.0    Plant                ppl x1.08  distinct2 tgt 0.90 comp 0.82  coord_gate 0.936  pos_gate(tgt/comp) 0.823/0.028  edit_norm 14.083
+
+=== concept 11 (Album) -- complement classes: ['Company', 'EducationalInstitution', 'Artist', 'Athlete', 'OfficeHolder', 'MeanOfTransportation', 'Building', 'NaturalPlace', 'Village', 'Animal', 'Plant', 'Film', 'WrittenWork'] ===
+[remove] h rm_range_comp        Album                ppl x1.12  distinct2 tgt 0.76 comp 0.86  coord_gate 0.935  pos_gate(tgt/comp) 0.905/0.147  edit_norm 12.748
+[remove] h st_range_a0.5        Album                ppl x1.03  distinct2 tgt 0.89 comp 0.86  coord_gate 0.939  pos_gate(tgt/comp) 0.830/0.127  edit_norm 2.532
+[remove] h st_range_a1.0        Album                ppl x0.92  distinct2 tgt 0.90 comp 0.87  coord_gate 0.936  pos_gate(tgt/comp) 0.860/0.145  edit_norm 5.316
+[remove] h st_range_a2.0        Album                ppl x1.06  distinct2 tgt 0.91 comp 0.87  coord_gate 0.934  pos_gate(tgt/comp) 0.838/0.139  edit_norm 10.307
+[remove] h st_transport_a0.5    Album                ppl x1.01  distinct2 tgt 0.89 comp 0.86  coord_gate 0.939  pos_gate(tgt/comp) 0.803/0.127  edit_norm 2.484
+[remove] h st_transport_a1.0    Album                ppl x0.93  distinct2 tgt 0.92 comp 0.88  coord_gate 0.936  pos_gate(tgt/comp) 0.863/0.145  edit_norm 5.373
+[remove] h st_transport_a2.0    Album                ppl x1.07  distinct2 tgt 0.85 comp 0.87  coord_gate 0.934  pos_gate(tgt/comp) 0.875/0.135  edit_norm 10.733
+[remove] z rm_range_comp        Album                ppl x1.32  distinct2 tgt 0.64 comp 0.86  coord_gate 0.939  pos_gate(tgt/comp) 0.914/0.129  edit_norm 12.160
+[remove] z st_range_a0.5        Album                ppl x0.98  distinct2 tgt 0.88 comp 0.86  coord_gate 0.940  pos_gate(tgt/comp) 0.861/0.117  edit_norm 2.630
+[remove] z st_range_a1.0        Album                ppl x1.26  distinct2 tgt 0.89 comp 0.87  coord_gate 0.939  pos_gate(tgt/comp) 0.846/0.105  edit_norm 5.101
+[remove] z st_range_a2.0        Album                ppl x1.47  distinct2 tgt 0.77 comp 0.86  coord_gate 0.939  pos_gate(tgt/comp) 0.866/0.115  edit_norm 10.524
+[remove] z st_transport_a0.5    Album                ppl x0.97  distinct2 tgt 0.93 comp 0.86  coord_gate 0.939  pos_gate(tgt/comp) 0.841/0.115  edit_norm 3.710
+[remove] z st_transport_a1.0    Album                ppl x1.23  distinct2 tgt 0.93 comp 0.87  coord_gate 0.938  pos_gate(tgt/comp) 0.809/0.119  edit_norm 7.253
+[remove] z st_transport_a2.0    Album                ppl x1.67  distinct2 tgt 0.87 comp 0.87  coord_gate 0.937  pos_gate(tgt/comp) 0.809/0.119  edit_norm 14.365
+
+=== concept 12 (Film) -- complement classes: ['Company', 'EducationalInstitution', 'Artist', 'Athlete', 'OfficeHolder', 'MeanOfTransportation', 'Building', 'NaturalPlace', 'Village', 'Animal', 'Plant', 'Album', 'WrittenWork'] ===
+[remove] h rm_range_comp        Film                 ppl x1.21  distinct2 tgt 0.73 comp 0.81  coord_gate 0.931  pos_gate(tgt/comp) 0.745/0.143  edit_norm 9.865
+[remove] h st_range_a0.5        Film                 ppl x0.90  distinct2 tgt 0.97 comp 0.83  coord_gate 0.941  pos_gate(tgt/comp) 0.857/0.183  edit_norm 2.186
+[remove] h st_range_a1.0        Film                 ppl x0.95  distinct2 tgt 0.93 comp 0.81  coord_gate 0.938  pos_gate(tgt/comp) 0.817/0.160  edit_norm 4.087
+[remove] h st_range_a2.0        Film                 ppl x1.14  distinct2 tgt 0.80 comp 0.84  coord_gate 0.933  pos_gate(tgt/comp) 0.787/0.183  edit_norm 8.137
+[remove] h st_transport_a0.5    Film                 ppl x0.90  distinct2 tgt 0.96 comp 0.81  coord_gate 0.941  pos_gate(tgt/comp) 0.852/0.177  edit_norm 2.188
+[remove] h st_transport_a1.0    Film                 ppl x0.96  distinct2 tgt 0.92 comp 0.81  coord_gate 0.938  pos_gate(tgt/comp) 0.845/0.174  edit_norm 4.323
+[remove] h st_transport_a2.0    Film                 ppl x1.24  distinct2 tgt 0.79 comp 0.82  coord_gate 0.936  pos_gate(tgt/comp) 0.817/0.156  edit_norm 8.217
+[remove] z rm_range_comp        Film                 ppl x1.27  distinct2 tgt 0.73 comp 0.78  coord_gate 0.940  pos_gate(tgt/comp) 0.802/0.089  edit_norm 9.350
+[remove] z st_range_a0.5        Film                 ppl x0.90  distinct2 tgt 0.97 comp 0.84  coord_gate 0.945  pos_gate(tgt/comp) 0.797/0.126  edit_norm 1.797
+[remove] z st_range_a1.0        Film                 ppl x0.95  distinct2 tgt 0.96 comp 0.84  coord_gate 0.943  pos_gate(tgt/comp) 0.772/0.110  edit_norm 3.444
+[remove] z st_range_a2.0        Film                 ppl x1.06  distinct2 tgt 0.84 comp 0.84  coord_gate 0.942  pos_gate(tgt/comp) 0.797/0.132  edit_norm 7.260
+[remove] z st_transport_a0.5    Film                 ppl x0.90  distinct2 tgt 0.96 comp 0.84  coord_gate 0.944  pos_gate(tgt/comp) 0.782/0.124  edit_norm 2.699
+[remove] z st_transport_a1.0    Film                 ppl x0.94  distinct2 tgt 0.96 comp 0.83  coord_gate 0.943  pos_gate(tgt/comp) 0.747/0.093  edit_norm 5.042
+[remove] z st_transport_a2.0    Film                 ppl x1.51  distinct2 tgt 0.92 comp 0.82  coord_gate 0.942  pos_gate(tgt/comp) 0.789/0.110  edit_norm 10.793
+
+=== concept 13 (WrittenWork) -- complement classes: ['Company', 'EducationalInstitution', 'Artist', 'Athlete', 'OfficeHolder', 'MeanOfTransportation', 'Building', 'NaturalPlace', 'Village', 'Animal', 'Plant', 'Album', 'Film'] ===
+[remove] h rm_range_comp        WrittenWork          ppl x1.26  distinct2 tgt 0.87 comp 0.86  coord_gate 0.943  pos_gate(tgt/comp) 0.875/0.251  edit_norm 13.078
+[remove] h st_range_a0.5        WrittenWork          ppl x1.01  distinct2 tgt 0.90 comp 0.82  coord_gate 0.945  pos_gate(tgt/comp) 0.815/0.222  edit_norm 1.891
+[remove] h st_range_a1.0        WrittenWork          ppl x1.02  distinct2 tgt 0.89 comp 0.83  coord_gate 0.945  pos_gate(tgt/comp) 0.783/0.237  edit_norm 3.744
+[remove] h st_range_a2.0        WrittenWork          ppl x1.13  distinct2 tgt 0.91 comp 0.87  coord_gate 0.943  pos_gate(tgt/comp) 0.795/0.226  edit_norm 7.460
+[remove] h st_transport_a0.5    WrittenWork          ppl x1.02  distinct2 tgt 0.91 comp 0.82  coord_gate 0.945  pos_gate(tgt/comp) 0.820/0.222  edit_norm 1.934
+[remove] h st_transport_a1.0    WrittenWork          ppl x1.02  distinct2 tgt 0.89 comp 0.83  coord_gate 0.944  pos_gate(tgt/comp) 0.780/0.235  edit_norm 3.789
+[remove] h st_transport_a2.0    WrittenWork          ppl x1.13  distinct2 tgt 0.91 comp 0.87  coord_gate 0.943  pos_gate(tgt/comp) 0.800/0.224  edit_norm 7.601
+[remove] z rm_range_comp        WrittenWork          ppl x1.25  distinct2 tgt 0.80 comp 0.85  coord_gate 0.942  pos_gate(tgt/comp) 0.787/0.158  edit_norm 8.814
+[remove] z st_range_a0.5        WrittenWork          ppl x1.00  distinct2 tgt 0.90 comp 0.83  coord_gate 0.943  pos_gate(tgt/comp) 0.822/0.142  edit_norm 1.535
+[remove] z st_range_a1.0        WrittenWork          ppl x1.02  distinct2 tgt 0.91 comp 0.82  coord_gate 0.943  pos_gate(tgt/comp) 0.807/0.152  edit_norm 3.063
+[remove] z st_range_a2.0        WrittenWork          ppl x1.09  distinct2 tgt 0.87 comp 0.81  coord_gate 0.943  pos_gate(tgt/comp) 0.797/0.146  edit_norm 6.022
+[remove] z st_transport_a0.5    WrittenWork          ppl x1.01  distinct2 tgt 0.96 comp 0.83  coord_gate 0.943  pos_gate(tgt/comp) 0.822/0.144  edit_norm 2.527
+[remove] z st_transport_a1.0    WrittenWork          ppl x1.01  distinct2 tgt 0.89 comp 0.84  coord_gate 0.943  pos_gate(tgt/comp) 0.817/0.139  edit_norm 4.975
+[remove] z st_transport_a2.0    WrittenWork          ppl x1.08  distinct2 tgt 0.87 comp 0.84  coord_gate 0.942  pos_gate(tgt/comp) 0.774/0.150  edit_norm 9.662
+[remove] wrote eval_out/concept_remove_generate.json

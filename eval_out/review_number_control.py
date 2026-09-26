@@ -1,3 +1,4 @@
+import argparse
 import json
 from pathlib import Path
 import numpy as np
@@ -5,7 +6,13 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-source=Path('results/range_number_dpc_control.json')
+parser = argparse.ArgumentParser(description='Audit and plot one completed number-control run.')
+parser.add_argument('--source', default='results/range_number_dpc_control.json')
+parser.add_argument('--review_out', default='eval_out/number_control_review.json')
+parser.add_argument('--figure_prefix', default='figures/number_control/review')
+args = parser.parse_args()
+
+source=Path(args.source)
 d=json.loads(source.read_text()); arms=d['arms']; examples=d['test_examples']
 assert d['status']=='complete' and len(arms)==144
 fit=d['fit_examples']; labels=np.array([x['subject_number'] for x in examples])
@@ -56,7 +63,8 @@ report={'source':str(source),'checked_arms':len(arms),'holdouts_disjoint':True,
  'drop_summaries_recomputed_from_rows':True, 'flip_definition': 'gold_pair_probability < 0.5; exact ties reported separately','n_test':len(examples),'n_subject_lemmas':len(nouns),
  'averages_over_suppression_directions':summary,'paired_alpha1_comparisons':comparisons,
  'caveat':'Bootstrap resamples the 12 held-out subject nouns; it does not capture training-seed or template-family uncertainty.'}
-Path('eval_out/number_control_review.json').write_text(json.dumps(report,indent=2)+'\n')
+review_out=Path(args.review_out);review_out.parent.mkdir(parents=True,exist_ok=True)
+review_out.write_text(json.dumps(report,indent=2)+'\n')
 
 plt.rcParams.update({'font.size':10,'axes.spines.top':False,'axes.spines.right':False})
 fig,(ax,bx)=plt.subplots(1,2,figsize=(13,5.5),gridspec_kw={'width_ratios':[1,1.2]})
@@ -68,7 +76,7 @@ for source_num,direction,color in [(0,'singular','#4263eb'),(1,'plural','#0b9b83
 ax.set_xticks(x,['Residual','GeoAE','Rotation 0','Rotation 1','Rotation 2','Shuffled'],rotation=25,ha='right')
 ax.set_ylim(0,112);ax.set_ylabel('Target is/are preference flipped (%)')
 ax.set_title('Range shift at alpha = 1')
-ax.legend(loc='upper right',fontsize=9);ax.grid(axis='y',alpha=.2);ax.set_axisbelow(True)
+ax.legend(loc='lower right',fontsize=9);ax.grid(axis='y',alpha=.2);ax.set_axisbelow(True)
 styles=[('h','global','Residual global','#777777','--'),('z','global','GeoAE global','#5f3dc4','--'),
  ('z','salient','GeoAE salient','#e67700','-.'),('z','range','GeoAE range','#4263eb','-'),
  ('z','transport','GeoAE transport','#0b9b83','-')]
@@ -83,8 +91,8 @@ bx.set_ylabel('Target is/are preference flipped (%)');bx.set_title('Effect versu
 bx.grid(alpha=.2);bx.legend(fontsize=8,loc='lower right')
 fig.suptitle('Number control: learned coordinates retain stronger coordinate-wise edits',fontsize=13)
 fig.text(.5,.01,'144 held-out prompts; 12 subject nouns; 16 neutral prompts. Points: alpha 0.5, 1, 2. Strict forced-choice flips exclude ties and are not full-vocabulary generation hits.',ha='center',fontsize=8)
-fig.tight_layout(rect=[0,.045,1,.95]);out=Path('figures/number_control');out.mkdir(exist_ok=True)
-fig.savefig(out/'review.png',dpi=180);fig.savefig(out/'review.pdf');plt.close(fig)
+fig.tight_layout(rect=[0,.045,1,.95]);figure_prefix=Path(args.figure_prefix);figure_prefix.parent.mkdir(parents=True,exist_ok=True)
+fig.savefig(figure_prefix.with_suffix('.png'),dpi=180);fig.savefig(figure_prefix.with_suffix('.pdf'));plt.close(fig)
 print(json.dumps(comparisons,indent=2))
 print('Audit: all 144 arm summaries match saved per-example outcomes; held-out nouns/templates/prompts are disjoint.')
-print('Saved eval_out/number_control_review.json and figures/number_control/review.{png,pdf}')
+print(f'Saved {review_out} and {figure_prefix}.{{png,pdf}}')

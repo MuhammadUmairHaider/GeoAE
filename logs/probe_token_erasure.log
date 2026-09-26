@@ -1,0 +1,117 @@
+[probe] excluding anchor rows from 22 rungs (per_class=25, seed=42)
+[probe] loaded d6144_new
+[collect] Loading baseline k-means centroids: e2e/checkpoints/general/llama3.2-3B/layer27/balanced_kmeans_k2000_dpc_sampled.npz
+[probe] loaded km_new
+[collect] Loading baseline k-means centroids: e2e/checkpoints/general/llama3.2-3B/layer27/balanced_kmeans_k2000_dpc_sampled_tok64.npz
+[probe] km_tok64: 64 token directions erased before assignment
+[probe] loaded km_tok64
+[collect] Loading baseline k-means centroids: e2e/checkpoints/general/llama3.2-3B/layer27/balanced_kmeans_k2000_dpc_sampled_tok256.npz
+[probe] km_tok256: 256 token directions erased before assignment
+[probe] loaded km_tok256
+[collect] Loading baseline k-means centroids: e2e/checkpoints/general/llama3.2-3B/layer27/balanced_kmeans_k2000_dpc_sampled_pca64.npz
+[probe] km_pca64: 64 pca directions erased before assignment
+[probe] loaded km_pca64
+[probe] surface         excluded 175 anchor rows (0.1% of the rung)
+[probe] surface         token     n= 80,000 classes=  7
+[probe] pos_coarse      excluded 341 anchor rows (0.2% of the rung)
+[probe] pos_coarse      token     n= 80,000 classes= 13
+[probe] pos_fine        excluded 1,066 anchor rows (0.6% of the rung)
+[probe] pos_fine        token     n= 80,000 classes= 40
+[probe] ner_coarse      excluded 225 anchor rows (0.1% of the rung)
+[probe] ner_coarse      token     n= 80,000 classes=  9
+[probe] ner_fine        excluded 1,675 anchor rows (0.9% of the rung)
+[probe] ner_fine        token     n= 80,000 classes= 67
+[probe] sentiment       excluded 50 anchor rows (1.7% of the rung)
+[probe] sentiment       sequence  n=  2,950 classes=  2
+[probe] sentiment_long  excluded 50 anchor rows (2.5% of the rung)
+[probe] sentiment_long  sequence  n=  1,950 classes=  2
+[probe] subjectivity    excluded 50 anchor rows (1.7% of the rung)
+[probe] subjectivity    sequence  n=  2,950 classes=  2
+[probe] formality       excluded 75 anchor rows (1.2% of the rung)
+[probe] formality       sequence  n=  5,925 classes=  3
+[probe] atlas_doc       excluded 2,831 anchor rows (78.6% of the rung)
+[probe] atlas_doc       sequence  n=    773 classes= 18
+[probe] atlas_tone      excluded 5,002 anchor rows (76.8% of the rung)
+[probe] atlas_tone      sequence  n=  1,508 classes= 67
+[probe] atlas_content   excluded 4,788 anchor rows (79.6% of the rung)
+[probe] atlas_content   sequence  n=  1,224 classes= 65
+[probe] language        excluded 500 anchor rows (16.7% of the rung)
+[probe] language        sequence  n=  2,500 classes= 20
+[probe] domain          excluded 75 anchor rows (2.1% of the rung)
+[probe] domain          sequence  n=  3,525 classes=  3
+[probe] topic4          excluded 100 anchor rows (3.3% of the rung)
+[probe] topic4          sequence  n=  2,900 classes=  4
+[probe] topic14         excluded 350 anchor rows (5.8% of the rung)
+[probe] topic14         sequence  n=  5,650 classes= 14
+[probe] topic20         excluded 500 anchor rows (16.7% of the rung)
+[probe] topic20         sequence  n=  2,500 classes= 20
+[probe] ravel_country   excluded 2,520 anchor rows (31.5% of the rung)
+[probe] ravel_country   token     n=  5,480 classes= 73
+[probe] ravel_continent excluded 150 anchor rows (1.9% of the rung)
+[probe] ravel_continent token     n=  7,850 classes=  6
+[probe] ravel_language  excluded 1,976 anchor rows (24.7% of the rung)
+[probe] ravel_language  token     n=  6,024 classes= 53
+[probe] ioi_role        excluded 75 anchor rows (0.3% of the rung)
+[probe] ioi_role        token     n= 23,925 classes=  3
+[probe] ioi_name        excluded 1,100 anchor rows (4.6% of the rung)
+[probe] ioi_name        token     n= 22,900 classes= 44
+
+================================================================================================
+NMI  (higher = better)
+rung            grain          d6144_new        km_new      km_tok64     km_tok256      km_pca64
+surface         token             0.2598        0.2387        0.1863        0.1619        0.2108
+pos_coarse      token             0.4165        0.3539        0.2148        0.1664        0.2925
+pos_fine        token             0.4660        0.4048        0.2537        0.1977        0.3370
+ner_coarse      token             0.1488        0.1341        0.1110        0.0973        0.1184
+ner_fine        token             0.1756        0.1626        0.1507        0.1387        0.1572
+sentiment       sequence          0.0035        0.0024        0.0087        0.0095        0.0030
+sentiment_long  sequence          0.0648        0.0534        0.0584        0.0438        0.0545
+subjectivity    sequence          0.0488        0.0405        0.1339        0.1612        0.0900
+formality       sequence          0.1212        0.1165        0.1053        0.1008        0.1015
+atlas_doc       sequence          0.3362        0.3854        0.4993        0.4861        0.4585
+atlas_tone      sequence          0.2935        0.3239        0.4789        0.4974        0.4339
+atlas_content   sequence          0.3166        0.3673        0.5520        0.5652        0.4851
+language        sequence          0.5846        0.6379        0.7288        0.8081        0.7157
+domain          sequence          0.3363        0.3477        0.3466        0.3398        0.3358
+topic4          sequence          0.0867        0.0875        0.2351        0.2194        0.2212
+topic14         sequence          0.3503        0.4862        0.6237        0.5783        0.5947
+topic20         sequence          0.2777        0.2710        0.2916        0.2998        0.2801
+ravel_country   token             0.2790        0.3743        0.5177        0.6680        0.4664
+ravel_continent token             0.1417        0.1918        0.2833        0.3861        0.2461
+ravel_language  token             0.2240        0.3338        0.4798        0.5937        0.4225
+ioi_role        token             0.4268        0.3746        0.5165        0.4168        0.5012
+ioi_name        token             0.2047        0.1608        0.1718        0.1784        0.2158
+------------------------------------------------------------------------------------------------
+MEAN TOKEN      (10 rungs)        0.2743        0.2729        0.2886        0.3005        0.2968
+MEAN SEQUENCE   (12 rungs)        0.2350        0.2600        0.3385        0.3424        0.3145
+
+================================================================================================
+F1  (higher = better)
+rung            grain          d6144_new        km_new      km_tok64     km_tok256      km_pca64
+surface         token             0.2127        0.2065        0.2387        0.2606        0.2402
+pos_coarse      token             0.1339        0.1353        0.1368        0.1465        0.1603
+pos_fine        token             0.2541        0.2354        0.1977        0.1168        0.2612
+ner_coarse      token             0.1239        0.1250        0.1342        0.1241        0.1146
+ner_fine        token             0.1089        0.1168        0.1421        0.1368        0.1388
+sentiment       sequence          0.6554        0.5110        0.6320        0.6307        0.6436
+sentiment_long  sequence          0.3014        0.3054        0.3987        0.3797        0.2233
+subjectivity    sequence          0.4279        0.5518        0.5554        0.5438        0.4487
+formality       sequence          0.3108        0.3350        0.2581        0.3034        0.2316
+atlas_doc       sequence          0.1937        0.2195        0.1398        0.0561        0.1359
+atlas_tone      sequence          0.1215        0.1338        0.0928        0.0846        0.1358
+atlas_content   sequence          0.1177        0.1491        0.1345        0.0889        0.1329
+language        sequence          0.4429        0.5152        0.6646        0.7656        0.6511
+domain          sequence          0.3572        0.4226        0.4782        0.5187        0.4003
+topic4          sequence          0.3208        0.2717        0.3206        0.3286        0.3175
+topic14         sequence          0.3051        0.4078        0.5703        0.4876        0.5258
+topic20         sequence          0.0992        0.1180        0.1274        0.1421        0.1212
+ravel_country   token             0.1323        0.1748        0.3040        0.4171        0.2415
+ravel_continent token             0.2834        0.3152        0.3986        0.4684        0.3402
+ravel_language  token             0.1513        0.2332        0.4069        0.5401        0.3313
+ioi_role        token             0.5838        0.5766        0.7273        0.6291        0.7289
+ioi_name        token             0.1729        0.1474        0.1523        0.1583        0.1841
+------------------------------------------------------------------------------------------------
+MEAN TOKEN      (10 rungs)        0.2157        0.2266        0.2839        0.2998        0.2741
+MEAN SEQUENCE   (12 rungs)        0.3045        0.3284        0.3644        0.3608        0.3306
+
+[probe] wrote eval_out/probe_token_erasure.json

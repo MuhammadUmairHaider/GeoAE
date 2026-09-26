@@ -1,0 +1,60 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[collect] Device: cuda
+[collect] Loading AE checkpoint: checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_dpc_sampled/step_0014450.pt
+[collect] Mode: learned AE  K=2000  layer=27
+[collect] Loading LM: meta-llama/Llama-3.2-3B
+[collect] Held-out docs from activations_sampled_10M (context 2048, 64 pos/doc):
+[collect]   + edu_web    w=40   skip first 62,500 docs
+[collect]   + web        w=15   skip first 23,448 docs
+[collect]   + wiki       w=15   skip first 24,233 docs
+[collect]   + pile       w=10   skip first 15,719 docs
+[collect]   + code       w=8    skip first 12,500 docs
+[collect]   + math       w=5    skip first 7,815 docs
+[collect]   + wiki_de    w=3    skip first 4,729 docs
+[collect]   + wiki_fr    w=2    skip first 3,159 docs
+[collect]   + wiki_es    w=2    skip first 3,146 docs
+[collect] Encoded 500,000 candidate tokens across 7,857 docs (skipped first 4 tok/doc).
+[collect] live clusters (>= 1 tok): 2000/2000  (skipping 0 dead)
+[collect] Saved 2000 live clusters -> results/closest_tokens_dpc_sampled_heldout.json
+
+=== Most-used live clusters (mono = monosemanticity 0..1) ===
+
+cluster 1966  use=0.42%  mono=0.01  [math:413 edu_web:755 wiki:269 code:159 web:448 pile:40 wiki_de:19 wiki_fr:8 wiki_es:4]
+  tokens: ','×6, '##'×3, ' ::'×3, '#####'×2, ' money'×2, ' herpes'×2
+    d=856.681 [math] -moving tortoise behind. Conf«ident» that he will win, the
+    d=864.044 [math] oise walks at a slow steady« pace» for the entire race. The
+    d=877.540 [math]  gon/second in gon/h«our» is equal to3574800
+    d=894.482 [math] ?\n\n### Triple Cubes\n\n«#####» Age 5 to 11
+    d=897.226 [math]  square?\n\n### Display Boards\n\n«#####» Age 7 to 11
+
+cluster 143  use=0.35%  mono=0.27  [edu_web:473 math:247 code:292 web:236 wiki:205 pile:184 wiki_de:72 wiki_es:23 wiki_fr:27]
+  tokens: ' '×75, '-'×17, '.'×5, ':'×4, ':\n\n'×4, ')'×3
+    d=815.608 [web]  Margagliano at 850«-»830-4747 or Ar
+    d=867.886 [edu_web]  office today by calling 817«-»577-1444.
+    d=873.339 [pile] . Invest., 102,« »1933 (1998)).
+    d=904.045 [web]  County’s Recycling Hotline at« »946-7766, visit
+    d=914.494 [wiki_de] 1989, ISBN 3«-»920611-14-4
+
+cluster 1817  use=0.28%  mono=0.01  [wiki:652 wiki_de:147 edu_web:238 web:139 code:34 wiki_es:64 wiki_fr:82 math:28 pile:39]
+  tokens: ' Hag'×4, ' Mer'×2, ' Dob'×2, ' Mill'×2, ' Barn'×2, ' Dun'×2
+    d=781.119 [edu_web]  the state.\nState veterinarian Jim« Kaz»mierczak says it
+    d=786.874 [wiki]  his AllMusic review, Scott« Yan»ow stated: "Wes
+    d=799.074 [wiki]  was ridden by jockey John« Bul»lock and trained by Jack O
+    d=800.105 [web] weather Rhapsody by Kate« Rac»culia\nSeptember Sacrifice
+    d=809.400 [wiki_fr] , Mattoni et Pre«nd»ini en 2008,
+
+cluster 1782  use=0.25%  mono=0.03  [edu_web:408 wiki:346 code:31 web:244 pile:33 math:105 wiki_de:39 wiki_fr:22 wiki_es:33]
+  tokens: ' of'×8, ' for'×6, '#####'×6, ' Challenge'×5, ' True'×3, ' and'×3
+    d=718.614 [edu_web]  dynamic or efficient.\nExtra info« for» The Outbreak of the Pel
+    d=805.874 [math] \n\n##### Stage: 2« Challenge» Level:\n\nThere are over sixty
+    d=819.915 [edu_web] house and Smoke Fish\nSurv«ival» Lessons From The Donner Party
+    d=844.006 [math]  did he do it?\n\n###« Buying» a Balloon\n\n##### Stage
+    d=852.766 [web] , contentabove 1990« Hawkins» Motor Coach Wiring Diagram published by
+
+cluster 1822  use=0.25%  mono=0.57  [edu_web:729 web:253 wiki:138 math:62 wiki_de:3 pile:54 wiki_es:1 code:5]
+  tokens: ' and'×104, ' or'×88, 'or'×2, ' &'×2, ' even'×1, ' And'×1
+    d=893.179 [edu_web]  a ban on wireless connections to« or» from the secure network, or
+    d=929.986 [math] etrating Lubricants,« and» Dry Lubricants.\n•
+    d=955.744 [edu_web]  Adany ("timber"« or» "woods").\nThe naming contest
+    d=958.137 [edu_web]  animal, a pair of animals« or» a colony.\nIUCN
+    d=958.507 [edu_web]  see if a set of processes« or» procedures will enhance or harm project

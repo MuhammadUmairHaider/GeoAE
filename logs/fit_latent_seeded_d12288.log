@@ -1,0 +1,20 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[balanced-fit] AE norm from checkpoint (layer 27, meta-llama/Llama-3.2-3B)
+[balanced-fit] clustering in the AE LATENT (dim 12288)
+[balanced-fit] Sampling 300,000/9,825,178 activations and normalising …
+[balanced-fit] fitting on (300000, 12288) (13.7 GB)
+[balanced-fit] density fill pool: 32,768 of 300,000 latents
+[seeded] atlas: +448 concept classes (11,200 last-token rows) from 6,020 chunks
+[balanced-fit] seeded init — 785 labelled class means + 1215 peaks fill
+[balanced-fit]   density pct of picks: 78th (pool median = 50th) | peaks: 27/1,215 | min sep: 0.13x typical
+[balanced-fit] 8 epochs x 73 steps, batch 4096
+  epoch 1: tau 0.889 | live 1803/2000 | top-10 share 5.1% | reinit so far 0
+  epoch 2: tau 0.776 | live 1906/2000 | top-10 share 4.4% | reinit so far 0
+  epoch 3: tau 0.663 | live 1960/2000 | top-10 share 4.2% | reinit so far 0
+  epoch 4: tau 0.551 | live 1981/2000 | top-10 share 4.1% | reinit so far 0
+  epoch 5: tau 0.438 | live 1998/2000 | top-10 share 3.9% | reinit so far 0
+  epoch 6: tau 0.325 | live 2000/2000 | top-10 share 3.8% | reinit so far 0
+  epoch 7: tau 0.213 | live 2000/2000 | top-10 share 3.8% | reinit so far 0
+  epoch 8: tau 0.100 | live 2000/2000 | top-10 share 3.7% | reinit so far 0
+[balanced-fit] Final on a 300,000-token probe: 2000/2000 live, top-10 share 3.7%
+[balanced-fit] Saved -> e2e/checkpoints/general/llama3.2-3B/layer27/latent_seeded_k2000_d12288.npz

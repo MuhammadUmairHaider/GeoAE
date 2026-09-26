@@ -1,0 +1,42 @@
+Loading weights:   0%|          | 0/254 [00:00<?, ?it/s]Loading weights: 100%|██████████| 254/254 [00:00<00:00, 3481.55it/s]
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+[gen] 249,770 reference rows (even docs of the held-out tail)
+[collect] Loading baseline k-means centroids: e2e/checkpoints/general/llama3.2-3B/layer27/balanced_kmeans_k2000_dpc_sampled.npz
+[gen] base: 1078 eligible content clusters (of 2000); hubs 37 (10.3% of rows); targets e.g.  Tourism,  lightning,  Travel,  ACL,  Decision |  pam,  brunch,  cocktails,  outings,  knitting |  sondern,  wenn,  welche,  dass,  indem
+[gen] bypass: 747 eligible content clusters (of 2000); hubs 101 (25.6% of rows); targets e.g.  condoms,  sexuality,  subsidized,  burden,  subsidy |  Webb,  Rwanda,  Newspaper,  Amnesty,  Cot |  rehabilit,  amend,  oversee,  convince,  testify
+[gen] unsteered: median ppl 3.26; e.g. ' was in the middle of a conversation with a friend about the importance of being a good listener. I was explaining to her how I believe that listening is the most'
+[gen] base   a0.1: choice 0.311 (chance .25)  lexical +0.009  ppl x0.99  distinct2 0.86 | ' was in the mood for a light, summery salad. I had a few things in the'
+[gen] base   a0.2: choice 0.385 (chance .25)  lexical +0.028  ppl x1.13  distinct2 0.85 | ' was in the mood for a light, summery salad. I had a few things in the'
+[gen] base   a0.3: choice 0.574 (chance .25)  lexical +0.059  ppl x1.38  distinct2 0.82 | ' shared a post about the 2018-2019 school year being the 100 year anni'
+[gen] base   a0.5: choice 0.769 (chance .25)  lexical +0.191  ppl x1.88  distinct2 0.56 | ' shared a post about the \xa0“ \xa05 things to know about the new \xa0” \xa0, \xa0” \xa0'
+[gen] base   a0.75: choice 0.869 (chance .25)  lexical +0.376  ppl x1.57  distinct2 0.26 | ' awoke early morning my the sound my the the the sound my the sound my'
+[gen] base   a1.0: choice 0.926 (chance .25)  lexical +0.506  ppl x1.29  distinct2 0.16 | ' a the the the the the the the the the the the the the the the the the'
+[gen] bypass a0.1: choice 0.296 (chance .25)  lexical +0.004  ppl x1.04  distinct2 0.86 | ' was in the middle of a conversation with a friend about the importanc'
+[gen] bypass a0.2: choice 0.341 (chance .25)  lexical +0.005  ppl x1.08  distinct2 0.86 | ' was in the middle of a long, boring meeting when I got a text message'
+[gen] bypass a0.3: choice 0.399 (chance .25)  lexical +0.013  ppl x1.20  distinct2 0.86 | ' was in the middle of a long, long, long, long, long, long, long, long'
+[gen] bypass a0.5: choice 0.632 (chance .25)  lexical +0.038  ppl x1.69  distinct2 0.77 | ' was in the middle of a long, long, long, long, long, long, long, long'
+[gen] bypass a0.75: choice 0.831 (chance .25)  lexical +0.164  ppl x2.11  distinct2 0.57 | '\xa0wrote\xa0about the importance of\xa0the\xa0health care\xa0system\xa0for the health c'
+[gen] bypass a1.0: choice 0.915 (chance .25)  lexical +0.358  ppl x1.91  distinct2 0.39 | '\xa0wrote\xa0about the importance of data literacy skills  in health care.  '
+
+[gen] per alpha (mean [95% CI over targets])
+  base   a0.0  choice 0.245 [0.177,0.323]  lexical +0.000  ppl x1.00  degenerate 0.00
+  base   a0.1  choice 0.311 [0.241,0.385]  lexical +0.009  ppl x0.99  degenerate 0.05
+  base   a0.2  choice 0.385 [0.317,0.455]  lexical +0.028  ppl x1.13  degenerate 0.11
+  base   a0.3  choice 0.574 [0.505,0.641]  lexical +0.059  ppl x1.38  degenerate 0.14
+  base   a0.5  choice 0.769 [0.711,0.821]  lexical +0.191  ppl x1.88  degenerate 0.51
+  base   a0.75 choice 0.869 [0.835,0.903]  lexical +0.376  ppl x1.57  degenerate 0.88
+  base   a1.0  choice 0.926 [0.894,0.954]  lexical +0.506  ppl x1.29  degenerate 0.97
+  bypass a0.0  choice 0.245 [0.184,0.305]  lexical +0.000  ppl x1.00  degenerate 0.00
+  bypass a0.1  choice 0.296 [0.234,0.358]  lexical +0.004  ppl x1.04  degenerate 0.07
+  bypass a0.2  choice 0.341 [0.285,0.400]  lexical +0.005  ppl x1.08  degenerate 0.09
+  bypass a0.3  choice 0.399 [0.345,0.449]  lexical +0.013  ppl x1.20  degenerate 0.09
+  bypass a0.5  choice 0.632 [0.585,0.679]  lexical +0.038  ppl x1.69  degenerate 0.21
+  bypass a0.75 choice 0.831 [0.786,0.870]  lexical +0.164  ppl x2.11  degenerate 0.49
+  bypass a1.0  choice 0.915 [0.883,0.941]  lexical +0.358  ppl x1.91  degenerate 0.73
+
+[gen] at MATCHED fluency cost (continuation perplexity x vs unsteered): choice accuracy [95% CI over targets] (chance .25)
+  ppl x1.1   base 0.368 [0.295,0.438]   bypass 0.350 [0.288,0.407]
+  ppl x1.25  base 0.478 [0.411,0.549]   bypass 0.424 [0.371,0.479]
+  ppl x1.5   base 0.625 [0.562,0.687]   bypass 0.549 [0.501,0.595]
+  ppl x2.0   base  (out of range)   bypass 0.783 [0.712,0.842]
+[gen] wrote eval_out/cluster_steer_generate_v2.json

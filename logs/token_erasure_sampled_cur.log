@@ -1,0 +1,23 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[erasure] activations_sampled_10M/layer_27.npy  N=10,000,000  train rows [0, 9,500,000)  basis keys=['cur']  reported=['cur', 'pred']
+[erasure] reading 1,000,000 train rows …
+[erasure]   cur (basis): 4,003 classes >= 30 rows cover 75% of rows; between-class share of variance 0.170
+[erasure]   pred (reported only): 3,404 classes >= 30 rows cover 78% of rows; between-class share of variance 0.155
+
+[erasure] held-out diagnostics on 200,000 val rows (projected space)
+ basis  rank | var removed |   R2 cur |  R2 pred |  R2 doc | doc var kept
+  none     0 |       0.000 |    0.162 |    0.152 |   0.151 |        1.000
+ token    16 |       0.162 |    0.084 |    0.082 |   0.148 |        0.817
+ token    32 |       0.206 |    0.070 |    0.072 |   0.142 |        0.743
+ token    64 |       0.255 |    0.056 |    0.064 |   0.137 |        0.677
+ token   128 |       0.308 |    0.043 |    0.057 |   0.134 |        0.615
+ token   256 |       0.372 |    0.029 |    0.052 |   0.133 |        0.550
+ token   512 |       0.466 |    0.016 |    0.047 |   0.130 |        0.458
+   pca    16 |       0.186 |    0.101 |    0.084 |   0.132 |        0.710
+   pca    32 |       0.239 |    0.090 |    0.072 |   0.123 |        0.618
+   pca    64 |       0.302 |    0.079 |    0.061 |   0.112 |        0.519
+   pca   128 |       0.375 |    0.072 |    0.052 |   0.103 |        0.426
+   pca   256 |       0.466 |    0.067 |    0.044 |   0.093 |        0.329
+   pca   512 |       0.581 |    0.063 |    0.036 |   0.082 |        0.227
+
+[erasure] Saved -> e2e/checkpoints/general/llama3.2-3B/layer27/token_erasure_sampled_cur.npz

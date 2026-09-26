@@ -1,0 +1,29 @@
+[seed] seed=0 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+
+[quality] Loading raw k-means baseline: e2e/checkpoints/general/llama3.2-3B/layer27/baseline_kmeans_k2000_refit.npz
+[quality] Computing metrics for: plain_kmeans
+    silhouette … -0.1029
+    davies-bouldin … 2.1702
+    calinski-harabasz … 106.1
+    dunn index … 0.056353
+    separability ratio … 111.4506
+
+====================================================
+  Metric                              plain_kmeans
+----------------------------------------------------
+  Silhouette ↑                           -0.1029 *
+  Davies-Bouldin ↓                        2.1702 *
+  Calinski-Harabasz ↑                      106.1 *
+  Dunn Index ↑                          0.056353 *
+  Separability Ratio ↑                  111.4506 *
+  Inter-centroid Dist ↑                  77.6489 *
+  Min Centroid Dist ↑                     0.0004 *
+  Intra-cluster Var ↓                     0.4531 *
+  Cluster Balance H ↑                     0.3884 *
+  Empty Clusters ↓                           342 *
+  Effective K ↑                              309 *
+  Effective Rank ↑                        614.74 *
+====================================================
+  * = best value for that metric
+
+[quality] Full results saved → eval_out/cq_base_plain_kmeans.json

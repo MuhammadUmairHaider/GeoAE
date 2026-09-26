@@ -1,0 +1,86 @@
+Loading weights:   0%|          | 0/254 [00:00<?, ?it/s]Loading weights: 100%|██████████| 254/254 [00:00<00:00, 3299.89it/s]
+[csteer] 500,000 held-out rows: 249,770 reference (even docs), 250,230 source pool (odd docs)
+[collect] Loading baseline k-means centroids: e2e/checkpoints/general/llama3.2-3B/layer27/balanced_kmeans_k2000_dpc_sampled.npz
+[collect] Loading baseline k-means centroids: e2e/checkpoints/general/llama3.2-3B/layer27/balanced_kmeans_k2000_dpc_sampled_tokmean.npz
+[collect] Loading baseline k-means centroids: e2e/checkpoints/general/llama3.2-3B/layer27/balanced_kmeans_k2000_dpc_sampled_tok64.npz
+[csteer] d6144_new: 38 hubs (7.5% of rows), 1906 usable targets of 2000
+[csteer]   d6144_new:ae           a0.1: transfer 0.027 specific 0.530 move 0.081  a0.25: transfer 0.069 specific 0.609 move 0.203  a0.5: transfer 0.315 specific 0.792 move 0.406  a1.0: transfer 0.924 specific 0.971 move 0.811  a1.5: transfer 0.992 specific 0.991 move 1.217
+[csteer]   d6144_new:ae_h         a0.1: transfer 0.026 specific 0.530 move 0.078  a0.25: transfer 0.064 specific 0.608 move 0.195  a0.5: transfer 0.299 specific 0.791 move 0.390  a1.0: transfer 0.923 specific 0.973 move 0.779  a1.5: transfer 0.993 specific 0.991 move 1.169
+[csteer] tokbias: 101 hubs (25.6% of rows), 1782 usable targets of 2000
+[csteer]   tokbias:ae             a0.1: transfer 0.069 specific 0.516 move 0.060  a0.25: transfer 0.094 specific 0.544 move 0.150  a0.5: transfer 0.170 specific 0.607 move 0.300  a1.0: transfer 0.494 specific 0.770 move 0.601  a1.5: transfer 0.759 specific 0.884 move 0.901
+[csteer]   tokbias:ae_h           a0.1: transfer 0.072 specific 0.528 move 0.074  a0.25: transfer 0.117 specific 0.584 move 0.185  a0.5: transfer 0.306 specific 0.731 move 0.371  a1.0: transfer 0.850 specific 0.938 move 0.741  a1.5: transfer 0.975 specific 0.982 move 1.112
+[csteer] km_new: 37 hubs (10.3% of rows), 1943 usable targets of 2000
+[csteer]   km_new:km              a0.1: transfer 0.024 specific 0.531 move 0.080  a0.25: transfer 0.061 specific 0.597 move 0.199  a0.5: transfer 0.284 specific 0.771 move 0.398  a1.0: transfer 0.925 specific 0.971 move 0.795  a1.5: transfer 0.994 specific 0.992 move 1.193
+[csteer] km_tokmean: 63 hubs (23.6% of rows), 1921 usable targets of 2000
+[csteer]   km_tokmean:km          a0.1: transfer 0.047 specific 0.513 move 0.061  a0.25: transfer 0.070 specific 0.541 move 0.153  a0.5: transfer 0.143 specific 0.604 move 0.306  a1.0: transfer 0.491 specific 0.777 move 0.611  a1.5: transfer 0.796 specific 0.900 move 0.917
+[csteer] km_tok64: 45 hubs (15.8% of rows), 1943 usable targets of 2000
+[csteer]   km_tok64:km            a0.1: transfer 0.049 specific 0.503 move 0.047  a0.25: transfer 0.056 specific 0.511 move 0.117  a0.5: transfer 0.071 specific 0.529 move 0.233  a1.0: transfer 0.152 specific 0.594 move 0.467  a1.5: transfer 0.314 specific 0.691 move 0.700
+
+[csteer] at MATCHED EDIT SIZE (move = ||dh|| / ||h||): transfer / specificity [95% doc CI]
+  move 0.10
+    d6144_new:ae           transfer 0.034 [0.031,0.036]   specific 0.542 [0.536,0.549]   disrupt 0.082
+    d6144_new:ae_h         transfer 0.033 [0.031,0.035]   specific 0.545 [0.539,0.551]   disrupt 0.084
+    tokbias:ae             transfer 0.080 [0.076,0.084]   specific 0.528 [0.521,0.535]   disrupt 0.075
+    tokbias:ae_h           transfer 0.082 [0.078,0.086]   specific 0.541 [0.534,0.548]   disrupt 0.078
+    km_new:km              transfer 0.030 [0.028,0.032]   specific 0.543 [0.536,0.549]   disrupt 0.072
+    km_tokmean:km          transfer 0.057 [0.054,0.060]   specific 0.525 [0.518,0.532]   disrupt 0.070
+    km_tok64:km            transfer 0.054 [0.051,0.057]   specific 0.509 [0.502,0.516]   disrupt 0.035
+  move 0.20
+    d6144_new:ae           transfer 0.068 [0.064,0.071]   specific 0.607 [0.600,0.613]   disrupt 0.304
+    d6144_new:ae_h         transfer 0.071 [0.067,0.074]   specific 0.613 [0.606,0.620]   disrupt 0.316
+    tokbias:ae             transfer 0.119 [0.115,0.123]   specific 0.564 [0.558,0.571]   disrupt 0.276
+    tokbias:ae_h           transfer 0.132 [0.127,0.137]   specific 0.596 [0.589,0.603]   disrupt 0.306
+    km_new:km              transfer 0.062 [0.059,0.065]   specific 0.598 [0.591,0.605]   disrupt 0.272
+    km_tokmean:km          transfer 0.093 [0.089,0.096]   specific 0.560 [0.554,0.567]   disrupt 0.270
+    km_tok64:km            transfer 0.066 [0.063,0.070]   specific 0.523 [0.517,0.531]   disrupt 0.143
+  move 0.30
+    d6144_new:ae           transfer 0.187 [0.182,0.191]   specific 0.696 [0.690,0.702]   disrupt 0.972
+    d6144_new:ae_h         transfer 0.191 [0.187,0.196]   specific 0.707 [0.701,0.713]   disrupt 0.944
+    tokbias:ae             transfer 0.170 [0.164,0.176]   specific 0.606 [0.600,0.613]   disrupt 0.548
+    tokbias:ae_h           transfer 0.234 [0.228,0.239]   specific 0.675 [0.669,0.681]   disrupt 0.802
+    km_new:km              transfer 0.175 [0.170,0.179]   specific 0.686 [0.680,0.691]   disrupt 0.903
+    km_tokmean:km          transfer 0.141 [0.135,0.145]   specific 0.601 [0.595,0.608]   disrupt 0.546
+    km_tok64:km            transfer 0.094 [0.090,0.097]   specific 0.547 [0.540,0.554]   disrupt 0.389
+  move 0.50
+    d6144_new:ae           transfer 0.457 [0.449,0.464]   specific 0.833 [0.829,0.838]   disrupt 3.143
+    d6144_new:ae_h         transfer 0.476 [0.469,0.484]   specific 0.842 [0.838,0.847]   disrupt 3.137
+    tokbias:ae             transfer 0.385 [0.378,0.392]   specific 0.715 [0.709,0.721]   disrupt 1.924
+    tokbias:ae_h           transfer 0.496 [0.488,0.503]   specific 0.803 [0.798,0.808]   disrupt 2.647
+    km_new:km              transfer 0.449 [0.443,0.455]   specific 0.822 [0.818,0.827]   disrupt 3.062
+    km_tokmean:km          transfer 0.365 [0.359,0.371]   specific 0.714 [0.708,0.720]   disrupt 1.884
+    km_tok64:km            transfer 0.175 [0.170,0.181]   specific 0.608 [0.601,0.614]   disrupt 1.119
+
+[csteer] at MATCHED DISRUPTION (KL(p'||p_ref), nats): transfer / specificity [95% doc CI]
+  disrupt 0.10
+    d6144_new:ae           transfer 0.036 [0.034,0.039]   specific 0.547 [0.541,0.554]   move 0.108
+    d6144_new:ae_h         transfer 0.035 [0.033,0.038]   specific 0.550 [0.543,0.557]   move 0.107
+    tokbias:ae             transfer 0.085 [0.081,0.089]   specific 0.534 [0.527,0.540]   move 0.119
+    tokbias:ae_h           transfer 0.087 [0.083,0.091]   specific 0.547 [0.541,0.554]   move 0.112
+    km_new:km              transfer 0.035 [0.032,0.037]   specific 0.551 [0.544,0.557]   move 0.115
+    km_tokmean:km          transfer 0.062 [0.059,0.066]   specific 0.532 [0.525,0.540]   move 0.123
+    km_tok64:km            transfer 0.062 [0.058,0.065]   specific 0.518 [0.511,0.525]   move 0.164
+  disrupt 0.25
+    d6144_new:ae           transfer 0.060 [0.056,0.063]   specific 0.591 [0.584,0.598]   move 0.176
+    d6144_new:ae_h         transfer 0.059 [0.056,0.062]   specific 0.597 [0.590,0.605]   move 0.179
+    tokbias:ae             transfer 0.114 [0.110,0.119]   specific 0.560 [0.554,0.567]   move 0.190
+    tokbias:ae_h           transfer 0.120 [0.115,0.125]   specific 0.587 [0.580,0.594]   move 0.189
+    km_new:km              transfer 0.059 [0.056,0.062]   specific 0.593 [0.586,0.600]   move 0.191
+    km_tokmean:km          transfer 0.089 [0.085,0.093]   specific 0.557 [0.551,0.564]   move 0.193
+    km_tok64:km            transfer 0.078 [0.075,0.082]   specific 0.535 [0.527,0.542]   move 0.255
+  disrupt 0.50
+    d6144_new:ae           transfer 0.103 [0.099,0.106]   specific 0.634 [0.627,0.640]   move 0.231
+    d6144_new:ae_h         transfer 0.106 [0.102,0.110]   specific 0.641 [0.634,0.647]   move 0.229
+    tokbias:ae             transfer 0.161 [0.155,0.166]   specific 0.599 [0.592,0.606]   move 0.282
+    tokbias:ae_h           transfer 0.172 [0.166,0.177]   specific 0.627 [0.620,0.633]   move 0.239
+    km_new:km              transfer 0.103 [0.100,0.106]   specific 0.630 [0.623,0.636]   move 0.236
+    km_tokmean:km          transfer 0.133 [0.128,0.138]   specific 0.595 [0.588,0.601]   move 0.283
+    km_tok64:km            transfer 0.106 [0.102,0.110]   specific 0.557 [0.551,0.564]   move 0.336
+  disrupt 1.00
+    d6144_new:ae           transfer 0.192 [0.187,0.197]   specific 0.700 [0.694,0.706]   move 0.304
+    d6144_new:ae_h         transfer 0.202 [0.197,0.207]   specific 0.715 [0.709,0.721]   move 0.309
+    tokbias:ae             transfer 0.240 [0.235,0.246]   specific 0.642 [0.636,0.648]   move 0.366
+    tokbias:ae_h           transfer 0.275 [0.268,0.282]   specific 0.707 [0.700,0.714]   move 0.340
+    km_new:km              transfer 0.192 [0.188,0.197]   specific 0.699 [0.693,0.705]   move 0.315
+    km_tokmean:km          transfer 0.217 [0.211,0.222]   specific 0.640 [0.634,0.646]   move 0.370
+    km_tok64:km            transfer 0.162 [0.157,0.168]   specific 0.600 [0.593,0.607]   move 0.481
+[csteer] wrote eval_out/cluster_steering.json

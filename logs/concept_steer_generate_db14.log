@@ -1,0 +1,59 @@
+Loading weights:   0%|          | 0/254 [00:00<?, ?it/s]Loading weights: 100%|██████████| 254/254 [00:00<00:00, 4191.00it/s]
+[collect] Loading baseline k-means centroids: e2e/checkpoints/general/llama3.2-3B/layer27/balanced_kmeans_k2000_dpc_sampled.npz
+[concept] 249,770 reference rows (even docs of the held-out tail)
+[concept] reference scale: mean|x| 0.784  per-dim std 1.001
+[concept] base: K=2000 hubs 37 (10.3% of rows)
+[concept] bypass: K=2000 hubs 101 (25.6% of rows)
+[concept] db14: 14/14 classes with enough docs (Company, EducationalInstitution, Artist, Athlete, OfficeHolder, MeanOfTransportation, Building, NaturalPlace, Village, Animal, Plant, Album, Film, WrittenWork)
+[concept] captured-row scale: mean|x| 0.743  per-dim std 0.938  (reference: 0.784 / 1.001; should be similar)
+
+[concept] coverage on HELD documents (precision / recall / AUROC; label: AUROC only)
+  db14:
+    Company                    base[p=0.91 r=0.02 auroc=0.69]  bypass[p=0.98 r=0.05 auroc=0.65]  label[auroc=0.98]
+    EducationalInstitution     base[p=0.92 r=0.03 auroc=0.80]  bypass[p=1.00 r=0.04 auroc=0.73]  label[auroc=1.00]
+    Artist                     base[p=0.65 r=0.04 auroc=0.82]  bypass[p=0.80 r=0.07 auroc=0.91]  label[auroc=0.96]
+    Athlete                    base[p=0.97 r=0.08 auroc=0.92]  bypass[p=0.99 r=0.08 auroc=0.86]  label[auroc=1.00]
+    OfficeHolder               base[p=0.94 r=0.08 auroc=0.94]  bypass[p=1.00 r=0.14 auroc=0.86]  label[auroc=0.98]
+    MeanOfTransportation       base[p=0.97 r=0.28 auroc=0.99]  bypass[p=1.00 r=0.18 auroc=0.91]  label[auroc=1.00]
+    Building                   base[p=0.94 r=0.07 auroc=0.81]  bypass[p=0.99 r=0.07 auroc=0.79]  label[auroc=0.98]
+    NaturalPlace               base[p=0.82 r=0.05 auroc=0.80]  bypass[p=0.94 r=0.22 auroc=0.96]  label[auroc=1.00]
+    Village                    base[p=0.98 r=0.33 auroc=0.94]  bypass[p=0.99 r=0.29 auroc=0.76]  label[auroc=1.00]
+    Animal                     base[p=0.98 r=0.06 auroc=0.62]  bypass[p=1.00 r=0.12 auroc=0.89]  label[auroc=0.98]
+    Plant                      base[p=0.97 r=0.17 auroc=0.98]  bypass[p=1.00 r=0.13 auroc=0.77]  label[auroc=1.00]
+    Album                      base[p=0.80 r=0.15 auroc=0.94]  bypass[p=0.81 r=0.35 auroc=1.00]  label[auroc=1.00]
+    Film                       base[p=0.79 r=0.14 auroc=0.98]  bypass[p=0.90 r=0.21 auroc=0.95]  label[auroc=0.99]
+    WrittenWork                base[p=0.68 r=0.02 auroc=0.68]  bypass[p=0.81 r=0.10 auroc=0.90]  label[auroc=0.97]
+    MEAN base     auroc 0.849  (n=14/14)
+    MEAN bypass   auroc 0.852  (n=14/14)
+    MEAN label    auroc 0.988  (n=14/14)
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+
+[concept] unsteered: median ppl 3.26; e.g. ' 2018-2019 school year is in full swing and we are excited to see all '
+[concept] label  db14      a0.1  ppl x1.00  distinct2 0.88  edit_norm 3.383  (14 concepts)
+[concept] label  db14      a0.2  ppl x1.02  distinct2 0.87  edit_norm 6.766  (14 concepts)
+[concept] label  db14      a0.3  ppl x1.06  distinct2 0.84  edit_norm 10.149  (14 concepts)
+[concept] label  db14      a0.5  ppl x1.38  distinct2 0.74  edit_norm 16.915  (14 concepts)
+[concept] label  db14      a0.75 ppl x1.49  distinct2 0.44  edit_norm 25.373  (14 concepts)
+[concept] label  db14      a1.0  ppl x1.23  distinct2 0.23  edit_norm 33.830  (14 concepts)
+[concept] label  db14      a1.5  ppl x0.96  distinct2 0.10  edit_norm 50.746  (14 concepts)
+[concept] label  db14      a2.0  ppl x0.93  distinct2 0.07  edit_norm 67.661  (14 concepts)
+[concept] label  db14      a3.0  ppl x0.93  distinct2 0.05  edit_norm 101.491  (14 concepts)
+[concept] base   db14      a0.1  ppl x0.96  distinct2 0.87  edit_norm 3.424  (14 concepts)
+[concept] base   db14      a0.2  ppl x1.08  distinct2 0.87  edit_norm 6.905  (14 concepts)
+[concept] base   db14      a0.3  ppl x1.24  distinct2 0.87  edit_norm 10.488  (14 concepts)
+[concept] base   db14      a0.5  ppl x1.99  distinct2 0.76  edit_norm 17.707  (14 concepts)
+[concept] base   db14      a0.75 ppl x2.98  distinct2 0.53  edit_norm 26.684  (14 concepts)
+[concept] base   db14      a1.0  ppl x2.74  distinct2 0.37  edit_norm 35.165  (14 concepts)
+[concept] base   db14      a1.5  ppl x2.07  distinct2 0.22  edit_norm 51.878  (14 concepts)
+[concept] base   db14      a2.0  ppl x2.58  distinct2 0.18  edit_norm 67.758  (14 concepts)
+[concept] base   db14      a3.0  ppl x3.47  distinct2 0.19  edit_norm 100.080  (14 concepts)
+[concept] bypass db14      a0.1  ppl x1.00  distinct2 0.83  edit_norm 3.005  (14 concepts)
+[concept] bypass db14      a0.2  ppl x1.01  distinct2 0.83  edit_norm 6.007  (14 concepts)
+[concept] bypass db14      a0.3  ppl x1.12  distinct2 0.86  edit_norm 9.128  (14 concepts)
+[concept] bypass db14      a0.5  ppl x1.58  distinct2 0.82  edit_norm 15.334  (14 concepts)
+[concept] bypass db14      a0.75 ppl x2.35  distinct2 0.71  edit_norm 22.124  (14 concepts)
+[concept] bypass db14      a1.0  ppl x2.64  distinct2 0.55  edit_norm 27.392  (14 concepts)
+[concept] bypass db14      a1.5  ppl x2.43  distinct2 0.31  edit_norm 37.520  (14 concepts)
+[concept] bypass db14      a2.0  ppl x2.39  distinct2 0.21  edit_norm 48.348  (14 concepts)
+[concept] bypass db14      a3.0  ppl x2.87  distinct2 0.15  edit_norm 70.064  (14 concepts)
+[concept] wrote eval_out/concept_steer_generate_db14.json
