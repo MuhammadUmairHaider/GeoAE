@@ -13,4 +13,15 @@ L27 K=2000 d6144 dpc arm, finished 2026-09-15, vs k-means++ parent:
 - DB14 K=14 Hungarian: dpc 0.4946, below kmeanspp 0.4997, seeded_atlas 0.5575, raw zscore 0.6823.
 
 **Why:** balanced k-means on raw activations uses k-means++ init plus farthest reinit, so it cannot tell whether dpc's gains come from the init or the encoder. The user asked for a dpc-init encoder-free baseline (the request was lost once).
-**How to apply:** use `fit_balanced_kmeans --init dpc --reinit peaks` (added 2026-09-17). Target npz: `e2e/checkpoints/general/llama3.2-3B/layer27/balanced_kmeans_k2000_dpc.npz`. Compare as a 2x2: {k-means++, dpc} x {encoder, none}. Raw residual space has weaker density contrast (52nd pct of picks vs 69th in the AE latent). The `_dpc_tanh` arm has the same density settings and only swaps GELU for tanh. clustering_quality `--names` is aligned with (baseline, *checkpoints). For the probe use `--anchor_seed 42` to match `train.seed`. See [[fineweb-atlas-concept-alignment]].
+**DONE 2026-09-21** — `e2e/checkpoints/general/llama3.2-3B/layer27/balanced_kmeans_k2000_dpc.npz`
+(`fit_balanced_kmeans --init dpc --reinit peaks`, defaults otherwise = the balanced baseline's; 1.5M
+sample, 8 epochs; 2000/2000 live, top-10 share 5.7%, 1 reinit; ~12 min). Raw-space density is weak:
+picks at the 57th pct, only **14/2000 were true peaks**, rest coverage fill (69th pct inside the AE).
+**Probe NMI, 22 rungs — the 2x2 is an INTERACTION:** no-encoder kmeans++ 0.2557 / no-encoder dpc 0.2394;
+encoder(d6144 ep47) kmeans++ 0.2371 / dpc 0.2459; encoder d12288 dpc 0.2503. So dpc init HURTS without
+an encoder and HELPS with one. d12288 vs kmeans++ control −0.0054 (p=.56); vs the init-matched dpc
+control +0.0109 (p=.10, 16/22 rungs), topic14 flips from −0.097 to +0.053. Neither significant — but
+"balanced k-means beats the AE" was largely an INIT artefact; quote the init-matched control.
+**kNN / t-SNE / UMAP / PCA are IDENTICAL across all encoder-free controls** — they share one
+representation (normalised raw activation); only centroids differ, so only NMI-style metrics move.
+**How to apply:** use `fit_balanced_kmeans --init dpc --reinit peaks` (added 2026-09-17). Compare as a 2x2: {k-means++, dpc} x {encoder, none}. Raw residual space has weaker density contrast (52nd pct of picks vs 69th in the AE latent). The `_dpc_tanh` arm has the same density settings and only swaps GELU for tanh. clustering_quality `--names` is aligned with (baseline, *checkpoints). For the probe use `--anchor_seed 42` to match `train.seed`. See [[fineweb-atlas-concept-alignment]].

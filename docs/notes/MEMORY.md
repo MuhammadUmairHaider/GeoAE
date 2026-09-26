@@ -32,12 +32,16 @@ better separated AND semantically better organized than the base residual stream
 - Hard-EMA needs visited-mask so unvisited centroids don't decay to origin.
 - variance hinge (std→1 per dim) inflates intra-cluster variance → DB/separability-ratio look worse;
   use scale-normalized metrics (silhouette, Dunn) for fair comparison.
+- clustering_quality dunn/silhouette subsample with an UNSEEDED rng -> dunn swings ~50% between
+  runs; keep all arms in one invocation. steer selectivity sign is the NEGATION of the range
+  tool's. Both in [[cq-dunn-and-steer-sign-traps]].
 - cluster_loss rewards latent contraction; adaptive-σ sep_loss is scale-invariant so can't resist it.
 
 ## User workflow preferences
 - Uses tmux; no nohup needed. Long runs: plain `| tee` (stdout only) + `python -u` so tqdm bars stay on terminal.
 - Prefers to run long GPU commands themselves — hand over copy-paste command sheets rather than launching them.
 - Wants actionable, holistic analysis; concise tables with verdicts.
+- Main session = planner/analyst; implementation goes to cheaper subagents (sonnet) — [delegate-implementation](delegate-implementation.md).
 
 ## Detailed memories
 - [gemma3-12b-setup](gemma3-12b-setup.md) — Gemma 3 12B / Gemma Scope 2 track: Scope repo is SAEs not an LM, layers 12/24/31/41, disk math, the Gemma3ForConditionalGeneration decoder trap.
@@ -56,4 +60,14 @@ better separated AND semantically better organized than the base residual stream
 - [range-interventions-h-vs-z](range-interventions-h-vs-z.md) — NeuronLens ranges on L27 DB14: with d' saliency the AE beats base on precision at matched erasure (range a2 −0.053 p=.009); the earlier null and the z zero-replacement collapse were both mean-|a| artefacts; tanh d' run still pending.
 - [tanh-encoder-arm](tanh-encoder-arm.md) — tanh encoder arm: best global steering of any arm (z−h −0.075, p=.003), but range interventions reverse in tanh z and effective rank halves; best_val is epoch 5, use step_0014200.
 - [biasbios-range-reversal](biasbios-range-reversal.md) — bias_in_bios 27 professions: AE marginally worse than base (+0.03 collateral, p<=.015); AE margin shrinks as base quality rises (weak base +0.09, strong base −0.03) but a dataset effect remains.
+- [disk-cleanup-2026-09-18](disk-cleanup-2026-09-18.md) — 09-18: Gemma/L14 dumps + models gone (282 GB); 09-26: ALL checkpoints/ runs now hold only best_val + final (127 GB); declined candidates listed.
+- [supervised-finetune-ladder](supervised-finetune-ladder.md) — in-batch supervision + tier0/1/2 ladder; centroids are EMA buffers so codebook-only = offline latent refit.
+- [d12288-width-arm](d12288-width-arm.md) — 4x latent at L27: cost halves per doubling, best geometry/topic probes/DB14 interventions, but bias_in_bios deficit is width-invariant and the d3072 moderation effect vanishes.
+- [env-headless-render-tools](env-headless-render-tools.md) — node via nodejs-wheel-binaries; snap firefox screenshots only from ~/snap/firefox/common.
+- [cq-dunn-and-steer-sign-traps](cq-dunn-and-steer-sign-traps.md) — dunn is unusable (unseeded subsample); steer vs range selectivity signs are opposite.
 - [d3072-width-arm](d3072-width-arm.md) — d3072 vs d6144 (ep50): narrower latent amplifies range effects both ways (DB14 better, bios worse) and steepens base-quality moderation (rho −0.77 vs −0.29), at 2.5x MMLU cost; best_val is ep10.
+- [sampled-dump-data-ablation](sampled-dump-data-ablation.md) — d6144 old vs new (sampled) dump: best-vs-best recon asymmetry, topic14/language/number losses, ioi_role gain; old ep50 is a val-spike snapshot; number-control summary compares abs vs d'.
+- [token-erasure-option2](token-erasure-option2.md) — L27 has the most doc context of any layer (token share 6–11% everywhere past L4); token-erasure k-means: seq-rung chance-corrected NMI +.046 (topic14 +.13, RAVEL +.15), POS -.15; ~1/3 token-specific vs pca control.
+- [token-bypass-design-b](token-bypass-design-b.md) — token-bypass AE: clustering gains = the token-mean subtraction (encoder-free km_tokmean ties it); but it REVERSES the bias_in_bios intervention deficit (pooled steering +0.049 vs parent, p=.017; collateral ≈ base); DB14/number tie.
+- [cluster-steering-eval](cluster-steering-eval.md) — clusters as control handles: single-row bypass 1.4–2.5x base; generation: per fluent continuation equal, but bypass stays fluent at higher alpha → ~15 vs ~6.5 usable on-target per 100 (blind read 17 vs 3 of 180); judge traps (loops, priors, hash() shuffle bug).
+- [report-base-vs-bypass-only](report-base-vs-bypass-only.md) — user wants results as base vs bypass AE only, in plain units; other arms only on request.

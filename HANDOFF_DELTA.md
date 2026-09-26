@@ -1,18 +1,110 @@
-# GeoAE — handoff for NCSA Delta (2026-09-18, updated 2026-09-19)
+# GeoAE — handoff for NCSA Delta (2026-09-18, updated 2026-09-19, 2026-09-26)
 
 Moving off the Jetstream box (`circuits`, 484 GB disk, full) to NCSA Delta.
 **Nothing large is transferred.** Code, configs, small results and notes are in
-git; activation dumps and checkpoints are regenerated on Delta from code.
+git; activation dumps and checkpoints are regenerated on Delta from code. The
+one exception is the 291 MB frozen text corpus in section 0.
 
 Supersedes `HANDOFF_HPC.md` (2026-09-03), which is still accurate for the older
 findings it lists.
 
-**Read with this:** `docs/notes/MEMORY.md` indexes 16 notes, one finding each.
+**Read with this:** `docs/notes/MEMORY.md` indexes 29 notes, one finding each.
 These were Claude's machine-local memory at
 `~/.claude/projects/-home-exouser-RepresentationAE-GeoAE/memory/`, copied into the
 repo because that path doesn't exist on Delta. To give a Claude session on Delta
 the same context, copy them into its memory directory (the path is derived from
 the working directory, so it will differ).
+
+---
+
+## 0. Round 2 (2026-09-26): sampled dump + token-bypass 6k/12k (start here)
+
+Sections 1–7 describe the 2026-09-19 state and still hold. This section covers what
+changed since and the runs to do first on Delta.
+
+**New data distribution: the sampled dump** (`activations_sampled_10M`, config
+`configs/base/llama3.2-3b_extract_sampled.yaml`, code `geoae/build_corpus.py` +
+`geoae/extract_sampled.py`). Full documents up to 2048 tokens with 64 random
+positions kept per document (~157k docs, vs ~43k in the legacy dump), in a
+pretraining-like mix: fineweb-edu 40 / fineweb 15 / en-wiki 15 / Pile tail 10 /
+code 8 / finemath 5 / de-fr-es wiki 7. The legacy dump took every position 4–255
+from an equal 5-way mix that was 43% code and math.
+(`docs/notes/sampled-dump-data-ablation.md`)
+
+**New model: the token-bypass AE** (design B, `geoae/token_bias.py`,
+`model.token_bias`). The encoder sees x − b[current token] and the reconstruction
+is decoder(z) + b[current token], where b is a shrunk per-token mean. Token identity
+bypasses the latent, so clusters organise by context. The d6144 bypass arm vs the
+base residual on the old box:
+- Clustering by topic (topic14, chance-corrected NMI): 0.60 vs 0.45 for balanced
+  k-means on the raw residual. An encoder-free control that subtracts the same
+  per-token mean scores 0.59, so the gain is the subtraction rather than the encoder.
+- bias_in_bios interventions: the first AE at parity with the base residual. Every
+  earlier arm, at every width, was worse than base.
+- Cluster steering in generation: ~15 usable on-target continuations per 100 vs
+  ~6.5 for base (the bypass stays fluent at higher steering strength).
+- MMLU with the AE spliced into the forward pass: 0.548 (the non-bypass d6144
+  parent, spliced, gets 0.539).
+(`docs/notes/token-bypass-design-b.md`, `docs/notes/cluster-steering-eval.md`)
+
+The d12288 (4x) bypass arm was configured and GPU-smoke-tested but never trained.
+
+### Runs, in order
+
+```bash
+# (a) One-time setup: section 3, steps 0 (clone, setup.sh, HF + wandb login).
+
+# (b) Copy the frozen corpus (291 MB) from the old box, so Delta extracts from the SAME
+#     documents: the dump, and with it the eval rows, then matches the old one up to GPU
+#     numerics. Skip this and build_corpus re-streams from the HF hub, which gives a
+#     different document sample (shuffle buffers and dataset revisions).
+mkdir -p $GEOAE_ROOT/corpus                                   # on Delta (corpus/ is gitignored)
+scp -r corpus/sampled_v1 <user>@login.delta.ncsa.illinois.edu:/work/hdd/<project>/<user>/GeoAE/corpus/
+#     ^ on the old box, from the repo root (password + Duo, like ssh)
+
+# (c) corpus (reused) -> extract (~1.5 h, 61 GB) -> token-bias table (~15 min, 300 MB).
+#     One GPU job; resubmitting the same command skips finished steps.
+JOB=$(sbatch --parsable -A <account> scripts/delta/extract_sampled.sbatch)
+
+# (d) Both AEs, one GPU each, concurrently, starting when (c) succeeds. The table step
+#     writes the dump's norm cache, which train.sbatch stages together with the dump.
+sbatch -A <account> --dependency=afterok:$JOB scripts/delta/train.sbatch \
+  configs/base/llama3.2-3b_l27_k2000_bnh_b32k_lam1_d6144_dpc_sampled_tokbias.yaml
+sbatch -A <account> --dependency=afterok:$JOB --time=36:00:00 scripts/delta/train.sbatch \
+  configs/base/llama3.2-3b_l27_k2000_bnh_b32k_lam1_d12288_dpc_sampled_tokbias.yaml
+#     A job that hits its walltime resumes from the newest checkpoint on resubmission.
+
+# (e) The base arm for every base-vs-bypass comparison: balanced k-means on the raw
+#     residual (same K, dpc init, Sinkhorn balancing, no encoder). It only borrows a
+#     checkpoint's normalisation, so run it once any d6144 epoch has saved.
+CK=checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_dpc_sampled_tokbias/step_0000289.pt
+sbatch -A <account> --mem=96g scripts/delta/eval.sbatch geoae.interp.fit_balanced_kmeans \
+  --checkpoint $CK --activations activations_sampled_10M/layer_27.npy \
+  --init dpc --reinit peaks --n_clusters 2000 --seed 42 \
+  --out e2e/checkpoints/general/llama3.2-3B/layer27/balanced_kmeans_k2000_dpc_sampled.npz
+```
+
+| run | time (old box, one A100 40 GB) | peak GPU | disk |
+|---|---|---|---|
+| extract + table | ~2 h | — | 61 GB dump + 0.3 GB table |
+| d6144 bypass | ~9 h (10.8 min/epoch) | below d12288's | 41 ckpts × ~0.8 GB = 33 GB |
+| d12288 bypass | ~17–20 h (~20 min/epoch) | 21.9 GB | 41 ckpts × ~1.3 GB = 54 GB |
+
+Evaluate **`step_0014450.pt`** (epoch 50) for both: this dump gives 289 steps per
+epoch, not the legacy dump's 284. The d12288 config's `keep_checkpoints` is back to 40
+(it was cut to 12 for the old box's disk).
+
+**Not ported yet.** The eval command sheets for these arms (`eval_out/run_tokbias.sh`,
+`run_tokbias_d12288.sh`, `run_tokbias_interventions.sh`, `run_cluster_steer_generate.sh`)
+still `cd` to the old box path and call `.venv/bin/python`. Port them to
+`eval.sbatch` once training is done. They also need the gitignored probe caches
+(`cache/`, `cache_ids/`), rebuilt with `concept_suite` as in section 3, step 3.
+
+**Comparability.** Delta-trained checkpoints are new replicates, not copies. The
+committed result JSONs and `dbpedia/joint_correct_*` sets belong to the old-box
+checkpoints. Compare arms trained on Delta with each other, and treat old-vs-Delta
+differences as seed/replicate noise (the epoch-to-epoch noise floor on range
+operators is ~0.05).
 
 ---
 
@@ -145,7 +237,7 @@ in float32.
 
 | in git | not in git (regenerate) |
 |---|---|
-| all code, tests (180), configs, docs | activation dumps (`activations_*`) |
+| all code, tests (324), configs, docs | activation dumps (`activations_*`) |
 | `results/*.json` — the evidence for every note (tracked by default since 2026-09-19) | closest-token dumps `results/ct_*`, `results/closest_tokens_*` (~440 MB, regenerable) |
 | `dbpedia/joint_correct_*.json` — pins each eval's document set (tracked by default) | checkpoints, `sweeps/`, `e2e/checkpoints/` |
 | `eval_out/` result JSONs and command sheets | `cache/` concept caches, `wandb/` |
