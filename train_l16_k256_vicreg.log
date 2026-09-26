@@ -1,0 +1,555 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[stream] Computing norm stats from layer_16.npy …
+[train-e2e] Loading frozen LLM: meta-llama/Llama-3.2-3B
+[stream] target layer 16/28 (is_last=False) full-forward + all-position splice
+[stream] AE enc=gelu L=3072 K=256 metric=euclidean sinkhorn=on ema=hard/0.9 λ_mse=0.05 λ_var=0.3 λ_cov=0.001 λ_unif=0.0
+[extract]   + web   allenai/c4
+[extract]   + wiki  wikimedia/wikipedia
+[extract]   + code  codeparrot/codeparrot-clean-valid
+[extract]   + math  open-web-math/open-web-math
+[stream] splice sanity: max|teacher-student(true residual)| = 0.0000 (OK)
+[extract]   + web   allenai/c4
+[extract]   + wiki  wikimedia/wikipedia
+[extract]   + code  codeparrot/codeparrot-clean-valid
+[extract]   + math  open-web-math/open-web-math
+
+[stream] Epoch 1/50 | tau=1.000 | λ_c=0.000 λ_s=0.0000 | centroids_init=False
+  step    100 | loss 3.0682 | kl 2.8521 | val_kl 3.2101 | clus 0.4298 | sep 1.0000 | fve -0.649 | var 0.4496 | cov 3.9407 | eff_K 256/256
+  [stream] new best val_kl=3.21006 -> best_val.pt
+  step    200 | loss 2.7146 | kl 2.4978 | val_kl 2.2275 | clus 0.4573 | sep 1.0000 | fve -0.581 | var 0.4498 | cov 5.1921 | eff_K 256/256
+  [stream] new best val_kl=2.22749 -> best_val.pt
+  step    300 | loss 2.0816 | kl 1.8714 | val_kl 1.5893 | clus 0.4828 | sep 1.0000 | fve -0.514 | var 0.4254 | cov 7.7736 | eff_K 256/256
+  [stream] new best val_kl=1.58931 -> best_val.pt
+  step    400 | loss 1.2708 | kl 1.0677 | val_kl 1.2388 | clus 0.4881 | sep 0.3679 | fve -0.428 | var 0.4354 | cov 5.0696 | eff_K 256/256
+  [stream] new best val_kl=1.23882 -> best_val.pt
+  step    500 | loss 1.2941 | kl 1.0967 | val_kl 1.0442 | clus 0.5028 | sep 0.3679 | fve -0.381 | var 0.4195 | cov 5.0357 | eff_K 256/256
+  [stream] new best val_kl=1.04424 -> best_val.pt
+[stream] Epoch 1 done in 8.2 min | val_kl=0.99548 | best=0.99548
+
+[stream] Epoch 2/50 | tau=1.000 | λ_c=0.000 λ_s=0.0000 | centroids_init=False
+  step    600 | loss 0.8511 | kl 0.6602 | val_kl 0.9076 | clus 0.5415 | sep 0.3679 | fve -0.279 | var 0.3868 | cov 7.5184 | eff_K 256/256
+  [stream] new best val_kl=0.90764 -> best_val.pt
+  step    700 | loss 0.6351 | kl 0.4485 | val_kl 0.8155 | clus 0.5540 | sep 1.0000 | fve -0.224 | var 0.3739 | cov 8.9565 | eff_K 256/256
+  [stream] new best val_kl=0.81546 -> best_val.pt
+  step    800 | loss 0.5214 | kl 0.3389 | val_kl 0.7545 | clus 0.5635 | sep 0.3679 | fve -0.176 | var 0.3633 | cov 7.9821 | eff_K 256/256
+  [stream] new best val_kl=0.75445 -> best_val.pt
+  step    900 | loss 0.6453 | kl 0.4532 | val_kl 0.6917 | clus 0.5940 | sep 0.3679 | fve -0.132 | var 0.3873 | cov 8.4768 | eff_K 256/256
+  [stream] new best val_kl=0.69166 -> best_val.pt
+  step   1000 | loss 0.5861 | kl 0.4040 | val_kl 0.6508 | clus 0.5587 | sep 1.0000 | fve -0.140 | var 0.3739 | cov 7.7094 | eff_K 256/256
+  [stream] new best val_kl=0.65080 -> best_val.pt
+[stream] Epoch 2 done in 8.2 min | val_kl=0.63275 | best=0.63275
+
+[stream] Epoch 3/50 | tau=1.000 | λ_c=0.000 λ_s=0.0000 | centroids_init=False
+  step   1100 | loss 0.6692 | kl 0.4880 | val_kl 0.6246 | clus 0.5824 | sep 1.0000 | fve -0.109 | var 0.3701 | cov 10.2345 | eff_K 256/256
+  [stream] new best val_kl=0.62456 -> best_val.pt
+  step   1200 | loss 0.4126 | kl 0.2374 | val_kl 0.5903 | clus 0.5919 | sep 1.0000 | fve -0.101 | var 0.3539 | cov 8.8973 | eff_K 256/256
+  [stream] new best val_kl=0.59032 -> best_val.pt
+  step   1300 | loss 0.7203 | kl 0.5337 | val_kl 0.5682 | clus 0.4722 | sep 1.0000 | fve -0.117 | var 0.4369 | cov 5.8068 | eff_K 256/256
+  [stream] new best val_kl=0.56819 -> best_val.pt
+  step   1400 | loss 0.4132 | kl 0.2424 | val_kl 0.5463 | clus 0.5895 | sep 1.0000 | fve -0.061 | var 0.3580 | cov 8.8154 | eff_K 256/256
+  [stream] new best val_kl=0.54628 -> best_val.pt
+  step   1500 | loss 0.3598 | kl 0.1776 | val_kl 0.5297 | clus 0.4803 | sep 0.3679 | fve -0.078 | var 0.4171 | cov 8.3896 | eff_K 256/256
+  [stream] new best val_kl=0.52967 -> best_val.pt
+  step   1600 | loss 0.3945 | kl 0.2014 | val_kl 0.5175 | clus 0.3890 | sep 1.0000 | fve -0.133 | var 0.4878 | cov 3.5142 | eff_K 256/256
+  [stream] new best val_kl=0.51747 -> best_val.pt
+[stream] Epoch 3 done in 8.4 min | val_kl=0.51661 | best=0.51661
+
+[stream] Epoch 4/50 | tau=1.000 | λ_c=0.000 λ_s=0.0000 | centroids_init=False
+  step   1700 | loss 0.3005 | kl 0.1323 | val_kl 0.4977 | clus 0.5938 | sep 1.0000 | fve -0.008 | var 0.3499 | cov 9.6151 | eff_K 256/256
+  [stream] new best val_kl=0.49775 -> best_val.pt
+  step   1800 | loss 0.4653 | kl 0.3053 | val_kl 0.4907 | clus 0.6185 | sep 1.0000 | fve -0.010 | var 0.3373 | cov 8.4071 | eff_K 256/256
+  [stream] new best val_kl=0.49066 -> best_val.pt
+  step   1900 | loss 0.4450 | kl 0.2653 | val_kl 0.4766 | clus 0.4636 | sep 1.0000 | fve -0.019 | var 0.4237 | cov 8.3636 | eff_K 256/256
+  [stream] new best val_kl=0.47661 -> best_val.pt
+  step   2000 | loss 0.3122 | kl 0.1248 | val_kl 0.4670 | clus 0.4816 | sep 0.3679 | fve -0.011 | var 0.4536 | cov 5.8012 | eff_K 256/256
+  [stream] new best val_kl=0.46699 -> best_val.pt
+  step   2100 | loss 0.4387 | kl 0.2739 | val_kl 0.4569 | clus 0.5989 | sep 1.0000 | fve 0.029 | var 0.3538 | cov 9.0782 | eff_K 256/256
+  [stream] new best val_kl=0.45688 -> best_val.pt
+[stream] Epoch 4 done in 8.3 min | val_kl=0.45001 | best=0.45001
+
+[stream] Epoch 5/50 | tau=1.000 | λ_c=0.000 λ_s=0.0000 | centroids_init=False
+  step   2200 | loss 0.4024 | kl 0.2453 | val_kl 0.4436 | clus 0.6893 | sep 1.0000 | fve -0.003 | var 0.3180 | cov 9.6382 | eff_K 256/256
+  [stream] new best val_kl=0.44361 -> best_val.pt
+  step   2300 | loss 0.4975 | kl 0.3407 | val_kl 0.4347 | clus 0.7132 | sep 1.0000 | fve -0.011 | var 0.3104 | cov 10.1497 | eff_K 256/256
+  [stream] new best val_kl=0.43470 -> best_val.pt
+  step   2400 | loss 0.5359 | kl 0.3753 | val_kl 0.4282 | clus 0.6969 | sep 0.3679 | fve -0.003 | var 0.3253 | cov 10.5506 | eff_K 256/256
+  [stream] new best val_kl=0.42822 -> best_val.pt
+  step   2500 | loss 0.4898 | kl 0.3334 | val_kl 0.4191 | clus 0.6846 | sep 1.0000 | fve -0.007 | var 0.3130 | cov 11.3261 | eff_K 256/256
+  [stream] new best val_kl=0.41910 -> best_val.pt
+  step   2600 | loss 0.3976 | kl 0.2448 | val_kl 0.4122 | clus 0.7287 | sep 1.0000 | fve 0.025 | var 0.3059 | cov 10.7013 | eff_K 256/256
+  [stream] new best val_kl=0.41217 -> best_val.pt
+  step   2700 | loss 0.6436 | kl 0.4890 | val_kl 0.4077 | clus 0.6926 | sep 1.0000 | fve -0.005 | var 0.3135 | cov 9.7756 | eff_K 256/256
+  [stream] new best val_kl=0.40770 -> best_val.pt
+[stream] Epoch 5 done in 8.5 min | val_kl=0.40779 | best=0.40770
+
+[stream] Epoch 6/50 | tau=1.000 | λ_c=0.050 λ_s=0.0000 | centroids_init=False
+[stream] k-means++ centroid init from 19,834 latents
+  step   2800 | loss 0.6429 | kl 0.4539 | val_kl 0.4025 | clus 0.5225 | sep 0.3872 | fve 0.004 | var 0.3359 | cov 12.5236 | eff_K 255/256
+  [stream] new best val_kl=0.40251 -> best_val.pt
+  step   2900 | loss 0.4276 | kl 0.2418 | val_kl 0.4010 | clus 0.5275 | sep 0.3897 | fve 0.025 | var 0.3260 | cov 11.5466 | eff_K 255/256
+  [stream] new best val_kl=0.40099 -> best_val.pt
+  step   3000 | loss 0.4104 | kl 0.2389 | val_kl 0.3838 | clus 0.5817 | sep 0.3819 | fve 0.016 | var 0.2388 | cov 12.5807 | eff_K 256/256
+  [stream] new best val_kl=0.38379 -> best_val.pt
+  step   3100 | loss 0.4005 | kl 0.2193 | val_kl 0.3809 | clus 0.5603 | sep 0.3843 | fve 0.008 | var 0.2678 | cov 16.5970 | eff_K 256/256
+  [stream] new best val_kl=0.38091 -> best_val.pt
+  step   3200 | loss 0.3791 | kl 0.2028 | val_kl 0.3813 | clus 0.5524 | sep 0.3950 | fve 0.051 | var 0.2651 | cov 16.3482 | eff_K 256/256
+[stream] Epoch 6 done in 7.9 min | val_kl=0.37641 | best=0.37641
+
+[stream] Epoch 7/50 | tau=1.000 | λ_c=0.050 λ_s=0.0000 | centroids_init=True
+  step   3300 | loss 0.4446 | kl 0.2687 | val_kl 0.3751 | clus 0.4775 | sep 0.3871 | fve 0.033 | var 0.3304 | cov 9.6071 | eff_K 256/256
+  [stream] new best val_kl=0.37510 -> best_val.pt
+  step   3400 | loss 0.3324 | kl 0.1677 | val_kl 0.3683 | clus 0.4948 | sep 0.3833 | fve 0.119 | var 0.2697 | cov 12.3672 | eff_K 256/256
+  [stream] new best val_kl=0.36830 -> best_val.pt
+  step   3500 | loss 0.6793 | kl 0.5017 | val_kl 0.3666 | clus 0.4652 | sep 0.3881 | fve 0.124 | var 0.3256 | cov 11.9408 | eff_K 256/256
+  [stream] new best val_kl=0.36663 -> best_val.pt
+  step   3600 | loss 0.2452 | kl 0.0682 | val_kl 0.3629 | clus 0.3676 | sep 0.3948 | fve 0.156 | var 0.3612 | cov 11.2398 | eff_K 256/256
+  [stream] new best val_kl=0.36291 -> best_val.pt
+  step   3700 | loss 0.3649 | kl 0.1979 | val_kl 0.3592 | clus 0.4983 | sep 0.3846 | fve 0.163 | var 0.2668 | cov 16.2879 | eff_K 256/256
+  [stream] new best val_kl=0.35917 -> best_val.pt
+[stream] Epoch 7 done in 8.3 min | val_kl=0.35516 | best=0.35516
+
+[stream] Epoch 8/50 | tau=1.000 | λ_c=0.050 λ_s=0.0000 | centroids_init=True
+  step   3800 | loss 0.2559 | kl 0.0844 | val_kl 0.3538 | clus 0.4461 | sep 0.4446 | fve 0.195 | var 0.2940 | cov 16.3661 | eff_K 256/256
+  [stream] new best val_kl=0.35384 -> best_val.pt
+  step   3900 | loss 0.3552 | kl 0.1772 | val_kl 0.3518 | clus 0.4164 | sep 0.3910 | fve 0.147 | var 0.3673 | cov 8.0081 | eff_K 256/256
+  [stream] new best val_kl=0.35176 -> best_val.pt
+  step   4000 | loss 0.2211 | kl 0.0495 | val_kl 0.3489 | clus 0.3679 | sep 0.4129 | fve 0.203 | var 0.3468 | cov 12.3678 | eff_K 256/256
+  [stream] new best val_kl=0.34892 -> best_val.pt
+  step   4100 | loss 0.4167 | kl 0.2388 | val_kl 0.3468 | clus 0.4673 | sep 0.3924 | fve 0.162 | var 0.3367 | cov 14.0430 | eff_K 256/256
+  [stream] new best val_kl=0.34676 -> best_val.pt
+  step   4200 | loss 0.2931 | kl 0.1224 | val_kl 0.3429 | clus 0.4747 | sep 0.4057 | fve 0.180 | var 0.2959 | cov 14.6232 | eff_K 256/256
+  [stream] new best val_kl=0.34288 -> best_val.pt
+  step   4300 | loss 0.2743 | kl 0.0800 | val_kl 0.3463 | clus 0.3449 | sep 0.4012 | fve 0.078 | var 0.4543 | cov 4.6659 | eff_K 256/256
+[stream] Epoch 8 done in 8.2 min | val_kl=0.33740 | best=0.33740
+
+[stream] Epoch 9/50 | tau=1.000 | λ_c=0.050 λ_s=0.0000 | centroids_init=True
+  step   4400 | loss 0.3036 | kl 0.1302 | val_kl 0.3380 | clus 0.4732 | sep 0.3873 | fve 0.167 | var 0.3158 | cov 14.6855 | eff_K 256/256
+  step   4500 | loss 0.4175 | kl 0.2442 | val_kl 0.3383 | clus 0.4600 | sep 0.3911 | fve 0.172 | var 0.3305 | cov 11.0331 | eff_K 256/256
+  step   4600 | loss 0.5736 | kl 0.4031 | val_kl 0.3324 | clus 0.4636 | sep 0.3797 | fve 0.071 | var 0.3296 | cov 9.5139 | eff_K 256/256
+  [stream] new best val_kl=0.33235 -> best_val.pt
+  step   4700 | loss 0.8070 | kl 0.6210 | val_kl 0.3315 | clus 0.4324 | sep 0.3828 | fve -0.003 | var 0.3987 | cov 6.4422 | eff_K 256/256
+  [stream] new best val_kl=0.33153 -> best_val.pt
+  step   4800 | loss 0.5857 | kl 0.4295 | val_kl 0.3324 | clus 0.5105 | sep 0.3884 | fve 0.141 | var 0.2600 | cov 11.5656 | eff_K 256/256
+[stream] Epoch 9 done in 8.0 min | val_kl=0.32855 | best=0.32855
+
+[stream] Epoch 10/50 | tau=0.978 | λ_c=0.050 λ_s=0.0001 | centroids_init=True
+  step   4900 | loss 0.4548 | kl 0.2640 | val_kl 0.3286 | clus 0.6322 | sep 0.3879 | fve 0.089 | var 0.2855 | cov 22.4528 | eff_K 256/256
+  step   5000 | loss 0.3281 | kl 0.1503 | val_kl 0.3266 | clus 0.6231 | sep 0.3947 | fve 0.142 | var 0.2508 | cov 21.3938 | eff_K 256/256
+  [stream] new best val_kl=0.32655 -> best_val.pt
+  step   5100 | loss 0.3153 | kl 0.1539 | val_kl 0.3250 | clus 0.5779 | sep 0.3832 | fve 0.169 | var 0.2301 | cov 17.3349 | eff_K 256/256
+  [stream] new best val_kl=0.32503 -> best_val.pt
+  step   5200 | loss 0.3205 | kl 0.1607 | val_kl 0.3206 | clus 0.5171 | sep 0.3864 | fve 0.139 | var 0.2743 | cov 10.7382 | eff_K 256/256
+  [stream] new best val_kl=0.32064 -> best_val.pt
+  step   5300 | loss 0.4359 | kl 0.2671 | val_kl 0.3177 | clus 0.5566 | sep 0.3876 | fve 0.131 | var 0.2649 | cov 15.8203 | eff_K 256/256
+  [stream] new best val_kl=0.31774 -> best_val.pt
+  step   5400 | loss 0.3577 | kl 0.1983 | val_kl 0.3207 | clus 0.5818 | sep 0.3828 | fve 0.163 | var 0.2356 | cov 14.4838 | eff_K 256/256
+[stream] Epoch 10 done in 8.1 min | val_kl=0.31896 | best=0.31774
+
+[stream] Epoch 11/50 | tau=0.956 | λ_c=0.050 λ_s=0.0002 | centroids_init=True
+  step   5500 | loss 0.7130 | kl 0.5439 | val_kl 0.3152 | clus 0.4766 | sep 0.3809 | fve 0.173 | var 0.3248 | cov 10.5987 | eff_K 256/256
+  [stream] new best val_kl=0.31516 -> best_val.pt
+  step   5600 | loss 0.3498 | kl 0.1989 | val_kl 0.3076 | clus 0.5547 | sep 0.3847 | fve 0.169 | var 0.2262 | cov 13.0044 | eff_K 256/256
+  [stream] new best val_kl=0.30755 -> best_val.pt
+  step   5700 | loss 0.4807 | kl 0.3195 | val_kl 0.3082 | clus 0.5166 | sep 0.3820 | fve 0.202 | var 0.2724 | cov 13.2836 | eff_K 256/256
+  step   5800 | loss 0.4177 | kl 0.2643 | val_kl 0.3092 | clus 0.5165 | sep 0.3812 | fve 0.203 | var 0.2502 | cov 13.5120 | eff_K 256/256
+  step   5900 | loss 0.3404 | kl 0.1861 | val_kl 0.3073 | clus 0.5163 | sep 0.3877 | fve 0.206 | var 0.2536 | cov 14.8925 | eff_K 256/256
+  [stream] new best val_kl=0.30727 -> best_val.pt
+[stream] Epoch 11 done in 7.9 min | val_kl=0.30251 | best=0.30251
+
+[stream] Epoch 12/50 | tau=0.934 | λ_c=0.050 λ_s=0.0004 | centroids_init=True
+  step   6000 | loss 0.2887 | kl 0.1253 | val_kl 0.3022 | clus 0.4474 | sep 0.4212 | fve 0.256 | var 0.2888 | cov 20.7655 | eff_K 256/256
+  [stream] new best val_kl=0.30223 -> best_val.pt
+  step   6100 | loss 0.3500 | kl 0.1814 | val_kl 0.3014 | clus 0.5411 | sep 0.3802 | fve 0.207 | var 0.2781 | cov 16.6282 | eff_K 256/256
+  [stream] new best val_kl=0.30135 -> best_val.pt
+  step   6200 | loss 0.2535 | kl 0.0991 | val_kl 0.2976 | clus 0.5351 | sep 0.3831 | fve 0.234 | var 0.2400 | cov 16.5107 | eff_K 256/256
+  [stream] new best val_kl=0.29760 -> best_val.pt
+  step   6300 | loss 0.2930 | kl 0.1310 | val_kl 0.2982 | clus 0.5333 | sep 0.3805 | fve 0.238 | var 0.2780 | cov 14.4324 | eff_K 256/256
+  step   6400 | loss 0.4135 | kl 0.2405 | val_kl 0.2979 | clus 0.4394 | sep 0.4102 | fve 0.189 | var 0.3470 | cov 15.0908 | eff_K 255/256
+  step   6500 | loss 0.3435 | kl 0.1917 | val_kl 0.2982 | clus 0.5505 | sep 0.3859 | fve 0.208 | var 0.2311 | cov 15.5276 | eff_K 256/256
+[stream] Epoch 12 done in 8.3 min | val_kl=0.30642 | best=0.29760
+
+[stream] Epoch 13/50 | tau=0.912 | λ_c=0.050 λ_s=0.0005 | centroids_init=True
+  step   6600 | loss 0.4144 | kl 0.2477 | val_kl 0.2967 | clus 0.5176 | sep 0.3847 | fve 0.223 | var 0.3074 | cov 12.9880 | eff_K 256/256
+  [stream] new best val_kl=0.29670 -> best_val.pt
+  step   6700 | loss 0.3492 | kl 0.1760 | val_kl 0.2946 | clus 0.5184 | sep 0.3848 | fve 0.256 | var 0.3283 | cov 13.1501 | eff_K 256/256
+  [stream] new best val_kl=0.29459 -> best_val.pt
+  step   6800 | loss 0.3552 | kl 0.1975 | val_kl 0.2935 | clus 0.5744 | sep 0.3837 | fve 0.233 | var 0.2368 | cov 18.2775 | eff_K 256/256
+  [stream] new best val_kl=0.29351 -> best_val.pt
+  step   6900 | loss 0.2953 | kl 0.1458 | val_kl 0.2909 | clus 0.6359 | sep 0.3873 | fve 0.216 | var 0.1799 | cov 19.4777 | eff_K 256/256
+  [stream] new best val_kl=0.29088 -> best_val.pt
+  step   7000 | loss 0.3434 | kl 0.1939 | val_kl 0.2916 | clus 0.6178 | sep 0.3783 | fve 0.218 | var 0.1963 | cov 16.0984 | eff_K 256/256
+[stream] Epoch 13 done in 8.0 min | val_kl=0.29073 | best=0.29073
+
+[stream] Epoch 14/50 | tau=0.890 | λ_c=0.050 λ_s=0.0006 | centroids_init=True
+  step   7100 | loss 0.3236 | kl 0.1699 | val_kl 0.2914 | clus 0.6592 | sep 0.3876 | fve 0.216 | var 0.1854 | cov 18.4922 | eff_K 256/256
+  step   7200 | loss 0.3512 | kl 0.1992 | val_kl 0.2889 | clus 0.6532 | sep 0.3883 | fve 0.172 | var 0.1768 | cov 16.6651 | eff_K 256/256
+  [stream] new best val_kl=0.28887 -> best_val.pt
+  step   7300 | loss 0.2963 | kl 0.1280 | val_kl 0.2850 | clus 0.6194 | sep 0.4149 | fve 0.255 | var 0.2319 | cov 24.9654 | eff_K 256/256
+  [stream] new best val_kl=0.28501 -> best_val.pt
+  step   7400 | loss 1.0376 | kl 0.8622 | val_kl 0.2832 | clus 0.5300 | sep 0.3848 | fve 0.115 | var 0.3364 | cov 9.8291 | eff_K 256/256
+  [stream] new best val_kl=0.28317 -> best_val.pt
+  step   7500 | loss 0.3390 | kl 0.1793 | val_kl 0.2829 | clus 0.6001 | sep 0.3816 | fve 0.237 | var 0.2466 | cov 16.2213 | eff_K 256/256
+  [stream] new best val_kl=0.28288 -> best_val.pt
+  step   7600 | loss 0.3326 | kl 0.1747 | val_kl 0.2824 | clus 0.6441 | sep 0.3863 | fve 0.193 | var 0.2156 | cov 16.2416 | eff_K 256/256
+  [stream] new best val_kl=0.28238 -> best_val.pt
+[stream] Epoch 14 done in 8.1 min | val_kl=0.27970 | best=0.27970
+
+[stream] Epoch 15/50 | tau=0.868 | λ_c=0.050 λ_s=0.0007 | centroids_init=True
+  step   7700 | loss 0.3507 | kl 0.1936 | val_kl 0.2824 | clus 0.5627 | sep 0.3899 | fve 0.185 | var 0.2562 | cov 12.4969 | eff_K 256/256
+  step   7800 | loss 0.2878 | kl 0.1245 | val_kl 0.2847 | clus 0.6362 | sep 0.3871 | fve 0.218 | var 0.2233 | cov 20.9377 | eff_K 256/256
+  step   7900 | loss 0.2992 | kl 0.1431 | val_kl 0.2798 | clus 0.6134 | sep 0.3866 | fve 0.243 | var 0.2293 | cov 17.1039 | eff_K 256/256
+  step   8000 | loss 0.3443 | kl 0.1981 | val_kl 0.2788 | clus 0.6162 | sep 0.3908 | fve 0.252 | var 0.1939 | cov 17.2813 | eff_K 256/256
+  [stream] new best val_kl=0.27882 -> best_val.pt
+  step   8100 | loss 0.3353 | kl 0.1913 | val_kl 0.2776 | clus 0.6304 | sep 0.3823 | fve 0.248 | var 0.1766 | cov 17.7198 | eff_K 256/256
+  [stream] new best val_kl=0.27760 -> best_val.pt
+[stream] Epoch 15 done in 7.9 min | val_kl=0.27576 | best=0.27576
+
+[stream] Epoch 16/50 | tau=0.846 | λ_c=0.050 λ_s=0.0009 | centroids_init=True
+  step   8200 | loss 0.3771 | kl 0.2258 | val_kl 0.2782 | clus 0.5481 | sep 0.3831 | fve 0.255 | var 0.2542 | cov 12.7450 | eff_K 256/256
+  step   8300 | loss 0.4076 | kl 0.2394 | val_kl 0.2775 | clus 0.4929 | sep 0.4170 | fve 0.245 | var 0.2695 | cov 28.0167 | eff_K 256/256
+  step   8400 | loss 0.3122 | kl 0.1682 | val_kl 0.2744 | clus 0.6404 | sep 0.3823 | fve 0.211 | var 0.1732 | cov 17.3010 | eff_K 256/256
+  [stream] new best val_kl=0.27442 -> best_val.pt
+  step   8500 | loss 0.2945 | kl 0.1513 | val_kl 0.2739 | clus 0.6176 | sep 0.3812 | fve 0.240 | var 0.1794 | cov 17.9890 | eff_K 256/256
+  [stream] new best val_kl=0.27385 -> best_val.pt
+  step   8600 | loss 0.3233 | kl 0.1799 | val_kl 0.2742 | clus 0.5855 | sep 0.3811 | fve 0.252 | var 0.2018 | cov 15.6195 | eff_K 256/256
+  step   8700 | loss 0.5408 | kl 0.3690 | val_kl 0.2721 | clus 0.5072 | sep 0.3943 | fve 0.268 | var 0.3296 | cov 14.0509 | eff_K 255/256
+  [stream] new best val_kl=0.27208 -> best_val.pt
+[stream] Epoch 16 done in 8.1 min | val_kl=0.27018 | best=0.27018
+
+[stream] Epoch 17/50 | tau=0.824 | λ_c=0.050 λ_s=0.0010 | centroids_init=True
+  step   8800 | loss 0.2625 | kl 0.1062 | val_kl 0.2727 | clus 0.5678 | sep 0.4010 | fve 0.278 | var 0.2281 | cov 21.4675 | eff_K 256/256
+  step   8900 | loss 0.3272 | kl 0.1717 | val_kl 0.2706 | clus 0.5955 | sep 0.3906 | fve 0.278 | var 0.2224 | cov 19.5038 | eff_K 256/256
+  step   9000 | loss 0.2376 | kl 0.0971 | val_kl 0.2735 | clus 0.6063 | sep 0.3854 | fve 0.341 | var 0.1779 | cov 20.6995 | eff_K 256/256
+  step   9100 | loss 0.2264 | kl 0.0654 | val_kl 0.2705 | clus 0.4583 | sep 0.3975 | fve 0.294 | var 0.3125 | cov 14.2587 | eff_K 256/256
+  step   9200 | loss 0.3154 | kl 0.1560 | val_kl 0.2698 | clus 0.5304 | sep 0.3970 | fve 0.407 | var 0.2486 | cov 24.7249 | eff_K 256/256
+  [stream] new best val_kl=0.26977 -> best_val.pt
+[stream] Epoch 17 done in 8.1 min | val_kl=0.26950 | best=0.26950
+
+[stream] Epoch 18/50 | tau=0.802 | λ_c=0.050 λ_s=0.0011 | centroids_init=True
+  step   9300 | loss 0.2808 | kl 0.1368 | val_kl 0.2662 | clus 0.5760 | sep 0.3826 | fve 0.291 | var 0.2045 | cov 18.3967 | eff_K 256/256
+  [stream] new best val_kl=0.26621 -> best_val.pt
+  step   9400 | loss 0.2335 | kl 0.0621 | val_kl 0.2673 | clus 0.5923 | sep 0.3908 | fve 0.264 | var 0.2423 | cov 32.4132 | eff_K 256/256
+  step   9500 | loss 0.2930 | kl 0.1292 | val_kl 0.2684 | clus 0.5793 | sep 0.4021 | fve 0.231 | var 0.2428 | cov 23.9146 | eff_K 256/256
+  step   9600 | loss 0.3415 | kl 0.1930 | val_kl 0.2656 | clus 0.5880 | sep 0.3913 | fve 0.289 | var 0.1986 | cov 24.1968 | eff_K 256/256
+  [stream] new best val_kl=0.26558 -> best_val.pt
+  step   9700 | loss 0.2212 | kl 0.0766 | val_kl 0.2638 | clus 0.5753 | sep 0.3945 | fve 0.335 | var 0.1933 | cov 23.3194 | eff_K 256/256
+  [stream] new best val_kl=0.26375 -> best_val.pt
+  step   9800 | loss 0.3354 | kl 0.1721 | val_kl 0.2649 | clus 0.5420 | sep 0.3836 | fve 0.265 | var 0.2922 | cov 14.7751 | eff_K 256/256
+[stream] Epoch 18 done in 8.1 min | val_kl=0.26482 | best=0.26375
+
+[stream] Epoch 19/50 | tau=0.780 | λ_c=0.050 λ_s=0.0012 | centroids_init=True
+  step   9900 | loss 0.3238 | kl 0.1369 | val_kl 0.2651 | clus 0.6954 | sep 0.4109 | fve 0.275 | var 0.2009 | cov 49.5812 | eff_K 256/256
+  step  10000 | loss 0.3909 | kl 0.2462 | val_kl 0.2623 | clus 0.6745 | sep 0.3825 | fve 0.218 | var 0.1673 | cov 18.0146 | eff_K 255/256
+  [stream] new best val_kl=0.26228 -> best_val.pt
+  [reinit] step 10000: 1 dead clusters
+  step  10100 | loss 0.2656 | kl 0.1120 | val_kl 0.2643 | clus 0.6173 | sep 0.3856 | fve 0.306 | var 0.2208 | cov 18.8509 | eff_K 256/256
+  step  10200 | loss 0.2628 | kl 0.1170 | val_kl 0.2607 | clus 0.6183 | sep 0.3945 | fve 0.232 | var 0.2041 | cov 15.1409 | eff_K 256/256
+  [stream] new best val_kl=0.26069 -> best_val.pt
+  step  10300 | loss 0.2642 | kl 0.1239 | val_kl 0.2593 | clus 0.6253 | sep 0.3905 | fve 0.257 | var 0.1819 | cov 16.0783 | eff_K 256/256
+  [stream] new best val_kl=0.25935 -> best_val.pt
+[stream] Epoch 19 done in 7.9 min | val_kl=0.26005 | best=0.25935
+
+[stream] Epoch 20/50 | tau=0.759 | λ_c=0.050 λ_s=0.0013 | centroids_init=True
+  step  10400 | loss 0.3061 | kl 0.1601 | val_kl 0.2607 | clus 0.4968 | sep 0.3856 | fve 0.297 | var 0.2476 | cov 16.0753 | eff_K 256/256
+  step  10500 | loss 0.4139 | kl 0.2565 | val_kl 0.2619 | clus 0.5769 | sep 0.3847 | fve 0.320 | var 0.2426 | cov 21.2452 | eff_K 256/256
+  step  10600 | loss 0.2535 | kl 0.1127 | val_kl 0.2573 | clus 0.5852 | sep 0.3859 | fve 0.332 | var 0.2012 | cov 17.9430 | eff_K 256/256
+  [stream] new best val_kl=0.25728 -> best_val.pt
+  step  10700 | loss 0.3867 | kl 0.2408 | val_kl 0.2539 | clus 0.6136 | sep 0.3851 | fve 0.312 | var 0.2064 | cov 18.3879 | eff_K 256/256
+  [stream] new best val_kl=0.25388 -> best_val.pt
+  step  10800 | loss 0.2727 | kl 0.1338 | val_kl 0.2527 | clus 0.5847 | sep 0.3875 | fve 0.339 | var 0.1901 | cov 19.8142 | eff_K 256/256
+  [stream] new best val_kl=0.25274 -> best_val.pt
+  step  10900 | loss 0.3635 | kl 0.2114 | val_kl 0.2559 | clus 0.6365 | sep 0.3855 | fve 0.305 | var 0.2130 | cov 21.6206 | eff_K 256/256
+[stream] Epoch 20 done in 8.1 min | val_kl=0.25488 | best=0.25274
+
+[stream] Epoch 21/50 | tau=0.737 | λ_c=0.050 λ_s=0.0015 | centroids_init=True
+  step  11000 | loss 0.2761 | kl 0.1215 | val_kl 0.2547 | clus 0.6698 | sep 0.3931 | fve 0.301 | var 0.1896 | cov 22.8382 | eff_K 256/256
+  step  11100 | loss 0.3010 | kl 0.1552 | val_kl 0.2511 | clus 0.6435 | sep 0.3892 | fve 0.281 | var 0.1882 | cov 19.0984 | eff_K 256/256
+  [stream] new best val_kl=0.25114 -> best_val.pt
+  step  11200 | loss 0.3349 | kl 0.1291 | val_kl 0.2481 | clus 0.7241 | sep 0.4377 | fve 0.290 | var 0.2232 | cov 62.7057 | eff_K 256/256
+  [stream] new best val_kl=0.24810 -> best_val.pt
+  step  11300 | loss 0.2642 | kl 0.1143 | val_kl 0.2517 | clus 0.6694 | sep 0.3821 | fve 0.314 | var 0.1828 | cov 20.5272 | eff_K 256/256
+  step  11400 | loss 0.3199 | kl 0.1447 | val_kl 0.2503 | clus 0.6756 | sep 0.4187 | fve 0.321 | var 0.2195 | cov 36.5420 | eff_K 256/256
+[stream] Epoch 21 done in 8.0 min | val_kl=0.24747 | best=0.24747
+
+[stream] Epoch 22/50 | tau=0.715 | λ_c=0.050 λ_s=0.0016 | centroids_init=True
+  step  11500 | loss 0.3529 | kl 0.1678 | val_kl 0.2525 | clus 0.7075 | sep 0.3906 | fve 0.269 | var 0.2433 | cov 35.7749 | eff_K 256/256
+  step  11600 | loss 0.2739 | kl 0.1293 | val_kl 0.2518 | clus 0.7096 | sep 0.3866 | fve 0.291 | var 0.1483 | cov 21.5346 | eff_K 255/256
+  step  11700 | loss 0.3518 | kl 0.2029 | val_kl 0.2456 | clus 0.6546 | sep 0.3868 | fve 0.321 | var 0.1840 | cov 24.5038 | eff_K 256/256
+  [stream] new best val_kl=0.24562 -> best_val.pt
+  step  11800 | loss 0.3217 | kl 0.1783 | val_kl 0.2480 | clus 0.6574 | sep 0.3828 | fve 0.240 | var 0.1787 | cov 16.8708 | eff_K 256/256
+  step  11900 | loss 2.0937 | kl 1.9343 | val_kl 0.2466 | clus 0.5730 | sep 0.3827 | fve 0.141 | var 0.2884 | cov 9.4674 | eff_K 256/256
+  step  12000 | loss 0.9442 | kl 0.7817 | val_kl 0.2465 | clus 0.5904 | sep 0.3807 | fve 0.152 | var 0.2830 | cov 13.2985 | eff_K 256/256
+[stream] Epoch 22 done in 8.2 min | val_kl=0.25046 | best=0.24562
+
+[stream] Epoch 23/50 | tau=0.693 | λ_c=0.050 λ_s=0.0017 | centroids_init=True
+  step  12100 | loss 0.2470 | kl 0.1005 | val_kl 0.2488 | clus 0.6325 | sep 0.3841 | fve 0.305 | var 0.2068 | cov 17.0164 | eff_K 256/256
+  step  12200 | loss 0.2477 | kl 0.1053 | val_kl 0.2450 | clus 0.7054 | sep 0.3839 | fve 0.309 | var 0.1408 | cov 24.3575 | eff_K 256/256
+  [stream] new best val_kl=0.24499 -> best_val.pt
+  step  12300 | loss 0.2696 | kl 0.1258 | val_kl 0.2455 | clus 0.6359 | sep 0.3815 | fve 0.324 | var 0.1870 | cov 20.0604 | eff_K 255/256
+  step  12400 | loss 0.3031 | kl 0.1650 | val_kl 0.2477 | clus 0.7478 | sep 0.3859 | fve 0.271 | var 0.1183 | cov 21.4225 | eff_K 255/256
+  step  12500 | loss 2.4048 | kl 2.2356 | val_kl 0.2449 | clus 0.5659 | sep 0.3803 | fve 0.166 | var 0.3219 | cov 10.5803 | eff_K 255/256
+  [stream] new best val_kl=0.24492 -> best_val.pt
+[stream] Epoch 23 done in 7.9 min | val_kl=0.24307 | best=0.24307
+
+[stream] Epoch 24/50 | tau=0.671 | λ_c=0.050 λ_s=0.0018 | centroids_init=True
+  step  12600 | loss 0.2031 | kl 0.0273 | val_kl 0.2431 | clus 0.4472 | sep 0.4253 | fve 0.348 | var 0.3526 | cov 19.1803 | eff_K 255/256
+  step  12700 | loss 0.3069 | kl 0.1413 | val_kl 0.2444 | clus 0.4886 | sep 0.3971 | fve 0.323 | var 0.3056 | cov 21.8388 | eff_K 255/256
+  step  12800 | loss 0.1802 | kl 0.0451 | val_kl 0.2434 | clus 0.5583 | sep 0.3861 | fve 0.355 | var 0.1962 | cov 18.4342 | eff_K 255/256
+  step  12900 | loss 0.1831 | kl 0.0274 | val_kl 0.2453 | clus 0.5503 | sep 0.3850 | fve 0.272 | var 0.2831 | cov 13.0079 | eff_K 255/256
+  step  13000 | loss 0.2853 | kl 0.1401 | val_kl 0.2396 | clus 0.5808 | sep 0.3846 | fve 0.413 | var 0.2147 | cov 20.4333 | eff_K 255/256
+  [stream] new best val_kl=0.23965 -> best_val.pt
+  [reinit] step 13000: 1 dead clusters
+  step  13100 | loss 0.2094 | kl 0.0611 | val_kl 0.2389 | clus 0.5903 | sep 0.3885 | fve 0.412 | var 0.2040 | cov 25.2169 | eff_K 256/256
+  [stream] new best val_kl=0.23893 -> best_val.pt
+[stream] Epoch 24 done in 8.1 min | val_kl=0.24002 | best=0.23893
+
+[stream] Epoch 25/50 | tau=0.649 | λ_c=0.050 λ_s=0.0020 | centroids_init=True
+  step  13200 | loss 0.3116 | kl 0.1712 | val_kl 0.2397 | clus 0.6342 | sep 0.3869 | fve 0.367 | var 0.1768 | cov 23.7563 | eff_K 256/256
+  step  13300 | loss 0.2623 | kl 0.0846 | val_kl 0.2423 | clus 0.6054 | sep 0.3945 | fve 0.375 | var 0.2775 | cov 33.5798 | eff_K 256/256
+  step  13400 | loss 0.3121 | kl 0.1685 | val_kl 0.2393 | clus 0.6131 | sep 0.3806 | fve 0.334 | var 0.2141 | cov 15.2483 | eff_K 255/256
+  step  13500 | loss 0.2325 | kl 0.0955 | val_kl 0.2440 | clus 0.6112 | sep 0.3855 | fve 0.339 | var 0.1694 | cov 22.4459 | eff_K 256/256
+  step  13600 | loss 0.2583 | kl 0.1124 | val_kl 0.2381 | clus 0.5925 | sep 0.3943 | fve 0.351 | var 0.2149 | cov 17.7421 | eff_K 256/256
+  [stream] new best val_kl=0.23811 -> best_val.pt
+[stream] Epoch 25 done in 8.0 min | val_kl=0.24242 | best=0.23811
+
+[stream] Epoch 26/50 | tau=0.627 | λ_c=0.050 λ_s=0.0021 | centroids_init=True
+  step  13700 | loss 0.2154 | kl 0.0766 | val_kl 0.2389 | clus 0.6897 | sep 0.3840 | fve 0.334 | var 0.1618 | cov 19.3274 | eff_K 256/256
+  step  13800 | loss 0.2439 | kl 0.0982 | val_kl 0.2434 | clus 0.6453 | sep 0.3941 | fve 0.356 | var 0.1909 | cov 22.9243 | eff_K 256/256
+  step  13900 | loss 0.2258 | kl 0.0793 | val_kl 0.2370 | clus 0.6466 | sep 0.3873 | fve 0.361 | var 0.1871 | cov 24.7530 | eff_K 256/256
+  [stream] new best val_kl=0.23695 -> best_val.pt
+  step  14000 | loss 0.2719 | kl 0.1279 | val_kl 0.2366 | clus 0.5805 | sep 0.3878 | fve 0.359 | var 0.2256 | cov 16.0980 | eff_K 256/256
+  [stream] new best val_kl=0.23662 -> best_val.pt
+  step  14100 | loss 0.2688 | kl 0.1311 | val_kl 0.2376 | clus 0.6715 | sep 0.3884 | fve 0.328 | var 0.1677 | cov 19.8663 | eff_K 256/256
+  step  14200 | loss 0.2396 | kl 0.1031 | val_kl 0.2337 | clus 0.6386 | sep 0.3850 | fve 0.380 | var 0.1738 | cov 19.4989 | eff_K 256/256
+  [stream] new best val_kl=0.23369 -> best_val.pt
+[stream] Epoch 26 done in 8.4 min | val_kl=0.23510 | best=0.23369
+
+[stream] Epoch 27/50 | tau=0.605 | λ_c=0.050 λ_s=0.0022 | centroids_init=True
+  step  14300 | loss 0.2586 | kl 0.1217 | val_kl 0.2385 | clus 0.6693 | sep 0.3861 | fve 0.359 | var 0.1695 | cov 19.4123 | eff_K 256/256
+  step  14400 | loss 0.2205 | kl 0.0817 | val_kl 0.2332 | clus 0.6515 | sep 0.3799 | fve 0.381 | var 0.1665 | cov 21.2979 | eff_K 256/256
+  [stream] new best val_kl=0.23318 -> best_val.pt
+  step  14500 | loss 0.2407 | kl 0.1076 | val_kl 0.2373 | clus 0.6436 | sep 0.3827 | fve 0.371 | var 0.1479 | cov 21.4474 | eff_K 256/256
+  step  14600 | loss 0.2900 | kl 0.1308 | val_kl 0.2353 | clus 0.6358 | sep 0.4075 | fve 0.368 | var 0.2071 | cov 33.0321 | eff_K 256/256
+  step  14700 | loss 0.2475 | kl 0.1014 | val_kl 0.2347 | clus 0.5968 | sep 0.3864 | fve 0.342 | var 0.2221 | cov 18.5442 | eff_K 256/256
+[stream] Epoch 27 done in 8.0 min | val_kl=0.23340 | best=0.23318
+
+[stream] Epoch 28/50 | tau=0.583 | λ_c=0.050 λ_s=0.0023 | centroids_init=True
+  step  14800 | loss 0.2501 | kl 0.1131 | val_kl 0.2331 | clus 0.6469 | sep 0.3821 | fve 0.387 | var 0.1719 | cov 20.0778 | eff_K 256/256
+  [stream] new best val_kl=0.23314 -> best_val.pt
+  step  14900 | loss 0.2459 | kl 0.1052 | val_kl 0.2334 | clus 0.6920 | sep 0.3855 | fve 0.362 | var 0.1554 | cov 24.0297 | eff_K 256/256
+  step  15000 | loss 0.2032 | kl 0.0559 | val_kl 0.2405 | clus 0.5970 | sep 0.3988 | fve 0.362 | var 0.2162 | cov 21.3273 | eff_K 256/256
+  step  15100 | loss 0.2992 | kl 0.1549 | val_kl 0.2367 | clus 0.6090 | sep 0.3778 | fve 0.310 | var 0.2096 | cov 18.1658 | eff_K 256/256
+  step  15200 | loss 0.1896 | kl 0.0537 | val_kl 0.2353 | clus 0.6567 | sep 0.3875 | fve 0.388 | var 0.1536 | cov 23.6159 | eff_K 256/256
+[stream] Epoch 28 done in 7.9 min | val_kl=0.23481 | best=0.23314
+
+[stream] Epoch 29/50 | tau=0.561 | λ_c=0.050 λ_s=0.0024 | centroids_init=True
+  step  15300 | loss 0.2765 | kl 0.1459 | val_kl 0.2344 | clus 0.6627 | sep 0.3831 | fve 0.341 | var 0.1366 | cov 21.5997 | eff_K 256/256
+  step  15400 | loss 0.2656 | kl 0.1341 | val_kl 0.2360 | clus 0.6650 | sep 0.3864 | fve 0.341 | var 0.1366 | cov 21.8538 | eff_K 256/256
+  step  15500 | loss 0.3045 | kl 0.1652 | val_kl 0.2342 | clus 0.6121 | sep 0.3809 | fve 0.379 | var 0.1959 | cov 18.0163 | eff_K 256/256
+  step  15600 | loss 0.2856 | kl 0.1505 | val_kl 0.2333 | clus 0.6255 | sep 0.3831 | fve 0.377 | var 0.1674 | cov 22.2014 | eff_K 256/256
+  step  15700 | loss 0.2525 | kl 0.1219 | val_kl 0.2378 | clus 0.6494 | sep 0.3895 | fve 0.381 | var 0.1488 | cov 21.2673 | eff_K 256/256
+  step  15800 | loss 0.2495 | kl 0.1075 | val_kl 0.2322 | clus 0.6014 | sep 0.3906 | fve 0.398 | var 0.1854 | cov 26.7084 | eff_K 256/256
+  [stream] new best val_kl=0.23220 -> best_val.pt
+[stream] Epoch 29 done in 8.1 min | val_kl=0.23275 | best=0.23220
+
+[stream] Epoch 30/50 | tau=0.539 | λ_c=0.050 λ_s=0.0026 | centroids_init=True
+  step  15900 | loss 0.2848 | kl 0.1334 | val_kl 0.2390 | clus 0.6292 | sep 0.3927 | fve 0.429 | var 0.2063 | cov 28.2930 | eff_K 256/256
+  step  16000 | loss 0.2664 | kl 0.1344 | val_kl 0.2340 | clus 0.6232 | sep 0.3834 | fve 0.391 | var 0.1623 | cov 20.6090 | eff_K 256/256
+  step  16100 | loss 0.3481 | kl 0.2167 | val_kl 0.2345 | clus 0.6439 | sep 0.3786 | fve 0.368 | var 0.1601 | cov 19.6764 | eff_K 256/256
+  step  16200 | loss 0.2351 | kl 0.1065 | val_kl 0.2332 | clus 0.6095 | sep 0.3871 | fve 0.384 | var 0.1514 | cov 21.9658 | eff_K 256/256
+  step  16300 | loss 0.2772 | kl 0.1358 | val_kl 0.2354 | clus 0.6731 | sep 0.3829 | fve 0.387 | var 0.1473 | cov 30.0126 | eff_K 256/256
+[stream] Epoch 30 done in 7.9 min | val_kl=0.23180 | best=0.23180
+
+[stream] Epoch 31/50 | tau=0.517 | λ_c=0.050 λ_s=0.0027 | centroids_init=True
+  step  16400 | loss 0.2945 | kl 0.1517 | val_kl 0.2308 | clus 0.6884 | sep 0.3883 | fve 0.351 | var 0.1981 | cov 15.6280 | eff_K 256/256
+  [stream] new best val_kl=0.23080 -> best_val.pt
+  step  16500 | loss 0.2891 | kl 0.1093 | val_kl 0.2320 | clus 0.7266 | sep 0.4029 | fve 0.352 | var 0.1800 | cov 54.1045 | eff_K 256/256
+  step  16600 | loss 0.2756 | kl 0.1413 | val_kl 0.2331 | clus 0.7691 | sep 0.3851 | fve 0.338 | var 0.1031 | cov 24.5397 | eff_K 256/256
+  step  16700 | loss 0.2330 | kl 0.0784 | val_kl 0.2330 | clus 0.6160 | sep 0.3992 | fve 0.358 | var 0.2258 | cov 24.2798 | eff_K 256/256
+  step  16800 | loss 2.3951 | kl 2.2439 | val_kl 0.2324 | clus 0.6330 | sep 0.3867 | fve 0.151 | var 0.2431 | cov 10.2670 | eff_K 256/256
+  step  16900 | loss 0.2600 | kl 0.1131 | val_kl 0.2334 | clus 0.7193 | sep 0.3879 | fve 0.342 | var 0.1693 | cov 19.7336 | eff_K 256/256
+[stream] Epoch 31 done in 8.2 min | val_kl=0.23200 | best=0.23080
+
+[stream] Epoch 32/50 | tau=0.495 | λ_c=0.050 λ_s=0.0028 | centroids_init=True
+  step  17000 | loss 0.3812 | kl 0.2057 | val_kl 0.2325 | clus 0.7494 | sep 0.4132 | fve 0.366 | var 0.1669 | cov 49.2158 | eff_K 256/256
+  step  17100 | loss 0.2332 | kl 0.0884 | val_kl 0.2266 | clus 0.6942 | sep 0.3945 | fve 0.381 | var 0.1550 | cov 26.5147 | eff_K 256/256
+  [stream] new best val_kl=0.22659 -> best_val.pt
+  step  17200 | loss 0.2519 | kl 0.1146 | val_kl 0.2346 | clus 0.6932 | sep 0.3860 | fve 0.360 | var 0.1426 | cov 20.8716 | eff_K 256/256
+  step  17300 | loss 0.2287 | kl 0.0846 | val_kl 0.2276 | clus 0.6493 | sep 0.3908 | fve 0.385 | var 0.1766 | cov 24.6343 | eff_K 256/256
+  step  17400 | loss 0.2489 | kl 0.0951 | val_kl 0.2289 | clus 0.6928 | sep 0.3960 | fve 0.389 | var 0.1725 | cov 32.3505 | eff_K 256/256
+[stream] Epoch 32 done in 8.1 min | val_kl=0.23001 | best=0.22659
+
+[stream] Epoch 33/50 | tau=0.473 | λ_c=0.050 λ_s=0.0029 | centroids_init=True
+  step  17500 | loss 0.2096 | kl 0.0735 | val_kl 0.2284 | clus 0.5565 | sep 0.3832 | fve 0.389 | var 0.2098 | cov 17.4681 | eff_K 255/256
+  step  17600 | loss 0.2436 | kl 0.1042 | val_kl 0.2339 | clus 0.6003 | sep 0.4046 | fve 0.384 | var 0.1902 | cov 20.0788 | eff_K 255/256
+  step  17700 | loss 0.2018 | kl 0.0638 | val_kl 0.2259 | clus 0.6855 | sep 0.4048 | fve 0.433 | var 0.1583 | cov 23.3574 | eff_K 255/256
+  [stream] new best val_kl=0.22592 -> best_val.pt
+  step  17800 | loss 0.2353 | kl 0.0821 | val_kl 0.2299 | clus 0.6049 | sep 0.4046 | fve 0.439 | var 0.2372 | cov 24.8441 | eff_K 255/256
+  step  17900 | loss 0.7918 | kl 0.6385 | val_kl 0.2272 | clus 0.4985 | sep 0.3842 | fve 0.265 | var 0.3140 | cov 10.1479 | eff_K 256/256
+  step  18000 | loss 0.2529 | kl 0.1211 | val_kl 0.2270 | clus 0.5448 | sep 0.3806 | fve 0.370 | var 0.2089 | cov 15.6017 | eff_K 256/256
+[stream] Epoch 33 done in 8.1 min | val_kl=0.23292 | best=0.22592
+
+[stream] Epoch 34/50 | tau=0.451 | λ_c=0.050 λ_s=0.0030 | centroids_init=True
+  step  18100 | loss 0.1633 | kl 0.0258 | val_kl 0.2291 | clus 0.5957 | sep 0.3781 | fve 0.328 | var 0.2109 | cov 15.0011 | eff_K 256/256
+  step  18200 | loss 0.1779 | kl 0.0515 | val_kl 0.2285 | clus 0.5810 | sep 0.3750 | fve 0.437 | var 0.1707 | cov 18.7155 | eff_K 256/256
+  step  18300 | loss 0.2964 | kl 0.1670 | val_kl 0.2272 | clus 0.6693 | sep 0.3805 | fve 0.418 | var 0.1412 | cov 22.4583 | eff_K 255/256
+  step  18400 | loss 0.2058 | kl 0.0728 | val_kl 0.2253 | clus 0.6300 | sep 0.3933 | fve 0.393 | var 0.1596 | cov 23.4122 | eff_K 256/256
+  [stream] new best val_kl=0.22526 -> best_val.pt
+  step  18500 | loss 0.2011 | kl 0.0685 | val_kl 0.2206 | clus 0.6696 | sep 0.3894 | fve 0.424 | var 0.1527 | cov 22.3421 | eff_K 255/256
+  [stream] new best val_kl=0.22062 -> best_val.pt
+[stream] Epoch 34 done in 7.9 min | val_kl=0.22125 | best=0.22062
+
+[stream] Epoch 35/50 | tau=0.429 | λ_c=0.050 λ_s=0.0032 | centroids_init=True
+  step  18600 | loss 0.3563 | kl 0.1972 | val_kl 0.2273 | clus 0.5575 | sep 0.3949 | fve 0.405 | var 0.2863 | cov 18.5443 | eff_K 256/256
+  step  18700 | loss 0.2843 | kl 0.1329 | val_kl 0.2253 | clus 0.7055 | sep 0.3852 | fve 0.367 | var 0.1701 | cov 31.9957 | eff_K 256/256
+  step  18800 | loss 0.2320 | kl 0.1034 | val_kl 0.2214 | clus 0.7066 | sep 0.3789 | fve 0.408 | var 0.1192 | cov 24.5076 | eff_K 256/256
+  step  18900 | loss 0.2370 | kl 0.1032 | val_kl 0.2233 | clus 0.6125 | sep 0.3798 | fve 0.413 | var 0.1564 | cov 26.0650 | eff_K 256/256
+  step  19000 | loss 0.3267 | kl 0.1709 | val_kl 0.2213 | clus 0.6117 | sep 0.3928 | fve 0.381 | var 0.2255 | cov 29.0073 | eff_K 256/256
+  step  19100 | loss 0.2191 | kl 0.0752 | val_kl 0.2210 | clus 0.6310 | sep 0.3914 | fve 0.425 | var 0.1978 | cov 24.6579 | eff_K 256/256
+[stream] Epoch 35 done in 8.0 min | val_kl=0.22515 | best=0.22062
+
+[stream] Epoch 36/50 | tau=0.407 | λ_c=0.050 λ_s=0.0033 | centroids_init=True
+  step  19200 | loss 0.2724 | kl 0.1359 | val_kl 0.2249 | clus 0.7726 | sep 0.3807 | fve 0.363 | var 0.1163 | cov 24.4059 | eff_K 256/256
+  step  19300 | loss 0.4374 | kl 0.2812 | val_kl 0.2209 | clus 0.6144 | sep 0.3898 | fve 0.309 | var 0.2571 | cov 18.7279 | eff_K 256/256
+  step  19400 | loss 0.2153 | kl 0.0873 | val_kl 0.2213 | clus 0.6749 | sep 0.3862 | fve 0.398 | var 0.1239 | cov 24.0637 | eff_K 256/256
+  step  19500 | loss 0.2388 | kl 0.0993 | val_kl 0.2207 | clus 0.7178 | sep 0.3818 | fve 0.381 | var 0.1494 | cov 22.0706 | eff_K 256/256
+  step  19600 | loss 0.8874 | kl 0.7402 | val_kl 0.2196 | clus 0.6188 | sep 0.3769 | fve 0.337 | var 0.2366 | cov 14.8048 | eff_K 256/256
+  [stream] new best val_kl=0.21961 -> best_val.pt
+[stream] Epoch 36 done in 8.0 min | val_kl=0.22218 | best=0.21961
+
+[stream] Epoch 37/50 | tau=0.385 | λ_c=0.050 λ_s=0.0034 | centroids_init=True
+  step  19700 | loss 0.3825 | kl 0.2371 | val_kl 0.2222 | clus 0.6125 | sep 0.3891 | fve 0.407 | var 0.1996 | cov 24.2738 | eff_K 256/256
+  step  19800 | loss 0.3284 | kl 0.1955 | val_kl 0.2199 | clus 0.6786 | sep 0.3834 | fve 0.390 | var 0.1469 | cov 21.6713 | eff_K 256/256
+  step  19900 | loss 0.2280 | kl 0.0873 | val_kl 0.2205 | clus 0.6793 | sep 0.3874 | fve 0.410 | var 0.1560 | cov 25.5113 | eff_K 256/256
+  step  20000 | loss 0.2361 | kl 0.0996 | val_kl 0.2233 | clus 0.7315 | sep 0.3831 | fve 0.361 | var 0.1304 | cov 25.5358 | eff_K 256/256
+  step  20100 | loss 0.3683 | kl 0.2391 | val_kl 0.2229 | clus 0.6645 | sep 0.3825 | fve 0.371 | var 0.1460 | cov 19.6402 | eff_K 256/256
+  step  20200 | loss 0.2434 | kl 0.1152 | val_kl 0.2222 | clus 0.6724 | sep 0.3842 | fve 0.406 | var 0.1379 | cov 21.4176 | eff_K 256/256
+[stream] Epoch 37 done in 8.3 min | val_kl=0.22366 | best=0.21961
+
+[stream] Epoch 38/50 | tau=0.363 | λ_c=0.050 λ_s=0.0035 | centroids_init=True
+  step  20300 | loss 0.4678 | kl 0.3386 | val_kl 0.2235 | clus 0.6108 | sep 0.3935 | fve 0.405 | var 0.1644 | cov 19.8128 | eff_K 255/256
+  step  20400 | loss 0.2907 | kl 0.1505 | val_kl 0.2238 | clus 0.5951 | sep 0.3827 | fve 0.402 | var 0.2109 | cov 16.8972 | eff_K 256/256
+  step  20500 | loss 0.2235 | kl 0.0954 | val_kl 0.2196 | clus 0.6530 | sep 0.3890 | fve 0.451 | var 0.1395 | cov 23.5524 | eff_K 256/256
+  step  20600 | loss 0.2659 | kl 0.1288 | val_kl 0.2203 | clus 0.5954 | sep 0.3856 | fve 0.423 | var 0.2020 | cov 18.8460 | eff_K 256/256
+  step  20700 | loss 0.3610 | kl 0.2117 | val_kl 0.2206 | clus 0.5869 | sep 0.3912 | fve 0.401 | var 0.2507 | cov 14.6199 | eff_K 256/256
+[stream] Epoch 38 done in 7.9 min | val_kl=0.22417 | best=0.21961
+
+[stream] Epoch 39/50 | tau=0.341 | λ_c=0.050 λ_s=0.0037 | centroids_init=True
+  step  20800 | loss 0.3960 | kl 0.2309 | val_kl 0.2202 | clus 0.7090 | sep 0.3899 | fve 0.332 | var 0.2070 | cov 33.2405 | eff_K 256/256
+  step  20900 | loss 0.2358 | kl 0.1035 | val_kl 0.2196 | clus 0.7509 | sep 0.3852 | fve 0.368 | var 0.1101 | cov 24.1027 | eff_K 256/256
+  step  21000 | loss 0.3067 | kl 0.1349 | val_kl 0.2198 | clus 0.7201 | sep 0.3974 | fve 0.334 | var 0.2034 | cov 35.8304 | eff_K 256/256
+  step  21100 | loss 0.2518 | kl 0.1126 | val_kl 0.2162 | clus 0.7677 | sep 0.3924 | fve 0.410 | var 0.1147 | cov 29.9585 | eff_K 256/256
+  [stream] new best val_kl=0.21621 -> best_val.pt
+  step  21200 | loss 0.2758 | kl 0.1220 | val_kl 0.2201 | clus 0.7731 | sep 0.3916 | fve 0.396 | var 0.1512 | cov 34.8669 | eff_K 256/256
+  step  21300 | loss 0.2965 | kl 0.1445 | val_kl 0.2190 | clus 0.6674 | sep 0.3858 | fve 0.330 | var 0.2037 | cov 24.1410 | eff_K 256/256
+[stream] Epoch 39 done in 8.0 min | val_kl=0.21820 | best=0.21621
+
+[stream] Epoch 40/50 | tau=0.320 | λ_c=0.050 λ_s=0.0038 | centroids_init=True
+  step  21400 | loss 0.2212 | kl 0.0891 | val_kl 0.2168 | clus 0.7360 | sep 0.3889 | fve 0.391 | var 0.1217 | cov 22.8131 | eff_K 256/256
+  step  21500 | loss 0.5272 | kl 0.3800 | val_kl 0.2211 | clus 0.6512 | sep 0.3812 | fve 0.354 | var 0.1973 | cov 23.8782 | eff_K 256/256
+  step  21600 | loss 0.3255 | kl 0.1107 | val_kl 0.2176 | clus 0.7514 | sep 0.4543 | fve 0.343 | var 0.2763 | cov 56.6961 | eff_K 256/256
+  step  21700 | loss 0.2333 | kl 0.0948 | val_kl 0.2165 | clus 0.6948 | sep 0.3902 | fve 0.398 | var 0.1492 | cov 25.8131 | eff_K 256/256
+  step  21800 | loss 0.3073 | kl 0.1749 | val_kl 0.2215 | clus 0.7175 | sep 0.3814 | fve 0.412 | var 0.1372 | cov 20.4963 | eff_K 256/256
+[stream] Epoch 40 done in 8.0 min | val_kl=0.22041 | best=0.21621
+
+[stream] Epoch 41/50 | tau=0.298 | λ_c=0.050 λ_s=0.0039 | centroids_init=True
+  step  21900 | loss 0.1555 | kl 0.0359 | val_kl 0.2209 | clus 0.6125 | sep 0.3843 | fve 0.432 | var 0.1413 | cov 19.6389 | eff_K 256/256
+  step  22000 | loss 0.2014 | kl 0.0819 | val_kl 0.2189 | clus 0.6980 | sep 0.3836 | fve 0.456 | var 0.1029 | cov 22.7870 | eff_K 256/256
+  step  22100 | loss 0.3561 | kl 0.2185 | val_kl 0.2188 | clus 0.6125 | sep 0.3722 | fve 0.392 | var 0.2148 | cov 13.9912 | eff_K 256/256
+  step  22200 | loss 0.2195 | kl 0.0901 | val_kl 0.2197 | clus 0.6017 | sep 0.3861 | fve 0.383 | var 0.1772 | cov 19.5569 | eff_K 256/256
+  step  22300 | loss 0.1802 | kl 0.0388 | val_kl 0.2187 | clus 0.5688 | sep 0.3939 | fve 0.469 | var 0.1934 | cov 28.6379 | eff_K 256/256
+  step  22400 | loss 0.1740 | kl 0.0524 | val_kl 0.2197 | clus 0.6312 | sep 0.3816 | fve 0.409 | var 0.1369 | cov 20.9796 | eff_K 256/256
+[stream] Epoch 41 done in 8.3 min | val_kl=0.21894 | best=0.21621
+
+[stream] Epoch 42/50 | tau=0.276 | λ_c=0.050 λ_s=0.0040 | centroids_init=True
+  step  22500 | loss 0.2401 | kl 0.0653 | val_kl 0.2181 | clus 0.5936 | sep 0.4671 | fve 0.460 | var 0.2639 | cov 40.7139 | eff_K 256/256
+  step  22600 | loss 0.2151 | kl 0.0839 | val_kl 0.2169 | clus 0.7106 | sep 0.3823 | fve 0.430 | var 0.1206 | cov 26.3345 | eff_K 256/256
+  step  22700 | loss 0.2879 | kl 0.1348 | val_kl 0.2142 | clus 0.6323 | sep 0.3889 | fve 0.406 | var 0.2509 | cov 19.3767 | eff_K 256/256
+  [stream] new best val_kl=0.21418 -> best_val.pt
+  step  22800 | loss 0.2912 | kl 0.1458 | val_kl 0.2138 | clus 0.7110 | sep 0.3889 | fve 0.403 | var 0.1606 | cov 31.3495 | eff_K 256/256
+  [stream] new best val_kl=0.21375 -> best_val.pt
+  step  22900 | loss 0.2239 | kl 0.0816 | val_kl 0.2149 | clus 0.5921 | sep 0.3932 | fve 0.444 | var 0.2282 | cov 17.9540 | eff_K 256/256
+[stream] Epoch 42 done in 7.9 min | val_kl=0.21651 | best=0.21375
+
+[stream] Epoch 43/50 | tau=0.254 | λ_c=0.050 λ_s=0.0041 | centroids_init=True
+  step  23000 | loss 0.2805 | kl 0.1509 | val_kl 0.2152 | clus 0.6219 | sep 0.3818 | fve 0.454 | var 0.1661 | cov 19.5535 | eff_K 256/256
+  step  23100 | loss 1.4750 | kl 1.3166 | val_kl 0.2142 | clus 0.5911 | sep 0.3986 | fve 0.280 | var 0.2623 | cov 20.7975 | eff_K 256/256
+  step  23200 | loss 0.2644 | kl 0.1189 | val_kl 0.2187 | clus 0.6910 | sep 0.3899 | fve 0.399 | var 0.1531 | cov 32.3101 | eff_K 256/256
+  step  23300 | loss 0.2008 | kl 0.0807 | val_kl 0.2149 | clus 0.6876 | sep 0.3788 | fve 0.438 | var 0.1019 | cov 23.7409 | eff_K 256/256
+  step  23400 | loss 0.2574 | kl 0.0928 | val_kl 0.2175 | clus 0.7289 | sep 0.4571 | fve 0.402 | var 0.1676 | cov 40.9429 | eff_K 256/256
+  step  23500 | loss 0.2359 | kl 0.1074 | val_kl 0.2180 | clus 0.7916 | sep 0.3959 | fve 0.392 | var 0.0967 | cov 21.9779 | eff_K 256/256
+[stream] Epoch 43 done in 8.1 min | val_kl=0.21342 | best=0.21342
+
+[stream] Epoch 44/50 | tau=0.232 | λ_c=0.050 λ_s=0.0043 | centroids_init=True
+  step  23600 | loss 0.2893 | kl 0.1522 | val_kl 0.2131 | clus 0.5949 | sep 0.3835 | fve 0.420 | var 0.1869 | cov 22.7360 | eff_K 256/256
+  [stream] new best val_kl=0.21306 -> best_val.pt
+  step  23700 | loss 0.3514 | kl 0.2162 | val_kl 0.2166 | clus 0.5776 | sep 0.3863 | fve 0.412 | var 0.2092 | cov 17.8039 | eff_K 256/256
+  step  23800 | loss 0.2271 | kl 0.0923 | val_kl 0.2176 | clus 0.7398 | sep 0.3829 | fve 0.410 | var 0.1285 | cov 25.2361 | eff_K 256/256
+  step  23900 | loss 0.2637 | kl 0.1243 | val_kl 0.2162 | clus 0.6619 | sep 0.3818 | fve 0.440 | var 0.1662 | cov 25.9734 | eff_K 256/256
+  step  24000 | loss 0.2710 | kl 0.1378 | val_kl 0.2147 | clus 0.6622 | sep 0.3909 | fve 0.420 | var 0.1620 | cov 20.9044 | eff_K 256/256
+[stream] Epoch 44 done in 7.9 min | val_kl=0.21582 | best=0.21306
+
+[stream] Epoch 45/50 | tau=0.210 | λ_c=0.050 λ_s=0.0044 | centroids_init=True
+  step  24100 | loss 0.6583 | kl 0.4993 | val_kl 0.2164 | clus 0.6611 | sep 0.3960 | fve 0.321 | var 0.2352 | cov 25.1817 | eff_K 256/256
+  step  24200 | loss 0.1998 | kl 0.0628 | val_kl 0.2158 | clus 0.6884 | sep 0.3849 | fve 0.396 | var 0.1518 | cov 25.2080 | eff_K 256/256
+  step  24300 | loss 0.2011 | kl 0.0492 | val_kl 0.2163 | clus 0.6038 | sep 0.4109 | fve 0.438 | var 0.2333 | cov 24.9668 | eff_K 256/256
+  step  24400 | loss 0.2466 | kl 0.1144 | val_kl 0.2163 | clus 0.6595 | sep 0.3888 | fve 0.460 | var 0.1530 | cov 23.5311 | eff_K 256/256
+  step  24500 | loss 0.3392 | kl 0.1551 | val_kl 0.2115 | clus 0.7029 | sep 0.4077 | fve 0.456 | var 0.2129 | cov 57.2949 | eff_K 256/256
+  [stream] new best val_kl=0.21154 -> best_val.pt
+  step  24600 | loss 0.3046 | kl 0.1675 | val_kl 0.2122 | clus 0.6105 | sep 0.3814 | fve 0.408 | var 0.2044 | cov 17.8074 | eff_K 256/256
+[stream] Epoch 45 done in 8.4 min | val_kl=0.21440 | best=0.21154
+
+[stream] Epoch 46/50 | tau=0.188 | λ_c=0.050 λ_s=0.0045 | centroids_init=True
+  step  24700 | loss 0.2514 | kl 0.1191 | val_kl 0.2115 | clus 0.7070 | sep 0.3828 | fve 0.414 | var 0.1431 | cov 21.3892 | eff_K 256/256
+  [stream] new best val_kl=0.21150 -> best_val.pt
+  step  24800 | loss 0.3903 | kl 0.2129 | val_kl 0.2151 | clus 0.7297 | sep 0.4371 | fve 0.427 | var 0.2103 | cov 48.3291 | eff_K 256/256
+  step  24900 | loss 0.2525 | kl 0.1265 | val_kl 0.2145 | clus 0.6326 | sep 0.3835 | fve 0.439 | var 0.1392 | cov 22.8372 | eff_K 256/256
+  step  25000 | loss 0.2016 | kl 0.0748 | val_kl 0.2109 | clus 0.6311 | sep 0.3830 | fve 0.460 | var 0.1440 | cov 23.9019 | eff_K 256/256
+  [stream] new best val_kl=0.21087 -> best_val.pt
+  step  25100 | loss 0.2348 | kl 0.1102 | val_kl 0.2109 | clus 0.6463 | sep 0.3847 | fve 0.430 | var 0.1531 | cov 17.9614 | eff_K 256/256
+[stream] Epoch 46 done in 7.9 min | val_kl=0.21097 | best=0.21087
+
+[stream] Epoch 47/50 | tau=0.166 | λ_c=0.050 λ_s=0.0046 | centroids_init=True
+  step  25200 | loss 0.2838 | kl 0.1493 | val_kl 0.2121 | clus 0.6273 | sep 0.3917 | fve 0.478 | var 0.1684 | cov 25.4577 | eff_K 256/256
+  step  25300 | loss 0.2621 | kl 0.1361 | val_kl 0.2147 | clus 0.6556 | sep 0.3858 | fve 0.454 | var 0.1425 | cov 21.6621 | eff_K 256/256
+  step  25400 | loss 0.2363 | kl 0.0712 | val_kl 0.2112 | clus 0.5910 | sep 0.3946 | fve 0.465 | var 0.2586 | cov 31.4824 | eff_K 256/256
+  step  25500 | loss 0.2279 | kl 0.0995 | val_kl 0.2126 | clus 0.6191 | sep 0.3840 | fve 0.466 | var 0.1548 | cov 23.3974 | eff_K 256/256
+  step  25600 | loss 0.4212 | kl 0.2871 | val_kl 0.2155 | clus 0.7112 | sep 0.3737 | fve 0.374 | var 0.1413 | cov 22.4082 | eff_K 256/256
+  step  25700 | loss 0.3105 | kl 0.1734 | val_kl 0.2102 | clus 0.6272 | sep 0.3896 | fve 0.450 | var 0.2062 | cov 17.3471 | eff_K 256/256
+  [stream] new best val_kl=0.21016 -> best_val.pt
+[stream] Epoch 47 done in 8.2 min | val_kl=0.21042 | best=0.21016
+
+[stream] Epoch 48/50 | tau=0.144 | λ_c=0.050 λ_s=0.0048 | centroids_init=True
+  step  25800 | loss 0.1667 | kl 0.0415 | val_kl 0.2099 | clus 0.5608 | sep 0.3836 | fve 0.470 | var 0.1641 | cov 22.6140 | eff_K 256/256
+  [stream] new best val_kl=0.20987 -> best_val.pt
+  step  25900 | loss 0.1977 | kl 0.0756 | val_kl 0.2097 | clus 0.6501 | sep 0.3852 | fve 0.508 | var 0.1226 | cov 25.4748 | eff_K 256/256
+  [stream] new best val_kl=0.20966 -> best_val.pt
+  step  26000 | loss 0.2489 | kl 0.1229 | val_kl 0.2108 | clus 0.6695 | sep 0.3780 | fve 0.406 | var 0.1460 | cov 19.4306 | eff_K 256/256
+  step  26100 | loss 0.2081 | kl 0.0659 | val_kl 0.2159 | clus 0.6310 | sep 0.3948 | fve 0.415 | var 0.1853 | cov 26.0355 | eff_K 256/256
+  step  26200 | loss 0.2204 | kl 0.0984 | val_kl 0.2176 | clus 0.6498 | sep 0.3863 | fve 0.410 | var 0.1359 | cov 20.9348 | eff_K 256/256
+[stream] Epoch 48 done in 8.0 min | val_kl=0.21283 | best=0.20966
+
+[stream] Epoch 49/50 | tau=0.122 | λ_c=0.050 λ_s=0.0049 | centroids_init=True
+  step  26300 | loss 0.2903 | kl 0.0659 | val_kl 0.2129 | clus 0.7362 | sep 0.4049 | fve 0.438 | var 0.2555 | cov 79.6233 | eff_K 256/256
+  step  26400 | loss 0.2494 | kl 0.1131 | val_kl 0.2129 | clus 0.7540 | sep 0.3846 | fve 0.379 | var 0.1254 | cov 23.6933 | eff_K 256/256
+  step  26500 | loss 0.2528 | kl 0.0993 | val_kl 0.2096 | clus 0.8008 | sep 0.3898 | fve 0.419 | var 0.1320 | cov 37.1331 | eff_K 256/256
+  [stream] new best val_kl=0.20960 -> best_val.pt
+  step  26600 | loss 0.2976 | kl 0.0939 | val_kl 0.2159 | clus 0.7082 | sep 0.5025 | fve 0.439 | var 0.2192 | cov 70.1239 | eff_K 256/256
+  step  26700 | loss 0.2821 | kl 0.0735 | val_kl 0.2118 | clus 0.7150 | sep 0.4509 | fve 0.420 | var 0.2380 | cov 65.8477 | eff_K 256/256
+  step  26800 | loss 0.3551 | kl 0.2118 | val_kl 0.2149 | clus 0.7433 | sep 0.3817 | fve 0.396 | var 0.1590 | cov 22.5499 | eff_K 256/256
+[stream] Epoch 49 done in 8.1 min | val_kl=0.21270 | best=0.20960
+
+[stream] Epoch 50/50 | tau=0.100 | λ_c=0.050 λ_s=0.0050 | centroids_init=True
+  step  26900 | loss 0.2403 | kl 0.0913 | val_kl 0.2122 | clus 0.6052 | sep 0.3958 | fve 0.494 | var 0.2135 | cov 28.3184 | eff_K 256/256
+  step  27000 | loss 0.2186 | kl 0.0930 | val_kl 0.2151 | clus 0.6759 | sep 0.3841 | fve 0.403 | var 0.1272 | cov 21.4414 | eff_K 256/256
+  step  27100 | loss 0.2379 | kl 0.1074 | val_kl 0.2114 | clus 0.7091 | sep 0.3787 | fve 0.428 | var 0.1339 | cov 22.6731 | eff_K 256/256
+  step  27200 | loss 0.3490 | kl 0.2049 | val_kl 0.2102 | clus 0.7331 | sep 0.3890 | fve 0.389 | var 0.1878 | cov 20.3344 | eff_K 256/256
+  step  27300 | loss 0.2607 | kl 0.1368 | val_kl 0.2112 | clus 0.6539 | sep 0.3834 | fve 0.469 | var 0.1347 | cov 22.2874 | eff_K 256/256
+[stream] corpus exhausted — restarting stream (data repeats)
+[extract]   + web   allenai/c4
+[extract]   + wiki  wikimedia/wikipedia
+[extract]   + code  codeparrot/codeparrot-clean-valid
+[extract]   + math  open-web-math/open-web-math
+[stream] Epoch 50 done in 8.1 min | val_kl=0.21103 | best=0.20960
+
+[stream] Done. Best val_kl = 0.20960

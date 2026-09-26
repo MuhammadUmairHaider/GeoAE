@@ -1,0 +1,15 @@
+[seed] seed=42 deterministic=True (cudnn.deterministic, tf32 off, CUBLAS_WORKSPACE_CONFIG set)
+[ccc] LM=meta-llama/Llama-3.2-3B layer=27 (AE target_layer=27) K=256
+[eval] Splice sanity check PASSED (max logit diff = 0.00e+00)
+[ccc] Computing avg replacement from wiki …
+[ccc] Loading ag_news test split …
+[ccc] Accuracy comparison: base vs AE-recon on 50 random docs/class (full, unfiltered) …
+
+  class                       n    base  AE-recon   delta
+  World                      50   1.000     0.940  -0.060
+  Sports                     50   0.200     0.760  +0.560
+  Business                   50   0.300     0.480  +0.180
+  Sci/Tech                   50   0.060     0.020  -0.040
+  OVERALL                   200   0.390     0.550  +0.160
+
+[ccc] base=0.390  AE-recon=0.550  delta=+0.160  -> results_acc_ag_news_k256_vicreg_accuracy.json
