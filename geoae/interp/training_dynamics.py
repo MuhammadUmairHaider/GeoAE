@@ -366,7 +366,10 @@ def report(rows: list[dict]) -> None:
 
 
 def main():
-    SP = "/tmp/claude-1001/-home-exouser-RepresentationAE-GeoAE/870ea3ff-b19b-4c54-a3f1-e8289a510213/scratchpad/"
+    # Atlas probe inputs, written by geoae/interp/prepare_atlas_probe.py.
+    # These were defaults pointing at a scratchpad on the old box, so every
+    # default was unusable anywhere else; cache/ is where the caches land.
+    SP = "cache/"
     ap = argparse.ArgumentParser()
     ap.add_argument("--checkpoints", required=True, help="dir containing step_*.pt")
     ap.add_argument("--atlas", default=SP + "atlas8k.npz")

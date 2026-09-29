@@ -38,8 +38,6 @@ from sklearn.metrics import normalized_mutual_info_score as nmi_score
 from geoae.checkpoint import load_ae_checkpoint
 from geoae.interp.closest_tokens import load_baseline_kmeans
 
-SP = "/tmp/claude-1001/-home-exouser-RepresentationAE-GeoAE/870ea3ff-b19b-4c54-a3f1-e8289a510213/scratchpad/"
-
 # rung -> (cache file, label key, grain, human description)
 LADDER = [
     ("surface",       "pos.npz",            "surface",     "token",    "orthographic class"),

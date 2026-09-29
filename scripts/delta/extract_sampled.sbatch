@@ -46,7 +46,7 @@ fi
 TABLE="${TABLE:-e2e/checkpoints/general/llama3.2-3B/layer27/token_bias_sampled.npz}"
 mkdir -p logs
 
-read -r ACT N_TOKENS TARGET_LAYER < <(uv run python - "$CFG" <<'PY'
+read -r ACT N_TOKENS TARGET_LAYER < <(uv run --no-sync python - "$CFG" <<'PY'
 import sys
 from geoae.config import Config
 c = Config.from_yaml(sys.argv[1])
@@ -55,13 +55,22 @@ PY
 )
 
 # ---- 1. corpus --------------------------------------------------------------
-# Always run — build_corpus is incremental and reuses finished source files.
-uv run python -u -m geoae.build_corpus --config "$CFG" --workers 3 \
-  2>&1 | tee -a "logs/corpus_$(basename "$CFG" .yaml).log"
+# Normally run on a CPU allocation instead — build_corpus never touches the GPU, so
+# doing it here spends ~40 min of an A100's hours on network and tokeniser work:
+#     sbatch -A $DELTA_CPU_ACCOUNT scripts/delta/corpus.sbatch "$CFG"
+# Set SKIP_CORPUS=1 once that has finished. Left unset the step still runs here, so
+# a single submission of this job remains sufficient on its own; build_corpus is
+# incremental and reuses finished source files either way.
+if [ -n "${SKIP_CORPUS:-}" ]; then
+  echo "[skip] corpus step (SKIP_CORPUS set) — expecting it to be complete already"
+else
+  uv run --no-sync python -u -m geoae.build_corpus --config "$CFG" --workers 3 \
+    2>&1 | tee -a "logs/corpus_$(basename "$CFG" .yaml).log"
+fi
 
 # ---- 2. extract ---------------------------------------------------------------
 extract_done() {
-  uv run python - "$ACT" "$N_TOKENS" <<'PY'
+  uv run --no-sync python - "$ACT" "$N_TOKENS" <<'PY'
 import json, sys
 from pathlib import Path
 m = Path(sys.argv[1]) / "meta.json"
@@ -73,7 +82,7 @@ PY
 if extract_done; then
   echo "[skip] $ACT/meta.json already complete (mode=sampled, n_tokens=$N_TOKENS)"
 else
-  uv run python -u -m geoae.extract --config "$CFG" \
+  uv run --no-sync python -u -m geoae.extract --config "$CFG" \
     2>&1 | tee "logs/extract_$(basename "$CFG" .yaml).log"
   extract_done || { echo "ABORT: extraction finished but $ACT/meta.json is not complete"; exit 1; }
 fi
@@ -82,11 +91,11 @@ fi
 if [ -e "$TABLE" ]; then
   echo "[skip] $TABLE already exists"
 else
-  uv run python -u -m geoae.token_bias --activations_dir "$ACT" --layer "$TARGET_LAYER" --out "$TABLE" \
+  uv run --no-sync python -u -m geoae.token_bias --activations_dir "$ACT" --layer "$TARGET_LAYER" --out "$TABLE" \
     2>&1 | tee "logs/token_bias_$(basename "$ACT").log"
   NORM_CACHE="$ACT/norm_params_layer${TARGET_LAYER}.npz"
   [ -e "$NORM_CACHE" ] || { echo "ABORT: expected norm cache $NORM_CACHE was not written"; exit 1; }
 fi
 
-echo "Next: sbatch -A <account> scripts/delta/train.sbatch configs/base/llama3.2-3b_l27_k2000_bnh_b32k_lam1_d6144_dpc_sampled_tokbias.yaml"
-echo "  and: sbatch -A <account> scripts/delta/train.sbatch configs/base/llama3.2-3b_l27_k2000_bnh_b32k_lam1_d12288_dpc_sampled_tokbias.yaml"
+echo "Next: sbatch scripts/delta/train.sbatch configs/base/llama3.2-3b_l27_k2000_bnh_b32k_lam1_d6144_dpc_sampled_tokbias.yaml"
+echo "  and: sbatch scripts/delta/train.sbatch configs/base/llama3.2-3b_l27_k2000_bnh_b32k_lam1_d12288_dpc_sampled_tokbias.yaml"

@@ -1,7 +1,7 @@
 """Refresh the Gemma report from saved artifacts; never starts an experiment.
 
 Run on each requested status/report update:
-    .venv/bin/python eval_out/update_gemma_report.py
+    scripts/delta/py eval_out/update_gemma_report.py
 Outputs live outside geoae/ and the run's completion records, so refreshing the
 report does not change the active pipeline's source manifest or artifacts.
 """
@@ -402,7 +402,7 @@ def build_report(root, output):
         path = root / "repairs" / name
         if path.exists():
             text.append("Repair provenance: " + link(path) + ".")
-    text += ["Refresh on the next requested update:", "```bash\n.venv/bin/python eval_out/update_gemma_report.py\n```",
+    text += ["Refresh on the next requested update:", "```bash\nscripts/delta/py eval_out/update_gemma_report.py\n```",
              "The refresh reads artifacts and regenerates this report, its embedded-figure HTML, and a JSON snapshot. It does not launch jobs or change the experiment manifest.",
              table(["UTC snapshot", "Newly completed stages", "Running at snapshot"], [[u["timestamp"], ", ".join(u["new_completed_stages"]) or "No new completion", ", ".join(u["running_stages"]) or "None detected"] for u in updates[-10:]])]
     text += ["### Verified result artifacts", *["- " + link(root / "evals" / name) for name in sorted(hashes)]]

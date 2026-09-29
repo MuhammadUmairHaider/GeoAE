@@ -1,6 +1,6 @@
 #!/bin/bash
 # Run any evaluation module on one GPU, e.g.:
-#   sbatch -A <account> scripts/delta/eval.sbatch geoae.interp.range_intervention_compare \
+#   sbatch scripts/delta/eval.sbatch geoae.interp.range_intervention_compare \
 #     --checkpoint checkpoints/llama3.2-3B/layer27/<run>/best_val.pt --dataset db14 \
 #     --saliency dprime --out results/range_intervention_db14_<run>_dprime.json
 # The joint-correct document sets (dbpedia/joint_correct_*.json) are in git, so
@@ -18,4 +18,4 @@
 set -euo pipefail
 MODULE="${1:?usage: sbatch eval.sbatch <python.module> [args]}"; shift
 source scripts/delta/env.sh
-uv run python -u -m "$MODULE" "$@"
+uv run --no-sync python -u -m "$MODULE" "$@"

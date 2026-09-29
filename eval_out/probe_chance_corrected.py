@@ -17,7 +17,7 @@ token ids (token_id, or last_token_id beside H_last). Each rung also reports
 `leak` = cNMI(label; current token id): the bypass is a function of the token id
 alone, so this bounds how much of the concept the bypass can carry around the latent.
 
-    .venv/bin/python -u eval_out/probe_chance_corrected.py \
+    scripts/delta/py -u eval_out/probe_chance_corrected.py \
         --models d6144_new=<ckpt> --baselines km_a=<npz>,km_b=<npz> --out eval_out/x.json
 """
 from __future__ import annotations

@@ -141,7 +141,9 @@ def main():
     args = ap.parse_args()
 
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    _, _, _, ck = load_ae_checkpoint(args.checkpoint, "cpu")
+    # Only model_name + layer are read; the AE itself is discarded, so a token-bypass
+    # checkpoint is fine here (its bias is never used).
+    _, _, _, ck = load_ae_checkpoint(args.checkpoint, "cpu", allow_token_bias=True)
     model_name = ck["config"]["extraction"]["model_name"]
     layer = ck["config"]["data"]["target_layer"]
     print(f"[bench] {args.bench}: {model_name} layer {layer}")

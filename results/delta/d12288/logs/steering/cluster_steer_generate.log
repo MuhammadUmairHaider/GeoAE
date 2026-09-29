@@ -1,0 +1,44 @@
+Loading weights:   0%|          | 0/254 [00:00<?, ?it/s]Loading weights:  68%|██████▊   | 172/254 [00:00<00:00, 1536.17it/s]Loading weights: 100%|██████████| 254/254 [00:00<00:00, 597.92it/s] 
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+[gen] 249,770 reference rows (even docs of the held-out tail)
+[collect] Loading baseline k-means centroids: e2e/checkpoints/general/llama3.2-3B/layer27/delta/balanced_kmeans_k2000_dpc_sampled.npz
+[gen] base: 1109 eligible content clusters (of 2000); hubs 45 (11.4% of rows); targets e.g.  inhab,  preserves,  grows,  prefers,  infect |  Fits,  Adjustable,  Compatible,  Closure,  Signed |  discourse,  cooperative,  teaching,  parental,  Structural
+[gen] bypass: 728 eligible content clusters (of 2000); hubs 94 (22.3% of rows); targets e.g.  assaulted,  compensated,  refreshed,  naughty,  fined |  alleles,  allele,  binds,  mutants,  adaptor |  disbelief,  attribution,  disappointment,  envy,  madness
+[gen] unsteered: median ppl 3.26; e.g. ' was in the middle of a conversation with a friend about the importance of being a good listener. I was explaining to her how I believe that listening is the most'
+[gen] base   a0.1: choice 0.315 (chance .25)  lexical +0.007  ppl x0.99  distinct2 0.87 | ' was in the mood for a light, summery, and refreshing salad. I had a f'
+[gen] base   a0.2: choice 0.415 (chance .25)  lexical +0.018  ppl x1.12  distinct2 0.84 | ' was in a meeting with a group of people from different backgrounds an'
+[gen] base   a0.3: choice 0.527 (chance .25)  lexical +0.040  ppl x1.35  distinct2 0.83 | ' was in a meeting with a group of people I was introduced to by a mutu'
+[gen] base   a0.5: choice 0.735 (chance .25)  lexical +0.161  ppl x1.82  distinct2 0.58 | ' was in a meeting with a group of about 20 of my peers from around the'
+[gen] base   a0.75: choice 0.887 (chance .25)  lexical +0.408  ppl x1.46  distinct2 0.25 | ' was was was was was was was was was was was was was was was was was w'
+[gen] base   a1.0: choice 0.951 (chance .25)  lexical +0.550  ppl x1.26  distinct2 0.16 | ' was was was was was was was was was was was was was was was was was w'
+[gen] bypass a0.1: choice 0.290 (chance .25)  lexical +0.010  ppl x1.03  distinct2 0.83 | ' was in the middle of a very important meeting when I got a call from '
+[gen] bypass a0.2: choice 0.370 (chance .25)  lexical +0.020  ppl x1.09  distinct2 0.82 | ' was in a meeting with a group of about 20 people, all of whom were in'
+[gen] bypass a0.3: choice 0.465 (chance .25)  lexical +0.036  ppl x1.29  distinct2 0.81 | ' was in a meeting with a group of about 20 people, all of whom were in'
+[gen] bypass a0.5: choice 0.695 (chance .25)  lexical +0.099  ppl x1.79  distinct2 0.73 | ' posted a very excited and happy looking picture of me on Facebook wit'
+[gen] bypass a0.75: choice 0.865 (chance .25)  lexical +0.246  ppl x2.20  distinct2 0.52 | ' awoke to a very happy feeling inside me that I awoke feeling very hap'
+[gen] bypass a1.0: choice 0.944 (chance .25)  lexical +0.384  ppl x2.00  distinct2 0.34 | ' awoke to a very happy feeling inside me aware that I am a very lucky '
+
+[gen] per alpha (mean [95% CI over targets])
+  base   a0.0  choice 0.246 [0.190,0.304]  lexical +0.000  ppl x1.00  degenerate 0.00
+  base   a0.1  choice 0.315 [0.245,0.383]  lexical +0.007  ppl x0.99  degenerate 0.05
+  base   a0.2  choice 0.415 [0.341,0.490]  lexical +0.018  ppl x1.12  degenerate 0.12
+  base   a0.3  choice 0.527 [0.454,0.600]  lexical +0.040  ppl x1.35  degenerate 0.14
+  base   a0.5  choice 0.735 [0.677,0.790]  lexical +0.161  ppl x1.82  degenerate 0.48
+  base   a0.75 choice 0.887 [0.857,0.916]  lexical +0.408  ppl x1.46  degenerate 0.90
+  base   a1.0  choice 0.951 [0.931,0.968]  lexical +0.550  ppl x1.26  degenerate 0.96
+  bypass a0.0  choice 0.245 [0.181,0.311]  lexical +0.000  ppl x1.00  degenerate 0.00
+  bypass a0.1  choice 0.290 [0.223,0.356]  lexical +0.010  ppl x1.03  degenerate 0.10
+  bypass a0.2  choice 0.370 [0.304,0.439]  lexical +0.020  ppl x1.09  degenerate 0.12
+  bypass a0.3  choice 0.465 [0.401,0.528]  lexical +0.036  ppl x1.29  degenerate 0.15
+  bypass a0.5  choice 0.695 [0.641,0.748]  lexical +0.099  ppl x1.79  degenerate 0.26
+  bypass a0.75 choice 0.865 [0.826,0.900]  lexical +0.246  ppl x2.20  degenerate 0.57
+  bypass a1.0  choice 0.944 [0.919,0.965]  lexical +0.384  ppl x2.00  degenerate 0.81
+
+[gen] at MATCHED fluency cost (continuation perplexity x vs unsteered): choice accuracy [95% CI over targets] (chance .25)
+  ppl x1.1   base 0.402 [0.327,0.475]   bypass 0.373 [0.303,0.453]
+  ppl x1.25  base 0.483 [0.412,0.557]   bypass 0.445 [0.377,0.511]
+  ppl x1.5   base 0.602 [0.526,0.675]   bypass 0.570 [0.505,0.633]
+/work/nvme/bbyl/mhaider/venvs/geoae/lib/python3.14/site-packages/numpy/lib/_nanfunctions_impl.py:1396: RuntimeWarning: All-NaN slice encountered
+  return _nanquantile_unchecked(
+  ppl x2.0   base  (out of range)   bypass 0.786 [0.722,0.854]
+[gen] wrote eval_out/delta/d12288/cluster_steer_generate.json

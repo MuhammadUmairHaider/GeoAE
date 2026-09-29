@@ -1,0 +1,56 @@
+Loading weights:   0%|          | 0/254 [00:00<?, ?it/s]Loading weights:   6%|▌         | 14/254 [00:00<00:01, 125.83it/s]Loading weights:  11%|█         | 27/254 [00:00<00:03, 72.53it/s] Loading weights:  14%|█▍        | 36/254 [00:00<00:02, 73.80it/s]Loading weights:  18%|█▊        | 45/254 [00:00<00:02, 74.46it/s]Loading weights:  21%|██        | 53/254 [00:00<00:03, 58.12it/s]Loading weights:  24%|██▎       | 60/254 [00:00<00:03, 55.15it/s]Loading weights:  26%|██▌       | 66/254 [00:01<00:03, 51.40it/s]Loading weights:  28%|██▊       | 72/254 [00:01<00:03, 47.01it/s]Loading weights:  31%|███▏      | 80/254 [00:01<00:03, 51.59it/s]Loading weights:  34%|███▍      | 86/254 [00:01<00:03, 44.95it/s]Loading weights:  36%|███▌      | 91/254 [00:02<00:06, 25.36it/s]Loading weights:  37%|███▋      | 95/254 [00:02<00:06, 23.69it/s]Loading weights:  41%|████      | 104/254 [00:02<00:04, 32.60it/s]Loading weights: 100%|██████████| 254/254 [00:02<00:00, 104.30it/s]
+[csteer] 500,000 held-out rows: 249,770 reference (even docs), 250,230 source pool (odd docs)
+[collect] Loading baseline k-means centroids: e2e/checkpoints/general/llama3.2-3B/layer27/delta/balanced_kmeans_k2000_dpc_sampled.npz
+[collect] Loading baseline k-means centroids: e2e/checkpoints/general/llama3.2-3B/layer27/delta/balanced_kmeans_k2000_dpc_sampled_tokmean.npz
+[csteer] base: 0 hubs (0.0% of rows), 1988 usable targets of 2000
+[csteer]   base:km                a0.1: transfer 0.027 specific 0.529 move 0.079  a0.25: transfer 0.066 specific 0.601 move 0.198  a0.5: transfer 0.296 specific 0.777 move 0.397  a1.0: transfer 0.928 specific 0.971 move 0.794  a1.5: transfer 0.993 specific 0.992 move 1.191
+[csteer] base_tokmean: 0 hubs (0.0% of rows), 1973 usable targets of 2000
+[csteer]   base_tokmean:km        a0.1: transfer 0.060 specific 0.513 move 0.061  a0.25: transfer 0.085 specific 0.541 move 0.153  a0.5: transfer 0.157 specific 0.604 move 0.305  a1.0: transfer 0.495 specific 0.782 move 0.611  a1.5: transfer 0.795 specific 0.895 move 0.916
+[csteer] bypass: 0 hubs (0.0% of rows), 1915 usable targets of 2000
+[csteer]   bypass:ae              a0.1: transfer 0.095 specific 0.518 move 0.064  a0.25: transfer 0.125 specific 0.545 move 0.159  a0.5: transfer 0.211 specific 0.602 move 0.318  a1.0: transfer 0.502 specific 0.752 move 0.636  a1.5: transfer 0.737 specific 0.864 move 0.954
+[csteer]   bypass:ae_h            a0.1: transfer 0.087 specific 0.528 move 0.073  a0.25: transfer 0.134 specific 0.580 move 0.183  a0.5: transfer 0.318 specific 0.721 move 0.366  a1.0: transfer 0.822 specific 0.924 move 0.732  a1.5: transfer 0.959 specific 0.978 move 1.099
+
+[csteer] at MATCHED EDIT SIZE (move = ||dh|| / ||h||): transfer / specificity [95% doc CI]
+  move 0.10
+    base:km                transfer 0.033 [0.031,0.036]   specific 0.542 [0.535,0.549]   disrupt 0.066
+    base_tokmean:km        transfer 0.071 [0.067,0.074]   specific 0.525 [0.518,0.531]   disrupt 0.067
+    bypass:ae              transfer 0.107 [0.102,0.111]   specific 0.528 [0.521,0.535]   disrupt 0.079
+    bypass:ae_h            transfer 0.098 [0.094,0.102]   specific 0.541 [0.534,0.547]   disrupt 0.078
+  move 0.20
+    base:km                transfer 0.067 [0.064,0.071]   specific 0.603 [0.596,0.609]   disrupt 0.254
+    base_tokmean:km        transfer 0.107 [0.103,0.111]   specific 0.560 [0.553,0.567]   disrupt 0.255
+    bypass:ae              transfer 0.147 [0.143,0.152]   specific 0.560 [0.553,0.567]   disrupt 0.278
+    bypass:ae_h            transfer 0.151 [0.146,0.156]   specific 0.593 [0.587,0.600]   disrupt 0.303
+  move 0.30
+    base:km                transfer 0.184 [0.179,0.188]   specific 0.691 [0.686,0.697]   disrupt 0.857
+    base_tokmean:km        transfer 0.155 [0.150,0.159]   specific 0.601 [0.595,0.608]   disrupt 0.510
+    bypass:ae              transfer 0.201 [0.195,0.206]   specific 0.596 [0.589,0.603]   disrupt 0.551
+    bypass:ae_h            transfer 0.251 [0.245,0.257]   specific 0.670 [0.664,0.676]   disrupt 0.748
+  move 0.50
+    base:km                transfer 0.460 [0.454,0.467]   specific 0.828 [0.823,0.832]   disrupt 2.996
+    base_tokmean:km        transfer 0.372 [0.366,0.379]   specific 0.717 [0.711,0.723]   disrupt 1.821
+    bypass:ae              transfer 0.377 [0.371,0.384]   specific 0.688 [0.682,0.694]   disrupt 1.814
+    bypass:ae_h            transfer 0.502 [0.494,0.510]   specific 0.795 [0.790,0.800]   disrupt 2.479
+
+[csteer] at MATCHED DISRUPTION (KL(p'||p_ref), nats): transfer / specificity [95% doc CI]
+  disrupt 0.10
+    base:km                transfer 0.040 [0.037,0.042]   specific 0.553 [0.547,0.560]   move 0.119
+    base_tokmean:km        transfer 0.078 [0.074,0.082]   specific 0.533 [0.525,0.540]   move 0.126
+    bypass:ae              transfer 0.111 [0.106,0.116]   specific 0.532 [0.525,0.539]   move 0.114
+    bypass:ae_h            transfer 0.103 [0.099,0.107]   specific 0.546 [0.539,0.553]   move 0.112
+  disrupt 0.25
+    base:km                transfer 0.067 [0.063,0.070]   specific 0.602 [0.595,0.609]   move 0.199
+    base_tokmean:km        transfer 0.107 [0.103,0.111]   specific 0.560 [0.553,0.566]   move 0.198
+    bypass:ae              transfer 0.142 [0.137,0.147]   specific 0.556 [0.549,0.563]   move 0.190
+    bypass:ae_h            transfer 0.139 [0.134,0.144]   specific 0.584 [0.577,0.591]   move 0.188
+  disrupt 0.50
+    base:km                transfer 0.115 [0.111,0.119]   specific 0.639 [0.633,0.645]   move 0.241
+    base_tokmean:km        transfer 0.153 [0.148,0.158]   specific 0.600 [0.593,0.607]   move 0.296
+    bypass:ae              transfer 0.191 [0.185,0.197]   specific 0.589 [0.582,0.596]   move 0.281
+    bypass:ae_h            transfer 0.195 [0.189,0.200]   specific 0.627 [0.620,0.634]   move 0.244
+  disrupt 1.00
+    base:km                transfer 0.211 [0.206,0.216]   specific 0.712 [0.706,0.719]   move 0.324
+    base_tokmean:km        transfer 0.236 [0.231,0.242]   specific 0.645 [0.639,0.652]   move 0.377
+    bypass:ae              transfer 0.265 [0.259,0.271]   specific 0.630 [0.624,0.637]   move 0.378
+    bypass:ae_h            transfer 0.308 [0.300,0.316]   specific 0.713 [0.705,0.721]   move 0.357
+[csteer] wrote eval_out/delta/d3072/cluster_steering_allhubs.json

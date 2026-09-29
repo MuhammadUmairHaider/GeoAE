@@ -93,6 +93,22 @@ class ActivationBuffer(Dataset):
             if len(self._tok) != N:
                 raise ValueError(f"{tp} has {len(self._tok):,} rows, layer file has {N:,}")
 
+    # DataLoader workers receive the dataset by PICKLING it under the spawn and
+    # forkserver start methods, and forkserver is Python 3.14's Linux default (the
+    # old box's Python forked, which shares the mapping for free). Pickling a
+    # np.memmap copies its whole contents: ~58 GB per worker on the 10M-row dump,
+    # which OOM-killed every Delta training job in epoch 1. Ship the path instead
+    # and reopen the mapping (with its read hint) inside the worker.
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state["_mmap"] = None
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self._mmap = np.load(str(self.activations_dir / f"layer_{self.layer}.npy"), mmap_mode="r")
+        self._advise("random")
+
     def _advise(self, kind: str) -> None:
         """
         Tell the kernel how this mapping will be read. Advisory only; failures

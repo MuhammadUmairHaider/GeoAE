@@ -1,0 +1,42 @@
+Loading weights:   0%|          | 0/254 [00:00<?, ?it/s]Loading weights: 100%|██████████| 254/254 [00:00<00:00, 11257.14it/s]
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+[gen] 249,770 reference rows (even docs of the held-out tail)
+[collect] Loading baseline k-means centroids: e2e/checkpoints/general/llama3.2-3B/layer27/delta/balanced_kmeans_k4000_dpc_sampled.npz
+[gen] base: 1420 eligible content clusters (of 4000); hubs 55 (10.2% of rows); targets e.g.  strides,  spraw,  sanitation,  runoff,  warehouses |  Plans,  Imp,  Lesson,  Grade,  Composition |  INCLUDE,  HIM,  INV,  SOUTH,  BEEN
+[gen] bypass: 806 eligible content clusters (of 4000); hubs 207 (25.0% of rows); targets e.g.  peaks,  glacier,  summit,  Plain,  Ridge |  televised,  seeding,  streamed,  bracket,  sponsoring |  fertilizer,  lime,  drip,  nutrient,  nitrogen
+[gen] unsteered: median ppl 3.26; e.g. ' was in the middle of a conversation with a friend about the importance of being a good listener. I was explaining to her how I believe that listening is the most'
+[gen] base   a0.1: choice 0.331 (chance .25)  lexical +0.009  ppl x0.98  distinct2 0.85 | ' was in the mood for a light, summery, and refreshing salad. I had a f'
+[gen] base   a0.2: choice 0.416 (chance .25)  lexical +0.025  ppl x1.18  distinct2 0.84 | ' was in a meeting and a colleague of mine, who I respect and admire, s'
+[gen] base   a0.3: choice 0.581 (chance .25)  lexical +0.058  ppl x1.45  distinct2 0.79 | ' shared with you my top 5 ways to use up leftover turkey and today, I '
+[gen] base   a0.5: choice 0.776 (chance .25)  lexical +0.258  ppl x1.86  distinct2 0.53 | ' shared with you, my top 5 ways I de-stress and recharge my batteries,'
+[gen] base   a0.75: choice 0.868 (chance .25)  lexical +0.478  ppl x1.52  distinct2 0.25 | ' and my co workers,\xa0were\xa0 planning and\xa0discuss\xa0\xa0,\xa0\xa0,\xa0,\xa0,\xa0,\xa0,\xa0,\xa0,\xa0'
+[gen] base   a1.0: choice 0.904 (chance .25)  lexical +0.623  ppl x1.33  distinct2 0.15 | ' and and and and and and and and and and and and and and and and and a'
+[gen] bypass a0.1: choice 0.290 (chance .25)  lexical +0.007  ppl x1.02  distinct2 0.84 | ' was in the middle of a very important meeting when I got a call from '
+[gen] bypass a0.2: choice 0.367 (chance .25)  lexical +0.015  ppl x1.11  distinct2 0.82 | ' was at the airport, and I was in the line to check in my luggage. I w'
+[gen] bypass a0.3: choice 0.453 (chance .25)  lexical +0.023  ppl x1.26  distinct2 0.81 | ' was at the local library and I saw a sign for a free book. I was a li'
+[gen] bypass a0.5: choice 0.654 (chance .25)  lexical +0.075  ppl x1.78  distinct2 0.74 | ' was at the local high school to photograph the prom. Prom season in h'
+[gen] bypass a0.75: choice 0.865 (chance .25)  lexical +0.248  ppl x2.06  distinct2 0.55 | ' was at the top of a mountain ridge near where I grew up north of wher'
+[gen] bypass a1.0: choice 0.916 (chance .25)  lexical +0.424  ppl x1.92  distinct2 0.37 | ' awoke to the sound of raindrops on the roof top. \xa0 immediately,  the '
+
+[gen] per alpha (mean [95% CI over targets])
+  base   a0.0  choice 0.250 [0.195,0.318]  lexical +0.000  ppl x1.00  degenerate 0.00
+  base   a0.1  choice 0.331 [0.267,0.403]  lexical +0.009  ppl x0.98  degenerate 0.07
+  base   a0.2  choice 0.416 [0.351,0.481]  lexical +0.025  ppl x1.18  degenerate 0.09
+  base   a0.3  choice 0.581 [0.520,0.638]  lexical +0.058  ppl x1.45  degenerate 0.17
+  base   a0.5  choice 0.776 [0.710,0.831]  lexical +0.258  ppl x1.86  degenerate 0.56
+  base   a0.75 choice 0.868 [0.826,0.905]  lexical +0.478  ppl x1.52  degenerate 0.89
+  base   a1.0  choice 0.904 [0.874,0.934]  lexical +0.623  ppl x1.33  degenerate 0.98
+  bypass a0.0  choice 0.258 [0.200,0.320]  lexical +0.000  ppl x1.00  degenerate 0.00
+  bypass a0.1  choice 0.290 [0.230,0.351]  lexical +0.007  ppl x1.02  degenerate 0.09
+  bypass a0.2  choice 0.367 [0.310,0.431]  lexical +0.015  ppl x1.11  degenerate 0.11
+  bypass a0.3  choice 0.453 [0.390,0.511]  lexical +0.023  ppl x1.26  degenerate 0.14
+  bypass a0.5  choice 0.654 [0.601,0.704]  lexical +0.075  ppl x1.78  degenerate 0.25
+  bypass a0.75 choice 0.865 [0.832,0.895]  lexical +0.248  ppl x2.06  degenerate 0.53
+  bypass a1.0  choice 0.916 [0.887,0.944]  lexical +0.424  ppl x1.92  degenerate 0.77
+
+[gen] at MATCHED fluency cost (continuation perplexity x vs unsteered): choice accuracy [95% CI over targets] (chance .25)
+  ppl x1.1   base 0.381 [0.323,0.449]   bypass 0.363 [0.295,0.427]
+  ppl x1.25  base 0.465 [0.411,0.527]   bypass 0.449 [0.392,0.509]
+  ppl x1.5   base 0.610 [0.550,0.672]   bypass 0.555 [0.505,0.608]
+  ppl x2.0   base  (out of range)   bypass 0.824 [0.745,0.876]
+[gen] wrote eval_out/delta/d6144k4000/cluster_steer_generate.json

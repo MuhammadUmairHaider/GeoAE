@@ -11,7 +11,7 @@ For each arm, on the val tail of a sampled dump (rows never trained on):
 
 A token-bypass AE should drop cNMI cur and trivial cur without losing fvu.
 
-    .venv/bin/python -u eval_out/token_structure.py \
+    scripts/delta/py -u eval_out/token_structure.py \
         --arms d6144_new=<ckpt>,tokbias=<ckpt>,km_new=<npz> --out eval_out/token_structure_tokbias.json
 """
 from __future__ import annotations

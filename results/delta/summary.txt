@@ -1,0 +1,230 @@
+============================================================================================
+  GeoAE delta round 2 — base vs bypass, plain units
+============================================================================================
+
+============================================================================================
+RECONSTRUCTION FVE + TOKEN STRUCTURE (held-out dump rows)
+============================================================================================
+  FVE = 1 - fvu (fraction of variance explained by the reconstruction, higher better).
+  trivial_cur_80 = share of clusters where >=80% of members share the SAME current token.
+                                    d768         d3072         d6144        d12288    d6144k4000
+  FVE base                             –             –             –             –             –
+  FVE bypass                       0.453         0.887         0.965         0.983         0.969
+  trivial_cur_80 base              0.103         0.103         0.103         0.103         0.116
+  trivial_cur_80 bypass            0.045         0.055         0.051         0.056         0.062
+
+============================================================================================
+CONCEPT PROBE — chance-corrected NMI (cache_ids/); base vs base_tokmean vs bypass
+============================================================================================
+  d768:
+    topic14 cNMI                   0.377         0.553         0.540
+    mean sequence-rung cNMI         0.168         0.209         0.204
+    mean POS cNMI                  0.362         0.219         0.179
+  d3072:
+    topic14 cNMI                   0.377         0.553         0.588
+    mean sequence-rung cNMI         0.168         0.209         0.233
+    mean POS cNMI                  0.362         0.219         0.155
+  d6144:
+    topic14 cNMI                   0.377         0.553         0.579
+    mean sequence-rung cNMI         0.168         0.209         0.222
+    mean POS cNMI                  0.362         0.219         0.171
+  d12288:
+    topic14 cNMI                   0.377         0.553         0.529
+    mean sequence-rung cNMI         0.168         0.209         0.205
+    mean POS cNMI                  0.362         0.219         0.197
+  d6144k4000:
+    topic14 cNMI                   0.504         0.548         0.554
+    mean sequence-rung cNMI         0.187         0.207         0.221
+    mean POS cNMI                  0.341         0.212         0.181
+
+============================================================================================
+MMLU UNDER THE AE SPLICE (n=2000)
+============================================================================================
+                                    d768         d3072         d6144        d12288    d6144k4000
+  base acc                         0.562         0.562         0.562         0.562         0.562
+  recon acc (bypass spliced in)         0.000         0.492         0.550         0.553         0.543
+  delta (recon - base)            -0.562        -0.070        -0.012        -0.009        -0.018
+
+============================================================================================
+CLUSTERING QUALITY (1M rows, seed 0) — silhouette-family metrics; dunn NOT reported
+============================================================================================
+  NOTE: clustering_quality's dunn_index subsamples with an UNSEEDED RNG and is not
+  comparable across runs (see docs/notes/cq-dunn-and-steer-sign-traps.md); omitted here.
+  d768:
+                                    base        bypass
+    silhouette (up)               -0.024         0.006
+    balance H (up)                 0.969         0.945
+    effective K (up)            1998.000      1981.000
+    effective rank (up)          173.266        67.340
+  d3072:
+                                    base        bypass
+    silhouette (up)               -0.024        -0.015
+    balance H (up)                 0.969         0.951
+    effective K (up)            1998.000      1996.000
+    effective rank (up)          173.266       121.734
+  d6144:
+                                    base        bypass
+    silhouette (up)               -0.024        -0.009
+    balance H (up)                 0.969         0.946
+    effective K (up)            1998.000      1986.000
+    effective rank (up)          173.266       161.820
+  d12288:
+                                    base        bypass
+    silhouette (up)               -0.024         0.001
+    balance H (up)                 0.969         0.941
+    effective K (up)            1998.000      1995.000
+    effective rank (up)          173.266       213.156
+  d6144k4000:
+                                    base        bypass
+    silhouette (up)               -0.033        -0.016
+    balance H (up)                 0.965         0.949
+    effective K (up)            3901.000      3983.000
+    effective rank (up)          244.953       187.532
+
+============================================================================================
+DB14 RANGE INTERVENTIONS
+============================================================================================
+  matched erasure: h and z interpolated to the largest tgt_drop BOTH reach; collateral
+  (comp_drop) reported there. NEGATIVE collateral delta (z - h) = AE does less damage.
+  d768: – (missing)
+  d3072:
+    st_global     target removed 100.0/100  collateral h +60.77/100  z +56.44/100  Δ(z-h)  -4.33/100  (n=13)
+    st_salient    target removed 100.0/100  collateral h +52.60/100  z +49.42/100  Δ(z-h)  -3.17/100  (n=13)
+    st_range      target removed  99.6/100  collateral h +44.23/100  z +47.31/100  Δ(z-h)  +3.08/100  (n=13)
+    st_transport  target removed  99.4/100  collateral h +47.12/100  z +53.87/100  Δ(z-h)  +6.75/100  (n=13)
+    rm_range_comp  own setting: removed/collateral h   86/20  -> z   97/29   selectivity z-h  +1.0  (z wins 6/13)
+    st_range_a1.0  own setting: removed/collateral h   87/26  -> z   94/26   selectivity z-h  +6.3  (z wins 8/13)
+  d6144:
+    st_global     target removed 100.0/100  collateral h +60.63/100  z +59.02/100  Δ(z-h)  -1.61/100  (n=14)
+    st_salient    target removed 100.0/100  collateral h +50.89/100  z +53.84/100  Δ(z-h)  +2.95/100  (n=14)
+    st_range      target removed 100.0/100  collateral h +43.30/100  z +43.12/100  Δ(z-h)  -0.18/100  (n=14)
+    st_transport  target removed  99.9/100  collateral h +47.32/100  z +48.21/100  Δ(z-h)  +0.89/100  (n=14)
+    rm_range_comp  own setting: removed/collateral h   86/19  -> z   87/13   selectivity z-h  +6.3  (z wins 10/14)
+    st_range_a1.0  own setting: removed/collateral h   85/23  -> z   88/19   selectivity z-h  +6.3  (z wins 9/14)
+  d12288:
+    st_global     target removed 100.0/100  collateral h +60.09/100  z +59.46/100  Δ(z-h)  -0.62/100  (n=14)
+    st_salient    target removed 100.0/100  collateral h +51.43/100  z +53.30/100  Δ(z-h)  +1.88/100  (n=14)
+    st_range      target removed 100.0/100  collateral h +43.39/100  z +42.14/100  Δ(z-h)  -1.25/100  (n=14)
+    st_transport  target removed  99.9/100  collateral h +46.87/100  z +46.43/100  Δ(z-h)  -0.44/100  (n=14)
+    rm_range_comp  own setting: removed/collateral h   87/20  -> z   89/18   selectivity z-h  +3.9  (z wins 9/14)
+    st_range_a1.0  own setting: removed/collateral h   86/25  -> z   88/22   selectivity z-h  +3.5  (z wins 10/14)
+  d6144k4000:
+    st_global     target removed 100.0/100  collateral h +59.20/100  z +59.11/100  Δ(z-h)  -0.09/100  (n=14)
+    st_salient    target removed 100.0/100  collateral h +50.62/100  z +53.75/100  Δ(z-h)  +3.12/100  (n=14)
+    st_range      target removed 100.0/100  collateral h +44.20/100  z +42.05/100  Δ(z-h)  -2.14/100  (n=14)
+    st_transport  target removed  99.9/100  collateral h +47.95/100  z +45.58/100  Δ(z-h)  -2.36/100  (n=14)
+    rm_range_comp  own setting: removed/collateral h   87/19  -> z   88/18   selectivity z-h  +1.2  (z wins 7/14)
+    st_range_a1.0  own setting: removed/collateral h   86/25  -> z   88/23   selectivity z-h  +4.5  (z wins 8/14)
+
+============================================================================================
+BIAS_IN_BIOS RANGE INTERVENTIONS
+============================================================================================
+  matched erasure: h and z interpolated to the largest tgt_drop BOTH reach; collateral
+  (comp_drop) reported there. NEGATIVE collateral delta (z - h) = AE does less damage.
+  d768: – (missing)
+  d3072:
+    st_global     target removed 100.0/100  collateral h +44.86/100  z +51.99/100  Δ(z-h)  +7.13/100  (n=27)
+    st_salient    target removed  99.7/100  collateral h +33.43/100  z +47.18/100  Δ(z-h) +13.75/100  (n=27)
+    st_range      target removed  99.6/100  collateral h +27.82/100  z +48.01/100  Δ(z-h) +20.19/100  (n=27)
+    st_transport  target removed  99.6/100  collateral h +33.52/100  z +52.77/100  Δ(z-h) +19.25/100  (n=27)
+    rm_range_comp  own setting: removed/collateral h   88/6   -> z   94/23   selectivity z-h -10.3  (z wins 3/27)
+    st_range_a1.0  own setting: removed/collateral h   87/8   -> z   93/23   selectivity z-h  -8.4  (z wins 5/27)
+  d6144:
+    st_global     target removed 100.0/100  collateral h +47.69/100  z +49.63/100  Δ(z-h)  +1.94/100  (n=27)
+    st_salient    target removed  99.8/100  collateral h +37.92/100  z +42.35/100  Δ(z-h)  +4.43/100  (n=27)
+    st_range      target removed  99.7/100  collateral h +32.73/100  z +38.76/100  Δ(z-h)  +6.03/100  (n=27)
+    st_transport  target removed  99.7/100  collateral h +37.96/100  z +41.96/100  Δ(z-h)  +3.99/100  (n=27)
+    rm_range_comp  own setting: removed/collateral h   89/9   -> z   92/10   selectivity z-h  +2.2  (z wins 13/27)
+    st_range_a1.0  own setting: removed/collateral h   87/11  -> z   91/13   selectivity z-h  +2.5  (z wins 14/27)
+  d12288:
+    st_global     target removed 100.0/100  collateral h +48.24/100  z +48.33/100  Δ(z-h)  +0.09/100  (n=27)
+    st_salient    target removed  99.7/100  collateral h +37.22/100  z +42.16/100  Δ(z-h)  +4.94/100  (n=27)
+    st_range      target removed  99.6/100  collateral h +32.55/100  z +37.70/100  Δ(z-h)  +5.15/100  (n=27)
+    st_transport  target removed  99.6/100  collateral h +38.06/100  z +43.16/100  Δ(z-h)  +5.11/100  (n=27)
+    rm_range_comp  own setting: removed/collateral h   89/10  -> z   95/14   selectivity z-h  +0.7  (z wins 11/27)
+    st_range_a1.0  own setting: removed/collateral h   87/12  -> z   94/16   selectivity z-h  +2.3  (z wins 11/27)
+  d6144k4000:
+    st_global     target removed 100.0/100  collateral h +48.15/100  z +48.70/100  Δ(z-h)  +0.56/100  (n=27)
+    st_salient    target removed  99.8/100  collateral h +37.18/100  z +41.19/100  Δ(z-h)  +4.02/100  (n=27)
+    st_range      target removed  99.7/100  collateral h +33.33/100  z +36.26/100  Δ(z-h)  +2.92/100  (n=27)
+    st_transport  target removed  99.6/100  collateral h +39.10/100  z +41.08/100  Δ(z-h)  +1.99/100  (n=27)
+    rm_range_comp  own setting: removed/collateral h   89/10  -> z   89/9    selectivity z-h  +0.4  (z wins 14/27)
+    st_range_a1.0  own setting: removed/collateral h   87/12  -> z   90/11   selectivity z-h  +2.9  (z wins 16/27)
+
+============================================================================================
+NUMBER CONTROL — strict target-flip rate, range mode, alpha=1 (z minus h)
+============================================================================================
+                                    d768         d3072         d6144        d12288    d6144k4000
+  Δ strict flip (z - h)            0.160         0.069         0.132         0.132         0.139
+
+============================================================================================
+NEXT-TOKEN CLUSTER TRANSFER AT MATCHED DISRUPTION
+============================================================================================
+  d768:  (transfer = fraction of steered rows that land in the target cluster's signature)
+                     disrupt=0.1  disrupt=0.25   disrupt=0.5   disrupt=1.0
+    base (base:km)         0.036         0.059         0.104         0.195
+    bypass (bypass:ae)         0.134         0.163         0.201         0.268
+  d3072:  (transfer = fraction of steered rows that land in the target cluster's signature)
+                     disrupt=0.1  disrupt=0.25   disrupt=0.5   disrupt=1.0
+    base (base:km)         0.037         0.062         0.106         0.195
+    bypass (bypass:ae)         0.099         0.128         0.173         0.248
+  d6144:  (transfer = fraction of steered rows that land in the target cluster's signature)
+                     disrupt=0.1  disrupt=0.25   disrupt=0.5   disrupt=1.0
+    base (base:km)         0.037         0.060         0.106         0.197
+    bypass (bypass:ae)         0.090         0.118         0.164         0.245
+  d12288:  (transfer = fraction of steered rows that land in the target cluster's signature)
+                     disrupt=0.1  disrupt=0.25   disrupt=0.5   disrupt=1.0
+    base (base:km)         0.036         0.060         0.106         0.197
+    bypass (bypass:ae)         0.074         0.103         0.151         0.234
+  d6144k4000:  (transfer = fraction of steered rows that land in the target cluster's signature)
+                     disrupt=0.1  disrupt=0.25   disrupt=0.5   disrupt=1.0
+    base (base:km)         0.040         0.065         0.111         0.203
+    bypass (bypass:ae)         0.081         0.110         0.155         0.230
+
+============================================================================================
+CLUSTER STEERING — usable (fluent, on-target, net of unsteered) generations per 100, best alpha
+============================================================================================
+                                    d768         d3072         d6144        d12288    d6144k4000
+  base usable/100 (best alpha)           8.0           8.0           8.0           8.0           5.8
+  bypass usable/100 (best alpha)           9.8          12.6          12.9          10.0          12.5
+
+============================================================================================
+NAMED-CONCEPT STEERING — usable per 100 at best alpha, per handle (pooled db14+biasbios)
+============================================================================================
+  d768:
+    base           best alpha 0.5    usable/100 7.7
+    base_dir       best alpha 0.5    usable/100 20.8
+    bypass         best alpha 1.0    usable/100 13.8
+    bypass_dir     best alpha 0.5    usable/100 23.5
+    label          best alpha 0.5    usable/100 27.0
+    label_z        best alpha 0.5    usable/100 27.7
+  d3072:
+    base           best alpha 0.5    usable/100 7.7
+    base_dir       best alpha 0.5    usable/100 20.8
+    bypass         best alpha 1.0    usable/100 19.3
+    bypass_dir     best alpha 0.5    usable/100 24.8
+    label          best alpha 0.5    usable/100 27.0
+    label_z        best alpha 0.5    usable/100 28.6
+  d6144:
+    base           best alpha 0.5    usable/100 7.7
+    base_dir       best alpha 0.5    usable/100 20.8
+    bypass         best alpha 1.0    usable/100 16.9
+    bypass_dir     best alpha 0.5    usable/100 26.2
+    label          best alpha 0.5    usable/100 27.0
+    label_z        best alpha 0.5    usable/100 27.0
+  d12288:
+    base           best alpha 0.5    usable/100 7.7
+    base_dir       best alpha 0.5    usable/100 20.8
+    bypass         best alpha 1.0    usable/100 17.4
+    bypass_dir     best alpha 0.5    usable/100 25.8
+    label          best alpha 0.5    usable/100 27.0
+    label_z        best alpha 0.5    usable/100 28.3
+  d6144k4000:
+    base           best alpha 0.5    usable/100 10.7
+    base_dir       best alpha 0.5    usable/100 22.5
+    bypass         best alpha 0.75   usable/100 17.5
+    bypass_dir     best alpha 0.5    usable/100 25.2
+    label          best alpha 0.5    usable/100 23.5
+    label_z        best alpha 0.5    usable/100 26.7
+
+[summary] wrote /projects/bbyl/mhaider/GeoAE/results/delta/summary.json

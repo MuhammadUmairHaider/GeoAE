@@ -19,7 +19,7 @@ import subprocess
 import sys
 import time
 
-# Permit `.venv/bin/python scripts/repair_gemma_concept_cache.py` from the repo.
+# Permit `scripts/delta/py scripts/repair_gemma_concept_cache.py` from the repo.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from geoae.config import Config

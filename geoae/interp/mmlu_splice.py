@@ -10,7 +10,7 @@ token-bypass AEs: the splice gets each position's current token id from a
 TokenIdTap on the input embedding. For a plain AE it reproduces the existing
 numbers (check: d6144_new recon_acc 0.5390 at n=2000, seed 42).
 
-    .venv/bin/python -u -m geoae.interp.mmlu_splice --checkpoint <ckpt> --out eval_out/mmlu_<tag>.json
+    scripts/delta/py -u -m geoae.interp.mmlu_splice --checkpoint <ckpt> --out eval_out/mmlu_<tag>.json
 """
 from __future__ import annotations
 

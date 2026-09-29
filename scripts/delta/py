@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# The interpreter for eval_out/*.sh on Delta.
+#
+# The sheets were written for the old box, where `PY=.venv/bin/python` was a
+# single word they could use both quoted and unquoted:
+#
+#     $PY -u -m geoae.interp.mmlu_splice ...
+#     "$PY" - "$CKPT" 12288 <<'EOF' ... EOF
+#
+# On Delta the interpreter lives in a uv-managed venv on /work/nvme, so the
+# equivalent is `uv run python` — two words, which breaks every "$PY" use. This
+# wrapper keeps the interpreter a single path, so the sheets only need
+# PY=scripts/delta/py and nothing else changes.
+#
+# It also sources env.sh, so a sheet run directly on a login node or inside a
+# plain `srun` gets the right HF_HOME, UV_PROJECT_ENVIRONMENT and cwd without
+# the caller having to remember.
+#
+# --no-sync: the venv is created once by scripts/delta/setup.sh. Re-resolving
+# the lockfile on every one of the hundreds of python calls a sheet makes would
+# add minutes of Lustre metadata traffic per sheet, and a sheet must never
+# silently change the environment mid-run.
+#
+# The venv is checked first: with --no-sync, `uv run` against a missing venv
+# creates an EMPTY one and then fails with a bare "No module named 'torch'",
+# which reads like a broken install rather than "you never ran setup".
+set -euo pipefail
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/env.sh"
+
+if [ ! -x "$UV_PROJECT_ENVIRONMENT/bin/python" ]; then
+  echo "ABORT: no venv at $UV_PROJECT_ENVIRONMENT" >&2
+  echo "  DELTA_PROJECT=$DELTA_PROJECT (from scripts/delta/site.sh)." >&2
+  echo "  Create it once with:  bash scripts/delta/setup.sh" >&2
+  exit 1
+fi
+exec uv run --no-sync python "$@"

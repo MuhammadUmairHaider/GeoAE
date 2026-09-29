@@ -1,0 +1,187 @@
+Loading weights:   0%|          | 0/254 [00:00<?, ?it/s]Loading weights:  85%|████████▌ | 216/254 [00:00<00:00, 2137.76it/s]Loading weights: 100%|██████████| 254/254 [00:00<00:00, 2267.59it/s]
+[collect] Loading baseline k-means centroids: e2e/checkpoints/general/llama3.2-3B/layer27/delta/balanced_kmeans_k2000_dpc_sampled.npz
+[concept] 249,770 reference rows (even docs of the held-out tail)
+[concept] reference scale: mean|x| 0.784  per-dim std 1.001
+[concept] base: K=2000 hubs 45 (11.4% of rows)
+[concept] bypass: K=2000 hubs 81 (19.5% of rows)
+[concept] db14: 14/14 classes with enough docs (Company, EducationalInstitution, Artist, Athlete, OfficeHolder, MeanOfTransportation, Building, NaturalPlace, Village, Animal, Plant, Album, Film, WrittenWork)
+[concept] db14: cos(label, label_z) mean 0.892 [min 0.855, max 0.955]  (n=14)
+[concept] db14: cos(base_dir, label) mean 0.676 [min 0.464, max 0.846]  (n=14)
+[concept] db14: cos(bypass_dir, label) mean 0.671 [min 0.440, max 0.856]  (n=14)
+[concept] db14: cos(base_dir, bypass_dir) mean 0.678 [min 0.174, max 0.906]  (n=14)
+[concept] biasbios: 28/28 classes with enough docs (accountant, architect, attorney, chiropractor, comedian, composer, dentist, dietitian, dj, filmmaker, interior_designer, journalist, model, nurse, painter, paralegal, pastor, personal_trainer, photographer, physician, poet, professor, psychologist, rapper, software_engineer, surgeon, teacher, yoga_teacher)
+[concept] biasbios: cos(label, label_z) mean 0.800 [min 0.720, max 0.868]  (n=28)
+[concept] biasbios: cos(base_dir, label) mean 0.490 [min 0.146, max 0.680]  (n=28)
+[concept] biasbios: cos(bypass_dir, label) mean 0.467 [min 0.241, max 0.614]  (n=28)
+[concept] biasbios: cos(base_dir, bypass_dir) mean 0.688 [min 0.230, max 0.988]  (n=28)
+[concept] captured-row scale: mean|x| 0.758  per-dim std 0.955  (reference: 0.784 / 1.001; should be similar)
+
+[concept] coverage on HELD documents (precision / recall / AUROC; direction handles: AUROC only)
+  db14:
+    Company                    label[auroc=0.98]  label_z[auroc=0.97]  base[p=0.77 r=0.02 auroc=0.69]  bypass[p=0.98 r=0.06 auroc=0.66]  base_dir[auroc=0.96]  bypass_dir[auroc=0.94]
+    EducationalInstitution     label[auroc=1.00]  label_z[auroc=0.99]  base[p=0.93 r=0.07 auroc=0.92]  bypass[p=1.00 r=0.13 auroc=0.91]  base_dir[auroc=1.00]  bypass_dir[auroc=1.00]
+    Artist                     label[auroc=0.96]  label_z[auroc=0.94]  base[p=0.46 r=0.05 auroc=0.95]  bypass[p=0.76 r=0.05 auroc=0.85]  base_dir[auroc=0.87]  bypass_dir[auroc=0.96]
+    Athlete                    label[auroc=1.00]  label_z[auroc=1.00]  base[p=1.00 r=0.11 auroc=0.95]  bypass[p=0.99 r=0.03 auroc=0.63]  base_dir[auroc=1.00]  bypass_dir[auroc=0.98]
+    OfficeHolder               label[auroc=0.98]  label_z[auroc=0.98]  base[p=0.84 r=0.10 auroc=0.93]  bypass[p=0.83 r=0.09 auroc=0.97]  base_dir[auroc=0.99]  bypass_dir[auroc=0.99]
+    MeanOfTransportation       label[auroc=1.00]  label_z[auroc=1.00]  base[p=0.98 r=0.26 auroc=1.00]  bypass[p=0.94 r=0.30 auroc=1.00]  base_dir[auroc=1.00]  bypass_dir[auroc=1.00]
+    Building                   label[auroc=0.98]  label_z[auroc=0.98]  base[p=0.89 r=0.07 auroc=0.89]  bypass[p=0.97 r=0.11 auroc=0.89]  base_dir[auroc=0.92]  bypass_dir[auroc=0.96]
+    NaturalPlace               label[auroc=1.00]  label_z[auroc=1.00]  base[p=0.80 r=0.06 auroc=0.82]  bypass[p=0.92 r=0.20 auroc=0.96]  base_dir[auroc=1.00]  bypass_dir[auroc=1.00]
+    Village                    label[auroc=1.00]  label_z[auroc=1.00]  base[p=0.98 r=0.29 auroc=0.95]  bypass[p=0.95 r=0.10 auroc=0.95]  base_dir[auroc=1.00]  bypass_dir[auroc=0.99]
+    Animal                     label[auroc=0.98]  label_z[auroc=0.97]  base[p=0.98 r=0.08 auroc=0.63]  bypass[p=0.98 r=0.15 auroc=0.95]  base_dir[auroc=0.96]  bypass_dir[auroc=0.97]
+    Plant                      label[auroc=1.00]  label_z[auroc=0.99]  base[p=0.99 r=0.13 auroc=0.84]  bypass[p=1.00 r=0.03 auroc=0.77]  base_dir[auroc=0.99]  bypass_dir[auroc=0.99]
+    Album                      label[auroc=1.00]  label_z[auroc=0.99]  base[p=0.81 r=0.14 auroc=0.95]  bypass[p=0.85 r=0.22 auroc=0.99]  base_dir[auroc=1.00]  bypass_dir[auroc=1.00]
+    Film                       label[auroc=0.99]  label_z[auroc=0.99]  base[p=0.83 r=0.14 auroc=0.96]  bypass[p=0.68 r=0.19 auroc=0.94]  base_dir[auroc=0.98]  bypass_dir[auroc=0.97]
+    WrittenWork                label[auroc=0.97]  label_z[auroc=0.94]  base[p=0.72 r=0.02 auroc=0.74]  bypass[p=0.56 r=0.03 auroc=0.70]  base_dir[auroc=0.89]  bypass_dir[auroc=0.91]
+    MEAN label    auroc 0.988  (n=14/14)
+    MEAN label_z  auroc 0.981  (n=14/14)
+    MEAN base     auroc 0.873  (n=14/14)
+    MEAN bypass   auroc 0.868  (n=14/14)
+    MEAN base_dir auroc 0.968  (n=14/14)
+    MEAN bypass_dir auroc 0.975  (n=14/14)
+  biasbios:
+    accountant                 label[auroc=0.94]  label_z[auroc=0.93]  base[p=0.32 r=0.08 auroc=0.86]  bypass[p=0.65 r=0.09 auroc=0.84]  base_dir[auroc=0.89]  bypass_dir[auroc=0.95]
+    architect                  label[auroc=0.94]  label_z[auroc=0.92]  base[p=0.24 r=0.02 auroc=0.70]  bypass[p=0.61 r=0.02 auroc=0.65]  base_dir[auroc=0.86]  bypass_dir[auroc=0.86]
+    attorney                   label[auroc=0.96]  label_z[auroc=0.94]  base[p=0.44 r=0.06 auroc=0.79]  bypass[p=0.47 r=0.11 auroc=0.86]  base_dir[auroc=0.93]  bypass_dir[auroc=0.91]
+    chiropractor               label[auroc=0.95]  label_z[auroc=0.89]  base[p=0.60 r=0.04 auroc=0.84]  bypass[p=0.65 r=0.01 auroc=0.62]  base_dir[auroc=0.68]  bypass_dir[auroc=0.68]
+    comedian                   label[auroc=0.97]  label_z[auroc=0.94]  base[p=0.20 r=0.07 auroc=0.77]  bypass[p=0.26 r=0.12 auroc=0.88]  base_dir[auroc=0.87]  bypass_dir[auroc=0.85]
+    composer                   label[auroc=0.99]  label_z[auroc=0.96]  base[p=0.33 r=0.07 auroc=0.83]  bypass[p=0.60 r=0.06 auroc=0.83]  base_dir[auroc=0.96]  bypass_dir[auroc=0.96]
+    dentist                    label[auroc=0.93]  label_z[auroc=0.91]  base[p=0.56 r=0.09 auroc=0.73]  bypass[p=0.73 r=0.11 auroc=0.76]  base_dir[auroc=0.91]  bypass_dir[auroc=0.89]
+    dietitian                  label[auroc=0.95]  label_z[auroc=0.93]  base[p=0.60 r=0.04 auroc=0.76]  bypass[p=0.84 r=0.05 auroc=0.73]  base_dir[auroc=0.94]  bypass_dir[auroc=0.94]
+    dj                         label[auroc=0.98]  label_z[auroc=0.97]  base[p=0.36 r=0.10 auroc=0.91]  bypass[p=0.39 r=0.07 auroc=0.85]  base_dir[auroc=0.95]  bypass_dir[auroc=0.92]
+    filmmaker                  label[auroc=0.96]  label_z[auroc=0.94]  base[p=0.27 r=0.08 auroc=0.87]  bypass[p=0.32 r=0.19 auroc=0.88]  base_dir[auroc=0.93]  bypass_dir[auroc=0.93]
+    interior_designer          label[auroc=0.98]  label_z[auroc=0.95]  base[p=0.39 r=0.08 auroc=0.86]  bypass[p=0.45 r=0.07 auroc=0.88]  base_dir[auroc=0.94]  bypass_dir[auroc=0.94]
+    journalist                 label[auroc=0.94]  label_z[auroc=0.91]  base[p=0.21 r=0.01 auroc=0.71]  bypass[p=0.32 r=0.01 auroc=0.56]  base_dir[auroc=0.85]  bypass_dir[auroc=0.67]
+    model                      label[auroc=0.95]  label_z[auroc=0.94]  base[p=0.70 r=0.04 auroc=0.73]  bypass[p=0.83 r=0.03 auroc=0.70]  base_dir[auroc=0.78]  bypass_dir[auroc=0.74]
+    nurse                      label[auroc=0.93]  label_z[auroc=0.90]  base[p=0.52 r=0.13 auroc=0.76]  bypass[p=0.58 r=0.09 auroc=0.77]  base_dir[auroc=0.78]  bypass_dir[auroc=0.80]
+    painter                    label[auroc=0.96]  label_z[auroc=0.92]  base[p=0.70 r=0.09 auroc=0.86]  bypass[p=0.48 r=0.13 auroc=0.87]  base_dir[auroc=0.95]  bypass_dir[auroc=0.90]
+    paralegal                  label[auroc=0.95]  label_z[auroc=0.93]  base[p=0.53 r=0.09 auroc=0.86]  bypass[p=0.47 r=0.29 auroc=0.91]  base_dir[auroc=0.91]  bypass_dir[auroc=0.94]
+    pastor                     label[auroc=0.99]  label_z[auroc=0.97]  base[p=0.57 r=0.01 auroc=0.64]  bypass[p=0.88 r=0.09 auroc=0.85]  base_dir[auroc=0.90]  bypass_dir[auroc=0.96]
+    personal_trainer           label[auroc=0.97]  label_z[auroc=0.96]  base[p=0.54 r=0.04 auroc=0.79]  bypass[p=0.50 r=0.08 auroc=0.83]  base_dir[auroc=0.93]  bypass_dir[auroc=0.94]
+    photographer               label[auroc=0.96]  label_z[auroc=0.91]  base[p=0.17 r=0.02 auroc=0.68]  bypass[p=0.21 r=0.08 auroc=0.82]  base_dir[auroc=0.82]  bypass_dir[auroc=0.90]
+    physician                  label[auroc=0.94]  label_z[auroc=0.91]  base[p=0.30 r=0.06 auroc=0.83]  bypass[p=0.22 r=0.04 auroc=0.76]  base_dir[auroc=0.81]  bypass_dir[auroc=0.85]
+    poet                       label[auroc=0.98]  label_z[auroc=0.94]  base[p=0.29 r=0.05 auroc=0.88]  bypass[p=0.24 r=0.04 auroc=0.79]  base_dir[auroc=0.93]  bypass_dir[auroc=0.86]
+    professor                  label[auroc=0.93]  label_z[auroc=0.88]  base[p=0.42 r=0.01 auroc=0.59]  bypass[p=0.75 r=0.01 auroc=0.55]  base_dir[auroc=0.85]  bypass_dir[auroc=0.81]
+    psychologist               label[auroc=0.95]  label_z[auroc=0.90]  base[p=0.49 r=0.06 auroc=0.78]  bypass[p=0.62 r=0.05 auroc=0.73]  base_dir[auroc=0.91]  bypass_dir[auroc=0.89]
+    rapper                     label[auroc=0.98]  label_z[auroc=0.96]  base[p=0.40 r=0.06 auroc=0.88]  bypass[p=0.43 r=0.04 auroc=0.84]  base_dir[auroc=0.95]  bypass_dir[auroc=0.94]
+    software_engineer          label[auroc=0.99]  label_z[auroc=0.98]  base[p=0.71 r=0.04 auroc=0.82]  bypass[p=0.73 r=0.08 auroc=0.88]  base_dir[auroc=0.98]  bypass_dir[auroc=0.98]
+    surgeon                    label[auroc=0.93]  label_z[auroc=0.90]  base[p=0.39 r=0.03 auroc=0.69]  bypass[p=0.75 r=0.01 auroc=0.60]  base_dir[auroc=0.90]  bypass_dir[auroc=0.89]
+    teacher                    label[auroc=0.85]  label_z[auroc=0.81]  base[p=0.49 r=0.02 auroc=0.70]  bypass[p=0.70 r=0.01 auroc=0.60]  base_dir[auroc=0.76]  bypass_dir[auroc=0.77]
+    yoga_teacher               label[auroc=0.98]  label_z[auroc=0.97]  base[p=0.58 r=0.07 auroc=0.89]  bypass[p=0.34 r=0.10 auroc=0.86]  base_dir[auroc=0.95]  bypass_dir[auroc=0.93]
+    MEAN label    auroc 0.955  (n=28/28)
+    MEAN label_z  auroc 0.928  (n=28/28)
+    MEAN base     auroc 0.786  (n=28/28)
+    MEAN bypass   auroc 0.775  (n=28/28)
+    MEAN base_dir auroc 0.887  (n=28/28)
+    MEAN bypass_dir auroc 0.879  (n=28/28)
+[transformers] Ignoring clean_up_tokenization_spaces=True for BPE tokenizer TokenizersBackend. The clean_up_tokenization post-processing step is designed for WordPiece tokenizers and is destructive for BPE (it strips spaces before punctuation). Set clean_up_tokenization_spaces=False to suppress this warning, or set clean_up_tokenization_spaces_for_bpe_even_though_it_will_corrupt_output=True to force cleanup anyway.
+
+[concept] unsteered: median ppl 3.26; e.g. ' 2018-2019 school year is in full swing and we are excited to see all '
+[concept] label  db14      a0.1  ppl x1.00  distinct2 0.89  edit_norm 3.370  (14 concepts)
+[concept] label  db14      a0.2  ppl x1.02  distinct2 0.87  edit_norm 6.740  (14 concepts)
+[concept] label  db14      a0.3  ppl x1.07  distinct2 0.85  edit_norm 10.109  (14 concepts)
+[concept] label  db14      a0.5  ppl x1.38  distinct2 0.73  edit_norm 16.849  (14 concepts)
+[concept] label  db14      a0.75 ppl x1.50  distinct2 0.46  edit_norm 25.274  (14 concepts)
+[concept] label  db14      a1.0  ppl x1.23  distinct2 0.24  edit_norm 33.698  (14 concepts)
+[concept] label  db14      a1.5  ppl x0.96  distinct2 0.11  edit_norm 50.547  (14 concepts)
+[concept] label  db14      a2.0  ppl x0.93  distinct2 0.07  edit_norm 67.396  (14 concepts)
+[concept] label  db14      a3.0  ppl x0.93  distinct2 0.05  edit_norm 101.095  (14 concepts)
+[concept] label_z db14      a0.1  ppl x1.00  distinct2 0.89  edit_norm 3.370  (14 concepts)
+[concept] label_z db14      a0.2  ppl x1.02  distinct2 0.87  edit_norm 6.740  (14 concepts)
+[concept] label_z db14      a0.3  ppl x1.07  distinct2 0.85  edit_norm 10.109  (14 concepts)
+[concept] label_z db14      a0.5  ppl x1.39  distinct2 0.73  edit_norm 16.849  (14 concepts)
+[concept] label_z db14      a0.75 ppl x1.51  distinct2 0.47  edit_norm 25.274  (14 concepts)
+[concept] label_z db14      a1.0  ppl x1.27  distinct2 0.25  edit_norm 33.698  (14 concepts)
+[concept] label_z db14      a1.5  ppl x1.01  distinct2 0.11  edit_norm 50.547  (14 concepts)
+[concept] label_z db14      a2.0  ppl x0.90  distinct2 0.07  edit_norm 67.396  (14 concepts)
+[concept] label_z db14      a3.0  ppl x0.86  distinct2 0.05  edit_norm 101.095  (14 concepts)
+[concept] base   db14      a0.1  ppl x0.98  distinct2 0.86  edit_norm 3.411  (14 concepts)
+[concept] base   db14      a0.2  ppl x1.06  distinct2 0.85  edit_norm 6.855  (14 concepts)
+[concept] base   db14      a0.3  ppl x1.21  distinct2 0.87  edit_norm 10.273  (14 concepts)
+[concept] base   db14      a0.5  ppl x1.87  distinct2 0.74  edit_norm 17.755  (14 concepts)
+[concept] base   db14      a0.75 ppl x2.87  distinct2 0.53  edit_norm 26.298  (14 concepts)
+[concept] base   db14      a1.0  ppl x2.79  distinct2 0.38  edit_norm 34.946  (14 concepts)
+[concept] base   db14      a1.5  ppl x2.52  distinct2 0.24  edit_norm 50.809  (14 concepts)
+[concept] base   db14      a2.0  ppl x2.63  distinct2 0.20  edit_norm 66.658  (14 concepts)
+[concept] base   db14      a3.0  ppl x3.38  distinct2 0.20  edit_norm 98.239  (14 concepts)
+[concept] bypass db14      a0.1  ppl x1.02  distinct2 0.87  edit_norm 2.877  (14 concepts)
+[concept] bypass db14      a0.2  ppl x1.01  distinct2 0.82  edit_norm 5.778  (14 concepts)
+[concept] bypass db14      a0.3  ppl x1.10  distinct2 0.83  edit_norm 8.729  (14 concepts)
+[concept] bypass db14      a0.5  ppl x1.63  distinct2 0.79  edit_norm 14.787  (14 concepts)
+[concept] bypass db14      a0.75 ppl x2.37  distinct2 0.69  edit_norm 21.582  (14 concepts)
+[concept] bypass db14      a1.0  ppl x2.46  distinct2 0.52  edit_norm 27.238  (14 concepts)
+[concept] bypass db14      a1.5  ppl x2.29  distinct2 0.32  edit_norm 38.824  (14 concepts)
+[concept] bypass db14      a2.0  ppl x2.04  distinct2 0.24  edit_norm 51.141  (14 concepts)
+[concept] bypass db14      a3.0  ppl x2.00  distinct2 0.18  edit_norm 74.764  (14 concepts)
+[concept] base_dir db14      a0.1  ppl x1.00  distinct2 0.88  edit_norm 3.370  (14 concepts)
+[concept] base_dir db14      a0.2  ppl x1.00  distinct2 0.85  edit_norm 6.740  (14 concepts)
+[concept] base_dir db14      a0.3  ppl x1.06  distinct2 0.84  edit_norm 10.109  (14 concepts)
+[concept] base_dir db14      a0.5  ppl x1.37  distinct2 0.75  edit_norm 16.849  (14 concepts)
+[concept] base_dir db14      a0.75 ppl x1.57  distinct2 0.53  edit_norm 25.274  (14 concepts)
+[concept] base_dir db14      a1.0  ppl x1.40  distinct2 0.29  edit_norm 33.698  (14 concepts)
+[concept] base_dir db14      a1.5  ppl x1.08  distinct2 0.14  edit_norm 50.547  (14 concepts)
+[concept] base_dir db14      a2.0  ppl x0.99  distinct2 0.09  edit_norm 67.396  (14 concepts)
+[concept] base_dir db14      a3.0  ppl x0.91  distinct2 0.06  edit_norm 101.095  (14 concepts)
+[concept] bypass_dir db14      a0.1  ppl x1.00  distinct2 0.87  edit_norm 3.370  (14 concepts)
+[concept] bypass_dir db14      a0.2  ppl x1.02  distinct2 0.86  edit_norm 6.740  (14 concepts)
+[concept] bypass_dir db14      a0.3  ppl x1.08  distinct2 0.82  edit_norm 10.109  (14 concepts)
+[concept] bypass_dir db14      a0.5  ppl x1.39  distinct2 0.74  edit_norm 16.849  (14 concepts)
+[concept] bypass_dir db14      a0.75 ppl x1.44  distinct2 0.42  edit_norm 25.274  (14 concepts)
+[concept] bypass_dir db14      a1.0  ppl x1.18  distinct2 0.22  edit_norm 33.698  (14 concepts)
+[concept] bypass_dir db14      a1.5  ppl x1.01  distinct2 0.10  edit_norm 50.547  (14 concepts)
+[concept] bypass_dir db14      a2.0  ppl x0.97  distinct2 0.06  edit_norm 67.396  (14 concepts)
+[concept] bypass_dir db14      a3.0  ppl x0.95  distinct2 0.05  edit_norm 101.095  (14 concepts)
+[concept] label  biasbios  a0.1  ppl x1.00  distinct2 0.88  edit_norm 3.480  (28 concepts)
+[concept] label  biasbios  a0.2  ppl x1.03  distinct2 0.86  edit_norm 6.959  (28 concepts)
+[concept] label  biasbios  a0.3  ppl x1.11  distinct2 0.83  edit_norm 10.439  (28 concepts)
+[concept] label  biasbios  a0.5  ppl x1.35  distinct2 0.65  edit_norm 17.398  (28 concepts)
+[concept] label  biasbios  a0.75 ppl x1.25  distinct2 0.29  edit_norm 26.097  (28 concepts)
+[concept] label  biasbios  a1.0  ppl x0.99  distinct2 0.13  edit_norm 34.796  (28 concepts)
+[concept] label  biasbios  a1.5  ppl x0.88  distinct2 0.06  edit_norm 52.194  (28 concepts)
+[concept] label  biasbios  a2.0  ppl x0.86  distinct2 0.05  edit_norm 69.592  (28 concepts)
+[concept] label  biasbios  a3.0  ppl x0.88  distinct2 0.04  edit_norm 104.389  (28 concepts)
+[concept] label_z biasbios  a0.1  ppl x0.99  distinct2 0.88  edit_norm 3.480  (28 concepts)
+[concept] label_z biasbios  a0.2  ppl x1.05  distinct2 0.86  edit_norm 6.959  (28 concepts)
+[concept] label_z biasbios  a0.3  ppl x1.12  distinct2 0.84  edit_norm 10.439  (28 concepts)
+[concept] label_z biasbios  a0.5  ppl x1.44  distinct2 0.72  edit_norm 17.398  (28 concepts)
+[concept] label_z biasbios  a0.75 ppl x1.51  distinct2 0.42  edit_norm 26.097  (28 concepts)
+[concept] label_z biasbios  a1.0  ppl x1.22  distinct2 0.21  edit_norm 34.796  (28 concepts)
+[concept] label_z biasbios  a1.5  ppl x1.02  distinct2 0.09  edit_norm 52.194  (28 concepts)
+[concept] label_z biasbios  a2.0  ppl x0.95  distinct2 0.07  edit_norm 69.592  (28 concepts)
+[concept] label_z biasbios  a3.0  ppl x0.89  distinct2 0.05  edit_norm 104.389  (28 concepts)
+[concept] base   biasbios  a0.1  ppl x0.99  distinct2 0.88  edit_norm 3.446  (28 concepts)
+[concept] base   biasbios  a0.2  ppl x1.06  distinct2 0.85  edit_norm 6.919  (28 concepts)
+[concept] base   biasbios  a0.3  ppl x1.25  distinct2 0.86  edit_norm 10.404  (28 concepts)
+[concept] base   biasbios  a0.5  ppl x2.05  distinct2 0.73  edit_norm 17.922  (28 concepts)
+[concept] base   biasbios  a0.75 ppl x2.68  distinct2 0.49  edit_norm 26.351  (28 concepts)
+[concept] base   biasbios  a1.0  ppl x2.51  distinct2 0.36  edit_norm 34.855  (28 concepts)
+[concept] base   biasbios  a1.5  ppl x2.57  distinct2 0.24  edit_norm 51.462  (28 concepts)
+[concept] base   biasbios  a2.0  ppl x3.37  distinct2 0.21  edit_norm 68.256  (28 concepts)
+[concept] base   biasbios  a3.0  ppl x4.71  distinct2 0.20  edit_norm 100.786  (28 concepts)
+[concept] bypass biasbios  a0.1  ppl x1.04  distinct2 0.86  edit_norm 3.110  (28 concepts)
+[concept] bypass biasbios  a0.2  ppl x1.04  distinct2 0.81  edit_norm 6.218  (28 concepts)
+[concept] bypass biasbios  a0.3  ppl x1.10  distinct2 0.80  edit_norm 9.410  (28 concepts)
+[concept] bypass biasbios  a0.5  ppl x1.59  distinct2 0.76  edit_norm 15.826  (28 concepts)
+[concept] bypass biasbios  a0.75 ppl x2.21  distinct2 0.65  edit_norm 23.491  (28 concepts)
+[concept] bypass biasbios  a1.0  ppl x2.68  distinct2 0.54  edit_norm 30.092  (28 concepts)
+[concept] bypass biasbios  a1.5  ppl x2.52  distinct2 0.35  edit_norm 43.213  (28 concepts)
+[concept] bypass biasbios  a2.0  ppl x2.54  distinct2 0.25  edit_norm 55.812  (28 concepts)
+[concept] bypass biasbios  a3.0  ppl x2.77  distinct2 0.19  edit_norm 81.816  (28 concepts)
+[concept] base_dir biasbios  a0.1  ppl x1.01  distinct2 0.86  edit_norm 3.480  (28 concepts)
+[concept] base_dir biasbios  a0.2  ppl x1.03  distinct2 0.84  edit_norm 6.959  (28 concepts)
+[concept] base_dir biasbios  a0.3  ppl x1.12  distinct2 0.82  edit_norm 10.439  (28 concepts)
+[concept] base_dir biasbios  a0.5  ppl x1.51  distinct2 0.75  edit_norm 17.398  (28 concepts)
+[concept] base_dir biasbios  a0.75 ppl x1.67  distinct2 0.50  edit_norm 26.097  (28 concepts)
+[concept] base_dir biasbios  a1.0  ppl x1.47  distinct2 0.31  edit_norm 34.796  (28 concepts)
+[concept] base_dir biasbios  a1.5  ppl x1.20  distinct2 0.14  edit_norm 52.194  (28 concepts)
+[concept] base_dir biasbios  a2.0  ppl x1.01  distinct2 0.08  edit_norm 69.592  (28 concepts)
+[concept] base_dir biasbios  a3.0  ppl x0.96  distinct2 0.05  edit_norm 104.389  (28 concepts)
+[concept] bypass_dir biasbios  a0.1  ppl x1.03  distinct2 0.88  edit_norm 3.480  (28 concepts)
+[concept] bypass_dir biasbios  a0.2  ppl x1.04  distinct2 0.85  edit_norm 6.959  (28 concepts)
+[concept] bypass_dir biasbios  a0.3  ppl x1.11  distinct2 0.82  edit_norm 10.439  (28 concepts)
+[concept] bypass_dir biasbios  a0.5  ppl x1.46  distinct2 0.76  edit_norm 17.398  (28 concepts)
+[concept] bypass_dir biasbios  a0.75 ppl x1.61  distinct2 0.51  edit_norm 26.097  (28 concepts)
+[concept] bypass_dir biasbios  a1.0  ppl x1.45  distinct2 0.30  edit_norm 34.796  (28 concepts)
+[concept] bypass_dir biasbios  a1.5  ppl x1.09  distinct2 0.12  edit_norm 52.194  (28 concepts)
+[concept] bypass_dir biasbios  a2.0  ppl x1.00  distinct2 0.07  edit_norm 69.592  (28 concepts)
+[concept] bypass_dir biasbios  a3.0  ppl x0.95  distinct2 0.05  edit_norm 104.389  (28 concepts)
+[concept] wrote eval_out/delta/d768/concept_steer_generate.json

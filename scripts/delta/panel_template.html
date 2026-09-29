@@ -1,0 +1,373 @@
+<title>GeoAE Width Series</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root {
+  --bg: #f2f4f6; --panel: #ffffff; --ink: #14171c; --ink-2: #4c5361; --ink-3: #7f8793;
+  --rule: #dbdfe5; --rule-soft: #eceff2; --band: #f4f6f8;
+  --s-d768: #2a78d6; --s-d3072: #eb6834; --s-d6144: #1baf7a; --s-d12288: #eda100; --s-d6144k4000: #e87ba4; --s-d12288k4000: #008300;
+  --good: #0ca30c; --warn: #fab219; --serious: #ec835a; --critical: #d03b3b;
+  --good-ink: #0a7a0a; --crit-ink: #b52f2f; --warn-ink: #8a5d00;
+  --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #0e1014; --panel: #171a1f; --ink: #eceff3; --ink-2: #b0b7c2; --ink-3: #7c8490;
+    --rule: #2a2f37; --rule-soft: #20242a; --band: #1c2026;
+    --s-d768: #3987e5; --s-d3072: #d95926; --s-d6144: #199e70; --s-d12288: #c98500; --s-d6144k4000: #d55181; --s-d12288k4000: #008300;
+    --good-ink: #37c437; --crit-ink: #ef7a7a; --warn-ink: #fab219;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0e1014; --panel: #171a1f; --ink: #eceff3; --ink-2: #b0b7c2; --ink-3: #7c8490;
+  --rule: #2a2f37; --rule-soft: #20242a; --band: #1c2026;
+  --s-d768: #3987e5; --s-d3072: #d95926; --s-d6144: #199e70; --s-d12288: #c98500; --s-d6144k4000: #d55181; --s-d12288k4000: #008300;
+  --good-ink: #37c437; --crit-ink: #ef7a7a; --warn-ink: #fab219;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.5; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 56px; display: grid; gap: 28px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+.mono, .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.eyebrow { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); font-weight: 500; }
+a { color: inherit; text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--s768); outline-offset: 2px; }
+
+header { display: grid; gap: 10px; }
+header h1 { font-size: 28px; font-weight: 600; letter-spacing: -.01em; }
+.sub { color: var(--ink-2); max-width: 72ch; }
+.snap { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--ink-3); font-size: 12.5px; }
+.summary { display: flex; flex-wrap: wrap; gap: 8px 28px; padding-block: 14px; border-block: 1px solid var(--rule); }
+.summary div { display: grid; gap: 2px; }
+.summary b { font-weight: 500; font-size: 15px; }
+
+section { display: grid; gap: 14px; }
+.sec-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.sec-head h2 { font-size: 17px; font-weight: 600; }
+.sec-head p { margin: 0; color: var(--ink-3); font-size: 12.5px; max-width: 70ch; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(212px, 1fr)); gap: 12px; }
+.card { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 16px; display: grid; gap: 12px; align-content: start; }
+.card-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.ident { display: flex; align-items: center; gap: 10px; }
+.glyph { width: 18px; height: 3px; border-radius: 2px; background: var(--c); }
+.ident .w { font-family: var(--mono); font-size: 20px; font-weight: 500; }
+.ident .cap { font-size: 11.5px; color: var(--ink-3); }
+.pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 500; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--rule); white-space: nowrap; }
+.pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--dot, var(--ink-3)); }
+.pill.run { --dot: var(--good); color: var(--good-ink); }
+.pill.head { --dot: var(--good); color: var(--good-ink); }
+.pill.queue { --dot: var(--ink-3); color: var(--ink-2); }
+.pill.done { --dot: var(--ink); color: var(--ink); }
+.pill.bad { --dot: var(--critical); color: var(--crit-ink); }
+.pill.warn { --dot: var(--warn); color: var(--warn-ink); }
+
+.prog { display: grid; gap: 6px; }
+.prog-line { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--ink-2); }
+.bar { position: relative; height: 8px; border-radius: 4px; background: var(--rule-soft); overflow: hidden; }
+.bar i { position: absolute; inset: 0 auto 0 0; background: var(--c); border-radius: 4px; }
+.bar u { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--panel); }
+.bar s { position: absolute; top: 0; bottom: 0; background: repeating-linear-gradient(135deg, var(--c) 0 2px, transparent 2px 5px); opacity: .45; text-decoration: none; }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
+.stat { display: grid; gap: 1px; }
+.stat .k { font-size: 11.5px; color: var(--ink-3); }
+.stat .v { font-family: var(--mono); font-size: 16px; font-variant-numeric: tabular-nums; }
+.stat .v small { font-size: 11.5px; color: var(--ink-3); }
+.foot { border-top: 1px solid var(--rule-soft); padding-top: 10px; display: grid; gap: 4px; font-size: 12.5px; color: var(--ink-2); }
+.foot .mono { font-size: 11.5px; color: var(--ink-3); }
+
+.charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 12px; }
+.chart { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 16px 14px 10px; display: grid; gap: 6px; position: relative; }
+.chart h3 { font-size: 14px; font-weight: 600; }
+.chart .note { font-size: 12px; color: var(--ink-3); margin: 0; }
+.chart svg { width: 100%; height: auto; display: block; touch-action: pan-y; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 14px; height: 3px; border-radius: 2px; background: var(--c); }
+.tip { position: absolute; pointer-events: none; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 10px; font-size: 12px; box-shadow: 0 4px 14px rgba(0,0,0,.12); display: grid; gap: 2px; min-width: 150px; z-index: 2; }
+.tip b { font-weight: 600; }
+.tip div { display: flex; justify-content: space-between; gap: 12px; }
+.tip span { display: inline-flex; align-items: center; gap: 6px; }
+.tip i { width: 10px; height: 3px; border-radius: 2px; background: var(--c); }
+
+.tbl-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+th, td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--rule-soft); white-space: nowrap; vertical-align: top; }
+th { font-weight: 500; color: var(--ink-3); font-size: 11.5px; background: var(--band); }
+tr:last-child td { border-bottom: 0; }
+td.num, th.num { text-align: right; }
+td.wrapok { white-space: normal; min-width: 220px; color: var(--ink-2); }
+.wtag { display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); }
+.wtag i { width: 12px; height: 3px; border-radius: 2px; background: var(--c); }
+
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px 16px; background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 16px; }
+.mixrow { display: grid; grid-template-columns: 82px 1fr 44px; align-items: center; gap: 10px; font-size: 12.5px; }
+.mixrow .track { height: 8px; background: var(--rule-soft); border-radius: 4px; overflow: hidden; }
+.mixrow .track i { display: block; height: 100%; background: var(--ink-2); border-radius: 4px; }
+.mix { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 16px; display: grid; gap: 7px; }
+.meter { height: 6px; width: 110px; background: var(--rule-soft); border-radius: 3px; overflow: hidden; display: inline-block; vertical-align: middle; margin-right: 8px; }
+.meter i { display: block; height: 100%; background: var(--ink-2); }
+
+.timeline { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 6px 16px; display: grid; }
+.ev { display: grid; grid-template-columns: 92px 14px 1fr; gap: 10px; padding-block: 10px; border-bottom: 1px solid var(--rule-soft); }
+.ev:last-child { border-bottom: 0; }
+.ev time { font-family: var(--mono); font-size: 12px; color: var(--ink-3); padding-top: 1px; }
+.ev .dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 5px; background: var(--k, var(--ink-3)); }
+.ev.ok { --k: var(--good); } .ev.bad { --k: var(--critical); } .ev.fix { --k: var(--s768); }
+.ev p { margin: 0; color: var(--ink-2); }
+.ev p b { color: var(--ink); font-weight: 500; }
+.watch { background: var(--panel); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; display: grid; gap: 8px; }
+.watch p { margin: 0; color: var(--ink-2); display: grid; grid-template-columns: 18px 1fr; gap: 8px; }
+.watch p::before { content: "›"; color: var(--ink-3); font-weight: 600; }
+code { font-family: var(--mono); font-size: .92em; }
+@media (max-width: 520px) { header h1 { font-size: 23px; } .ev { grid-template-columns: 74px 12px 1fr; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Delta · round 2 · single seed</span>
+    <h1>GeoAE width series</h1>
+    <p class="sub">Token-bypass autoencoder on Llama-3.2-3B layer 27: K = 2,000 balanced clusters, 50 epochs at batch 32,768, the new 10M-row sampled dump. Four latent widths at K = 2,000, plus one d6144 run at K = 4,000.</p>
+    <div class="snap"><span id="snap"></span><span>Say “status” to Claude to refresh</span><a id="wandb" href="#" target="_blank" rel="noopener">W&amp;B project</a></div>
+    <div class="summary" id="summary"></div>
+  </header>
+
+  <section>
+    <div class="sec-head"><h2>Runs</h2><p>Epochs are counted from saved checkpoints. Striped bar = where a head-start run is expected to stop before its queued job resumes it.</p></div>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Training curves</h2><p>Held-out rows only. Shaded phases follow the config: reconstruction only (1–5), + variance/covariance terms (6–10), + clustering from 11.</p></div>
+    <div class="charts">
+      <div class="chart" id="c-fve"><h3>Variance explained on held-out rows</h3><p class="note">1 − val MSE / variance, higher is better.</p><div class="legend" data-legend></div><svg data-svg role="img" aria-label="Held-out FVE per epoch for each width"></svg></div>
+      <div class="chart" id="c-min"><h3>Minutes per epoch</h3><p class="note">Wall-clock per epoch. Steps up at epoch 6 when the variance/covariance terms start; jumps also mark moves between GPUs.</p><div class="legend" data-legend></div><svg data-svg role="img" aria-label="Minutes per epoch for each run"></svg></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Slurm</h2><p>Queue now, then every job in this campaign.</p></div>
+    <div class="tbl-wrap"><table id="t-queue"></table></div>
+    <div class="tbl-wrap"><table id="t-hist"></table></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Budget and storage</h2><p>Single-GPU jobs bill one GPU; the two older whole-node A40 jobs bill four. Slurm reserves the full time limit up front.</p></div>
+    <div class="two">
+      <div class="tbl-wrap"><table id="t-acct"></table></div>
+      <div class="tbl-wrap"><table id="t-disk"></table></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Training data</h2><p><code>activations_sampled_10M</code>: 64 random positions per document, up to 2,048 tokens, pretraining-like mix.</p></div>
+    <div class="facts" id="facts"></div>
+    <div class="two">
+      <div class="mix" id="mix"><span class="eyebrow">Source mix (share of rows)</span></div>
+      <div class="mix" id="pos"><span class="eyebrow">Token position of sampled rows</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>What to watch</h2></div>
+    <div class="watch" id="watch"></div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Timeline</h2><p>Sat 26 – Sun 27 Sep, CDT.</p></div>
+    <div class="timeline" id="timeline"></div>
+  </section>
+</div>
+
+<script type="application/json" id="panel-data">__PANEL_DATA__</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById("panel-data").textContent);
+  const col = k => `var(--s-${k})`;
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const f3 = x => x == null ? "–" : Number(x).toFixed(3);
+  const fint = x => x == null ? "–" : Number(x).toLocaleString("en-US");
+  const runs = D.runs;
+  const byK = Object.fromEntries(runs.map(r => [r.key, r]));
+  const W = runs.map(r => r.key);
+
+  $("#snap").textContent = "Snapshot " + D.generated_label;
+  $("#wandb").href = D.wandb;
+
+  // ---- summary line ----
+  const active = runs.filter(r => r.state === "running" || r.state === "head start").length;
+  const done = runs.filter(r => r.state === "done").length;
+  const running = runs.find(r => r.state === "running");
+  const acct = Object.fromEntries(D.accounts.map(a => [a.account, a.balance]));
+  const bimc = D.storage.find(s => s.path === "/work/hdd/bimc");
+  const sum = [
+    ["Training now", `${active} of ${runs.length}` + (done ? ` · ${done} done` : "")],
+    ["Next milestone", running ? `${running.label} finishes ~${running.eta}` : "waiting for nodes"],
+    ["GPU-h left", `bbyl ${acct["bbyl-delta-gpu"] ?? "–"} · beto ${acct["beto-delta-gpu"] ?? "–"} · bimc ${acct["bimc-delta-gpu"] ?? "–"}`],
+    ["Data disk", bimc ? `${bimc.used} of ${bimc.quota}` : "–"],
+  ];
+  $("#summary").innerHTML = sum.map(([k, v]) => `<div><span class="eyebrow">${k}</span><b class="num">${esc(v)}</b></div>`).join("");
+
+  // ---- run cards ----
+  const pillCls = { "running": "run", "head start": "head", "queued": "queue", "done": "done", "stopped": "bad" };
+  $("#cards").innerHTML = runs.map(r => {
+    const pct = 100 * r.epochs_done / r.n_epochs;
+    const stopPct = r.stops_epoch ? 100 * r.stops_epoch / r.n_epochs : null;
+    let when = "";
+    if (r.state === "running") when = `Finishes <b>~${esc(r.eta)}</b> · ${r.hours_left} h left`;
+    else if (r.state === "head start") when = r.stops_at
+      ? `Stops ~${esc(r.stops_at)} near epoch ${r.stops_epoch} when job ${esc(r.host_job)} ends, then job <span class="mono">${esc(r.queued_job)}</span> resumes it on ${esc((r.queued_account || "").replace("-delta-gpu", ""))} (A100 or A40): <b>~${r.hours_after_restart} h</b> left after restart`
+      : `Head start inside job ${esc(r.host_job)}`;
+    else if (r.state === "queued") when = `Queued as job ${esc(r.queued_job)} · ${r.hours_left ?? "?"} h of training left`;
+    else if (r.state === "done") when = `Final checkpoint <span class="mono">${esc(r.final_ckpt)}</span>`;
+    else when = "Not in the queue";
+    return `<article class="card" style="--c:${col(r.key)}">
+      <div class="card-top"><div class="ident"><span class="glyph"></span><div><div class="w">${esc(r.label)}</div><div class="cap">latent ${fint(r.width)} · ${fint(r.k)} clusters</div></div></div>
+        <span class="pill ${pillCls[r.state] || "queue"}">${esc(r.state)}</span></div>
+      <div class="prog"><div class="prog-line"><span><b class="num">${r.epochs_done}</b> / ${r.n_epochs} epochs</span><span class="num">${r.min_per_epoch ?? "–"} min/epoch</span></div>
+        <div class="bar" aria-hidden="true">${stopPct ? `<s style="left:${pct}%;width:${stopPct - pct}%"></s>` : ""}<i style="width:${pct}%"></i><u style="left:10%"></u><u style="left:20%"></u></div></div>
+      <div class="stats">
+        <div class="stat"><span class="k">Held-out FVE</span><span class="v">${f3(r.fve)}</span></div>
+        <div class="stat"><span class="k">Val MSE</span><span class="v">${f3(r.val_mse)}</span></div>
+        <div class="stat"><span class="k">Clusters in use</span><span class="v">${r.usage ? fint(r.usage.perplexity) : "–"} <small>/ ${fint(r.k)}</small></span></div>
+        <div class="stat"><span class="k">Checkpoints</span><span class="v">${r.ckpts} <small>${r.ckpt_gb} GB</small></span></div>
+      </div>
+      <div class="foot"><span>${when}</span><span class="mono">${esc(r.where)}${r.resumes ? ` · resumed ×${r.resumes}` : ""}</span>${r.usage ? `<span class="mono">${r.usage.starved} starved · top-10 clusters hold ${r.usage.top10}% · ${esc(r.usage.ckpt)}</span>` : ""}</div>
+    </article>`;
+  }).join("");
+
+  // ---- charts ----
+  const NS = "http://www.w3.org/2000/svg";
+  function lineChart(id, key, opts) {
+    const root = document.getElementById(id), svg = root.querySelector("[data-svg]");
+    root.querySelector("[data-legend]").innerHTML = W.map(w => `<span style="--c:${col(w)}"><i></i>${esc(byK[w].label)}</span>`).join("");
+    const Wd = 600, H = 270, m = { l: 46, r: 86, t: 26, b: 30 };
+    svg.setAttribute("viewBox", `0 0 ${Wd} ${H}`);
+    const series = W.map(w => ({ w, pts: (byK[w]?.history || []).filter(p => p[key] != null && p.epoch >= (opts.fromEpoch || 1)).map(p => [p.epoch, p[key]]) }));
+    const all = series.flatMap(s => s.pts.map(p => p[1]));
+    let [lo, hi] = opts.domain(all);
+    const x = e => m.l + (e - 1) / 49 * (Wd - m.l - m.r);
+    const y = v => m.t + (1 - (v - lo) / (hi - lo)) * (H - m.t - m.b);
+    let g = "";
+    // phase bands
+    [[1, 5.5, "recon"], [5.5, 10.5, "+ var/cov"], [10.5, 50, "+ clustering"]].forEach(([a, b, lab], i) => {
+      if (i === 1) g += `<rect x="${x(a)}" y="${m.t}" width="${x(b) - x(a)}" height="${H - m.t - m.b}" fill="var(--band)"/>`;
+      g += `<text x="${(x(Math.max(a, 1)) + x(b)) / 2}" y="${m.t - 9}" text-anchor="middle" font-size="10.5" fill="var(--ink-3)">${lab}</text>`;
+    });
+    [5.5, 10.5].forEach(e => g += `<line x1="${x(e)}" x2="${x(e)}" y1="${m.t}" y2="${H - m.b}" stroke="var(--rule)" stroke-dasharray="3 3"/>`);
+    // grid + y ticks
+    opts.ticks(lo, hi).forEach(t => {
+      g += `<line x1="${m.l}" x2="${Wd - m.r}" y1="${y(t)}" y2="${y(t)}" stroke="var(--rule-soft)"/>`;
+      g += `<text x="${m.l - 8}" y="${y(t) + 3.5}" text-anchor="end" font-size="10.5" fill="var(--ink-3)" font-family="var(--mono)">${opts.fmt(t)}</text>`;
+    });
+    g += `<line x1="${m.l}" x2="${Wd - m.r}" y1="${H - m.b}" y2="${H - m.b}" stroke="var(--rule)"/>`;
+    [1, 10, 20, 30, 40, 50].forEach(e => g += `<text x="${x(e)}" y="${H - m.b + 16}" text-anchor="middle" font-size="10.5" fill="var(--ink-3)" font-family="var(--mono)">${e}</text>`);
+    g += `<text x="${Wd - m.r}" y="${H - 2}" text-anchor="end" font-size="10.5" fill="var(--ink-3)">epoch</text>`;
+    // lines
+    series.forEach(s => {
+      if (!s.pts.length) return;
+      const d = s.pts.map((p, i) => `${i ? "L" : "M"}${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`).join("");
+      g += `<path d="${d}" fill="none" stroke="${col(s.w)}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>`;
+      const e = s.pts[s.pts.length - 1];
+      g += `<circle cx="${x(e[0])}" cy="${y(e[1])}" r="4" fill="${col(s.w)}" stroke="var(--panel)" stroke-width="2"/>`;
+    });
+    // direct end labels, de-overlapped
+    const labs = series.filter(s => s.pts.length).map(s => { const e = s.pts[s.pts.length - 1]; return { w: s.w, x: x(e[0]), y: y(e[1]), v: e[1] }; }).sort((a, b) => a.y - b.y);
+    for (let i = 1; i < labs.length; i++) if (labs[i].y - labs[i - 1].y < 13) labs[i].y = labs[i - 1].y + 13;
+    const over = labs.length ? labs[labs.length - 1].y - (H - m.b - 2) : 0;
+    if (over > 0) labs.forEach(l => l.y -= over);
+    labs.forEach(l => g += `<text x="${l.x + 8}" y="${l.y + 4}" font-size="11" fill="var(--ink-2)" font-family="var(--mono)">${esc(byK[l.w].short)} ${opts.fmt(l.v)}</text>`);
+    g += `<line data-cross x1="0" x2="0" y1="${m.t}" y2="${H - m.b}" stroke="var(--ink-3)" stroke-width="1" visibility="hidden"/>`;
+    svg.innerHTML = g;
+    // hover: crosshair + tooltip at nearest epoch
+    const tip = document.createElement("div"); tip.className = "tip"; tip.hidden = true; root.appendChild(tip);
+    const cross = svg.querySelector("[data-cross]");
+    const maxE = Math.max(1, ...series.flatMap(s => s.pts.map(p => p[0])));
+    function move(ev) {
+      const r = svg.getBoundingClientRect(), sx = (ev.clientX - r.left) * Wd / r.width;
+      const e = Math.min(maxE, Math.max(1, Math.round(1 + (sx - m.l) / (Wd - m.l - m.r) * 49)));
+      cross.setAttribute("x1", x(e)); cross.setAttribute("x2", x(e)); cross.setAttribute("visibility", "visible");
+      const rows = series.map(s => { const p = s.pts.find(q => q[0] === e); return p ? `<div><span><i style="--c:${col(s.w)}"></i>${esc(byK[s.w].label)}</span><span class="num">${opts.fmt(p[1], true)}</span></div>` : ""; }).join("");
+      tip.innerHTML = `<b>Epoch ${e}</b>${rows || "<span>no data yet</span>"}`; tip.hidden = false;
+      const rr = root.getBoundingClientRect(), px = ev.clientX - rr.left;
+      tip.style.left = Math.min(rr.width - tip.offsetWidth - 8, Math.max(8, px + 14)) + "px";
+      tip.style.top = (ev.clientY - rr.top + 14) + "px";
+    }
+    svg.addEventListener("pointermove", move);
+    svg.addEventListener("pointerdown", move);
+    svg.addEventListener("pointerleave", () => { tip.hidden = true; cross.setAttribute("visibility", "hidden"); });
+  }
+  const niceTicks = (lo, hi, n) => { const st = [0.01, 0.02, 0.05, 0.1, 0.2, 0.25, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 250, 500, 1000].find(s => (hi - lo) / s <= n) || 1000; const out = []; for (let t = Math.ceil(lo / st) * st; t <= hi + 1e-9; t += st) out.push(+t.toFixed(4)); return out; };
+  lineChart("c-fve", "fve", {
+    domain: v => [v.length ? Math.max(0, Math.floor((Math.min(...v) - 0.05) * 10) / 10) : 0, 1],
+    ticks: (lo, hi) => niceTicks(lo, hi, 6), fmt: (t, full) => Number(t).toFixed(full ? 3 : 2),
+  });
+  lineChart("c-min", "minutes", {
+    domain: v => [0, Math.max(5, Math.ceil(Math.max(0, ...v) / 5) * 5)],
+    ticks: (lo, hi) => niceTicks(lo, hi, 5), fmt: (t, full) => full ? Number(t).toFixed(1) : String(Math.round(t)),
+  });
+
+  // ---- tables ----
+  const wtag = k => k && byK[k] ? `<span class="wtag" style="--c:${col(k)}"><i></i>${esc(byK[k].label)}</span>` : "–";
+  const statePill = s => { const k = /RUNNING/.test(s) ? "run" : /PENDING/.test(s) ? "queue" : /COMPLETED/.test(s) ? "done" : /CANCEL/.test(s) ? "queue" : "bad"; return `<span class="pill ${k}">${esc(s.toLowerCase().replace(/_/g, " "))}</span>`; };
+  const qRows = D.queue.map(j => `<tr><td class="mono">${esc(j.id)}</td><td>${wtag(j.key)}</td><td>${esc(j.account.replace("-delta-gpu", ""))}</td><td class="mono">${esc(j.partition)}</td><td>${statePill(j.state)}</td><td class="mono">${esc(j.elapsed)} / ${esc(j.limit)}</td><td class="mono">${esc(j.state === "RUNNING" ? j.node : j.reason + (j.dependency && j.dependency !== "(null)" ? " · " + j.dependency.replace("(unfulfilled)", "") : ""))}</td></tr>`)
+    .concat(D.steps.map(s => `<tr><td class="mono">${esc(s.id)}</td><td>${wtag(s.key)}</td><td colspan="2" class="mono">step inside ${esc(s.id.split(".")[0])}</td><td>${statePill("RUNNING")}</td><td class="mono">${esc(s.elapsed)}</td><td class="mono">${esc(s.node)}</td></tr>`));
+  $("#t-queue").innerHTML = `<thead><tr><th>Job</th><th>Run</th><th>Account</th><th>Partition</th><th>State</th><th>Elapsed / limit</th><th>Node or reason</th></tr></thead><tbody>${qRows.join("") || `<tr><td colspan="7">Queue is empty.</td></tr>`}</tbody>`;
+  const why = { "OUT_OF_MEMORY": "Python 3.14 copied the 58 GB dump into every DataLoader worker. Fixed in geoae/data.py.", "CANCELLED": "Replaced: CPU account had too little billing for an 8 h request." };
+  const nice = n => ({ "geoae-corpus": "corpus build", "geoae-extract-sampled": "extract + token table", "geoae-train": "training" }[n] || n);
+  $("#t-hist").innerHTML = `<thead><tr><th>Job</th><th>What</th><th>Account</th><th>State</th><th>Start</th><th class="num">Elapsed</th><th>Note</th></tr></thead><tbody>${D.history.map(h => `<tr><td class="mono">${esc(h.id)}</td><td>${h.key ? wtag(h.key) : esc(nice(h.name))}</td><td>${esc(h.account.replace(/-delta-(gpu|cpu)/, " $1"))}</td><td>${statePill(h.state)}</td><td class="mono">${esc((h.start || "").replace("2026-", "").replace("T", " ").slice(0, 11))}</td><td class="num mono">${esc(h.elapsed)}</td><td class="wrapok">${esc(why[h.state] || "")}</td></tr>`).join("")}</tbody>`;
+
+  const use = { "bbyl-delta-gpu": "d768 (done), d3072, d12288, K4000", "beto-delta-gpu": "spare (lowest fairshare, jobs start slowly)", "bimc-delta-gpu": "d6144", "beto-delta-cpu": "corpus build", "bimc-delta-cpu": "unused", "bgrb-delta-gpu": "spare" };
+  $("#t-acct").innerHTML = `<thead><tr><th>Account</th><th class="num">Hours left</th><th>Used for</th></tr></thead><tbody>${D.accounts.map(a => `<tr><td class="mono">${esc(a.account)}</td><td class="num mono">${fint(a.balance)}</td><td>${esc(use[a.account] || "")}</td></tr>`).join("")}</tbody>`;
+  const gb = s => { const m = /([\d.]+)\s*([GT])/.exec(s || ""); return m ? +m[1] * (m[2] === "T" ? 1000 : 1) : null; };
+  $("#t-disk").innerHTML = `<thead><tr><th>Path</th><th>Used of quota</th><th>Holds</th></tr></thead><tbody>${D.storage.map(s => { const u = gb(s.used), q = gb(s.quota); const p = u && q ? Math.min(100, 100 * u / q) : 0; return `<tr><td class="mono">${esc(s.path)}</td><td class="mono"><span class="meter"><i style="width:${p}%"></i></span>${esc(s.used)} / ${esc(s.quota)}</td><td>${esc(s.role)}</td></tr>`; }).join("")}</tbody>`;
+
+  // ---- data ----
+  const d = D.dump, t = D.token_bias;
+  const facts = [
+    ["Rows", fint(d.rows)], ["Documents", fint(d.docs)], ["Median doc length", fint(d.doc_len_median) + " tok"],
+    ["Median L27 norm", d.median_norm], ["Rows > 10× median norm", d.over10x], ["Extraction time", d.hours + " h"],
+    ["Token table", (t.tokens || "–") + " tokens"], ["Val rows covered", (t.val_coverage ?? "–") + "%"], ["Variance removed by table", t.var_removed != null ? (100 * t.var_removed).toFixed(1) + "%" : "–"],
+  ];
+  $("#facts").innerHTML = facts.map(([k, v]) => `<div class="stat"><span class="k">${k}</span><span class="v">${esc(v)}</span></div>`).join("");
+  const label = { edu_web: "edu web", web: "web", wiki: "wiki (en)", pile: "Pile tail", code: "code", math: "math", wiki_de: "wiki (de)", wiki_fr: "wiki (fr)", wiki_es: "wiki (es)" };
+  const mx = Math.max(...Object.values(d.mix || { a: 1 }));
+  $("#mix").innerHTML += Object.entries(d.mix || {}).map(([k, v]) => `<div class="mixrow"><span>${esc(label[k] || k)}</span><span class="track"><i style="width:${100 * v / mx}%"></i></span><span class="num">${Math.round(100 * v)}%</span></div>`).join("");
+  const pv = Object.values(d.positions || { a: 1 }), pm = Math.max(...pv), ptot = pv.reduce((a, b) => a + b, 0);
+  $("#pos").innerHTML += Object.entries(d.positions || {}).map(([k, v]) => `<div class="mixrow"><span class="mono">${esc(k.replace(/[\[\)]/g, "").replace(",", "–"))}</span><span class="track"><i style="width:${100 * v / pm}%"></i></span><span class="num">${(100 * v / ptot).toFixed(0)}%</span></div>`).join("");
+
+  // ---- watch + timeline ----
+  const watch = [];
+  runs.filter(r => r.state === "queued" && r.epochs_done > 0).forEach(r => watch.push(`${r.label} is waiting for a node with ${r.epochs_done} epochs saved. When it starts it should resume at epoch ${r.epochs_done + 1}, as d3072 and d6144 did.`));
+  const starved = runs.filter(r => r.usage && r.usage.zero > 0);
+  watch.push(starved.length ? `${starved.map(r => r.label).join(", ")} has clusters with zero hard assignments. Check before evals.` : `Cluster usage is healthy in every run: no cluster is empty, and “clusters in use” (usage perplexity from the checkpoint’s hard-assignment counts) is ${Math.min(...runs.filter(r => r.usage).map(r => Math.round(100 * r.usage.perp_frac)))}–${Math.max(...runs.filter(r => r.usage).map(r => Math.round(100 * r.usage.perp_frac)))}% of K. The log’s “dying” count is balancing telemetry, not a collapse signal.`);
+  watch.push(`Evals read the final checkpoint <code>step_0014450.pt</code> (50 epochs × 289 steps). All four logs confirm 9,500,000 training rows, so that name is right.`);
+  watch.push(`Before evals: <code>run_tokbias.sh</code> still needs the parent-AE decision, and d768/d3072 have no eval sheets yet.`);
+  $("#watch").innerHTML = watch.map(w => `<p><span>${w}</span></p>`).join("");
+  const ev = [
+    ["Sat 17:03", "ok", "<b>Corpus built</b> on beto CPU in 7 min: 204,353 documents, the same per-source counts as the old box."],
+    ["Sat 18:41", "ok", "<b>Extraction done</b> on a bbyl A100 in 1.5 h: 10M rows, exact source mix, median norm 56.6."],
+    ["Sat 21:11", "ok", "<b>Token table done</b> after 2.5 h of normalisation passes over the 61 GB dump on /work/hdd."],
+    ["Sat 21:28", "bad", "<b>All four trainings OOM</b> in epoch 1: Python 3.14 starts DataLoader workers with forkserver, which pickled the whole memory-mapped dump into each worker."],
+    ["Sat 22:17", "fix", "<b>Fixed and resubmitted</b>: workers now reopen the file by path (116 MB instead of 58 GB). One whole node per run."],
+    ["Sat 22:21", "ok", "<b>d768 starts</b> on gpua092. Full cluster: the other three were estimated to start Mon 05:04."],
+    ["Sun 00:39", "fix", "<b>Head start</b>: d3072, d6144, d12288 on gpua092's idle GPUs 1–3. Their queued jobs now wait for d768's job, accept A100 or A40, and are split across bbyl, bimc and beto."],
+    ["Sun 03:55", "ok", "<b>d768 finished</b>: 50 epochs in 5.6 h, final checkpoint step_0014450.pt. Its job ending stopped the three head starts at epochs 23, 17 and 11."],
+    ["Sun 03:56", "ok", "<b>d6144 resumed</b> on an A40 (gpub084, bimc) from its epoch-17 checkpoint."],
+    ["Sun 05:27", "ok", "<b>d3072 resumed</b> on an A40 (gpub096, bbyl) from its epoch-23 checkpoint."],
+    ["Sun 06:48", "fix", "<b>K = 4,000 run added</b>: the d6144 bypass recipe with twice the clusters (batch unchanged, so 8.2 rows per cluster per batch). Started on an A40 whole node."],
+    ["Sun 07:59", "bad", "<b>K = 4,000 job cancelled by mistake</b> while moving jobs to single GPUs: it had started minutes earlier. Lost part of epoch 6."],
+    ["Sun 09:32", "ok", "<b>d3072 finished</b> (4.1 h on its A40 after resuming)."],
+    ["Sun 10:29", "ok", "<b>d6144 finished</b>, the main arm: final checkpoint step_0014450.pt."],
+    ["Sun 08:10", "ok", "<b>Single GPUs from here on</b>: K = 4,000 resumed at epoch 6 on gpub014, d12288 resumed at epoch 12 on gpub056 (both A40, bbyl). Requests cut to 8 CPUs / 48 GB, preempt partitions allowed."],
+  ];
+  $("#timeline").innerHTML = ev.map(([tm, k, txt]) => `<div class="ev ${k}"><time>${tm}</time><span class="dot"></span><p>${txt}</p></div>`).join("");
+})();
+</script>

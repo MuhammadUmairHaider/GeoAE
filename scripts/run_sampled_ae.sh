@@ -17,9 +17,11 @@
 #   train   : resumes from the newest readable step_*.pt (--resume latest)
 # A failing step stops the chain (set -e); its log is under logs/.
 set -euo pipefail
-cd /home/exouser/RepresentationAE/GeoAE
+# Delta: env.sh resolves GEOAE_ROOT from its own location, exports HF_HOME /
+# UV_PROJECT_ENVIRONMENT / SBATCH_ACCOUNT, and cds to the repo root.
+source "$(dirname "${BASH_SOURCE[0]}")/../scripts/delta/env.sh"
 
-PY=.venv/bin/python
+PY=scripts/delta/py
 EXTRACT_CFG=configs/base/llama3.2-3b_extract_sampled.yaml
 WIDTH=${WIDTH:-6144}
 case "$WIDTH" in 6144|12288) ;; *) echo "WIDTH must be 6144 or 12288, got $WIDTH"; exit 1;; esac

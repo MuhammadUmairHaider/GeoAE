@@ -1,7 +1,7 @@
 """Render the checked-in evaluation report as a self-contained, printable HTML page.
 
 Run from any directory with a Python environment containing markdown-it-py:
-    .venv/bin/python eval_out/render_evaluation_report.py
+    scripts/delta/py eval_out/render_evaluation_report.py
 """
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Train (or continue) one GeoAE run:
-#   sbatch -A <account> scripts/delta/train.sbatch configs/base/<run>.yaml [extra train args]
+#   sbatch scripts/delta/train.sbatch configs/base/<run>.yaml [extra train args]
 #
 # Stages the activation dump onto node-local NVMe /tmp before training. Reading a
 # 60 GB dump with random access from shared storage is what made epoch 1 take
@@ -21,7 +21,7 @@ set -euo pipefail
 CONFIG="${1:?usage: sbatch train.sbatch <config.yaml> [extra args]}"; shift
 source scripts/delta/env.sh
 
-read -r ACT_DIR CKPT_DIR < <(uv run python - "$CONFIG" <<'PY'
+read -r ACT_DIR CKPT_DIR < <(uv run --no-sync python - "$CONFIG" <<'PY'
 import sys
 from geoae.config import Config
 c = Config.from_yaml(sys.argv[1])
@@ -29,7 +29,14 @@ print(c.data.activations_dir, c.train.checkpoints_dir)
 PY
 )
 SRC="$GEOAE_ROOT/$ACT_DIR"
-[ -d "$SRC" ] || { echo "missing $SRC — run extract.sbatch first"; exit 1; }
+# Check for CONTENT, not just the directory. scripts/delta/link_data.sh creates the
+# dump directory so its symlink resolves, and `-d` follows symlinks, so an
+# un-extracted dump would otherwise pass here and fail later inside the loader.
+if [ ! -d "$SRC" ] || [ -z "$(ls "$SRC"/layer_*.npy 2>/dev/null)" ]; then
+  echo "no extracted dump at $SRC (no layer_*.npy)."
+  echo "Run the extraction first:  sbatch scripts/delta/extract_sampled.sbatch <extract config>"
+  exit 1
+fi
 STAGE="/tmp/${SLURM_JOB_ID:-local}/$(basename "$ACT_DIR")"
 mkdir -p "$STAGE"
 echo "[stage] $SRC -> $STAGE"
@@ -40,7 +47,7 @@ ls "$GEOAE_ROOT/$CKPT_DIR"/step_*.pt >/dev/null 2>&1 && RESUME=(--resume latest)
 
 NAME=$(basename "$CONFIG" .yaml)
 set +e
-uv run python -u -m geoae.train --config "$CONFIG" --activations_dir "$STAGE" \
+uv run --no-sync python -u -m geoae.train --config "$CONFIG" --activations_dir "$STAGE" \
   "${RESUME[@]}" "$@" 2>&1 | tee -a "logs/${NAME}.log"
 RC=${PIPESTATUS[0]}
 set -e

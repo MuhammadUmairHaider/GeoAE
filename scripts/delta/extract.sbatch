@@ -1,7 +1,7 @@
 #!/bin/bash
 # Re-extract a residual-stream dump (the L27 one took 28 min on an A100 40 GB).
-#   sbatch -A <account> scripts/delta/extract.sbatch                          # L27
-#   sbatch -A <account> scripts/delta/extract.sbatch --layers 14 \
+#   sbatch scripts/delta/extract.sbatch                          # L27
+#   sbatch scripts/delta/extract.sbatch --layers 14 \
 #          --out_dir activations_diverse_10M_l14                              # L14
 #SBATCH --job-name=geoae-extract
 #SBATCH --partition=gpuA100x4
@@ -17,4 +17,4 @@ set -euo pipefail
 source scripts/delta/env.sh
 ARGS=("$@")
 [ ${#ARGS[@]} -eq 0 ] && ARGS=(--out_dir activations_diverse_10M)
-uv run python -u -m geoae.extract --config configs/base/llama3.2-3b_extract.yaml "${ARGS[@]}"
+uv run --no-sync python -u -m geoae.extract --config configs/base/llama3.2-3b_extract.yaml "${ARGS[@]}"

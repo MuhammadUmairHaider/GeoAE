@@ -1,0 +1,39 @@
+[judge] 9,600 judgements (google/gemini-2.5-flash-lite); cached ones are free
+[judge] unparseable answers: 1 (counted as misses)
+
+[judge] LLM forced choice, target vs 3 other clusters (chance .25), mean [95% CI over targets]
+  base   a0.0   0.264 [0.212,0.319]   ppl x1.00
+  base   a0.1   0.296 [0.250,0.343]   ppl x0.98
+  base   a0.2   0.300 [0.253,0.346]   ppl x1.18
+  base   a0.3   0.307 [0.261,0.356]   ppl x1.45
+  base   a0.5   0.391 [0.329,0.454]   ppl x1.86
+  base   a0.75  0.443 [0.362,0.523]   ppl x1.52
+  bypass a0.0   0.258 [0.214,0.306]   ppl x1.00
+  bypass a0.1   0.245 [0.194,0.295]   ppl x1.02
+  bypass a0.2   0.260 [0.210,0.310]   ppl x1.11
+  bypass a0.3   0.314 [0.261,0.366]   ppl x1.26
+  bypass a0.5   0.401 [0.351,0.455]   ppl x1.78
+  bypass a0.75  0.479 [0.431,0.524]   ppl x2.06
+
+[judge] at MATCHED fluency cost (continuation perplexity x): LLM-judged hit rate [95% CI]
+  ppl x1.1   base 0.298 [0.255,0.342]   bypass 0.259 [0.220,0.307]
+  ppl x1.25  base 0.302 [0.259,0.349]   bypass 0.311 [0.258,0.364]
+  ppl x1.5   base 0.320 [0.277,0.366]   bypass 0.358 [0.310,0.408]
+  ppl x2.0   base (out of range)   bypass 0.464 [0.402,0.507]
+
+[judge] at MATCHED share of degenerate continuations: LLM-judged hit rate [95% CI]
+  degenerate 10%  base 0.301 [0.256,0.345]   bypass 0.253 [0.205,0.307]
+  degenerate 20%  base 0.313 [0.267,0.371]   bypass 0.363 [0.316,0.413]
+  degenerate 30%  base 0.335 [0.288,0.380]   bypass 0.415 [0.360,0.461]
+  degenerate 50%  base 0.378 [0.321,0.442]   bypass 0.471 [0.425,0.512]
+
+[judge] FLUENT continuations only, net of the same cell's unsteered hit (per 100) [95% CI over targets]
+   alpha  base: fluent share / net hit / usable   bypass: fluent share / net hit / usable
+     0.1  base:  93% /  +2.6 [-1,+5] /  2.4   bypass:  92% /  -1.8 [-4,+1] / -1.6
+     0.2  base:  91% /  +3.9 [+1,+7] /  3.5   bypass:  89% /  +0.7 [-3,+4] /  0.6
+     0.3  base:  83% /  +6.5 [+3,+9] /  5.4   bypass:  86% /  +5.1 [+1,+9] /  4.4
+/projects/bbyl/mhaider/GeoAE/geoae/interp/cluster_steer_judge.py:199: RuntimeWarning: Mean of empty slice
+  per_t = np.nanmean(d, 1)
+     0.5  base:  44% / +13.0 [+4,+22] /  5.8   bypass:  75% / +15.5 [+12,+21] / 11.6
+    0.75  base:  11% / +28.6 [+16,+47] /  3.2   bypass:  47% / +26.5 [+15,+31] / 12.5
+[judge] wrote results/delta/d6144k4000/steering/cluster_steer_judge.json  (calls 9331, cached 269)
