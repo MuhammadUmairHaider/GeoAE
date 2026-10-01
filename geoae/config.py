@@ -70,6 +70,8 @@ class ModelConfig:
                                    # same scale cluster_loss already uses. See model.py.      # "none" | "batch" (BatchNorm1d between linear and act)
     token_bias: str = ""           # token-bypass table (.npz from geoae.token_bias); "" = off.
                                    # Encoder sees x - b[tok], recon = dec(z) + b[tok].
+    token_bias_mode: str = "bypass"  # "bypass": subtract before encoding; "decoder_only": full x.
+                                    # Both modes add the fixed token table after decoding.
 
 
 @dataclass
@@ -205,6 +207,10 @@ class Config:
 
     def validate(self) -> "Config":
         """Reject out-of-range values for the enumerated train fields."""
+        if self.model.token_bias_mode not in ("bypass", "decoder_only"):
+            raise ValueError(f"Invalid model.token_bias_mode={self.model.token_bias_mode!r}")
+        if self.model.token_bias_mode == "decoder_only" and not self.model.token_bias:
+            raise ValueError("decoder_only requires model.token_bias")
         for k, allowed in _TRAIN_CHOICES.items():
             v = getattr(self.train, k)
             if v not in allowed:

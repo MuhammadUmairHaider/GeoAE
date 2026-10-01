@@ -23,8 +23,8 @@ def load_ae_checkpoint(
     Rebuild a GeoAE from a training checkpoint (base, e2e, or stream format —
     they share model_state / norm_mean / norm_std / config).
 
-    A token-bypass checkpoint (model.token_bias) needs the current token ids at
-    every encode/decode. Tools written against `ae.encoder` / `ae.decoder` would
+    A token-bias checkpoint (model.token_bias) needs the current token ids to
+    decode and, in bypass mode, encode. Tools written against `ae.encoder` / `ae.decoder` would
     silently drop the bias, so they are refused unless the caller passes
     allow_token_bias=True — which asserts it uses ae.encode / ae.decode with ids.
 
@@ -39,7 +39,7 @@ def load_ae_checkpoint(
         if not allow_token_bias:
             raise SystemExit(
                 f"{ckpt_path} is a TOKEN-BYPASS AE (model.token_bias={mc.get('token_bias')!r}): "
-                f"encoding needs the current token ids. This tool has not been converted to "
+                f"token-aware encoding/decoding is required. This tool has not been converted to "
                 f"ae.encode(x, tok) / ae.decode(z, tok); it would silently drop the bias.")
         tb_rows = ckpt["model_state"]["tb_table"].shape[0]
         tb_vocab = ckpt["model_state"]["tb_index"].shape[0]
@@ -100,6 +100,7 @@ def load_ae_checkpoint(
         ema_hard=tc.get("ema_hard", False),
         token_bias_rows=tb_rows,
         vocab_size=tb_vocab,
+        token_bias_mode=mc.get("token_bias_mode", "bypass"),
     ).to(device)
     # `sinkhorn_g` was added with the generalised balancing knobs; checkpoints
     # written before it are still loadable, but nothing else may be missing.

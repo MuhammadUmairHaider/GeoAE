@@ -129,10 +129,11 @@ def build_model(cfg: Config, device: torch.device, no_sinkhorn: bool = False) ->
         latent_norm=getattr(cfg.model, "latent_norm", "none"),
         token_bias_rows=0 if tb is None else len(tb["token_ids"]),
         vocab_size=0 if tb is None else int(tb["vocab_size"]),
+        token_bias_mode=getattr(cfg.model, "token_bias_mode", "bypass"),
     ).to(device)
     if tb is not None:
         model.load_token_bias(torch.as_tensor(tb["token_ids"]), torch.as_tensor(tb["table"]))
-        print(f"[model] token bypass: {len(tb['token_ids']):,} tokens from {cfg.model.token_bias} "
+        print(f"[model] token bias ({model.token_bias_mode}): {len(tb['token_ids']):,} tokens from {cfg.model.token_bias} "
               f"(shrink k={float(tb['shrink_k']):g}, min_count={int(tb['min_count'])})")
     if no_sinkhorn:
         model.use_sinkhorn = False
@@ -399,6 +400,10 @@ def load_resume(path, model, opt, norm_mean, norm_std, device) -> tuple[int, int
     the model without any visible error.
     """
     ckpt = torch.load(str(path), map_location=device, weights_only=False)
+    saved_mode = ckpt.get("config", {}).get("model", {}).get("token_bias_mode", "bypass")
+    if saved_mode != model.token_bias_mode:
+        raise ValueError(f"[resume] token_bias_mode mismatch: checkpoint {saved_mode!r}, "
+                         f"current model {model.token_bias_mode!r}; refusing to resume")
     model.load_state_dict(ckpt["model_state"])
     if "opt_state" in ckpt:
         opt.load_state_dict(ckpt["opt_state"])

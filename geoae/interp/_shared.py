@@ -192,6 +192,10 @@ def ae_fingerprint(ae) -> str:
     """
     import hashlib
     h = hashlib.sha1()
+    # Mode affects reconstruction even for identical tensors. Preserve existing
+    # plain/bypass cache keys, but distinguish the decoder-only experiment.
+    if getattr(ae, "token_bias_mode", "bypass") == "decoder_only":
+        h.update(b"token_bias_mode=decoder_only")
     for k, v in sorted(ae.state_dict().items()):
         h.update(k.encode())
         h.update(v.detach().float().cpu().numpy().tobytes())

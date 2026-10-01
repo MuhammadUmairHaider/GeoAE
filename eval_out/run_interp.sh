@@ -6,6 +6,7 @@
 #
 #   eval_out/run_interp.sh <arm> <steps|groups...>
 #   arm: d768 | d3072 | d6144 | d12288 | d6144k4000 | d12288k4000     (Llama-3.2-3B, layer 27)
+#        d6144decoderonly                                        (full-input encoder, decoder bias)
 #        g1b_l{13,25}_d{1152,2304,4608}                            (Gemma 3 1B, K=2000)
 #
 #   eval_out/run_interp.sh d6144 judge judge3 atlas      # login node, ONE ARM AT A TIME (see judge)
@@ -85,6 +86,7 @@ case "$ARM" in
     d768)       CKDIR=k2000_bnh_b32k_lam1_d768_dpc_sampled_tokbias;  K=2000; DIM=768   ;;
     d3072)      CKDIR=k2000_bnh_b32k_lam1_d3072_dpc_sampled_tokbias; K=2000; DIM=3072  ;;
     d6144)      CKDIR=k2000_bnh_b32k_lam1_d6144_dpc_sampled_tokbias; K=2000; DIM=6144  ;;
+    d6144decoderonly) CKDIR=k2000_bnh_b32k_lam1_d6144_dpc_sampled_tokbias_decoderonly; K=2000; DIM=6144 ;;
     d12288)     CKDIR=k2000_bnh_b32k_lam1_d12288_dpc_sampled_tokbias;K=2000; DIM=12288 ;;
     d6144k4000) CKDIR=k4000_bnh_b32k_lam1_d6144_dpc_sampled_tokbias; K=4000; DIM=6144  ;;
     d12288k4000) CKDIR=k4000_bnh_b32k_lam1_d12288_dpc_sampled_tokbias; K=4000; DIM=12288 ;;
@@ -92,7 +94,7 @@ case "$ARM" in
         FAM=g1b; K=2000; DIM=${ARM##*_d}; LAYER=${ARM#g1b_l}; LAYER=${LAYER%%_*}
         CKDIR=k2000_bnh_b32k_lam1_d${DIM}_dpc_sampled_struct5_tokbias ;;
     *)
-        echo "usage: $0 <d768|d3072|d6144|d12288|d6144k4000|d12288k4000|g1b_l{13,25}_d{1152,2304,4608}> <steps|groups...>" >&2
+        echo "usage: $0 <d768|d3072|d6144|d6144decoderonly|d12288|d6144k4000|d12288k4000|g1b_l{13,25}_d{1152,2304,4608}> <steps|groups...>" >&2
         echo "  steps: wsd_data ct_base ct_tok ct wsd judge judge_tok judge3 atlas atlas_tok     groups: all gpu api" >&2
         exit 2
         ;;

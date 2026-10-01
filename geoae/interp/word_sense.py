@@ -341,7 +341,8 @@ def build_spaces(H: torch.Tensor, toks: torch.Tensor, args, device) -> dict:
           for i in range(0, len(x), 4096)]
     z = torch.cat(zs)
     spaces["bypass"] = (z.half().cpu(), nearest(z, ae.centroids, ae.metric),
-                        {"K": ae.n_clusters, "space": "latent", "token_bias": bool(ae.has_token_bias)})
+                        {"K": ae.n_clusters, "space": "latent", "token_bias": bool(ae.has_token_bias),
+                         "token_bias_mode": ae.token_bias_mode})
     del ae, z, zs
 
     if args.tokmean_kmeans:

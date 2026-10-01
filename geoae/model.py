@@ -71,8 +71,14 @@ class GeoAE(nn.Module):
         dist_scale: str = "raw",
         token_bias_rows: int = 0,
         vocab_size: int = 0,
+        token_bias_mode: str = "bypass",
     ):
         super().__init__()
+        if token_bias_mode not in ("bypass", "decoder_only"):
+            raise ValueError(f"Unknown token_bias_mode: {token_bias_mode!r}")
+        if token_bias_mode == "decoder_only" and token_bias_rows <= 0:
+            raise ValueError("decoder_only requires a token bias table")
+        self.token_bias_mode = token_bias_mode
         self.dist_scale = dist_scale
         self.hidden_size = hidden_size
         self.latent_dim = latent_dim
@@ -148,14 +154,15 @@ class GeoAE(nn.Module):
         self.register_buffer("sinkhorn_g", torch.zeros(n_clusters))
 
         # TOKEN BYPASS (design B; geoae/token_bias.py). A fixed per-token table b[t]
-        # of shrunk per-token means of the normalised residual: the encoder sees
+        # of shrunk per-token means of the normalised residual: in bypass mode the encoder sees
         # x - b[tok] and the reconstruction is decoder(z) + b[tok], so token identity
         # goes AROUND the latent instead of shaping the clusters, while the splice
         # stays faithful. Only the CURRENT token is bypassed: it is a fixed input,
         # so a latent edit cannot be pulled back by it (a predicted-next-token
         # bypass would be computed from the unedited activation). Buffers, not
         # parameters: frozen, saved in the checkpoint, no optimizer state. Tokens
-        # absent from the table (tb_index -1) get a zero bias. Not constructed at
+        # absent from the table (tb_index -1) get a zero bias. In decoder_only mode
+        # the encoder sees full x; the decoder still adds b[tok]. Not constructed at
         # all when token_bias_rows == 0, so every existing checkpoint is unchanged.
         if token_bias_rows > 0:
             if vocab_size <= 0:
@@ -328,6 +335,8 @@ class GeoAE(nn.Module):
 
     def encode(self, x: Tensor, tok: Tensor | None = None) -> Tensor:
         """Normalised activation -> latent. Use this, not `.encoder`, so the bypass applies."""
+        if self.token_bias_mode == "decoder_only":
+            return self.encoder(x)
         b = self.token_bias(tok)
         return self.encoder(x if b is None else x - b)
 
@@ -344,7 +353,7 @@ class GeoAE(nn.Module):
         Returns AEOutput with x_hat, z, Q, dist2.
         """
         b = self.token_bias(tok)
-        z = self.encoder(x if b is None else x - b)      # (B, L)
+        z = self.encoder(x if b is None or self.token_bias_mode == "decoder_only" else x - b)
         dist2 = pairwise_sq_dist(z, self.centroids, metric=self.metric)  # (B, K)
         # SCALE OF THE SINKHORN INPUT.
         #

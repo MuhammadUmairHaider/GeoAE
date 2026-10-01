@@ -20,8 +20,14 @@ Submitted on Delta under `bbyl-delta-gpu` on 2026-10-01:
   `afterok:22594394` (starts only after the first arm succeeds).
 Both request one A100, 16 CPUs, 100 GB RAM and 24 hours. Each trains 50 epochs
 with the existing matched hyperparameters and seed 42; stdout and training logs
-go under `logs/`. WandB is disabled for these jobs. No training was launched on
-the box. Do not submit duplicate jobs when resuming this handoff.
+go under `logs/`. WandB is disabled for these jobs. Do not submit duplicate jobs
+when resuming this handoff.
+
+The user subsequently requested **one additional box experiment** and clarified
+**6K only: this is GeoAE, not SAE training**. The chosen arm is decoder-only fixed
+token bias, with 6,144 latent dimensions, K=2,000, seed 42 and 50 epochs. It keeps
+the full normalized residual as encoder input and adds the same fixed token mean
+only after decoding. See the box experiment section below.
 
 1. Train a separate no-bypass AE on the same sampled dump as the current bypass
    AE: Llama-3.2-3B layer 27, latent width 6144, K=2000, seed 42, 50 epochs.
@@ -45,6 +51,37 @@ the box. Do not submit duplicate jobs when resuming this handoff.
 Inspiration: [Tokenized SAEs: Infusing per-token biases](https://www.lesswrong.com/posts/P8qLZco6Zq8LaLHe9/tokenized-saes-infusing-per-token-biases).
 That design adds a per-token decoder lookup while leaving the encoder unchanged;
 our half-subtraction arm is a separate proposed experiment, not its reproduction.
+
+## Additional box experiment: decoder-only token bias
+
+- Encoder: `z=encoder(x)`; reconstruction: `decoder(z)+b[current_token]`.
+- The token table remains frozen, using the same shrunk training-split token
+  means as the full-bypass run. The article learns its lookup; this control
+  isolates encoder subtraction within GeoAE and is not an SAE reproduction.
+- Config:
+  `configs/base/llama3.2-3b_l27_k2000_bnh_b32k_lam1_d6144_dpc_sampled_tokbias_decoderonly.yaml`.
+  It differs from the matched full-bypass config only in `token_bias_mode` and
+  the checkpoint output directory. Width stays **6144**, batch 32768, K=2000.
+- Launcher: `scripts/remote/train_decoderonly.sh` on `geoae-box`.
+  tmux session: `geoae_decoderonly`; log:
+  `logs/train_interp_decoderonly_d6144.log`. Check that session and log before
+  relaunching. The launcher resumes latest within this arm if restarted.
+- Outputs:
+  `checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_dpc_sampled_tokbias_decoderonly/`.
+  Source snapshot and preflight JSON: `runs/decoderonly_d6144/` on the box.
+- `model.token_bias_mode` is saved in checkpoint config, propagated by both
+  builder and loader, and checked on resume. Legacy checkpoints default to
+  `bypass`; decoder-only fingerprints differ even for identical weights.
+  Decoding needs token IDs; decoder-only encoding does not.
+- After training, `eval_out/run_interp.sh d6144decoderonly gpu` writes to its own
+  output arm, then `api` judges it. The generic `bypass` fields in these tools
+  refer to the evaluated AE; its metadata records `token_bias_mode=decoder_only`.
+  Vanilla residual k-means matches this arm's encoder input; token-mean k-means
+  remains the reconstruction-target control. Preserve all existing results.
+- Validation: 91 model/checkpoint/resume/interpretation tests passed on the box,
+  plus a full 32768-row forward/backward/optimizer step with geometry enabled.
+  Losses and gradients were finite; normalization matched the token table;
+  peak GPU allocation was 10.48 GiB. Smoke state was discarded before training.
 
 ## Existing results and definitions
 

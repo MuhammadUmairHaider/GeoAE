@@ -589,6 +589,7 @@ def main():
         "meta": {
             "mode": "learned_ae" if use_ae else "raw_kmeans_baseline",
             "checkpoint": str(source_path), "model_name": model_name,
+            **({"token_bias_mode": ae.token_bias_mode} if use_ae and ae.has_token_bias else {}),
             **({"token_bias": tok_bias.path, "space": "residual - b[token]"} if tok_bias is not None else {}),
             "target_layer": target_layer, "n_clusters": K,
             "n_tokens": N, "n_docs": len(docs),
