@@ -14,6 +14,15 @@ new sampled dump with absence of that earlier experiment.
 
 Next experiment order, agreed in this conversation:
 
+Submitted on Delta under `bbyl-delta-gpu` on 2026-10-01:
+- **22594394** `interp-nobypass-d6144`: no-bypass AE, pending Priority.
+- **22594395** `interp-halfbias-d6144`: alpha=0.5 AE, pending
+  `afterok:22594394` (starts only after the first arm succeeds).
+Both request one A100, 16 CPUs, 100 GB RAM and 24 hours. Each trains 50 epochs
+with the existing matched hyperparameters and seed 42; stdout and training logs
+go under `logs/`. WandB is disabled for these jobs. No training was launched on
+the box. Do not submit duplicate jobs when resuming this handoff.
+
 1. Train a separate no-bypass AE on the same sampled dump as the current bypass
    AE: Llama-3.2-3B layer 27, latent width 6144, K=2000, seed 42, 50 epochs.
    Existing config:
@@ -25,8 +34,11 @@ Next experiment order, agreed in this conversation:
    Here x is the normalized residual and b is the existing fixed, shrunk,
    training-split token-mean table. Scale the same table in both paths; do not
    independently refit it or mistake alpha for the shrinkage hyperparameter.
-   The alpha arm is not yet implemented. Preserve alpha in checkpoints and
-   ensure assignment/evaluation uses the same scale as training.
+   Implemented as `scripts/scale_token_bias.py` plus
+   `scripts/delta/train_halfbias.sbatch`: it writes an explicitly scaled table
+   with `bias_scale=0.5` and source provenance. The model embeds that scaled table
+   in its checkpoint; existing assignment/evaluation loads the same bias.
+   Config: `configs/base/llama3.2-3b_l27_k2000_bnh_b32k_lam1_d6144_dpc_sampled_tokbias_alpha0p5.yaml`.
 3. Consider multiple resolutions within each view after these comparisons.
    Complementary partitions can cross-cut; hierarchy is a hypothesis to test.
 
@@ -73,15 +85,20 @@ training seeds. A shifted judge level mix is not a demonstrated hierarchy.
 
 The earlier 400k dump-token union (vanilla base + bypass) was nameable 39.5%,
 versus 27.4% and 17.5% individually. This is a different sample/denominator than
-the atlas. A repeat judging of the same vanilla base with seed 1 has completed
-(`logs/rejudge_base_seed1.log`, `REJUDGE EXIT 0`); analyze it before claiming that
-the union demonstrates complementary interpretations rather than judge noise.
+the atlas. The completed same-base seed-1 repeat gives a 36.8% nameable union
+(seed-1 alone 26.5%); base+bypass is only 2.7 pp above that control. Conceptual
+union: same-base repeat 16.7%, base+bypass 19.5%. This indicates substantial
+evaluation variability; do not claim the full union gain as complementary
+interpretation. Results are saved in
+`results/delta/d6144/interp/view_union_repeat_control.json`.
 The three-judge chain also completed (`CHAIN EXIT 0`).
 
 ## Where to run and where to look
 
 - Local checkout: `/projects/bbyl/mhaider/GeoAE` on Delta. No training or heavy
-  analysis on the login node. Do not submit/cancel Slurm jobs unless requested.
+  analysis on the login node. The user explicitly requested these training jobs
+  on Delta, not the box. Submit no-bypass first and half subtraction with an
+  `afterok` dependency. Do not submit/cancel unrelated Slurm jobs.
 - GPU box: `ssh geoae-box`, checkout `~/GeoAE`, dedicated A100 40 GB.
   Use the checkout's `.venv/bin/python`, `GEOAE_REMOTE=1`,
   `HF_HUB_OFFLINE=1`, and `source scripts/remote/env.sh`.
@@ -109,10 +126,15 @@ The three-judge chain also completed (`CHAIN EXIT 0`).
 `test_atlas_summary`, `test_word_sense`, `test_closest_tokens_sampled`,
 `test_closest_tokens_docview`, and `test_token_erasure`.
 Shell syntax and staged whitespace are checked locally before committing.
+18 additional checks passed on the box for `test_scale_token_bias` and
+`test_token_bias`, including scaled bias checkpoint reconstruction after removing
+the original table file. The half config changes only the table and checkpoint
+paths relative to the existing bypass config.
 
 Continuation prompt for Claude:
 
 > Read HANDOFF_REMOTE.md and STATUS.md. Preserve existing uncommitted work.
 > Report the completed base-tok vs bypass interpretation results, then follow
 > the agreed order: matched separate no-bypass AE, alpha=0.5 subtraction, then
-> multiple resolutions. Keep STATUS.md current and run compute on geoae-box.
+> multiple resolutions. Keep STATUS.md current. These training jobs belong on
+> Delta; interpretation/evaluation work runs on geoae-box.
