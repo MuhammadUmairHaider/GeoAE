@@ -30,6 +30,12 @@
 # LD_LIBRARY_PATH. Add it back only if a CUDA symbol clash reappears.
 
 _geoae_self="${BASH_SOURCE[0]:-$0}"
+# Off Delta (no /work/hdd + /work/nvme, or GEOAE_REMOTE=1): use the portable environment instead, so the same
+# sheets run on any machine. See HANDOFF_REMOTE.md.
+if [ -n "${GEOAE_REMOTE:-}" ] || [ ! -d /work/hdd ] || [ ! -d /work/nvme ]; then
+    . "$(cd "$(dirname "$_geoae_self")/.." && pwd)/remote/env.sh"
+    return 0 2>/dev/null || exit 0
+fi
 export GEOAE_ROOT="${GEOAE_ROOT:-$(cd "$(dirname "$_geoae_self")/../.." && pwd)}"
 
 # Which allocation. Edit scripts/delta/site.sh, or export DELTA_PROJECT first.

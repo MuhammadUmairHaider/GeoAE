@@ -26,6 +26,10 @@
 # which reads like a broken install rather than "you never ran setup".
 set -euo pipefail
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/env.sh"
+# off Delta (scripts/remote/env.sh): the checkout's own venv, with or without uv on PATH
+if [ -n "${GEOAE_REMOTE:-}" ] && [ -x "$UV_PROJECT_ENVIRONMENT/bin/python" ]; then
+  exec "$UV_PROJECT_ENVIRONMENT/bin/python" "$@"
+fi
 
 if [ ! -x "$UV_PROJECT_ENVIRONMENT/bin/python" ]; then
   echo "ABORT: no venv at $UV_PROJECT_ENVIRONMENT" >&2

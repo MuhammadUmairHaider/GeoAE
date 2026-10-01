@@ -160,10 +160,12 @@ def sampled_sources(acts_dir: Path, corpus_dir: Path | None = None) -> tuple[dic
                                 f"pass --corpus_dir")
     files = {r["domain"]: r["file"] for r in json.load(open(corpus_dir / "manifest.json"))["sources"]}
     out = []
+    # Any kind works once build_corpus wrote it to a file: extract_sampled reads every source
+    # (structured included) from its corpus file in file order when corpus_dir is set.
     for s in meta["sources"]:
-        if s.get("kind", "hf") != "hf" or s["domain"] not in files:
-            raise ValueError(f"source {s['domain']!r} has no corpus file (kind "
-                             f"{s.get('kind', 'hf')!r}); held-out sampling needs one")
+        if s["domain"] not in files:
+            raise ValueError(f"source {s['domain']!r} (kind {s.get('kind', 'hf')!r}) has no "
+                             f"file in {corpus_dir}; held-out sampling needs one")
         out.append({"domain": s["domain"], "weight": s["weight"],
                     "file": corpus_dir / files[s["domain"]],
                     "offset": s["docs"] + s.get("skipped_short", 0)})
@@ -208,16 +210,19 @@ def stream_sampled_docs(sources: list[dict], meta: dict, n_tokens: int, tokenize
 # Checkpoint loading
 # ---------------------------------------------------------------------------
 
-def load_baseline_kmeans(npz_path: Path, device: torch.device, allow_erasure: bool = False):
+def load_baseline_kmeans(npz_path: Path, device: torch.device, allow_erasure: bool = False,
+                         allow_token_bias: bool = False):
     """Raw k-means baseline: centroids live directly in the normalised activation
     space (no encoder). Returns (centroids, mean, std, K, target_layer, model_name).
 
     A codebook fit with fit_balanced_kmeans --erase lives in a PROJECTED space;
     assigning un-projected activations to it is silently wrong, so callers that do
-    not apply `erase_U` themselves (allow_erasure=False) are refused."""
+    not apply `erase_U` themselves (allow_erasure=False) are refused. Likewise a
+    token-mean codebook (fit on x - b[token]) needs callers that subtract b[token]
+    themselves (allow_token_bias=True, or allow_erasure=True)."""
     print(f"[collect] Loading baseline k-means centroids: {npz_path}")
     d = np.load(str(npz_path), allow_pickle=True)
-    if "token_bias" in d.files and not allow_erasure:
+    if "token_bias" in d.files and not (allow_erasure or allow_token_bias):
         raise SystemExit(f"{npz_path} was fit on x - b[token] ({d['token_bias']}); this tool does "
                          f"not apply the token bias. Use concept_probe / probe_chance_corrected.")
     if "erase_U" in d.files and not allow_erasure:
@@ -357,9 +362,19 @@ def main():
         source_path = ckpt_path
     else:
         ckpt_path = Path(args.baseline_kmeans)
-        centroids, mean, std, K, target_layer, model_name = load_baseline_kmeans(ckpt_path, device)
+        centroids, mean, std, K, target_layer, model_name = load_baseline_kmeans(
+            ckpt_path, device, allow_token_bias=True)
         ae, metric = None, "euclidean"
         source_path = ckpt_path
+    # Token-mean codebook (the bypass AE's encoder-free control): assign x - b[token], with the table
+    # the codebook was fit with, so the encoder is the only difference from the bypass AE.
+    tok_bias = None
+    if not use_ae:
+        npz = np.load(str(ckpt_path), allow_pickle=True)
+        if "token_bias" in npz.files:
+            from geoae.token_bias import TokenBiasLookup
+            tok_bias = TokenBiasLookup(str(npz["token_bias"]), device)
+            print(f"[collect] token-mean codebook: assigning x - b[token] ({tok_bias.path})")
     print(f"[collect] Mode: {'learned AE' if use_ae else 'raw k-means baseline'}  K={K}  layer={target_layer}")
 
     print(f"[collect] Loading LM: {model_name}")
@@ -431,6 +446,8 @@ def main():
             tok = (ids[0].to(x_norm.device)[torch.as_tensor(pos, device=x_norm.device)]
                    if ae.has_token_bias else None)
             q = ae.encode(x_norm, tok)
+        elif tok_bias is not None:
+            q = x_norm - tok_bias(ids[0].to(x_norm.device)[torch.as_tensor(pos, device=x_norm.device)])
         else:
             q = x_norm
         d2 = pairwise_sq_dist(q, centroids, metric=metric)  # (n_pos, K)
@@ -572,6 +589,7 @@ def main():
         "meta": {
             "mode": "learned_ae" if use_ae else "raw_kmeans_baseline",
             "checkpoint": str(source_path), "model_name": model_name,
+            **({"token_bias": tok_bias.path, "space": "residual - b[token]"} if tok_bias is not None else {}),
             "target_layer": target_layer, "n_clusters": K,
             "n_tokens": N, "n_docs": len(docs),
             "sources": [{"domain": s["domain"], "name": s.get("name", str(s.get("file")))}

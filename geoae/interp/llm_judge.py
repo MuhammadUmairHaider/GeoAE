@@ -65,6 +65,7 @@ import os
 import random
 import re
 import sys
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -127,8 +128,12 @@ class LLM:
     def ask(self, prompt: str, max_tokens: int = 900) -> str:
         cp = self._cache_path(prompt)
         if cp.exists():
-            self.n_cached += 1
-            return json.loads(cp.read_text())["response"]
+            try:
+                hit = json.loads(cp.read_text())["response"]
+                self.n_cached += 1
+                return hit
+            except (ValueError, KeyError):              # truncated by a killed run: ask again
+                pass
         if self.dry_run:
             return ""
         last = None
@@ -146,7 +151,10 @@ class LLM:
                         messages=[{"role": "user", "content": prompt}],
                     )
                     out = "".join(b.text for b in r.content if getattr(b, "type", "") == "text")
-                cp.write_text(json.dumps({"prompt": prompt, "response": out}))
+                # write-then-rename: a run killed mid-write never leaves a truncated cache entry
+                tmp = cp.with_name(f"{cp.name}.{os.getpid()}.{threading.get_ident()}.tmp")
+                tmp.write_text(json.dumps({"prompt": prompt, "response": out}))
+                os.replace(tmp, cp)
                 self.n_calls += 1
                 return out
             except Exception as e:                       # noqa: BLE001 - surface after retries
@@ -154,6 +162,47 @@ class LLM:
                 time.sleep(min(2 ** attempt, 20))
         print(f"  [judge] giving up after retries: {last}", file=sys.stderr)
         return ""
+
+
+# ------------------------------------------------------------- fluency judge
+# Shared by cluster_steer_judge / concept_steer_judge. Concept-blind on purpose: the judge sees
+# only the prompt and the continuation, so fluency cannot be traded against topic.
+def fluency_prompt(prompt: str, cont: str) -> str:
+    return (
+        "A language model was given a prompt and, from that point, wrote a continuation.\n\n"
+        f"Prompt: {prompt!r}\nContinuation: {cont!r}\n\n"
+        "Is the continuation fluent, meaningful text that a competent writer could plausibly have "
+        "produced as a continuation of the prompt?\n"
+        "Answer NO if it is a word or phrase repeated in a loop (e.g. \"die die die\", "
+        "\"September September September\"), a list of unrelated words, gibberish or broken "
+        "fragments, or text that switches into nonsense. Text that is merely cut off at the end "
+        "(generation stopped mid-sentence) is NOT a reason to answer NO.\n\n"
+        "Answer with a single word, YES or NO, and nothing else."
+    )
+
+
+def parse_fluency(ans):
+    """True / False for YES / NO (first token, case-insensitive); None if unparseable."""
+    t = re.findall(r"[A-Za-z]+", ans or "")
+    if not t:
+        return None
+    w = t[0].upper()
+    return True if w == "YES" else False if w == "NO" else None
+
+
+def agreement_counts(judge, bigram) -> dict:
+    """Judge-vs-bigram fluency agreement over any two aligned boolean arrays."""
+    import numpy as np
+    j, b = np.asarray(judge, bool).ravel(), np.asarray(bigram, bool).ravel()
+    return {"both_yes": int((j & b).sum()), "judge_only": int((j & ~b).sum()),
+            "bigram_only": int((~j & b).sum()), "both_no": int((~j & ~b).sum())}
+
+
+def print_agreement(ag: dict) -> None:
+    print("[judge] fluency agreement, judge vs bigram (distinct2 >= 0.6), alpha > 0 continuations:")
+    print(f"  {'':14s} {'bigram YES':>11} {'bigram NO':>10}")
+    print(f"  {'judge YES':14s} {ag['both_yes']:>11,} {ag['judge_only']:>10,}")
+    print(f"  {'judge NO':14s} {ag['bigram_only']:>11,} {ag['both_no']:>10,}")
 
 
 # ------------------------------------------------------------------- prompts
@@ -273,7 +322,8 @@ def load_centroids(src: str):
         import numpy as np
         return torch.from_numpy(np.load(str(src))["centroids"]).float()
     from geoae.checkpoint import load_ae_checkpoint
-    ae, _, _, _ = load_ae_checkpoint(str(src), "cpu")
+    # only the centroids are read, so a token-bypass checkpoint is safe to load here
+    ae, _, _, _ = load_ae_checkpoint(str(src), "cpu", allow_token_bias=True)
     return ae.centroids.detach().float()
 
 
@@ -450,8 +500,19 @@ def judge_run(path: Path, args, llm: LLM, rng: random.Random):
         return None
 
     print(f"[judge] {path.name}: {len(chosen)} clusters, provider={args.provider} model={args.model}")
+    done, lock = [0], threading.Lock()
+
+    def one_logged(cid):
+        rec = one(cid)
+        with lock:
+            done[0] += 1
+            if done[0] % 25 == 0 or done[0] == len(chosen):
+                print(f"[judge] {path.parent.parent.name}/{path.name}: {done[0]}/{len(chosen)} clusters "
+                      f"({time.strftime('%H:%M:%S')}, api {llm.n_calls}, cached {llm.n_cached})", flush=True)
+        return rec
+
     with ThreadPoolExecutor(max_workers=args.concurrency) as ex:
-        recs = list(ex.map(one, chosen))
+        recs = list(ex.map(one_logged, chosen))
     return {"source": str(path), "provider": args.provider, "model": args.model,
             "n_clusters": len(recs), "clusters": recs}
 
