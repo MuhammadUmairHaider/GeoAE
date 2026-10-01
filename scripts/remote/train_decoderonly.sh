@@ -10,7 +10,10 @@ CONFIG=configs/base/llama3.2-3b_l27_k2000_bnh_b32k_lam1_d6144_dpc_sampled_tokbia
 CKDIR=checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_dpc_sampled_tokbias_decoderonly
 PROVENANCE=runs/decoderonly_d6144
 mkdir -p "$PROVENANCE" logs
-trap 'rc=$?; printf "DECODERONLY EXIT %s\n" "$rc"; exit "$rc"' EXIT
+complete=0
+trap 'rc=$?; if [ "$complete" -eq 1 ] && [ "$rc" -eq 0 ]; then printf "DECODERONLY COMPLETE\n"; else printf "DECODERONLY INCOMPLETE\n"; fi; printf "DECODERONLY EXIT %s\n" "$rc"; exit "$rc"' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 scripts/delta/py - <<'PY'
 import torch
 from geoae.config import Config
@@ -29,3 +32,17 @@ printf '[experiment] source commit: %s\n' "${GEOAE_SOURCE_COMMIT:-unspecified}"
 RESUME=()
 if compgen -G "$CKDIR/step_*.pt" > /dev/null; then RESUME=(--resume latest); fi
 scripts/delta/py -u -m geoae.train --config "$CONFIG" --no_wandb "${RESUME[@]}"
+scripts/delta/py - "$CKDIR" "$CONFIG" <<'PY'
+import sys
+import torch
+from pathlib import Path
+from geoae.config import Config
+from geoae.train_common import resolve_resume
+cfg = Config.from_yaml(sys.argv[2])
+path = resolve_resume('latest', Path(sys.argv[1]))
+ckpt = torch.load(path, map_location='cpu', weights_only=False)
+assert ckpt['epoch'] == cfg.train.n_epochs, 'The final training epoch was not saved'
+assert ckpt['config']['model']['token_bias_mode'] == 'decoder_only'
+print('[experiment] verified final checkpoint:', path.name, 'epoch', ckpt['epoch'], flush=True)
+PY
+complete=1

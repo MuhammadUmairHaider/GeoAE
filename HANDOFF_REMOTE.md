@@ -54,6 +54,16 @@ our half-subtraction arm is a separate proposed experiment, not its reproduction
 
 ## Additional box experiment: decoder-only token bias
 
+Interruption on 2026-10-01: epoch 43 stopped with `KeyboardInterrupt` while
+computing diagnostics. Its last durable checkpoint was epoch 42,
+`step_0012138.pt` (step 12138, validation MSE 0.07588), with optimizer state intact.
+The old `DECODERONLY EXIT 0` marker was misleading: a process-group SIGINT can
+make Bash's EXIT trap see zero despite an interrupted Python child. The launcher
+now records incomplete/complete separately, preserves interrupt exit codes, and
+verifies the final epoch checkpoint before declaring completion. Resume uses the
+same configuration, model, optimizer and original source snapshot. Append to the
+existing log when restarting, so interruption evidence is retained.
+
 - Encoder: `z=encoder(x)`; reconstruction: `decoder(z)+b[current_token]`.
 - The token table remains frozen, using the same shrunk training-split token
   means as the full-bypass run. The article learns its lookup; this control
