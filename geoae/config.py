@@ -1,0 +1,231 @@
+"""All hyperparameters in one place. Override via configs/default.yaml or a custom YAML."""
+from __future__ import annotations
+
+from dataclasses import dataclass, field, asdict
+from pathlib import Path
+from typing import List, Optional
+import yaml
+
+
+@dataclass
+class ExtractionConfig:
+    model_name: str = "meta-llama/Llama-3.2-3B"
+    layers: List[int] = field(default_factory=lambda: [16, 20, 24, 27])
+    target_layer: int = 27
+    hidden_size: int = 3072
+    pack_size: int = 16384        # (legacy, unused by per-doc extractor)
+    skip_first_n: int = 8         # (legacy, unused by per-doc extractor)
+    max_doc_tokens: int = 256     # truncate each doc (balances domains, diversifies contexts)
+    skip_leading: int = 4         # skip first N tokens of each doc (BOS / doc-start flood)
+    n_tokens: int = 5_000_000
+    dtype: str = "float16"        # storage dtype for .npy files
+    activations_dir: str = "activations"
+    log_every: int = 10           # batches between progress prints
+
+    # --- mode "sampled" (geoae/extract_sampled.py); "prefix" = legacy extract.py ----
+    mode: str = "prefix"          # "prefix" | "sampled"
+    context_len: int = 2048       # sampled: forward each doc up to this many tokens
+    positions_per_doc: int = 64   # sampled: uniform random positions kept per doc
+    batch_docs: int = 16          # sampled: docs per padded forward batch
+    shuffle_buffer: int = 10000   # sampled: HF streaming shuffle buffer per source
+    outlier_norm_mult: float = 0.0  # sampled: drop rows with norm > mult x median (0 = keep all)
+    min_doc_len: int = 10
+    corpus_dir: str = ""          # sampled: frozen corpus written by geoae.build_corpus
+    corpus_margin: float = 1.3    # build_corpus: stream this x each source's row quota
+    # sampled: list of {domain, weight, kind: hf|structured, name, config, split,
+    # field, exclude: {key, values}, shuffle_buffer}. Weights are token shares (normalised).
+    sources: List[dict] = field(default_factory=list)
+
+    # LEGACY / UNUSED: the prefix extractor hardcodes its sources (extract.py
+    # DEFAULT_SOURCES) and never reads this list.
+    data_sources: List[str] = field(default_factory=lambda: [
+        "allenai/c4",
+        "wikipedia",
+        "bookcorpus",
+        "codeparrot/github-code",
+        "cc_news",
+        "togethercomputer/RedPajama-Data-1T-Sample",
+    ])
+
+
+@dataclass
+class DataConfig:
+    activations_dir: str = "activations"
+    target_layer: int = 27
+    batch_size: int = 4096
+    val_frac: float = 0.05
+
+
+@dataclass
+class ModelConfig:
+    hidden_size: int = 3072
+    latent_dim: int = 2048
+    n_clusters: int = 128
+    nonlinearity: str = "linear"   # "linear" | "relu" | "gelu" | "tanh"
+    metric: str = "euclidean"      # "euclidean" (magnitude) | "cosine" (directional)
+    latent_norm: str = "none"
+    dist_scale: str = "raw"        # "raw" | "per_dim" — scale of dist2 fed to Sinkhorn.
+                                   # raw reproduces every run before 2026-09-04;
+                                   # per_dim divides by latent_dim so `tau` is on the
+                                   # same scale cluster_loss already uses. See model.py.      # "none" | "batch" (BatchNorm1d between linear and act)
+    token_bias: str = ""           # token-bypass table (.npz from geoae.token_bias); "" = off.
+                                   # Encoder sees x - b[tok], recon = dec(z) + b[tok].
+    token_bias_mode: str = "bypass"  # "bypass": subtract before encoding; "decoder_only": full x.
+                                    # Both modes add the fixed token table after decoding.
+
+
+@dataclass
+class LossConfig:
+    lambda_cluster: float = 0.1
+    lambda_sep: float = 0.01
+    sep_mode: str = "median"       # "median" (legacy, scale-free) | "intra" | "hinge"
+    sep_margin: float = 2.0        # hinge only: target d_min >= margin * intra radius
+    lambda_usage: float = 0.1
+    lambda_mse: float = 0.0   # weak MSE recon anchor for e2e KL training (0 = off)
+    lambda_var: float = 0.0   # VICReg variance hinge on latents (anti-contraction, 0 = off)
+    var_gamma: float = 1.0    # variance hinge target std; must be < 1 for tanh (std is capped at 1)
+    lambda_cov: float = 0.0   # VICReg covariance on latents (anti low-rank collapse, 0 = off)
+    lambda_unif: float = 0.0  # Wang–Isola uniformity on unit-sphere latents (cosine runs, 0 = off)
+    sinkhorn_iters: int = 3
+    # --- generalised cluster-marginal balancing (all defaults = today's behaviour) ---
+    balance: str = "uniform"       # "uniform" | "zipf" — shape of the column target; "none" — no Sinkhorn (nearest prototype)
+    balance_rho: float = 1.0       # column-constraint strength: 1 = hard Sinkhorn, 0 = softmax
+    balance_eta: float = 1.0       # cross-batch EMA on the column dual: 1 = per-batch
+    zipf_alpha_start: float = 0.0  # annealed 0 -> zipf_alpha_end over the tau window
+    zipf_alpha_end: float = 0.0
+    tau_start: float = 1.0
+    tau_end: float = 0.1
+    lambda_sup: float = 0.0   # supervised contrastive term on labelled rows (0 = off)
+
+
+@dataclass
+class TrainConfig:
+    n_epochs: int = 15
+    lr: float = 1e-4
+    betas: tuple = (0.9, 0.999)
+    weight_decay: float = 0.0
+    grad_clip: float = 1.0
+    ema_decay: float = 0.99
+    ema_hard: bool = False   # centroid EMA from hard (argmax) assignments instead of soft Q
+
+    # Training schedule phase boundaries (inclusive epoch numbers, 1-indexed)
+    recon_only_epochs: int = 2       # epochs 1..recon_only_epochs: pure reconstruction
+    clustering_start_epoch: int = 3  # epoch where clustering loss is added
+    full_loss_start_epoch: int = 6   # epoch where sep+usage losses are added
+    geometry_start_epoch: int = 0    # epoch where var/cov/unif switch on.
+                                     # 0 = on from step 1 (previous behaviour, unchanged).
+                                     # Set >1 for an explicit recon-only warmup before VICReg.
+
+    diag_every: int = 100            # steps between diagnostics
+    reinit_every: int = 1000         # steps between dead-cluster reinitialization (0 = never)
+    reinit_threshold: float = 0.1    # a prototype is re-seeded when its running usage share falls below this
+                                     # fraction of its target share (1/K for balance "uniform" / "none")
+    save_every: int = 1              # save checkpoint every N epochs
+    keep_checkpoints: int = 3        # keep last N + best-by-val-recon
+    keep_every_epochs: int = 0       # also never rotate away the checkpoint of every Nth epoch (0 = off)
+
+    centroid_init: str = "kmeans++"   # "kmeans++" | "semisup" | "class_means" | "seeded" | "dpc"
+                                      #   dpc: density peaks, unsupervised, no anchor cache
+                                      #   dpc_lloyd: dpc seeds, then plain k-means (Lloyd) on
+                                      #   lloyd_rows encoded latents (no balancing)
+    lloyd_rows: int = 1_583_334       # dpc_lloyd: latents for the Lloyd fit (= the plain k-means baseline)
+    lloyd_iters: int = 100            # dpc_lloyd: max Lloyd iterations (stops early below 0.01% changed)
+    freeze_centroids: bool = False    # True: prototypes never move after init (fixed codebook); usage still tracked
+    semisup_cap: int = 500            # semisup init: max labeled samples/class for class-mean centroids
+    # --- "seeded" init: labelled anchors + density x coverage fill -----------
+    anchor_cache: str = "cache"       # concept-cache dir; MUST match target_layer
+    anchor_per_class: int = 25        # labelled examples averaged per anchor (5-100)
+    anchor_min_examples: int = 5      # skip classes with fewer than this
+    anchor_mean_k: int = 5            # reinit seeds = mean of this many MOST TYPICAL members
+    atlas_last: str = ""              # FineWeb-Atlas last-token anchors (cache/atlas8k_last.npz)
+    atlas_min_examples: int = 25      # >=25 -> ~448 classes; >=5 -> ~2081, which exceeds K=2000
+    anchor_rungs: str = ""            # comma list; empty = every rung in the cache
+    density_power: float = 1.0        # 0 = pure coverage (k-means++), 1 = balanced
+    fill_mode: str = "coverage"       # "seeded" non-anchor fill: "coverage" | "peaks"
+    reinit_mode: str = "loss"         # "loss" (highest-recon-error) | "anchor" | "density" | "peaks"
+                                      #   anchor: unused LABELLED points first, then D^2
+    # --- density peaks: "dpc" init / fill_mode "peaks" / reinit_mode "peaks" --
+    density_pool: int = 32768         # latents encoded for the density estimate; delta is O(N^2)
+    density_knn: int = 32             # k for the kNN density rho
+    peak_min_sep_frac: float = 0.25   # reject a peak within this x median pair distance of a kept one
+    peak_refine_k: int = 8            # centroid = mean of this many NNs; 0 = the exact peak point
+    peak_reinit_pool: int = 8192      # batch rows used by reinit_mode "peaks" (O(N^2) per cycle)
+    # --- in-batch supervision for a short fine-tune (see geoae/supervised.py) --
+    # All default to off, so an ordinary run is byte-identical to before.
+    sup_frac: float = 0.0             # labelled rows per step, as a fraction of batch_size.
+                                      #   They are ADDED to the step, not swapped into the
+                                      #   batch: the unsupervised stream and the Sinkhorn
+                                      #   marginals keep seeing exactly what they saw before.
+    sup_cache: str = "cache"          # concept cache; MUST match target_layer
+    sup_rungs: str = ""               # comma list; empty = every rung. Supervising a SUBSET
+                                      #   leaves the rest as an uncontaminated transfer test.
+    sup_per_class: int = 500          # cap on rows loaded per class (bounds pool memory)
+    sup_m_per_class: int = 8          # rows per class in a supervised draw (>=2 for positives)
+    sup_holdout_classes: float = 0.2  # fraction of classes never trained on
+    sup_holdout_rows: float = 0.2     # fraction of rows held out inside trained classes
+    sup_min_examples: int = 10        # skip classes smaller than this
+    sup_temperature: float = 0.1      # SupCon temperature
+    freeze: str = "none"              # "none" | "decoder" — decoder-frozen keeps the fine-tuned
+                                      #   encoder decodable by the parent's decoder
+    teacher_mode: str = "cached"      # e2e only: "cached" (precomputed logits) |
+                                      # "onfly" (teacher = head(norm(x)) in-loop, no cache)
+    checkpoints_dir: str = "checkpoints"
+    runs_dir: str = "runs"
+    seed: int = 42
+
+    wandb_project: str = "geoae"
+    wandb_entity: Optional[str] = None
+
+
+# Enumerated train fields. from_yaml only checks that a key EXISTS, so without
+# this a typo ("dcp", "peak") silently falls through to the default branch and a
+# 50-epoch run produces the wrong arm with no error anywhere in the log.
+_TRAIN_CHOICES = {
+    "centroid_init": {"kmeans++", "semisup", "class_means", "seeded", "dpc", "dpc_lloyd"},
+    "reinit_mode": {"loss", "anchor", "density", "peaks"},
+    "fill_mode": {"coverage", "peaks"},
+    "teacher_mode": {"cached", "onfly"},
+    "freeze": {"none", "decoder"},
+}
+
+
+@dataclass
+class Config:
+    extraction: ExtractionConfig = field(default_factory=ExtractionConfig)
+    data: DataConfig = field(default_factory=DataConfig)
+    model: ModelConfig = field(default_factory=ModelConfig)
+    loss: LossConfig = field(default_factory=LossConfig)
+    train: TrainConfig = field(default_factory=TrainConfig)
+
+    @classmethod
+    def from_yaml(cls, path: str | Path) -> "Config":
+        with open(path) as f:
+            overrides = yaml.safe_load(f) or {}
+        cfg = cls()
+        for section, values in overrides.items():
+            sub = getattr(cfg, section, None)
+            if sub is None:
+                raise ValueError(f"Unknown config section: {section!r}")
+            for k, v in values.items():
+                if not hasattr(sub, k):
+                    raise ValueError(f"Unknown config key: {section}.{k!r}")
+                setattr(sub, k, v)
+        cfg.validate()
+        return cfg
+
+    def validate(self) -> "Config":
+        """Reject out-of-range values for the enumerated train fields."""
+        if self.model.token_bias_mode not in ("bypass", "decoder_only"):
+            raise ValueError(f"Invalid model.token_bias_mode={self.model.token_bias_mode!r}")
+        if self.model.token_bias_mode == "decoder_only" and not self.model.token_bias:
+            raise ValueError("decoder_only requires model.token_bias")
+        for k, allowed in _TRAIN_CHOICES.items():
+            v = getattr(self.train, k)
+            if v not in allowed:
+                raise ValueError(
+                    f"Invalid train.{k}={v!r}; expected one of {sorted(allowed)}"
+                )
+        return self
+
+    def to_dict(self) -> dict:
+        return asdict(self)

@@ -1,0 +1,31 @@
+# Full run v2: conservative clustering pressure, extended warmup.
+# Changes from default:
+#   - recon_only_epochs: 5 (was 2) — let reconstruction saturate first
+#   - clustering_start_epoch: 6 (was 3)
+#   - full_loss_start_epoch: 9 (was 6)
+#   - lambda_cluster: 0.01 (was 0.1) — 10x lower to avoid fighting reconstruction
+#   - lambda_sep: 0.005 (was 0.01) — scaled proportionally
+#   - lambda_usage: 0.05 (was 0.1) — scaled proportionally
+
+extraction:
+  n_tokens: 5000000
+
+model:
+  n_clusters: 128
+
+loss:
+  lambda_cluster: 0.01
+  lambda_sep: 0.005
+  lambda_usage: 0.05
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 20
+  recon_only_epochs: 5
+  clustering_start_epoch: 6
+  full_loss_start_epoch: 9
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-ae"

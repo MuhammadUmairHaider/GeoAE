@@ -1,0 +1,222 @@
+# Llama-3.2-3B L27, K=2000, batch 32768 — SEEDED INIT + FINEWEB-ATLAS ANCHORS.
+#
+# Adds `atlas_last` on top of the seeded arm: FineWeb-Atlas concepts as extra
+# anchors, taken from CHUNK LAST-TOKEN activations. Atlas labels ~95-token chunks
+# (multi-label: ~1.6 document, ~6.9 tone, ~5.7 content per chunk), and the last
+# token is used because at L27 it has attended over the whole chunk while still
+# being a single token of the kind the AE trains on — a mean-pooled chunk vector
+# is off-distribution for the encoder.
+#
+# ANCHOR BUDGET (measured):  499 rung anchors -> 946 with Atlas (444 new, 4 merged
+# by dedup), so 47% of K=2000 is now label-anchored and the density fill drops
+# 1501 -> 1054. The reinit pool doubles, 11,053 -> 22,253 examples.
+# atlas_min_examples 25 gives 448 classes (23 doc + 89 tone + 336 content).
+# At 5 it gives 2,081, which alone exceeds K — the fill would never run.
+#
+# TWO THINGS TO KNOW BEFORE TRUSTING A RESULT FROM THIS ARM:
+#
+# 1. CONTAMINATION. The anchor chunks (6,020 of 7,742) are the same chunks
+#    `concept_separability` scores. Any Atlas evaluation of this model is
+#    contaminated unless those chunks are held out — the analogue of
+#    `concept_probe --exclude_anchors`, which does NOT cover Atlas.
+#    `load_atlas_anchors` returns the chunk indices for exactly this purpose.
+#
+# 2. THESE CONCEPTS ARE WORSE IN THE LATENT THAN IN RAW h. Measured on this same
+#    cache at pool=last, 448 concepts: raw h beats the b32k latent by -0.105 AUC
+#    on doc type, -0.103 on tone, -0.074 on content, and the latent barely beats
+#    an UNTRAINED encoder of the same shape. So anchors placed at latent class
+#    means may be less distinct than the RAVEL/IOI ones that drove the earlier
+#    seeded gains. That is the risk this arm is testing.
+#
+# Original seeded rationale follows.
+# Llama-3.2-3B L27, K=2000, batch 32768 — SEMI-SUPERVISED SEEDED INIT.
+# Parent: llama3.2-3b_l27_k2000_bnh_b32k_lam1_d6144. Changes are init-only:
+# centroid_init kmeans++ -> seeded, and reinit_mode loss -> density.
+# Every loss weight, the schedule, width, batch and lr are untouched.
+#
+# WHY.  k-means++ picks each next centroid with probability proportional to D^2,
+# the squared distance to the nearest existing centroid — it deliberately seeks
+# the points FURTHEST from what it already has. That minimises worst-case k-means
+# cost and is the wrong objective for landing centroids on semantic modes. On
+# DBpedia-14 at K=14, seeding from 5-10 labelled examples per class reached ~93%
+# purity where k-means++ reproduced ~55%.
+#
+# `reinit_dead_clusters` had the same bias in sharper form: it reseeded dead
+# centroids from the HIGHEST-RECONSTRUCTION-LOSS sample in the batch, which is
+# nearly a definition of an outlier. The parent run churned 20-43 clusters per
+# 125-step cycle for 30 epochs before settling.
+#
+# reinit_mode "anchor" gives strict priority to UNSERVED LABELLED CLASSES.
+#
+# NOTE THIS IS THE CORRECTED RULE. The first seeded run (L14, 2026-09-04) picked
+# the individual unused example FARTHEST from any live centroid — which is
+# farthest-first selection, the same outlier-seeking rule as k-means++ merely
+# restricted to a labelled subset, and within a class it seeds on that class's
+# most ATYPICAL member. That run reinitialised 1470 clusters against the
+# k-means++ parent's 315 (586 in epoch 11 alone) and ended 2.4x more
+# concentrated (usage perplexity 1162 vs 1459).
+#
+# The rule now is:
+#   priority   per CLASS, (distance from class mean to nearest live centroid)
+#              divided by the class's own radius -- a COVERAGE question, not a
+#              distance one: "does this concept have a home, relative to how
+#              tight it is?"
+#   placement  the MEAN of the anchor_mean_k most typical members. Averaging >=5
+#              examples stops one unusual example defining a concept.
+#   consumption a class is spent once seeded, so successive reinits move on to
+#              the next unserved concept instead of re-seeding the same one.
+#
+# Anchors are re-encoded at every reinit rather than cached, since the encoder
+# keeps training and init-time latents go stale within an epoch.
+#
+# EVALUATE WITH `concept_probe --exclude_anchors`. Anchors are drawn from the
+# same concept caches the probe scores on; without the holdout the seeded rungs
+# report an inflated result (37% of ravel_country rows were anchors).
+#
+# WHAT SEEDING ACTUALLY BUYS HERE. K=2000 against 511 labelled classes, which
+# dedupe to ~419 anchors (rungs overlap — a token can be both a POS tag and an
+# NER type, so anchors within 0.25x the median inter-anchor distance are merged).
+# So ~21% of centroids are label-anchored and ~1580 come from the density fill.
+# This is NOT the DBpedia setup where K == n_classes and every centroid was
+# supervised; expect a smaller effect.
+#
+# ANCHOR COUNT vs per_class (measured on the parent checkpoint):
+#     per_class=5   -> 466 anchors      per_class=25 -> 419      per_class=100 -> 346
+# Fewer examples per class means noisier means, which dedupe less aggressively.
+# 25 is the middle of the 5-100 range you asked for.
+#
+# CAVEAT ON density_power. At 1.0 the greedy coverage term still dominates:
+# selected points sit at density 0.0105 vs a pool median of 0.0173, i.e. still
+# below-median density, just less extreme than pure coverage (0.0089). If the
+# clusters still look outlier-seeded, raise density_power to 2.0-3.0 before
+# concluding the idea does not work.
+#
+# anchor_cache MUST match target_layer — cache/ is L27, cache_l14/ is L14.
+# Feeding the wrong one silently produces anchors from a different layer.
+#
+#   uv run python -u -m geoae.train \
+#     --config configs/base/llama3.2-3b_l27_k2000_bnh_b32k_lam1_d6144_seeded_atlas.yaml \
+#     | tee logs/llama_l27_seeded_atlas.log
+
+extraction:
+  model_name: "meta-llama/Llama-3.2-3B"   # metadata only — no LM is loaded here
+
+data:
+  activations_dir: "activations_diverse_10M"   # same dump as the parent + the KL twin
+  target_layer: 27
+  batch_size: 32768         # B/K = 16.4; 3 arms fit concurrently on one 42 GB card
+  val_frac: 0.05            # -> 9.33M train / 491k val, same split as the parent
+
+model:
+  hidden_size: 3072
+  latent_dim: 6144          # see header
+  latent_norm: "batch"      # BatchNorm1d between encoder linear and GELU
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
+
+# CLUSTERING/SEPARATION STRENGTH (2nd deliberate change, on top of latent_dim).
+# At the parent's weights these terms barely participate: measured at init,
+# recon 1.535 / cluster 0.451 / sep 0.366, so lambda_cluster 0.05 contributes
+# 1.3% of the loss and lambda_sep 0.005 contributes 0.1%. Raised here to
+# lambda_cluster 0.5 (10x) and lambda_sep 0.3 (60x), giving roughly 11% and 5%
+# of the loss at init. lambda_sep 0.3 has precedent in this project
+# (kl_gelu_k1000_sep0.3).
+#
+# NOTE ON THE RAMP: lambda_sep rises LINEARLY from 0 at full_loss_start_epoch to
+# its nominal value only at n_epochs (train_common.lambda_schedule:94), so its
+# average weight across epochs 11-50 is about HALF of 0.3, and it only reaches
+# full strength in the last epoch. lambda_cluster has no ramp — it applies at
+# 0.5 from epoch 11. If separation needs to bite earlier, the knob is
+# full_loss_start_epoch, not lambda_sep.
+#
+# These shares are measured at INITIALISATION; cluster_loss and sep_loss both
+# shrink as training improves them, so the realised shares will drift down.
+#
+# THE FAILURE MODE TO WATCH.  cluster_loss rewards pulling latents toward their
+# centroid, i.e. it rewards CONTRACTION of the whole latent space, and sep_loss
+# uses an adaptive sigma which makes it scale-invariant — so sep cannot resist
+# contraction no matter how large lambda_sep is. The ONLY counter-pressure is the
+# VICReg variance hinge, lambda_var. A 10x cluster weight against an unchanged
+# lambda_var 0.3 is the risky part of this config.
+#
+# Detectable by epoch ~13 (first diagnostics after clustering starts at 11):
+# watch cluster/intra_var falling steadily and the latent norm shrinking. If that
+# happens, raise lambda_var to 0.5-1.0 and restart — do not wait for epoch 50.
+# Reminder that the W&B silhouette/entropy panels are NOT usable for this call;
+# they measure the Sinkhorn output on one batch.
+# LOSS WEIGHTS CHOSEN FROM THE lambda SWEEP (geoae.interp.lambda_sweep, 2026-08-30).
+#
+# lambda_cluster 2.0, NOT the 0.5 that looked like the knee. The sweep runs 10
+# epochs on 1.5M rows and so understates FVE: at lambda 0.05 it reaches 0.916
+# where a full run reaches ~0.998. Applying that ~0.09-0.15 offset, lambda 0.5
+# would land a full run back at FVE ~0.94-1.00 — the near-identity regime where
+# the encoder has already been shown to do nothing (balanced k-means with no
+# encoder matches it). lambda 2.0 projects to ~0.78-0.84, far enough from
+# identity that the encoder is forced to distort rather than copy. That is the
+# whole point of the run: at 0.5 we would reproduce the null instead of testing it.
+#
+# lambda_var 1.0 (up from 0.3). The sweep shows the variance term failing as
+# clustering strengthens — var loss 0.017 -> 0.045 -> 0.111 -> 0.694 at
+# lambda_cluster 0.05 -> 0.5 -> 2.0 -> 8.0. cluster_loss rewards contraction and
+# there is no norm layer, so lambda_var is the only counter-pressure; leaving it
+# at 0.3 against a 40x-stronger cluster term is how this run collapses.
+#
+# lambda_cov 0.01 (up from 0.001). Covariance blew from 15.9 to 76.6 over the
+# same range: the latent is becoming correlated, i.e. drifting low-rank.
+#
+# lambda_sep 0.3 is INERT and kept only for parity with the parent. Measured
+# across a 240x range of lambda_sep the converged value moves by 0.01, because
+# sigma^2 = median(d^2) makes sep_loss homogeneous of degree 2 and therefore
+# scale-free. It is not a knob until sep_loss is reformulated (fixed sigma,
+# intra-cluster-normalised sigma, or a hinge on the minimum pair distance).
+#
+# latent_norm stays "none" pending the BN arm of the sweep, which tests whether
+# BatchNorm holds the variance where lambda_var cannot.
+loss:
+  lambda_cluster: 1.0       # see header
+  lambda_sep: 0.3           # now a LIVE knob under sep_mode: hinge
+  sep_mode: "hinge"         # relu(margin*r_intra - d)^2; median is scale-free
+  sep_margin: 2.0           # target d_min >= 2 x mean intra-cluster radius
+  lambda_var: 1.0           # raised from 0.3 — sole defence against contraction
+  lambda_cov: 0.01          # raised from 0.001 — cov blew 15.9->76.6 in the sweep
+  lambda_unif: 0.0          # euclidean run: uniformity is for the cosine geometry
+  lambda_usage: 0.05        # unused by total_loss; config parity
+  lambda_mse: 0.0           # unused here — total_loss carries MSE at weight 1.0
+
+  balance: "zipf"
+  balance_rho: 0.6
+  balance_eta: 0.05
+  zipf_alpha_start: 0.0
+  zipf_alpha_end: 0.5
+
+  sinkhorn_iters: 3
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  lr: 2.8e-4                   # sqrt(8) scaling for the 8x larger batch
+  recon_only_epochs: 10        # no cluster loss until epoch 11 (lambda_schedule gate)
+  geometry_start_epoch: 6      # epochs 6-10 : + VICReg (var/cov), clustering still off
+  clustering_start_epoch: 11   # epochs 11+  : + cluster loss, centroids kmeans++ seeded
+  full_loss_start_epoch: 11    # sep ramps from 0; tau and zipf_alpha anneal from here
+  ema_decay: 0.9
+  ema_hard: true
+  centroid_init: "seeded"     # <<< labelled anchors + density x coverage fill
+  anchor_cache: "cache"        # concept cache — MUST be the L27 one, layers differ
+  anchor_per_class: 25         # labelled examples averaged per anchor (few-shot)
+  anchor_min_examples: 5       # skip classes with fewer than this
+  anchor_rungs: ""             # empty = all 19 rungs (511 classes -> ~419 anchors)
+  density_power: 1.0           # 0 = pure coverage (k-means++), higher = denser picks
+  anchor_mean_k: 5             # reinit seed = MEAN of this many most-typical members
+  atlas_last: "cache/atlas8k_last.npz"   # FineWeb-Atlas chunk LAST-TOKEN anchors
+  atlas_min_examples: 25       # >=25 -> 448 classes; >=5 -> 2081, exceeds K
+  reinit_mode: "anchor"        # <<< unserved labelled CLASS first, then D^2 sampling
+  checkpoints_dir: "checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_seeded_atlas"
+  diag_every: 12            # 284 steps/epoch now, not 2278
+  reinit_every: 125         # was 1000 steps = 0.44 epoch at B=4096
+  save_every: 1             # the trajectory analyses need every epoch
+  keep_checkpoints: 40      # default 3 would rotate the trajectory away
+  seed: 42
+  wandb_project: "geosep-general-e2e"

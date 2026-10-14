@@ -1,0 +1,234 @@
+"""
+Activation buffer and shuffled dataloader.
+
+Reads memory-mapped .npy files produced by geoae.extract.
+Normalises activations per-dimension using mean/std computed on the train split.
+"""
+from __future__ import annotations
+
+from pathlib import Path
+
+import numpy as np
+import torch
+from torch import Tensor
+from torch.utils.data import BatchSampler, Dataset, DataLoader, RandomSampler
+
+
+class ActivationBuffer(Dataset):
+    """
+    Random-access dataset over a memory-mapped activation file.
+
+    File layout expected:
+        activations/layer_<L>.npy  — shape (N, hidden_size), dtype float16
+        activations/meta.json      — extraction metadata
+
+    Normalisation params are computed once on the train split and cached to disk.
+    The buffer always returns float32 normalised tensors.
+    """
+
+    def __init__(
+        self,
+        activations_dir: str | Path,
+        layer: int,
+        val_frac: float = 0.05,
+        split: str = "train",      # "train" or "val"
+        norm_cache: str | Path | None = None,
+        max_train_rows: int | None = None,
+        return_tokens: bool = False,
+    ):
+        self.activations_dir = Path(activations_dir)
+        self.layer = layer
+        self.split = split
+
+        # Load memory-mapped file
+        npy_path = self.activations_dir / f"layer_{layer}.npy"
+        if not npy_path.exists():
+            raise FileNotFoundError(f"Activation file not found: {npy_path}")
+
+        self._mmap = np.load(str(npy_path), mmap_mode="r")
+        N = self._mmap.shape[0]
+
+        # Train/val split by index (no shuffle across split boundary)
+        val_start = int(N * (1.0 - val_frac))
+        if split == "train":
+            self._indices = np.arange(0, val_start)
+            # Escape hatch, NOT normally needed: MADV_RANDOM above already
+            # removes the readahead amplification that made random access slow.
+            # This only helps if the residual ~15 KB/row of real I/O still
+            # saturates the device — capping the split shrinks the working set so
+            # it stays resident in page cache. Costs training data, so prefer
+            # leaving it unset.
+            if max_train_rows is not None and max_train_rows >= len(self._indices):
+                gb = len(self._indices) * self._mmap.shape[1] * self._mmap.dtype.itemsize / 1e9
+                print(f"[data] ! --max_train_rows={max_train_rows:,} >= train split "
+                      f"({len(self._indices):,}) — NO CAP APPLIED, working set stays "
+                      f"{gb:.0f} GB. Pass a value BELOW the split size to shrink it.")
+            if max_train_rows is not None and max_train_rows < len(self._indices):
+                gb = max_train_rows * self._mmap.shape[1] * self._mmap.dtype.itemsize / 1e9
+                print(f"[data] train split capped {len(self._indices):,} -> "
+                      f"{max_train_rows:,} rows ({gb:.0f} GB working set)")
+                self._indices = self._indices[:max_train_rows]
+        elif split == "val":
+            self._indices = np.arange(val_start, N)
+        else:
+            raise ValueError(f"split must be 'train' or 'val', got {split!r}")
+
+        # Normalisation: compute on train split, cache to disk
+        if norm_cache is None:
+            norm_cache = self.activations_dir / f"norm_params_layer{layer}.npz"
+        self._norm_cache = Path(norm_cache)
+        # The norm pass (cache miss only) is a SEQUENTIAL scan and is hinted as
+        # such inside; MADV_RANDOM is applied after it, for the training reads.
+        self.mean, self.std = self._load_or_compute_norm(val_start)
+        self._advise("random")
+
+        # Current token id per row (rows_tok.npy, written by the sampled extractor),
+        # for a token-bypass AE. Items become (x, token_id) pairs.
+        self._tok = None
+        if return_tokens:
+            tp = self.activations_dir / "rows_tok.npy"
+            if not tp.exists():
+                raise FileNotFoundError(f"return_tokens needs {tp} (sampled-mode dumps write it)")
+            self._tok = np.load(str(tp))
+            if len(self._tok) != N:
+                raise ValueError(f"{tp} has {len(self._tok):,} rows, layer file has {N:,}")
+
+    # DataLoader workers receive the dataset by PICKLING it under the spawn and
+    # forkserver start methods, and forkserver is Python 3.14's Linux default (the
+    # old box's Python forked, which shares the mapping for free). Pickling a
+    # np.memmap copies its whole contents: ~58 GB per worker on the 10M-row dump,
+    # which OOM-killed every Delta training job in epoch 1. Ship the path instead
+    # and reopen the mapping (with its read hint) inside the worker.
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        state["_mmap"] = None
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self._mmap = np.load(str(self.activations_dir / f"layer_{self.layer}.npy"), mmap_mode="r")
+        self._advise("random")
+
+    def _advise(self, kind: str) -> None:
+        """
+        Tell the kernel how this mapping will be read. Advisory only; failures
+        are ignored (non-Linux, or numpy no longer exposing the raw mapping).
+
+        "random"     — training reads one scattered 15 KB row per sample, but the
+                       default readahead fetches ~2 MB around every touched page.
+                       Measured on the Gemma layer-47 dump: 139-192x read
+                       amplification on cold regions, which pins the GPU at 0%
+                       waiting on I/O. MADV_RANDOM drops it to ~0.1x
+                       (83 -> 75,232 rows/s on that file).
+        "sequential" — the norm pass streams the WHOLE file in order. Under
+                       MADV_RANDOM that same readahead suppression is a disaster:
+                       it degrades to a page fault per page, measured at 6.3 MB/s
+                       vs 913 MB/s, turning a ~5 min job into ~12 h. The two
+                       access patterns need opposite hints, so each is set around
+                       the code that uses it.
+        """
+        try:
+            import mmap as _mmap
+            flag = _mmap.MADV_RANDOM if kind == "random" else _mmap.MADV_SEQUENTIAL
+            self._mmap._mmap.madvise(flag)
+        except (AttributeError, OSError, ValueError):
+            pass
+
+    def _load_or_compute_norm(self, val_start: int) -> tuple[np.ndarray, np.ndarray]:
+        if self._norm_cache.exists():
+            d = np.load(str(self._norm_cache))
+            return d["mean"].astype(np.float32), d["std"].astype(np.float32)
+
+        self._advise("sequential")
+        print(f"[data] Computing normalisation stats over {val_start} train tokens …")
+        from tqdm import tqdm
+        D = self._mmap.shape[1]
+        chunk = 50_000  # rows per pass — keeps RAM under ~600 MB
+
+        # Pass 1: mean
+        acc = np.zeros(D, dtype=np.float64)
+        for s in tqdm(range(0, val_start, chunk), desc="[data] Pass 1/2 (Mean)"):
+            acc += self._mmap[s:min(s + chunk, val_start)].astype(np.float64).sum(axis=0)
+        mean = (acc / val_start).astype(np.float32)
+
+        # Pass 2: variance
+        acc[:] = 0.0
+        for s in tqdm(range(0, val_start, chunk), desc="[data] Pass 2/2 (Std)"):
+            blk = self._mmap[s:min(s + chunk, val_start)].astype(np.float64)
+            acc += ((blk - mean) ** 2).sum(axis=0)
+        std = (np.sqrt(acc / val_start) + 1e-8).astype(np.float32)
+
+        np.savez(str(self._norm_cache), mean=mean, std=std)
+        print(f"[data] Norm stats saved to {self._norm_cache}")
+        return mean, std
+
+    def __len__(self) -> int:
+        return len(self._indices)
+
+    def __getitem__(self, i):
+        if not isinstance(i, (int, np.integer)):
+            # A whole batch of positions at once (ShuffledActivationLoader): one sorted gather from the mapping
+            # and one vectorised normalisation, instead of batch_size single-row reads collated one by one
+            # (which, not the GPU, set the training speed). Same rows, same values; only the order within the
+            # batch differs, which no caller depends on.
+            j = self._indices[np.sort(np.asarray(i, dtype=np.int64))]
+            raw = self._mmap[j].astype(np.float32)
+            normed = torch.from_numpy((raw - self.mean) / self.std)
+            if self._tok is not None:
+                return normed, torch.from_numpy(np.asarray(self._tok[j], dtype=np.int64))
+            return normed
+        j = self._indices[i]
+        raw = self._mmap[j].astype(np.float32)
+        normed = torch.from_numpy((raw - self.mean) / self.std)
+        if self._tok is not None:
+            return normed, int(self._tok[j])
+        return normed
+
+    def denormalize(self, x: Tensor) -> Tensor:
+        """Convert normalised tensor back to raw activation space."""
+        mean = torch.from_numpy(self.mean).to(x.device)
+        std = torch.from_numpy(self.std).to(x.device)
+        return x * std + mean
+
+
+class ShuffledActivationLoader:
+    """
+    Yields shuffled batches by sampling random indices from an ActivationBuffer.
+
+    Decorrelates batches — consecutive tokens from one document are highly
+    correlated; random sampling fixes this (standard SAE practice).
+    """
+
+    def __init__(
+        self,
+        buffer: ActivationBuffer,
+        batch_size: int = 4096,
+        num_workers: int = 4,
+        pin_memory: bool = True,
+        drop_last: bool = True,
+    ):
+        self.buffer = buffer
+        self.batch_size = batch_size
+        # batch_size=None + a batch sampler: each worker receives a list of positions and the buffer returns the
+        # finished batch (ActivationBuffer.__getitem__), so there is no per-row fetch and no collation.
+        self._loader = DataLoader(
+            buffer,
+            batch_size=None,
+            sampler=BatchSampler(RandomSampler(buffer), batch_size=batch_size, drop_last=drop_last),
+            num_workers=num_workers,
+            pin_memory=pin_memory,
+        )
+
+    def __iter__(self):
+        return iter(self._loader)
+
+    def __len__(self) -> int:
+        return len(self._loader)
+
+
+def split_batch(batch, device) -> tuple[Tensor, Tensor | None]:
+    """(x, token_ids) on `device` from a loader batch; token_ids is None for plain buffers."""
+    if isinstance(batch, (list, tuple)):
+        x, tok = batch
+        return x.to(device, non_blocking=True), tok.to(device, non_blocking=True)
+    return batch.to(device, non_blocking=True), None

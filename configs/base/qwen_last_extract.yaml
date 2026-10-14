@@ -1,0 +1,13 @@
+# Norm-stats extraction for the Qwen last-layer streaming e2e run.
+# The streaming trainer (train_e2e_stream.py) only needs a cached
+# layer_<L>.npy to compute normalisation mean/std — teacher/student logits
+# are computed in-loop. 1M tokens is plenty for stable norm stats.
+#
+#   python geosep/extract_activations.py --config geosep/configs/qwen_last_extract.yaml
+
+extraction:
+  model_name: "Qwen/Qwen3.5-9B"
+  layers: [31]                       # FINAL decoder layer
+  hidden_size: 4096
+  activations_dir: "activations_qwen_diverse"   # -> geosep/activations_qwen_diverse
+  n_tokens: 1000000

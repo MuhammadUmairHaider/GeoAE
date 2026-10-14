@@ -1,0 +1,103 @@
+# End-to-end KL — GENERAL corpus, UNSUPERVISED. Gemma 3 12B PT, layer 47 of 48
+# (the FINAL decoder layer). Ported from the Llama-3.2-3B layer-27 VICReg recipe,
+# which is the best geometry run so far (fixed rank collapse 37->233, best
+# silhouette / Dunn / min-centroid-distance of any space including raw).
+#
+# WHY THIS LAYER: 47 is the last block, so the student path collapses to the
+# position-wise head — student = lm_head(norm(recon)), NO spliced second forward
+# and no backward through frozen blocks. That is the identical regime as the
+# Llama L27 and Qwen L31 runs (both were their model's final layer), so results
+# here are the like-for-like continuation of that line, and this is by far the
+# cheapest of the five Gemma configs. Start here.
+#
+# Confirmed exact for Gemma 3: final_logit_softcapping is null, so
+# lm_head(norm(x)) reproduces the model logits bit-for-bit (verified
+# max|teacher-student(true residual)| = 0). train_stream prints this check at
+# startup — if it is not ~0, stop.
+#
+# BASELINE: thinner than the Scope subset layers. `resid_post` has NOTHING at 47;
+# use resid_post_all/layer_47_width_{16k,262k}_l0_{small,big} — two widths, L0
+# small/big only, no medium and no 64k/1m. If SAE comparison breadth matters
+# more than run cost, use layer31 instead.
+#
+# MEMORY: Gemma 3's vocab is 262,208. Per-doc logits at T=256 are 256 x 262208 x
+# 4 B = 268 MB for the teacher and again for the student, plus log-softmax
+# temporaries. With no tail to backprop through, --max_doc_tokens 256 is fine on
+# a 40 GB A100 alongside ~23.5 GB of bf16 weights.
+#
+# MASSIVE ACTIVATION (measured on the real dump, 60k rows spread over all
+# 9,826,031): dim 2339 is a single always-on channel — median |x| = 153,600,
+# p1 = 59,392, p99 = 266,240, max 364,544, and |x| > 1000 on 100.0% of tokens.
+# It alone is 95.3% of ||x||^2: median token norm 157,283 falls to 34,830 with it
+# removed. The next channels down (1034, 3499, 2054, 102) sit at 1,700-3,200
+# against a typical dim's 370 — an order of magnitude, not three.
+#
+# This is why dtype MUST be float32. Only dim 2339 ever exceeds the fp16 max of
+# 65504, and only 0.026% of all elements do — but because it fires on every
+# token, that is 98.8% of ROWS carrying an inf. fp16 would have destroyed the
+# dump while looking like a rounding issue.
+#
+# LR: 2e-5 is a placeholder. Do NOT apply the naive
+#   lr ~= 1e-4 * (56 / median_token_norm)
+# rule here — it was calibrated on Llama/Qwen, which have no single dominant
+# channel. Applied to Gemma's 157,283 it suggests an absurd lr ~3.6e-8. The AE
+# never sees that scale: train_stream z-scores per dim, after which dim 2339 is
+# unremarkable (median |z| ~0.12, ranking nowhere near the top) and the input is
+# well conditioned — |z|max = 58.1, median token norm 60.0 vs sqrt(D) = 62.0,
+# only 2 of 3840 dims with |z|max > 50.
+#
+# Where the massive channel DOES bite is the KL gradient at the head. Gemma's
+# final RMSNorm divides by the RMS across dims, which dim 2339 sets 95% of, so
+# reconstruction error there acts as a global logit TEMPERATURE knob: ~1%
+# relative error on dim 2339 rescales every logit by ~1%. In z-space that is
+# 0.043 std on that one dim — the accuracy the AE must hit before val_kl can get
+# low. lambda_mse is the anchor for it, but note the MSE is equal-weight over
+# 3840 dims, so it does not single 2339 out; the KL itself supplies most of that
+# pressure. Start at 2e-5 and watch val_kl across the first epoch.
+#
+#   python -u -m geoae.e2e.train_stream \
+#     --config configs/e2e/general/gemma3-12B/layer47/kl_gelu_k2000_vicreg.yaml \
+#     --no_sinkhorn --accum 8 --max_doc_tokens 256 --tokens_per_epoch 1000000
+
+extraction:
+  model_name: "google/gemma-3-12b-pt"    # REQUIRED for e2e — the LLM is in the loop
+
+data:
+  activations_dir: "activations_gemma3_12b"   # norm stats only under train_stream
+  target_layer: 47
+  batch_size: 512
+  val_frac: 0.05
+
+model:
+  hidden_size: 3840
+  latent_dim: 3840                 # no bottleneck (matches the Llama VICReg run)
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
+
+loss:
+  lambda_cluster: 0.05
+  lambda_sep: 0.005
+  lambda_mse: 0.05
+  lambda_var: 0.3                  # VICReg variance hinge — blocks latent contraction
+  lambda_cov: 0.001                # VICReg covariance — blocks low-rank collapse
+  lambda_unif: 0.0
+  lambda_usage: 0.05               # unused by e2e loss; config parity
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  lr: 2.0e-5
+  recon_only_epochs: 5
+  clustering_start_epoch: 6
+  full_loss_start_epoch: 9
+  ema_decay: 0.9
+  ema_hard: true                   # centroids average only the points they win
+  teacher_mode: "onfly"            # ignored by the streaming trainer (always in-loop)
+  centroid_init: "kmeans++"
+  checkpoints_dir: "e2e/checkpoints/general/gemma3-12B/layer47/kl_gelu_k2000_vicreg"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

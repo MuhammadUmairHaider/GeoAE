@@ -1,0 +1,84 @@
+# Activation extraction — Gemma 3 4B PT, FINAL layer (33) only.
+#
+# WHY 4B: Gemma Scope 2 covers the whole Gemma 3 family, so dropping from 12B to
+# 4B costs nothing in SAE-baseline comparability. Verified against the hub
+# 2026-08-21 — `google/gemma-scope-2-4b-pt` has:
+#     resid_post      layers 9, 17, 22, 29   widths 16k/65k/262k/1m
+#     resid_post_all  layers 0..33           widths 16k/262k
+#     plus attn_out, mlp_out, transcoder, crosscoder suites
+# Same subset pattern as 12B (26/50/65/85% depth). As at 12B, the FINAL layer is
+# not in the `resid_post` subset — layer 33 baselines come from `resid_post_all`
+# (16k/262k) only.
+#
+# WHY LAYER 33: final decoder layer, the only one where e2e KL keeps the cheap
+# head-only path (student = lm_head(norm(recon)), no spliced second forward).
+# `final_logit_softcapping` is null on Gemma 3, so that shortcut stays exact —
+# unlike Gemma 2, where softcapping 30.0 would break it.
+#
+# MODEL DTYPE IS ALREADY BF16 and is not configurable here. geoae.checkpoint.
+# load_lm pins `dtype=torch.bfloat16` for every model in this repo. That is the
+# compute dtype and is unrelated to `extraction.dtype` below, which is the
+# STORAGE dtype of the .npy dump.
+#
+# STORAGE DTYPE — float32 is MANDATORY. bfloat16 is not available at all
+# (geoae.extract rejects it; numpy .npy cannot round-trip a third-party bf16
+# dtype, it serialises as an opaque |V2|), and float16 is POISONOUS here.
+#
+# MEASURED 2026-08-21 on this exact model, layer 33, 45,865 tokens before abort:
+#   dim 443 is a massive-activation channel, median |x| = 58,496, and it exceeds
+#   the float16 ceiling of 65,504 on 85.1% of tokens. Exactly ONE dim overflows —
+#   every other channel peaks at a median of ~2,240, so dim 443 is 26x the next
+#   largest. 39,050 non-finite elements in 45k tokens; the whole dump would be inf.
+#
+# This is the SAME pathology as 12B (dim 2339, median ~53,760, ~98% of tokens at
+# the final layer) at a different channel index, so treat it as a Gemma 3 family
+# trait: every size needs float32 storage, and any new size should be probed
+# before committing disk. geoae.extract aborts on the FIRST overflow:
+#
+#   python -u -m geoae.extract --config <cfg> --n_tokens 200000 --out_dir /tmp/probe
+#
+# DISK: d=2560 x float32 = 10.24 GB per 1M tokens per layer (fp16 would have been
+# 5.12, but see above — it is not an option). Against ~115 GB free on 2026-08-21
+# (112.7 GB after the 0.98 preflight margin), single layer:
+#    8M ->  82 GB (33 GB spare)   <- configured, the safe choice
+#    9M ->  92 GB (23 GB spare)
+#   10M -> 102 GB (13 GB spare)   <- parity with the 12B layer-47 dump, but tight
+#   11M -> 113 GB (does NOT fit)
+# 8M is ample: the KL runs read this dump only for norm stats (~500k rows) and
+# k-means baselines sample ~1M. Only the MSE base pipeline (geoae.train) trains
+# on these rows directly, and the 12B MSE run used just 4M.
+# geoae.extract preflights free space and aborts BEFORE loading the model.
+#
+# ARCHITECTURE: loads as Gemma3ForConditionalGeneration (model_type "gemma3",
+# multimodal). The vision tower is dropped at load; the text decoder lives at
+# lm.model.language_model, NOT lm.model.layers. geoae.lm_arch resolves it, and
+# hidden_size must come from lm_arch.hidden_size(model) — model.config.
+# hidden_size is wrong on the multimodal config (the real 2560 is in
+# config.text_config). Never hard-code lm.model.layers.
+#
+#   python -u -m geoae.extract --config configs/base/gemma3-4b_extract.yaml
+
+extraction:
+  model_name: "google/gemma-3-4b-pt"
+  layers: [33]                  # final decoder layer (34 layers, 0-indexed)
+  target_layer: 33              # never read by any code; kept consistent with data.target_layer
+  hidden_size: 2560             # checked against the loaded model; mismatch = hard fail
+  n_tokens: 8000000
+  dtype: "float32"              # MANDATORY — dim 443 overflows fp16, see header
+  max_doc_tokens: 256
+  skip_leading: 4
+  activations_dir: "activations_gemma3_4b"
+  log_every: 200
+
+data:
+  activations_dir: "activations_gemma3_4b"
+  target_layer: 33    # read by geoae.train — must name a layer in `layers` above
+  batch_size: 2048
+  val_frac: 0.05
+
+model:
+  hidden_size: 2560
+  latent_dim: 2560
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean

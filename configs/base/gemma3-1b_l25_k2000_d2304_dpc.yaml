@@ -1,0 +1,76 @@
+# Frozen Gemma 3 1B PT -> residual extraction -> dense DPC GeoAE (MSE pipeline).
+# Model config verified: gemma3_text, hidden_size=1152, 26 decoder layers.
+# Launch through geoae.gemma_dpc; do not use the legacy geoae.pipeline launcher.
+# All artifacts are isolated from the Llama and earlier Gemma experiments.
+extraction:
+  model_name: google/gemma-3-1b-pt
+  layers: [25]
+  target_layer: 25
+  hidden_size: 1152
+  n_tokens: 10000000
+  dtype: float32
+  max_doc_tokens: 256
+  skip_leading: 4
+  activations_dir: runs/gemma3_1b_l25_d2304_dpc_seed42/activations
+  log_every: 200
+
+data:
+  activations_dir: runs/gemma3_1b_l25_d2304_dpc_seed42/activations
+  target_layer: 25
+  batch_size: 32768
+  val_frac: 0.05
+
+model:
+  hidden_size: 1152
+  latent_dim: 2304
+  latent_norm: batch
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
+
+# Same objective/schedule as the main Llama DPC arm; not a KL-trained AE.
+# geoae.train uses reconstruction MSE with coefficient 1 regardless of lambda_mse.
+loss:
+  lambda_cluster: 1.0
+  lambda_sep: 0.3
+  sep_mode: hinge
+  sep_margin: 2.0
+  lambda_var: 1.0
+  lambda_cov: 0.01
+  lambda_unif: 0.0
+  lambda_usage: 0.05
+  lambda_mse: 0.0
+  balance: zipf
+  balance_rho: 0.6
+  balance_eta: 0.05
+  zipf_alpha_start: 0.0
+  zipf_alpha_end: 0.5
+  sinkhorn_iters: 3
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  lr: 2.8e-4
+  recon_only_epochs: 10
+  geometry_start_epoch: 6
+  clustering_start_epoch: 11
+  full_loss_start_epoch: 11
+  ema_decay: 0.9
+  ema_hard: true
+  centroid_init: dpc
+  density_power: 1.0
+  density_pool: 32768
+  density_knn: 32
+  peak_min_sep_frac: 0.25
+  peak_refine_k: 8
+  reinit_mode: peaks
+  peak_reinit_pool: 8192
+  diag_every: 12
+  reinit_every: 125
+  save_every: 1
+  keep_checkpoints: 3
+  seed: 42
+  checkpoints_dir: runs/gemma3_1b_l25_d2304_dpc_seed42/checkpoints
+  runs_dir: runs/gemma3_1b_l25_d2304_dpc_seed42
+  wandb_project: geoae-gemma3-1b-dpc

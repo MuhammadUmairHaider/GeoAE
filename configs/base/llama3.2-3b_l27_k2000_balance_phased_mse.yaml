@@ -1,0 +1,82 @@
+# Llama-3.2-3B layer 27, K=2000, GELU — MSE-ONLY twin of
+# configs/e2e/general/llama3.2-3B/layer27/kl_gelu_k2000_balance_phased.yaml
+#
+# Same balancing knobs, same phase boundaries, same lambdas. The only difference
+# is the reconstruction objective: no LM in the loop, so `total_loss` uses plain
+# MSE(x_hat, x) at implicit weight 1.0 instead of forward-KL against the frozen
+# head. Run it with `geoae.train`, not `geoae.e2e.train`.
+#
+# Why this pairing is worth having: at Gemma3-12B L47, MSE-only beat every KL
+# lambda on scale-normalised clustering metrics. If the balancing change helps,
+# it should help in both objectives; if it only helps under KL, that points at
+# the teacher rather than the geometry.
+#
+# BALANCING (identical to the KL twin)
+#   balance_rho 0.6  — apply 60% of the column correction, not all of it
+#   balance_eta 0.05 — carry the column dual across ~20 batches
+#   zipf_alpha  0.5  — annealed from 0 so the ranking reflects learned usage
+#   rho=1 / eta=1 / balance="uniform" reproduce sinkhorn_log bit-for-bit.
+#
+# PHASES (identical to the KL twin)
+#   epochs  1-5   reconstruction only        (MSE alone)
+#   epochs  6-10  reconstruction + VICReg    (var/cov on, no clustering)
+#   epochs 11+    everything                 (cluster, then sep ramps in)
+#
+# NOTE: `geoae/train.py` always passed lambda_var/lambda_cov, so unlike the e2e
+# trainer this path never had the silent VICReg drop. An MSE-only run here IS
+# comparable to earlier base-trainer checkpoints; the e2e ones are not.
+#
+#   python -u -m geoae.train \
+#     --config configs/base/llama3.2-3b_l27_k2000_balance_phased_mse.yaml \
+#     2>&1 | tee logs/l27_k2000_balance_phased_mse.log
+
+extraction:
+  model_name: "meta-llama/Llama-3.2-3B"   # metadata only — no LM is loaded here
+
+data:
+  activations_dir: "activations_diverse_10M"   # same dump the KL twin reads
+  target_layer: 27
+  batch_size: 4096          # no LM in the loop, so this can be larger than the e2e run
+  val_frac: 0.05            # -> 9.33M train / 491k val, same split as the KL twin
+
+model:
+  hidden_size: 3072
+  latent_dim: 3072          # square, matching the KL twin
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
+
+loss:
+  lambda_cluster: 0.05      # identical to the KL twin
+  lambda_sep: 0.005
+  lambda_var: 0.3           # VICReg variance hinge — anti-contraction
+  lambda_cov: 0.001         # VICReg covariance — anti low-rank collapse
+  lambda_unif: 0.0          # euclidean run: uniformity is for the cosine geometry
+  lambda_usage: 0.05        # unused by total_loss; config parity
+  lambda_mse: 0.0           # unused here — total_loss carries MSE at weight 1.0
+
+  balance: "zipf"
+  balance_rho: 0.6
+  balance_eta: 0.05
+  zipf_alpha_start: 0.0
+  zipf_alpha_end: 0.5
+
+  sinkhorn_iters: 3
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  lr: 1.0e-4                   # base default; MSE in z-space is well scaled
+  recon_only_epochs: 10        # no cluster loss until epoch 11 (lambda_schedule gate)
+  geometry_start_epoch: 6      # epochs 6-10 : + VICReg (var/cov), clustering still off
+  clustering_start_epoch: 11   # epochs 11+  : + cluster loss, centroids kmeans++ seeded
+  full_loss_start_epoch: 11    # sep ramps from 0; tau and zipf_alpha anneal from here
+  ema_decay: 0.9
+  ema_hard: true
+  centroid_init: "kmeans++"
+  checkpoints_dir: "checkpoints/llama3.2-3B/layer27/k2000_balance_phased_mse"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

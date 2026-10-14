@@ -1,0 +1,81 @@
+# MSE-ONLY control run — Gemma 3 4B PT, layer 33. Direct parallel of
+# configs/base/gemma3-12b_l47_mse_only.yaml, so the two are comparable as a
+# model-scale pair on the same question: does reconstruction alone produce a
+# usable latent, or does it drift toward the trivial solution?
+#
+# The same warning applies as at 12B and is worth re-reading: this architecture
+# has NEITHER of the two things that make an SAE's reconstruction task hard.
+#   * No bottleneck — latent_dim 2560 == hidden_size 2560.
+#   * No sparsity  — there is no L0/L1/TopK term anywhere in geoae.losses.
+# Near-identity is an excellent MSE solution with a structureless latent, so a
+# high FVE here is NOT success. At 12B this run reached val_mse 0.00596 (FVE
+# 0.994) and the near-identity question is still open — effective rank 432 sits
+# between the KL runs (59-162) and raw k-means (806). Judge this run on whether
+# the clusters carry semantics (closest_tokens mono, DB14 steering), not on FVE.
+#
+# DATA: activations_gemma3_4b/layer_33.npy — 7,860,951 tokens x 2560, float32,
+# 80.5 GB, zero non-finite. Sources exhausted at 7.86M of the 8M requested; the
+# .npy was trimmed to the real row count. val_frac 0.05 -> 7,467,903 train /
+# 393,048 val. That is more than the 12B MSE run actually saw (it was capped to
+# 4,000,000 rows by --max_train_rows), so do NOT pass that flag here unless you
+# want to match the 12B budget rather than use the data.
+#
+# LEARNING RATE: 1e-4, the base default, because the AE input is z-scored per
+# dim and MSE in z-space is well scaled. Do NOT derive an lr from the extraction
+# sanity line — it reports median_token_norm 81,056, but 4.4x of that is dim 443
+# alone (median |x| 78,848; every other channel peaks at ~2,320). Excluding it
+# the real scale is 18,560. The naive rule 1e-4 * (56/norm) would give 6.9e-8
+# from the sanity number or 3.0e-7 from the real one — both absurd. The rule was
+# calibrated on Llama/Qwen and does not transfer; see the gemma3 memory.
+# For an e2e KL run at this layer the raw scale DOES matter (it enters through
+# the KL gradient at the head): start at 2e-5 as at 12B, but note 4B's real
+# scale is ~4.5x 12B's ~4,140, so watch val_kl in the first few hundred steps
+# and be ready to drop it.
+#
+# LAYER 33 is the final decoder layer (34 total) — the only one where e2e KL
+# keeps the cheap head-only path. Gemma Scope 2 SAE baselines at this layer come
+# from resid_post_all only (16k/262k x l0 small/big); the deep resid_post suite
+# covers layers 9/17/22/29. Extract layer 29 instead if SAE breadth matters more.
+#
+#   python -u -m geoae.train --config configs/base/gemma3-4b_l33_mse_only.yaml
+
+extraction:
+  model_name: "google/gemma-3-4b-pt"
+
+data:
+  activations_dir: "activations_gemma3_4b"
+  target_layer: 33
+  batch_size: 4096          # no LM in the loop, so this can be large
+  val_frac: 0.05
+
+model:
+  hidden_size: 2560
+  latent_dim: 2560          # square, as at 12B — the point of the control
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
+
+loss:                       # identical to the 12B mse_only run
+  lambda_cluster: 0.05
+  lambda_sep: 0.005
+  lambda_var: 0.3           # VICReg variance hinge — the anti-identity pressure
+  lambda_cov: 0.001         # VICReg covariance — anti low-rank collapse
+  lambda_unif: 0.0
+  lambda_usage: 0.05        # unused (Sinkhorn balances Q by construction)
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  lr: 1.0e-4
+  recon_only_epochs: 2
+  clustering_start_epoch: 3
+  full_loss_start_epoch: 6
+  ema_decay: 0.9
+  ema_hard: true
+  centroid_init: "kmeans++"
+  checkpoints_dir: "checkpoints/gemma3-4B/layer33/mse_only_k2000"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

@@ -1,0 +1,47 @@
+# K=256 VICReg run at layer 16 — same recipe as layer27/kl_gelu_k256_vicreg.
+#
+# Layer 16 is mid-stream: representations are less linearly separable than
+# layer 27, so this tests whether the vicreg geometry recipe (var hinge +
+# cov + hard-EMA) holds up earlier in the network.
+
+extraction:
+  model_name: "meta-llama/Llama-3.2-3B"
+
+data:
+  activations_dir: "activations_diverse"
+  target_layer: 16
+  batch_size: 2048
+  val_frac: 0.05
+
+model:
+  hidden_size: 3072
+  latent_dim: 3072
+  n_clusters: 256
+  nonlinearity: gelu
+  metric: euclidean
+
+loss:
+  lambda_cluster: 0.05
+  lambda_sep: 0.005
+  lambda_mse: 0.05
+  lambda_var: 0.3
+  lambda_cov: 0.001
+  lambda_unif: 0.0
+  lambda_usage: 0.05               # unused by e2e loss; config parity
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  recon_only_epochs: 5
+  clustering_start_epoch: 6
+  full_loss_start_epoch: 9
+  ema_decay: 0.9
+  ema_hard: true
+  teacher_mode: "onfly"
+  centroid_init: "kmeans++"
+  checkpoints_dir: "e2e/checkpoints/general/llama3.2-3B/layer16/kl_gelu_k256_vicreg"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

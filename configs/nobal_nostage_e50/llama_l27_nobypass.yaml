@@ -1,0 +1,79 @@
+# 50 EPOCHS (user, 12 Oct 11:05 EDT: "if we dont need 100 we can limit to 50"): n_epochs 100 -> 50, checkpoints ..._nobal_nostage_e50;
+# everything else as the no-staging 100-epoch config below (ramps now run over epochs 1-50).
+# Llama-3.2-3B L27, d6144, K=2000, no bypass — NO-BALANCING RECIPE, 100 EPOCHS (user, 2026-10-12: "implement 1/k and reseding at <5%", "run the whole thing for 100 epochs").
+# Parent: configs/base/llama3.2-3b_l27_k2000_bnh_b32k_lam1_d6144_dpc_sampled.yaml (comments dropped). Changes, everything else identical:
+#   loss.balance            zipf -> none   no Sinkhorn: each latent goes to its nearest prototype; usage target = flat 1/K
+#   train.reinit_threshold  (0.1) -> 0.05  a prototype is re-seeded when its running usage share < 5% of 1/K
+#   train.n_epochs          50 -> 100      stages unchanged (1-5 reconstruction, 6-10 + variance/covariance, 11+ everything);
+#                                          temperature and separation ramps now run over epochs 11-100
+#   train.keep_checkpoints  -> 4, train.checkpoints_dir -> ..._nobal_e100
+#   train.diag_every        12 -> 144      logging only: a validation pass every 12 steps cost more time than the training steps
+# NO STAGED SCHEDULE (user, 12 Oct 10:25 EDT: "stop every thing. and start again with no staging"): every term and the
+# prototypes from epoch 1 — recon_only_epochs 10 -> 0, geometry_start_epoch 6 -> 1, clustering_start_epoch 11 -> 1,
+# full_loss_start_epoch 11 -> 1 (temperature and separation ramps run over epochs 1-100); checkpoints ..._nobal_nostage_e100.
+# The stage description in the lines above belongs to the previous (staged) campaign config this file was derived from.
+
+extraction:
+  model_name: "meta-llama/Llama-3.2-3B"
+
+data:
+  activations_dir: "activations_sampled_10M"
+  target_layer: 27
+  batch_size: 32768
+  val_frac: 0.05
+
+model:
+  hidden_size: 3072
+  latent_dim: 6144
+  latent_norm: "batch"
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
+
+loss:
+  lambda_cluster: 1.0
+  lambda_sep: 0.3
+  sep_mode: "hinge"
+  sep_margin: 2.0
+  lambda_var: 1.0
+  lambda_cov: 0.01
+  lambda_unif: 0.0
+  lambda_usage: 0.05
+  lambda_mse: 0.0
+
+  balance: none
+  balance_rho: 0.6
+  balance_eta: 0.05
+  zipf_alpha_start: 0.0
+  zipf_alpha_end: 0.5
+
+  sinkhorn_iters: 3
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  lr: 2.8e-4
+  recon_only_epochs: 0
+  geometry_start_epoch: 1
+  clustering_start_epoch: 1
+  full_loss_start_epoch: 1
+  ema_decay: 0.9
+  ema_hard: true
+  centroid_init: "dpc"
+  density_power: 1.0
+  density_pool: 32768
+  density_knn: 32
+  peak_min_sep_frac: 0.25
+  peak_refine_k: 8
+  reinit_mode: "peaks"
+  peak_reinit_pool: 8192
+  checkpoints_dir: "checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_dpc_sampled_nobal_nostage_e50"
+  diag_every: 144
+  reinit_every: 125
+  reinit_threshold: 0.05
+  save_every: 1
+  keep_checkpoints: 4
+  keep_every_epochs: 10
+  seed: 42
+  wandb_project: "geosep-general-e2e"

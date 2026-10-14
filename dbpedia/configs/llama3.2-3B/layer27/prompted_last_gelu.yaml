@@ -1,0 +1,29 @@
+data:
+  activations_dir: "dbpedia/activations/llama3.2-3B/last/prompted"
+  target_layer: 27
+  batch_size: 512
+  val_frac: 0.05
+
+model:
+  hidden_size: 3072
+  latent_dim: 3072
+  n_clusters: 14
+  nonlinearity: gelu
+
+loss:
+  lambda_cluster: 0.01
+  lambda_sep: 0.005
+  lambda_usage: 0.05
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 100
+  recon_only_epochs: 20
+  clustering_start_epoch: 21
+  full_loss_start_epoch: 30
+  checkpoints_dir: "dbpedia/checkpoints/llama3.2-3B/layer27/prompted_last_gelu"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-dbpedia"

@@ -1,0 +1,46 @@
+# End-to-end KL — GENERAL corpus, UNSUPERVISED, intermediate layer 20.
+#
+# Trained with the STREAMING on-the-fly trainer (train_e2e_stream.py): the
+# teacher (original logits) and student (recon-spliced logits) are BOTH computed
+# in-loop over a streamed diverse corpus, for ALL token positions. No teacher
+# cache on disk (the cached path would be ~1.28 TB and is DBpedia-only for
+# intermediate layers). `activations_dir` is used only for normalisation stats.
+#
+#   python geosep/e2e/train_e2e_stream.py \
+#     --config geosep/e2e/configs/general/llama3.2-3B/layer20/kl_gelu.yaml \
+#     --n_clusters 1000 --no_sinkhorn --accum 8
+
+extraction:
+  model_name: "meta-llama/Llama-3.2-3B"
+
+data:
+  activations_dir: "activations_diverse"   # -> geosep/activations_diverse (norm stats only)
+  target_layer: 20
+  batch_size: 512
+  val_frac: 0.05
+
+model:
+  hidden_size: 3072
+  latent_dim: 3072
+  n_clusters: 128
+  nonlinearity: gelu
+
+loss:
+  lambda_cluster: 0.01
+  lambda_sep: 0.005
+  lambda_usage: 0.05
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 20
+  recon_only_epochs: 5
+  clustering_start_epoch: 6
+  full_loss_start_epoch: 9
+  teacher_mode: "onfly"            # ignored by the streaming trainer (always in-loop)
+  centroid_init: "kmeans++"
+  checkpoints_dir: "e2e/checkpoints/general/llama3.2-3B/layer20/kl_gelu"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

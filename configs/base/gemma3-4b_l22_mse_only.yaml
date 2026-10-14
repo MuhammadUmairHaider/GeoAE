@@ -1,0 +1,119 @@
+# MSE-ONLY — Gemma 3 4B PT, layer 22 (65% depth). GELU encoder, K=2000.
+#
+# Lambdas are NOT inherited from the layer-33 config. They are derived by
+# gradient-balance analysis on this layer's own data; see the block below and
+# `python -u -m geoae.lambda_balance --config <this file>`.
+#
+# DATA: activations_gemma3_4b/layer_22.npy — 9,826,031 tokens x 2560, float32,
+# 100.6 GB. val_frac 0.05 -> 9,334,729 train / 491,302 val. Rows 0..7,860,950
+# are the same tokens as the whole layer-33 dump (deterministic round-robin
+# stream, no shuffle), so L22-vs-L33 is paired over that prefix.
+#
+# LEARNING RATE 1e-4, the base default: input is z-scored per dim, so MSE is
+# well scaled regardless of the raw activation scale. Do NOT derive an lr from
+# the extraction sanity line (median_token_norm 41,410) — that number is
+# dominated by a single massive-activation channel, and the Llama/Qwen norm rule
+# does not transfer to Gemma 3. Same reasoning as the layer-33 config.
+
+extraction:
+  model_name: "google/gemma-3-4b-pt"
+
+data:
+  activations_dir: "activations_gemma3_4b"
+  target_layer: 22
+  batch_size: 4096          # no LM in the loop, so this can be large
+  val_frac: 0.05
+
+model:
+  hidden_size: 2560
+  latent_dim: 2560
+  n_clusters: 2000
+  nonlinearity: gelu        # as at 12B/L47 and 4B/L33
+  metric: euclidean
+
+# LAMBDAS — DERIVED, not inherited. From `geoae.lambda_balance` on this layer's
+# own data (logs/lambda_balance_gemma3_4b_l22.log,
+# lambda_balance_gemma3_4b_l22.json, seed 42, 400-step recon-only warmup,
+# 6 probe batches @ 4096). Each weight is set so that
+#     lambda_T * ||d T / d theta_enc||  =  share_T * ||d recon / d theta_enc||
+# at the WARM operating point — after the recon-only phase, with k-means++
+# centroids live, i.e. the step where cluster/sep switch on and where the run
+# then spends 47 of its 50 epochs.
+#
+#   term      ||grad||   /recon   cos(recon)   share   lambda    (inherited -> share)
+#   recon     0.01209      1.00     +1.000       -        -
+#   cluster   0.12706     10.51     -0.054     0.25    0.02378   (0.05  -> 0.53)
+#   sep       1.20100     99.35     +0.001     0.05    0.000503  (0.005 -> 0.50)
+#   var       0.03060      2.53     +0.148     0.25    0.09873   (0.3   -> 0.76)
+#   cov       1.19910     99.20     -0.068     0.10    0.001008  (0.001 -> 0.099)
+#
+# WHAT CHANGED AND WHY. Under the inherited layer-33 weights the geometry terms
+# collectively deliver ~1.9x reconstruction's gradient at the moment they switch
+# on (0.53 + 0.50 + 0.76 + 0.099). For the MSE-only control that is backwards:
+# the run is supposed to answer "what does reconstruction alone build", and it
+# was being outvoted 2:1 by the regularisers. cluster drops 2.1x, sep 9.9x, var
+# 3.0x. lambda_cov is left essentially where it was — 0.001 already sat at a
+# 0.099 share, so the inherited value was right for this layer by luck or by
+# good judgement.
+#
+# SHARES. var is deliberately set EQUAL to cluster (0.25 each). cluster_loss
+# rewards latent contraction, and the adaptive-sigma sep_loss is scale-invariant
+# so it cannot resist that pull; variance_loss is the only counterforce in the
+# objective. Giving var less share than cluster is signing up for the collapse
+# the term exists to prevent. sep gets 0.05 because it plateaus once pairs are
+# roughly equidistant, and the schedule ramps it from 0 regardless.
+#
+# THE VARIANCE HINGE IS FULLY ACTIVE HERE, which is what makes lambda_var
+# meaningful at all: latent std is 0.615-0.746 across ALL 2560 dims, i.e. 100%
+# sit below the gamma=1.0 hinge hardcoded in losses.variance_loss. The term is
+# in its pure linear regime — a steady outward push, not a corrective one — and
+# will keep pushing until std reaches 1. Re-run lambda_balance if the encoder or
+# nonlinearity changes; if a future config puts every std above 1 the hinge goes
+# dead and lambda_var stops doing anything at any value.
+#
+# CONFLICT READING. cluster (-0.054), sep (+0.001) and cov (-0.068) are all
+# essentially ORTHOGONAL to reconstruction at the warm point — they spend their
+# pressure in directions recon does not care about, which is the ideal regime
+# for a geometry regulariser. var is the exception and is worth watching: it
+# starts at cos = -0.675 (strongly opposed to recon) at init and only turns to
+# +0.148 after the warmup. The opposition is transient, but it is real during
+# the recon_only_epochs window.
+#
+# CAVEAT — these balance a FIXED lambda at one point on a moving target. recon's
+# gradient was still falling when the probe ran (mse 1.44 -> 0.35 over 400 steps
+# and not converged), so every ratio above keeps drifting upward through
+# training. The weights are calibrated at switch-on, which is the most defensible
+# single point, not held there for 50 epochs. If the geometry terms visibly take
+# over late (silhouette climbing while val_mse stalls, latent std pinned at the
+# hinge, effective_k collapsing), re-probe from a mid-training checkpoint.
+#
+# RISK ON lambda_var. Dropping it 3.0x is the one change that could cost
+# something: on llama-3.2-3B layer 27 the var hinge is what fixed rank collapse
+# (effective rank 37 -> 233). Layer 22 shows no such pressure yet — effective
+# rank of z is 1561/2560 at the warm point — but watch cluster/effective_k and
+# the latent std trend in the first few epochs. If std starts falling rather
+# than climbing toward 1, raise the var share and re-derive.
+loss:
+  lambda_cluster: 0.02378
+  lambda_sep: 0.000503
+  lambda_var: 0.09873
+  lambda_cov: 0.001008
+  lambda_unif: 0.0          # cosine/uniformity geometry is a documented dead end
+  lambda_usage: 0.05        # unused (Sinkhorn balances Q by construction)
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  lr: 1.0e-4
+  recon_only_epochs: 2
+  clustering_start_epoch: 3
+  full_loss_start_epoch: 6
+  ema_decay: 0.9
+  ema_hard: true
+  centroid_init: "kmeans++"
+  checkpoints_dir: "checkpoints/gemma3-4B/layer22/mse_only_k2000"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

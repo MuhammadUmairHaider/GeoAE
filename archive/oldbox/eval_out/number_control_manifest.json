@@ -1,0 +1,3092 @@
+{
+  "status": "manifest",
+  "meta": {
+    "checkpoint": "checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_dpc/best_val.pt",
+    "out": "eval_out/number_control_manifest.json",
+    "seed": 42,
+    "n_fit_nouns": 16,
+    "n_test_nouns": 12,
+    "tao": 2.0,
+    "percent": 0.3,
+    "saliency": "abs",
+    "alphas": [
+      0.5,
+      1.0,
+      2.0
+    ],
+    "modes": [
+      "global",
+      "salient",
+      "range",
+      "transport"
+    ],
+    "rotation_seeds": [
+      0,
+      1,
+      2
+    ],
+    "rotation_rounds": 12,
+    "shuffle_labels": true,
+    "batch_size": 16,
+    "device": "cuda",
+    "dry_run": true,
+    "smoke": false,
+    "task": "constructed_subject_verb_number_agreement",
+    "readout": [
+      " is",
+      " are"
+    ],
+    "edit_position": "last prompt token only",
+    "range_fit_position": "last prompt token only",
+    "rotation": "structured orthogonal permutation/pair rotations",
+    "selection": "report all examples and a shared base+recon correct subset",
+    "selectivity_sign": "target_drop - complement_drop; higher is better"
+  },
+  "fit_examples": [
+    {
+      "id": "fit:engineer:0:0:0",
+      "split": "fit",
+      "subject_lemma": "engineer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The engineer near the window"
+    },
+    {
+      "id": "fit:engineer:0:0:1",
+      "split": "fit",
+      "subject_lemma": "engineer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The engineer near the windows"
+    },
+    {
+      "id": "fit:engineer:0:1:0",
+      "split": "fit",
+      "subject_lemma": "engineer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The engineers near the window"
+    },
+    {
+      "id": "fit:engineer:0:1:1",
+      "split": "fit",
+      "subject_lemma": "engineer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The engineers near the windows"
+    },
+    {
+      "id": "fit:engineer:1:0:0",
+      "split": "fit",
+      "subject_lemma": "engineer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The engineer behind the gate"
+    },
+    {
+      "id": "fit:engineer:1:0:1",
+      "split": "fit",
+      "subject_lemma": "engineer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The engineer behind the gates"
+    },
+    {
+      "id": "fit:engineer:1:1:0",
+      "split": "fit",
+      "subject_lemma": "engineer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The engineers behind the gate"
+    },
+    {
+      "id": "fit:engineer:1:1:1",
+      "split": "fit",
+      "subject_lemma": "engineer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The engineers behind the gates"
+    },
+    {
+      "id": "fit:engineer:2:0:0",
+      "split": "fit",
+      "subject_lemma": "engineer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The engineer in front of the building"
+    },
+    {
+      "id": "fit:engineer:2:0:1",
+      "split": "fit",
+      "subject_lemma": "engineer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The engineer in front of the buildings"
+    },
+    {
+      "id": "fit:engineer:2:1:0",
+      "split": "fit",
+      "subject_lemma": "engineer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The engineers in front of the building"
+    },
+    {
+      "id": "fit:engineer:2:1:1",
+      "split": "fit",
+      "subject_lemma": "engineer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The engineers in front of the buildings"
+    },
+    {
+      "id": "fit:pilot:0:0:0",
+      "split": "fit",
+      "subject_lemma": "pilot",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The pilot near the window"
+    },
+    {
+      "id": "fit:pilot:0:0:1",
+      "split": "fit",
+      "subject_lemma": "pilot",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The pilot near the windows"
+    },
+    {
+      "id": "fit:pilot:0:1:0",
+      "split": "fit",
+      "subject_lemma": "pilot",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The pilots near the window"
+    },
+    {
+      "id": "fit:pilot:0:1:1",
+      "split": "fit",
+      "subject_lemma": "pilot",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The pilots near the windows"
+    },
+    {
+      "id": "fit:pilot:1:0:0",
+      "split": "fit",
+      "subject_lemma": "pilot",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The pilot behind the gate"
+    },
+    {
+      "id": "fit:pilot:1:0:1",
+      "split": "fit",
+      "subject_lemma": "pilot",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The pilot behind the gates"
+    },
+    {
+      "id": "fit:pilot:1:1:0",
+      "split": "fit",
+      "subject_lemma": "pilot",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The pilots behind the gate"
+    },
+    {
+      "id": "fit:pilot:1:1:1",
+      "split": "fit",
+      "subject_lemma": "pilot",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The pilots behind the gates"
+    },
+    {
+      "id": "fit:pilot:2:0:0",
+      "split": "fit",
+      "subject_lemma": "pilot",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The pilot in front of the building"
+    },
+    {
+      "id": "fit:pilot:2:0:1",
+      "split": "fit",
+      "subject_lemma": "pilot",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The pilot in front of the buildings"
+    },
+    {
+      "id": "fit:pilot:2:1:0",
+      "split": "fit",
+      "subject_lemma": "pilot",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The pilots in front of the building"
+    },
+    {
+      "id": "fit:pilot:2:1:1",
+      "split": "fit",
+      "subject_lemma": "pilot",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The pilots in front of the buildings"
+    },
+    {
+      "id": "fit:tourist:0:0:0",
+      "split": "fit",
+      "subject_lemma": "tourist",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The tourist near the window"
+    },
+    {
+      "id": "fit:tourist:0:0:1",
+      "split": "fit",
+      "subject_lemma": "tourist",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The tourist near the windows"
+    },
+    {
+      "id": "fit:tourist:0:1:0",
+      "split": "fit",
+      "subject_lemma": "tourist",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The tourists near the window"
+    },
+    {
+      "id": "fit:tourist:0:1:1",
+      "split": "fit",
+      "subject_lemma": "tourist",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The tourists near the windows"
+    },
+    {
+      "id": "fit:tourist:1:0:0",
+      "split": "fit",
+      "subject_lemma": "tourist",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The tourist behind the gate"
+    },
+    {
+      "id": "fit:tourist:1:0:1",
+      "split": "fit",
+      "subject_lemma": "tourist",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The tourist behind the gates"
+    },
+    {
+      "id": "fit:tourist:1:1:0",
+      "split": "fit",
+      "subject_lemma": "tourist",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The tourists behind the gate"
+    },
+    {
+      "id": "fit:tourist:1:1:1",
+      "split": "fit",
+      "subject_lemma": "tourist",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The tourists behind the gates"
+    },
+    {
+      "id": "fit:tourist:2:0:0",
+      "split": "fit",
+      "subject_lemma": "tourist",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The tourist in front of the building"
+    },
+    {
+      "id": "fit:tourist:2:0:1",
+      "split": "fit",
+      "subject_lemma": "tourist",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The tourist in front of the buildings"
+    },
+    {
+      "id": "fit:tourist:2:1:0",
+      "split": "fit",
+      "subject_lemma": "tourist",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The tourists in front of the building"
+    },
+    {
+      "id": "fit:tourist:2:1:1",
+      "split": "fit",
+      "subject_lemma": "tourist",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The tourists in front of the buildings"
+    },
+    {
+      "id": "fit:writer:0:0:0",
+      "split": "fit",
+      "subject_lemma": "writer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The writer near the window"
+    },
+    {
+      "id": "fit:writer:0:0:1",
+      "split": "fit",
+      "subject_lemma": "writer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The writer near the windows"
+    },
+    {
+      "id": "fit:writer:0:1:0",
+      "split": "fit",
+      "subject_lemma": "writer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The writers near the window"
+    },
+    {
+      "id": "fit:writer:0:1:1",
+      "split": "fit",
+      "subject_lemma": "writer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The writers near the windows"
+    },
+    {
+      "id": "fit:writer:1:0:0",
+      "split": "fit",
+      "subject_lemma": "writer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The writer behind the gate"
+    },
+    {
+      "id": "fit:writer:1:0:1",
+      "split": "fit",
+      "subject_lemma": "writer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The writer behind the gates"
+    },
+    {
+      "id": "fit:writer:1:1:0",
+      "split": "fit",
+      "subject_lemma": "writer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The writers behind the gate"
+    },
+    {
+      "id": "fit:writer:1:1:1",
+      "split": "fit",
+      "subject_lemma": "writer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The writers behind the gates"
+    },
+    {
+      "id": "fit:writer:2:0:0",
+      "split": "fit",
+      "subject_lemma": "writer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The writer in front of the building"
+    },
+    {
+      "id": "fit:writer:2:0:1",
+      "split": "fit",
+      "subject_lemma": "writer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The writer in front of the buildings"
+    },
+    {
+      "id": "fit:writer:2:1:0",
+      "split": "fit",
+      "subject_lemma": "writer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The writers in front of the building"
+    },
+    {
+      "id": "fit:writer:2:1:1",
+      "split": "fit",
+      "subject_lemma": "writer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The writers in front of the buildings"
+    },
+    {
+      "id": "fit:worker:0:0:0",
+      "split": "fit",
+      "subject_lemma": "worker",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The worker near the window"
+    },
+    {
+      "id": "fit:worker:0:0:1",
+      "split": "fit",
+      "subject_lemma": "worker",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The worker near the windows"
+    },
+    {
+      "id": "fit:worker:0:1:0",
+      "split": "fit",
+      "subject_lemma": "worker",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The workers near the window"
+    },
+    {
+      "id": "fit:worker:0:1:1",
+      "split": "fit",
+      "subject_lemma": "worker",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The workers near the windows"
+    },
+    {
+      "id": "fit:worker:1:0:0",
+      "split": "fit",
+      "subject_lemma": "worker",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The worker behind the gate"
+    },
+    {
+      "id": "fit:worker:1:0:1",
+      "split": "fit",
+      "subject_lemma": "worker",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The worker behind the gates"
+    },
+    {
+      "id": "fit:worker:1:1:0",
+      "split": "fit",
+      "subject_lemma": "worker",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The workers behind the gate"
+    },
+    {
+      "id": "fit:worker:1:1:1",
+      "split": "fit",
+      "subject_lemma": "worker",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The workers behind the gates"
+    },
+    {
+      "id": "fit:worker:2:0:0",
+      "split": "fit",
+      "subject_lemma": "worker",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The worker in front of the building"
+    },
+    {
+      "id": "fit:worker:2:0:1",
+      "split": "fit",
+      "subject_lemma": "worker",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The worker in front of the buildings"
+    },
+    {
+      "id": "fit:worker:2:1:0",
+      "split": "fit",
+      "subject_lemma": "worker",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The workers in front of the building"
+    },
+    {
+      "id": "fit:worker:2:1:1",
+      "split": "fit",
+      "subject_lemma": "worker",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The workers in front of the buildings"
+    },
+    {
+      "id": "fit:student:0:0:0",
+      "split": "fit",
+      "subject_lemma": "student",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The student near the window"
+    },
+    {
+      "id": "fit:student:0:0:1",
+      "split": "fit",
+      "subject_lemma": "student",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The student near the windows"
+    },
+    {
+      "id": "fit:student:0:1:0",
+      "split": "fit",
+      "subject_lemma": "student",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The students near the window"
+    },
+    {
+      "id": "fit:student:0:1:1",
+      "split": "fit",
+      "subject_lemma": "student",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The students near the windows"
+    },
+    {
+      "id": "fit:student:1:0:0",
+      "split": "fit",
+      "subject_lemma": "student",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The student behind the gate"
+    },
+    {
+      "id": "fit:student:1:0:1",
+      "split": "fit",
+      "subject_lemma": "student",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The student behind the gates"
+    },
+    {
+      "id": "fit:student:1:1:0",
+      "split": "fit",
+      "subject_lemma": "student",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The students behind the gate"
+    },
+    {
+      "id": "fit:student:1:1:1",
+      "split": "fit",
+      "subject_lemma": "student",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The students behind the gates"
+    },
+    {
+      "id": "fit:student:2:0:0",
+      "split": "fit",
+      "subject_lemma": "student",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The student in front of the building"
+    },
+    {
+      "id": "fit:student:2:0:1",
+      "split": "fit",
+      "subject_lemma": "student",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The student in front of the buildings"
+    },
+    {
+      "id": "fit:student:2:1:0",
+      "split": "fit",
+      "subject_lemma": "student",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The students in front of the building"
+    },
+    {
+      "id": "fit:student:2:1:1",
+      "split": "fit",
+      "subject_lemma": "student",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The students in front of the buildings"
+    },
+    {
+      "id": "fit:photographer:0:0:0",
+      "split": "fit",
+      "subject_lemma": "photographer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The photographer near the window"
+    },
+    {
+      "id": "fit:photographer:0:0:1",
+      "split": "fit",
+      "subject_lemma": "photographer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The photographer near the windows"
+    },
+    {
+      "id": "fit:photographer:0:1:0",
+      "split": "fit",
+      "subject_lemma": "photographer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The photographers near the window"
+    },
+    {
+      "id": "fit:photographer:0:1:1",
+      "split": "fit",
+      "subject_lemma": "photographer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The photographers near the windows"
+    },
+    {
+      "id": "fit:photographer:1:0:0",
+      "split": "fit",
+      "subject_lemma": "photographer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The photographer behind the gate"
+    },
+    {
+      "id": "fit:photographer:1:0:1",
+      "split": "fit",
+      "subject_lemma": "photographer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The photographer behind the gates"
+    },
+    {
+      "id": "fit:photographer:1:1:0",
+      "split": "fit",
+      "subject_lemma": "photographer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The photographers behind the gate"
+    },
+    {
+      "id": "fit:photographer:1:1:1",
+      "split": "fit",
+      "subject_lemma": "photographer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The photographers behind the gates"
+    },
+    {
+      "id": "fit:photographer:2:0:0",
+      "split": "fit",
+      "subject_lemma": "photographer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The photographer in front of the building"
+    },
+    {
+      "id": "fit:photographer:2:0:1",
+      "split": "fit",
+      "subject_lemma": "photographer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The photographer in front of the buildings"
+    },
+    {
+      "id": "fit:photographer:2:1:0",
+      "split": "fit",
+      "subject_lemma": "photographer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The photographers in front of the building"
+    },
+    {
+      "id": "fit:photographer:2:1:1",
+      "split": "fit",
+      "subject_lemma": "photographer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The photographers in front of the buildings"
+    },
+    {
+      "id": "fit:soldier:0:0:0",
+      "split": "fit",
+      "subject_lemma": "soldier",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The soldier near the window"
+    },
+    {
+      "id": "fit:soldier:0:0:1",
+      "split": "fit",
+      "subject_lemma": "soldier",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The soldier near the windows"
+    },
+    {
+      "id": "fit:soldier:0:1:0",
+      "split": "fit",
+      "subject_lemma": "soldier",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The soldiers near the window"
+    },
+    {
+      "id": "fit:soldier:0:1:1",
+      "split": "fit",
+      "subject_lemma": "soldier",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The soldiers near the windows"
+    },
+    {
+      "id": "fit:soldier:1:0:0",
+      "split": "fit",
+      "subject_lemma": "soldier",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The soldier behind the gate"
+    },
+    {
+      "id": "fit:soldier:1:0:1",
+      "split": "fit",
+      "subject_lemma": "soldier",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The soldier behind the gates"
+    },
+    {
+      "id": "fit:soldier:1:1:0",
+      "split": "fit",
+      "subject_lemma": "soldier",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The soldiers behind the gate"
+    },
+    {
+      "id": "fit:soldier:1:1:1",
+      "split": "fit",
+      "subject_lemma": "soldier",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The soldiers behind the gates"
+    },
+    {
+      "id": "fit:soldier:2:0:0",
+      "split": "fit",
+      "subject_lemma": "soldier",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The soldier in front of the building"
+    },
+    {
+      "id": "fit:soldier:2:0:1",
+      "split": "fit",
+      "subject_lemma": "soldier",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The soldier in front of the buildings"
+    },
+    {
+      "id": "fit:soldier:2:1:0",
+      "split": "fit",
+      "subject_lemma": "soldier",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The soldiers in front of the building"
+    },
+    {
+      "id": "fit:soldier:2:1:1",
+      "split": "fit",
+      "subject_lemma": "soldier",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The soldiers in front of the buildings"
+    },
+    {
+      "id": "fit:baker:0:0:0",
+      "split": "fit",
+      "subject_lemma": "baker",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The baker near the window"
+    },
+    {
+      "id": "fit:baker:0:0:1",
+      "split": "fit",
+      "subject_lemma": "baker",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The baker near the windows"
+    },
+    {
+      "id": "fit:baker:0:1:0",
+      "split": "fit",
+      "subject_lemma": "baker",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The bakers near the window"
+    },
+    {
+      "id": "fit:baker:0:1:1",
+      "split": "fit",
+      "subject_lemma": "baker",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The bakers near the windows"
+    },
+    {
+      "id": "fit:baker:1:0:0",
+      "split": "fit",
+      "subject_lemma": "baker",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The baker behind the gate"
+    },
+    {
+      "id": "fit:baker:1:0:1",
+      "split": "fit",
+      "subject_lemma": "baker",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The baker behind the gates"
+    },
+    {
+      "id": "fit:baker:1:1:0",
+      "split": "fit",
+      "subject_lemma": "baker",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The bakers behind the gate"
+    },
+    {
+      "id": "fit:baker:1:1:1",
+      "split": "fit",
+      "subject_lemma": "baker",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The bakers behind the gates"
+    },
+    {
+      "id": "fit:baker:2:0:0",
+      "split": "fit",
+      "subject_lemma": "baker",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The baker in front of the building"
+    },
+    {
+      "id": "fit:baker:2:0:1",
+      "split": "fit",
+      "subject_lemma": "baker",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The baker in front of the buildings"
+    },
+    {
+      "id": "fit:baker:2:1:0",
+      "split": "fit",
+      "subject_lemma": "baker",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The bakers in front of the building"
+    },
+    {
+      "id": "fit:baker:2:1:1",
+      "split": "fit",
+      "subject_lemma": "baker",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The bakers in front of the buildings"
+    },
+    {
+      "id": "fit:gardener:0:0:0",
+      "split": "fit",
+      "subject_lemma": "gardener",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The gardener near the window"
+    },
+    {
+      "id": "fit:gardener:0:0:1",
+      "split": "fit",
+      "subject_lemma": "gardener",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The gardener near the windows"
+    },
+    {
+      "id": "fit:gardener:0:1:0",
+      "split": "fit",
+      "subject_lemma": "gardener",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The gardeners near the window"
+    },
+    {
+      "id": "fit:gardener:0:1:1",
+      "split": "fit",
+      "subject_lemma": "gardener",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The gardeners near the windows"
+    },
+    {
+      "id": "fit:gardener:1:0:0",
+      "split": "fit",
+      "subject_lemma": "gardener",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The gardener behind the gate"
+    },
+    {
+      "id": "fit:gardener:1:0:1",
+      "split": "fit",
+      "subject_lemma": "gardener",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The gardener behind the gates"
+    },
+    {
+      "id": "fit:gardener:1:1:0",
+      "split": "fit",
+      "subject_lemma": "gardener",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The gardeners behind the gate"
+    },
+    {
+      "id": "fit:gardener:1:1:1",
+      "split": "fit",
+      "subject_lemma": "gardener",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The gardeners behind the gates"
+    },
+    {
+      "id": "fit:gardener:2:0:0",
+      "split": "fit",
+      "subject_lemma": "gardener",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The gardener in front of the building"
+    },
+    {
+      "id": "fit:gardener:2:0:1",
+      "split": "fit",
+      "subject_lemma": "gardener",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The gardener in front of the buildings"
+    },
+    {
+      "id": "fit:gardener:2:1:0",
+      "split": "fit",
+      "subject_lemma": "gardener",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The gardeners in front of the building"
+    },
+    {
+      "id": "fit:gardener:2:1:1",
+      "split": "fit",
+      "subject_lemma": "gardener",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The gardeners in front of the buildings"
+    },
+    {
+      "id": "fit:painter:0:0:0",
+      "split": "fit",
+      "subject_lemma": "painter",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The painter near the window"
+    },
+    {
+      "id": "fit:painter:0:0:1",
+      "split": "fit",
+      "subject_lemma": "painter",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The painter near the windows"
+    },
+    {
+      "id": "fit:painter:0:1:0",
+      "split": "fit",
+      "subject_lemma": "painter",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The painters near the window"
+    },
+    {
+      "id": "fit:painter:0:1:1",
+      "split": "fit",
+      "subject_lemma": "painter",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The painters near the windows"
+    },
+    {
+      "id": "fit:painter:1:0:0",
+      "split": "fit",
+      "subject_lemma": "painter",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The painter behind the gate"
+    },
+    {
+      "id": "fit:painter:1:0:1",
+      "split": "fit",
+      "subject_lemma": "painter",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The painter behind the gates"
+    },
+    {
+      "id": "fit:painter:1:1:0",
+      "split": "fit",
+      "subject_lemma": "painter",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The painters behind the gate"
+    },
+    {
+      "id": "fit:painter:1:1:1",
+      "split": "fit",
+      "subject_lemma": "painter",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The painters behind the gates"
+    },
+    {
+      "id": "fit:painter:2:0:0",
+      "split": "fit",
+      "subject_lemma": "painter",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The painter in front of the building"
+    },
+    {
+      "id": "fit:painter:2:0:1",
+      "split": "fit",
+      "subject_lemma": "painter",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The painter in front of the buildings"
+    },
+    {
+      "id": "fit:painter:2:1:0",
+      "split": "fit",
+      "subject_lemma": "painter",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The painters in front of the building"
+    },
+    {
+      "id": "fit:painter:2:1:1",
+      "split": "fit",
+      "subject_lemma": "painter",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The painters in front of the buildings"
+    },
+    {
+      "id": "fit:sailor:0:0:0",
+      "split": "fit",
+      "subject_lemma": "sailor",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The sailor near the window"
+    },
+    {
+      "id": "fit:sailor:0:0:1",
+      "split": "fit",
+      "subject_lemma": "sailor",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The sailor near the windows"
+    },
+    {
+      "id": "fit:sailor:0:1:0",
+      "split": "fit",
+      "subject_lemma": "sailor",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The sailors near the window"
+    },
+    {
+      "id": "fit:sailor:0:1:1",
+      "split": "fit",
+      "subject_lemma": "sailor",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The sailors near the windows"
+    },
+    {
+      "id": "fit:sailor:1:0:0",
+      "split": "fit",
+      "subject_lemma": "sailor",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The sailor behind the gate"
+    },
+    {
+      "id": "fit:sailor:1:0:1",
+      "split": "fit",
+      "subject_lemma": "sailor",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The sailor behind the gates"
+    },
+    {
+      "id": "fit:sailor:1:1:0",
+      "split": "fit",
+      "subject_lemma": "sailor",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The sailors behind the gate"
+    },
+    {
+      "id": "fit:sailor:1:1:1",
+      "split": "fit",
+      "subject_lemma": "sailor",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The sailors behind the gates"
+    },
+    {
+      "id": "fit:sailor:2:0:0",
+      "split": "fit",
+      "subject_lemma": "sailor",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The sailor in front of the building"
+    },
+    {
+      "id": "fit:sailor:2:0:1",
+      "split": "fit",
+      "subject_lemma": "sailor",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The sailor in front of the buildings"
+    },
+    {
+      "id": "fit:sailor:2:1:0",
+      "split": "fit",
+      "subject_lemma": "sailor",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The sailors in front of the building"
+    },
+    {
+      "id": "fit:sailor:2:1:1",
+      "split": "fit",
+      "subject_lemma": "sailor",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The sailors in front of the buildings"
+    },
+    {
+      "id": "fit:farmer:0:0:0",
+      "split": "fit",
+      "subject_lemma": "farmer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The farmer near the window"
+    },
+    {
+      "id": "fit:farmer:0:0:1",
+      "split": "fit",
+      "subject_lemma": "farmer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The farmer near the windows"
+    },
+    {
+      "id": "fit:farmer:0:1:0",
+      "split": "fit",
+      "subject_lemma": "farmer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The farmers near the window"
+    },
+    {
+      "id": "fit:farmer:0:1:1",
+      "split": "fit",
+      "subject_lemma": "farmer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The farmers near the windows"
+    },
+    {
+      "id": "fit:farmer:1:0:0",
+      "split": "fit",
+      "subject_lemma": "farmer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The farmer behind the gate"
+    },
+    {
+      "id": "fit:farmer:1:0:1",
+      "split": "fit",
+      "subject_lemma": "farmer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The farmer behind the gates"
+    },
+    {
+      "id": "fit:farmer:1:1:0",
+      "split": "fit",
+      "subject_lemma": "farmer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The farmers behind the gate"
+    },
+    {
+      "id": "fit:farmer:1:1:1",
+      "split": "fit",
+      "subject_lemma": "farmer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The farmers behind the gates"
+    },
+    {
+      "id": "fit:farmer:2:0:0",
+      "split": "fit",
+      "subject_lemma": "farmer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The farmer in front of the building"
+    },
+    {
+      "id": "fit:farmer:2:0:1",
+      "split": "fit",
+      "subject_lemma": "farmer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The farmer in front of the buildings"
+    },
+    {
+      "id": "fit:farmer:2:1:0",
+      "split": "fit",
+      "subject_lemma": "farmer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The farmers in front of the building"
+    },
+    {
+      "id": "fit:farmer:2:1:1",
+      "split": "fit",
+      "subject_lemma": "farmer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The farmers in front of the buildings"
+    },
+    {
+      "id": "fit:actor:0:0:0",
+      "split": "fit",
+      "subject_lemma": "actor",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The actor near the window"
+    },
+    {
+      "id": "fit:actor:0:0:1",
+      "split": "fit",
+      "subject_lemma": "actor",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The actor near the windows"
+    },
+    {
+      "id": "fit:actor:0:1:0",
+      "split": "fit",
+      "subject_lemma": "actor",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The actors near the window"
+    },
+    {
+      "id": "fit:actor:0:1:1",
+      "split": "fit",
+      "subject_lemma": "actor",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The actors near the windows"
+    },
+    {
+      "id": "fit:actor:1:0:0",
+      "split": "fit",
+      "subject_lemma": "actor",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The actor behind the gate"
+    },
+    {
+      "id": "fit:actor:1:0:1",
+      "split": "fit",
+      "subject_lemma": "actor",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The actor behind the gates"
+    },
+    {
+      "id": "fit:actor:1:1:0",
+      "split": "fit",
+      "subject_lemma": "actor",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The actors behind the gate"
+    },
+    {
+      "id": "fit:actor:1:1:1",
+      "split": "fit",
+      "subject_lemma": "actor",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The actors behind the gates"
+    },
+    {
+      "id": "fit:actor:2:0:0",
+      "split": "fit",
+      "subject_lemma": "actor",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The actor in front of the building"
+    },
+    {
+      "id": "fit:actor:2:0:1",
+      "split": "fit",
+      "subject_lemma": "actor",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The actor in front of the buildings"
+    },
+    {
+      "id": "fit:actor:2:1:0",
+      "split": "fit",
+      "subject_lemma": "actor",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The actors in front of the building"
+    },
+    {
+      "id": "fit:actor:2:1:1",
+      "split": "fit",
+      "subject_lemma": "actor",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The actors in front of the buildings"
+    },
+    {
+      "id": "fit:musician:0:0:0",
+      "split": "fit",
+      "subject_lemma": "musician",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The musician near the window"
+    },
+    {
+      "id": "fit:musician:0:0:1",
+      "split": "fit",
+      "subject_lemma": "musician",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The musician near the windows"
+    },
+    {
+      "id": "fit:musician:0:1:0",
+      "split": "fit",
+      "subject_lemma": "musician",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The musicians near the window"
+    },
+    {
+      "id": "fit:musician:0:1:1",
+      "split": "fit",
+      "subject_lemma": "musician",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The musicians near the windows"
+    },
+    {
+      "id": "fit:musician:1:0:0",
+      "split": "fit",
+      "subject_lemma": "musician",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The musician behind the gate"
+    },
+    {
+      "id": "fit:musician:1:0:1",
+      "split": "fit",
+      "subject_lemma": "musician",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The musician behind the gates"
+    },
+    {
+      "id": "fit:musician:1:1:0",
+      "split": "fit",
+      "subject_lemma": "musician",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The musicians behind the gate"
+    },
+    {
+      "id": "fit:musician:1:1:1",
+      "split": "fit",
+      "subject_lemma": "musician",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The musicians behind the gates"
+    },
+    {
+      "id": "fit:musician:2:0:0",
+      "split": "fit",
+      "subject_lemma": "musician",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The musician in front of the building"
+    },
+    {
+      "id": "fit:musician:2:0:1",
+      "split": "fit",
+      "subject_lemma": "musician",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The musician in front of the buildings"
+    },
+    {
+      "id": "fit:musician:2:1:0",
+      "split": "fit",
+      "subject_lemma": "musician",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The musicians in front of the building"
+    },
+    {
+      "id": "fit:musician:2:1:1",
+      "split": "fit",
+      "subject_lemma": "musician",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The musicians in front of the buildings"
+    },
+    {
+      "id": "fit:athlete:0:0:0",
+      "split": "fit",
+      "subject_lemma": "athlete",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The athlete near the window"
+    },
+    {
+      "id": "fit:athlete:0:0:1",
+      "split": "fit",
+      "subject_lemma": "athlete",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The athlete near the windows"
+    },
+    {
+      "id": "fit:athlete:0:1:0",
+      "split": "fit",
+      "subject_lemma": "athlete",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The athletes near the window"
+    },
+    {
+      "id": "fit:athlete:0:1:1",
+      "split": "fit",
+      "subject_lemma": "athlete",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} near the {attractor}",
+      "prompt": "The athletes near the windows"
+    },
+    {
+      "id": "fit:athlete:1:0:0",
+      "split": "fit",
+      "subject_lemma": "athlete",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The athlete behind the gate"
+    },
+    {
+      "id": "fit:athlete:1:0:1",
+      "split": "fit",
+      "subject_lemma": "athlete",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The athlete behind the gates"
+    },
+    {
+      "id": "fit:athlete:1:1:0",
+      "split": "fit",
+      "subject_lemma": "athlete",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The athletes behind the gate"
+    },
+    {
+      "id": "fit:athlete:1:1:1",
+      "split": "fit",
+      "subject_lemma": "athlete",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} behind the {attractor}",
+      "prompt": "The athletes behind the gates"
+    },
+    {
+      "id": "fit:athlete:2:0:0",
+      "split": "fit",
+      "subject_lemma": "athlete",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The athlete in front of the building"
+    },
+    {
+      "id": "fit:athlete:2:0:1",
+      "split": "fit",
+      "subject_lemma": "athlete",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The athlete in front of the buildings"
+    },
+    {
+      "id": "fit:athlete:2:1:0",
+      "split": "fit",
+      "subject_lemma": "athlete",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The athletes in front of the building"
+    },
+    {
+      "id": "fit:athlete:2:1:1",
+      "split": "fit",
+      "subject_lemma": "athlete",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} in front of the {attractor}",
+      "prompt": "The athletes in front of the buildings"
+    }
+  ],
+  "test_examples": [
+    {
+      "id": "test:teacher:0:0:0",
+      "split": "test",
+      "subject_lemma": "teacher",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The teacher beside the window"
+    },
+    {
+      "id": "test:teacher:0:0:1",
+      "split": "test",
+      "subject_lemma": "teacher",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The teacher beside the windows"
+    },
+    {
+      "id": "test:teacher:0:1:0",
+      "split": "test",
+      "subject_lemma": "teacher",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The teachers beside the window"
+    },
+    {
+      "id": "test:teacher:0:1:1",
+      "split": "test",
+      "subject_lemma": "teacher",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The teachers beside the windows"
+    },
+    {
+      "id": "test:teacher:1:0:0",
+      "split": "test",
+      "subject_lemma": "teacher",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The teacher next to the gate"
+    },
+    {
+      "id": "test:teacher:1:0:1",
+      "split": "test",
+      "subject_lemma": "teacher",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The teacher next to the gates"
+    },
+    {
+      "id": "test:teacher:1:1:0",
+      "split": "test",
+      "subject_lemma": "teacher",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The teachers next to the gate"
+    },
+    {
+      "id": "test:teacher:1:1:1",
+      "split": "test",
+      "subject_lemma": "teacher",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The teachers next to the gates"
+    },
+    {
+      "id": "test:teacher:2:0:0",
+      "split": "test",
+      "subject_lemma": "teacher",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The teacher across from the building"
+    },
+    {
+      "id": "test:teacher:2:0:1",
+      "split": "test",
+      "subject_lemma": "teacher",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The teacher across from the buildings"
+    },
+    {
+      "id": "test:teacher:2:1:0",
+      "split": "test",
+      "subject_lemma": "teacher",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The teachers across from the building"
+    },
+    {
+      "id": "test:teacher:2:1:1",
+      "split": "test",
+      "subject_lemma": "teacher",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The teachers across from the buildings"
+    },
+    {
+      "id": "test:singer:0:0:0",
+      "split": "test",
+      "subject_lemma": "singer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The singer beside the window"
+    },
+    {
+      "id": "test:singer:0:0:1",
+      "split": "test",
+      "subject_lemma": "singer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The singer beside the windows"
+    },
+    {
+      "id": "test:singer:0:1:0",
+      "split": "test",
+      "subject_lemma": "singer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The singers beside the window"
+    },
+    {
+      "id": "test:singer:0:1:1",
+      "split": "test",
+      "subject_lemma": "singer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The singers beside the windows"
+    },
+    {
+      "id": "test:singer:1:0:0",
+      "split": "test",
+      "subject_lemma": "singer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The singer next to the gate"
+    },
+    {
+      "id": "test:singer:1:0:1",
+      "split": "test",
+      "subject_lemma": "singer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The singer next to the gates"
+    },
+    {
+      "id": "test:singer:1:1:0",
+      "split": "test",
+      "subject_lemma": "singer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The singers next to the gate"
+    },
+    {
+      "id": "test:singer:1:1:1",
+      "split": "test",
+      "subject_lemma": "singer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The singers next to the gates"
+    },
+    {
+      "id": "test:singer:2:0:0",
+      "split": "test",
+      "subject_lemma": "singer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The singer across from the building"
+    },
+    {
+      "id": "test:singer:2:0:1",
+      "split": "test",
+      "subject_lemma": "singer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The singer across from the buildings"
+    },
+    {
+      "id": "test:singer:2:1:0",
+      "split": "test",
+      "subject_lemma": "singer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The singers across from the building"
+    },
+    {
+      "id": "test:singer:2:1:1",
+      "split": "test",
+      "subject_lemma": "singer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The singers across from the buildings"
+    },
+    {
+      "id": "test:chef:0:0:0",
+      "split": "test",
+      "subject_lemma": "chef",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The chef beside the window"
+    },
+    {
+      "id": "test:chef:0:0:1",
+      "split": "test",
+      "subject_lemma": "chef",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The chef beside the windows"
+    },
+    {
+      "id": "test:chef:0:1:0",
+      "split": "test",
+      "subject_lemma": "chef",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The chefs beside the window"
+    },
+    {
+      "id": "test:chef:0:1:1",
+      "split": "test",
+      "subject_lemma": "chef",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The chefs beside the windows"
+    },
+    {
+      "id": "test:chef:1:0:0",
+      "split": "test",
+      "subject_lemma": "chef",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The chef next to the gate"
+    },
+    {
+      "id": "test:chef:1:0:1",
+      "split": "test",
+      "subject_lemma": "chef",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The chef next to the gates"
+    },
+    {
+      "id": "test:chef:1:1:0",
+      "split": "test",
+      "subject_lemma": "chef",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The chefs next to the gate"
+    },
+    {
+      "id": "test:chef:1:1:1",
+      "split": "test",
+      "subject_lemma": "chef",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The chefs next to the gates"
+    },
+    {
+      "id": "test:chef:2:0:0",
+      "split": "test",
+      "subject_lemma": "chef",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The chef across from the building"
+    },
+    {
+      "id": "test:chef:2:0:1",
+      "split": "test",
+      "subject_lemma": "chef",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The chef across from the buildings"
+    },
+    {
+      "id": "test:chef:2:1:0",
+      "split": "test",
+      "subject_lemma": "chef",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The chefs across from the building"
+    },
+    {
+      "id": "test:chef:2:1:1",
+      "split": "test",
+      "subject_lemma": "chef",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The chefs across from the buildings"
+    },
+    {
+      "id": "test:doctor:0:0:0",
+      "split": "test",
+      "subject_lemma": "doctor",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The doctor beside the window"
+    },
+    {
+      "id": "test:doctor:0:0:1",
+      "split": "test",
+      "subject_lemma": "doctor",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The doctor beside the windows"
+    },
+    {
+      "id": "test:doctor:0:1:0",
+      "split": "test",
+      "subject_lemma": "doctor",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The doctors beside the window"
+    },
+    {
+      "id": "test:doctor:0:1:1",
+      "split": "test",
+      "subject_lemma": "doctor",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The doctors beside the windows"
+    },
+    {
+      "id": "test:doctor:1:0:0",
+      "split": "test",
+      "subject_lemma": "doctor",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The doctor next to the gate"
+    },
+    {
+      "id": "test:doctor:1:0:1",
+      "split": "test",
+      "subject_lemma": "doctor",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The doctor next to the gates"
+    },
+    {
+      "id": "test:doctor:1:1:0",
+      "split": "test",
+      "subject_lemma": "doctor",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The doctors next to the gate"
+    },
+    {
+      "id": "test:doctor:1:1:1",
+      "split": "test",
+      "subject_lemma": "doctor",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The doctors next to the gates"
+    },
+    {
+      "id": "test:doctor:2:0:0",
+      "split": "test",
+      "subject_lemma": "doctor",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The doctor across from the building"
+    },
+    {
+      "id": "test:doctor:2:0:1",
+      "split": "test",
+      "subject_lemma": "doctor",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The doctor across from the buildings"
+    },
+    {
+      "id": "test:doctor:2:1:0",
+      "split": "test",
+      "subject_lemma": "doctor",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The doctors across from the building"
+    },
+    {
+      "id": "test:doctor:2:1:1",
+      "split": "test",
+      "subject_lemma": "doctor",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The doctors across from the buildings"
+    },
+    {
+      "id": "test:scientist:0:0:0",
+      "split": "test",
+      "subject_lemma": "scientist",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The scientist beside the window"
+    },
+    {
+      "id": "test:scientist:0:0:1",
+      "split": "test",
+      "subject_lemma": "scientist",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The scientist beside the windows"
+    },
+    {
+      "id": "test:scientist:0:1:0",
+      "split": "test",
+      "subject_lemma": "scientist",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The scientists beside the window"
+    },
+    {
+      "id": "test:scientist:0:1:1",
+      "split": "test",
+      "subject_lemma": "scientist",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The scientists beside the windows"
+    },
+    {
+      "id": "test:scientist:1:0:0",
+      "split": "test",
+      "subject_lemma": "scientist",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The scientist next to the gate"
+    },
+    {
+      "id": "test:scientist:1:0:1",
+      "split": "test",
+      "subject_lemma": "scientist",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The scientist next to the gates"
+    },
+    {
+      "id": "test:scientist:1:1:0",
+      "split": "test",
+      "subject_lemma": "scientist",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The scientists next to the gate"
+    },
+    {
+      "id": "test:scientist:1:1:1",
+      "split": "test",
+      "subject_lemma": "scientist",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The scientists next to the gates"
+    },
+    {
+      "id": "test:scientist:2:0:0",
+      "split": "test",
+      "subject_lemma": "scientist",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The scientist across from the building"
+    },
+    {
+      "id": "test:scientist:2:0:1",
+      "split": "test",
+      "subject_lemma": "scientist",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The scientist across from the buildings"
+    },
+    {
+      "id": "test:scientist:2:1:0",
+      "split": "test",
+      "subject_lemma": "scientist",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The scientists across from the building"
+    },
+    {
+      "id": "test:scientist:2:1:1",
+      "split": "test",
+      "subject_lemma": "scientist",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The scientists across from the buildings"
+    },
+    {
+      "id": "test:clerk:0:0:0",
+      "split": "test",
+      "subject_lemma": "clerk",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The clerk beside the window"
+    },
+    {
+      "id": "test:clerk:0:0:1",
+      "split": "test",
+      "subject_lemma": "clerk",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The clerk beside the windows"
+    },
+    {
+      "id": "test:clerk:0:1:0",
+      "split": "test",
+      "subject_lemma": "clerk",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The clerks beside the window"
+    },
+    {
+      "id": "test:clerk:0:1:1",
+      "split": "test",
+      "subject_lemma": "clerk",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The clerks beside the windows"
+    },
+    {
+      "id": "test:clerk:1:0:0",
+      "split": "test",
+      "subject_lemma": "clerk",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The clerk next to the gate"
+    },
+    {
+      "id": "test:clerk:1:0:1",
+      "split": "test",
+      "subject_lemma": "clerk",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The clerk next to the gates"
+    },
+    {
+      "id": "test:clerk:1:1:0",
+      "split": "test",
+      "subject_lemma": "clerk",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The clerks next to the gate"
+    },
+    {
+      "id": "test:clerk:1:1:1",
+      "split": "test",
+      "subject_lemma": "clerk",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The clerks next to the gates"
+    },
+    {
+      "id": "test:clerk:2:0:0",
+      "split": "test",
+      "subject_lemma": "clerk",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The clerk across from the building"
+    },
+    {
+      "id": "test:clerk:2:0:1",
+      "split": "test",
+      "subject_lemma": "clerk",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The clerk across from the buildings"
+    },
+    {
+      "id": "test:clerk:2:1:0",
+      "split": "test",
+      "subject_lemma": "clerk",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The clerks across from the building"
+    },
+    {
+      "id": "test:clerk:2:1:1",
+      "split": "test",
+      "subject_lemma": "clerk",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The clerks across from the buildings"
+    },
+    {
+      "id": "test:reporter:0:0:0",
+      "split": "test",
+      "subject_lemma": "reporter",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The reporter beside the window"
+    },
+    {
+      "id": "test:reporter:0:0:1",
+      "split": "test",
+      "subject_lemma": "reporter",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The reporter beside the windows"
+    },
+    {
+      "id": "test:reporter:0:1:0",
+      "split": "test",
+      "subject_lemma": "reporter",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The reporters beside the window"
+    },
+    {
+      "id": "test:reporter:0:1:1",
+      "split": "test",
+      "subject_lemma": "reporter",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The reporters beside the windows"
+    },
+    {
+      "id": "test:reporter:1:0:0",
+      "split": "test",
+      "subject_lemma": "reporter",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The reporter next to the gate"
+    },
+    {
+      "id": "test:reporter:1:0:1",
+      "split": "test",
+      "subject_lemma": "reporter",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The reporter next to the gates"
+    },
+    {
+      "id": "test:reporter:1:1:0",
+      "split": "test",
+      "subject_lemma": "reporter",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The reporters next to the gate"
+    },
+    {
+      "id": "test:reporter:1:1:1",
+      "split": "test",
+      "subject_lemma": "reporter",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The reporters next to the gates"
+    },
+    {
+      "id": "test:reporter:2:0:0",
+      "split": "test",
+      "subject_lemma": "reporter",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The reporter across from the building"
+    },
+    {
+      "id": "test:reporter:2:0:1",
+      "split": "test",
+      "subject_lemma": "reporter",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The reporter across from the buildings"
+    },
+    {
+      "id": "test:reporter:2:1:0",
+      "split": "test",
+      "subject_lemma": "reporter",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The reporters across from the building"
+    },
+    {
+      "id": "test:reporter:2:1:1",
+      "split": "test",
+      "subject_lemma": "reporter",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The reporters across from the buildings"
+    },
+    {
+      "id": "test:lawyer:0:0:0",
+      "split": "test",
+      "subject_lemma": "lawyer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The lawyer beside the window"
+    },
+    {
+      "id": "test:lawyer:0:0:1",
+      "split": "test",
+      "subject_lemma": "lawyer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The lawyer beside the windows"
+    },
+    {
+      "id": "test:lawyer:0:1:0",
+      "split": "test",
+      "subject_lemma": "lawyer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The lawyers beside the window"
+    },
+    {
+      "id": "test:lawyer:0:1:1",
+      "split": "test",
+      "subject_lemma": "lawyer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The lawyers beside the windows"
+    },
+    {
+      "id": "test:lawyer:1:0:0",
+      "split": "test",
+      "subject_lemma": "lawyer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The lawyer next to the gate"
+    },
+    {
+      "id": "test:lawyer:1:0:1",
+      "split": "test",
+      "subject_lemma": "lawyer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The lawyer next to the gates"
+    },
+    {
+      "id": "test:lawyer:1:1:0",
+      "split": "test",
+      "subject_lemma": "lawyer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The lawyers next to the gate"
+    },
+    {
+      "id": "test:lawyer:1:1:1",
+      "split": "test",
+      "subject_lemma": "lawyer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The lawyers next to the gates"
+    },
+    {
+      "id": "test:lawyer:2:0:0",
+      "split": "test",
+      "subject_lemma": "lawyer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The lawyer across from the building"
+    },
+    {
+      "id": "test:lawyer:2:0:1",
+      "split": "test",
+      "subject_lemma": "lawyer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The lawyer across from the buildings"
+    },
+    {
+      "id": "test:lawyer:2:1:0",
+      "split": "test",
+      "subject_lemma": "lawyer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The lawyers across from the building"
+    },
+    {
+      "id": "test:lawyer:2:1:1",
+      "split": "test",
+      "subject_lemma": "lawyer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The lawyers across from the buildings"
+    },
+    {
+      "id": "test:librarian:0:0:0",
+      "split": "test",
+      "subject_lemma": "librarian",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The librarian beside the window"
+    },
+    {
+      "id": "test:librarian:0:0:1",
+      "split": "test",
+      "subject_lemma": "librarian",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The librarian beside the windows"
+    },
+    {
+      "id": "test:librarian:0:1:0",
+      "split": "test",
+      "subject_lemma": "librarian",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The librarians beside the window"
+    },
+    {
+      "id": "test:librarian:0:1:1",
+      "split": "test",
+      "subject_lemma": "librarian",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The librarians beside the windows"
+    },
+    {
+      "id": "test:librarian:1:0:0",
+      "split": "test",
+      "subject_lemma": "librarian",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The librarian next to the gate"
+    },
+    {
+      "id": "test:librarian:1:0:1",
+      "split": "test",
+      "subject_lemma": "librarian",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The librarian next to the gates"
+    },
+    {
+      "id": "test:librarian:1:1:0",
+      "split": "test",
+      "subject_lemma": "librarian",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The librarians next to the gate"
+    },
+    {
+      "id": "test:librarian:1:1:1",
+      "split": "test",
+      "subject_lemma": "librarian",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The librarians next to the gates"
+    },
+    {
+      "id": "test:librarian:2:0:0",
+      "split": "test",
+      "subject_lemma": "librarian",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The librarian across from the building"
+    },
+    {
+      "id": "test:librarian:2:0:1",
+      "split": "test",
+      "subject_lemma": "librarian",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The librarian across from the buildings"
+    },
+    {
+      "id": "test:librarian:2:1:0",
+      "split": "test",
+      "subject_lemma": "librarian",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The librarians across from the building"
+    },
+    {
+      "id": "test:librarian:2:1:1",
+      "split": "test",
+      "subject_lemma": "librarian",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The librarians across from the buildings"
+    },
+    {
+      "id": "test:artist:0:0:0",
+      "split": "test",
+      "subject_lemma": "artist",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The artist beside the window"
+    },
+    {
+      "id": "test:artist:0:0:1",
+      "split": "test",
+      "subject_lemma": "artist",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The artist beside the windows"
+    },
+    {
+      "id": "test:artist:0:1:0",
+      "split": "test",
+      "subject_lemma": "artist",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The artists beside the window"
+    },
+    {
+      "id": "test:artist:0:1:1",
+      "split": "test",
+      "subject_lemma": "artist",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The artists beside the windows"
+    },
+    {
+      "id": "test:artist:1:0:0",
+      "split": "test",
+      "subject_lemma": "artist",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The artist next to the gate"
+    },
+    {
+      "id": "test:artist:1:0:1",
+      "split": "test",
+      "subject_lemma": "artist",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The artist next to the gates"
+    },
+    {
+      "id": "test:artist:1:1:0",
+      "split": "test",
+      "subject_lemma": "artist",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The artists next to the gate"
+    },
+    {
+      "id": "test:artist:1:1:1",
+      "split": "test",
+      "subject_lemma": "artist",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The artists next to the gates"
+    },
+    {
+      "id": "test:artist:2:0:0",
+      "split": "test",
+      "subject_lemma": "artist",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The artist across from the building"
+    },
+    {
+      "id": "test:artist:2:0:1",
+      "split": "test",
+      "subject_lemma": "artist",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The artist across from the buildings"
+    },
+    {
+      "id": "test:artist:2:1:0",
+      "split": "test",
+      "subject_lemma": "artist",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The artists across from the building"
+    },
+    {
+      "id": "test:artist:2:1:1",
+      "split": "test",
+      "subject_lemma": "artist",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The artists across from the buildings"
+    },
+    {
+      "id": "test:dancer:0:0:0",
+      "split": "test",
+      "subject_lemma": "dancer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The dancer beside the window"
+    },
+    {
+      "id": "test:dancer:0:0:1",
+      "split": "test",
+      "subject_lemma": "dancer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The dancer beside the windows"
+    },
+    {
+      "id": "test:dancer:0:1:0",
+      "split": "test",
+      "subject_lemma": "dancer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The dancers beside the window"
+    },
+    {
+      "id": "test:dancer:0:1:1",
+      "split": "test",
+      "subject_lemma": "dancer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The dancers beside the windows"
+    },
+    {
+      "id": "test:dancer:1:0:0",
+      "split": "test",
+      "subject_lemma": "dancer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The dancer next to the gate"
+    },
+    {
+      "id": "test:dancer:1:0:1",
+      "split": "test",
+      "subject_lemma": "dancer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The dancer next to the gates"
+    },
+    {
+      "id": "test:dancer:1:1:0",
+      "split": "test",
+      "subject_lemma": "dancer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The dancers next to the gate"
+    },
+    {
+      "id": "test:dancer:1:1:1",
+      "split": "test",
+      "subject_lemma": "dancer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The dancers next to the gates"
+    },
+    {
+      "id": "test:dancer:2:0:0",
+      "split": "test",
+      "subject_lemma": "dancer",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The dancer across from the building"
+    },
+    {
+      "id": "test:dancer:2:0:1",
+      "split": "test",
+      "subject_lemma": "dancer",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The dancer across from the buildings"
+    },
+    {
+      "id": "test:dancer:2:1:0",
+      "split": "test",
+      "subject_lemma": "dancer",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The dancers across from the building"
+    },
+    {
+      "id": "test:dancer:2:1:1",
+      "split": "test",
+      "subject_lemma": "dancer",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The dancers across from the buildings"
+    },
+    {
+      "id": "test:visitor:0:0:0",
+      "split": "test",
+      "subject_lemma": "visitor",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The visitor beside the window"
+    },
+    {
+      "id": "test:visitor:0:0:1",
+      "split": "test",
+      "subject_lemma": "visitor",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The visitor beside the windows"
+    },
+    {
+      "id": "test:visitor:0:1:0",
+      "split": "test",
+      "subject_lemma": "visitor",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The visitors beside the window"
+    },
+    {
+      "id": "test:visitor:0:1:1",
+      "split": "test",
+      "subject_lemma": "visitor",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} beside the {attractor}",
+      "prompt": "The visitors beside the windows"
+    },
+    {
+      "id": "test:visitor:1:0:0",
+      "split": "test",
+      "subject_lemma": "visitor",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The visitor next to the gate"
+    },
+    {
+      "id": "test:visitor:1:0:1",
+      "split": "test",
+      "subject_lemma": "visitor",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The visitor next to the gates"
+    },
+    {
+      "id": "test:visitor:1:1:0",
+      "split": "test",
+      "subject_lemma": "visitor",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The visitors next to the gate"
+    },
+    {
+      "id": "test:visitor:1:1:1",
+      "split": "test",
+      "subject_lemma": "visitor",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} next to the {attractor}",
+      "prompt": "The visitors next to the gates"
+    },
+    {
+      "id": "test:visitor:2:0:0",
+      "split": "test",
+      "subject_lemma": "visitor",
+      "subject_number": 0,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The visitor across from the building"
+    },
+    {
+      "id": "test:visitor:2:0:1",
+      "split": "test",
+      "subject_lemma": "visitor",
+      "subject_number": 0,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The visitor across from the buildings"
+    },
+    {
+      "id": "test:visitor:2:1:0",
+      "split": "test",
+      "subject_lemma": "visitor",
+      "subject_number": 1,
+      "attractor_number": 0,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The visitors across from the building"
+    },
+    {
+      "id": "test:visitor:2:1:1",
+      "split": "test",
+      "subject_lemma": "visitor",
+      "subject_number": 1,
+      "attractor_number": 1,
+      "template": "The {subject} across from the {attractor}",
+      "prompt": "The visitors across from the buildings"
+    }
+  ],
+  "neutral_prompts": [
+    "The opposite of hot is",
+    "The opposite of left is",
+    "The opposite of open is",
+    "The capital of France is",
+    "The capital of Japan is",
+    "The capital of Italy is",
+    "Two plus two equals",
+    "Three plus four equals",
+    "Ten minus five equals",
+    "Monday, Tuesday, Wednesday,",
+    "January, February, March,",
+    "The colors of the rainbow include red, orange,",
+    "A triangle has three",
+    "Water freezes at zero degrees",
+    "A year has twelve",
+    "A week has seven"
+  ],
+  "arms": {}
+}

@@ -1,0 +1,57 @@
+# End-to-end KL — GENERAL corpus, UNSUPERVISED. Qwen3.5-9B, layer 31 (FINAL
+# decoder layer). Mirrors the Llama-3.2-3B general layer27 run, retargeted to
+# Qwen. Trained with the STREAMING on-the-fly trainer (train_e2e_stream.py):
+# teacher (original logits) and student (recon-spliced logits) are BOTH computed
+# in-loop; for the last layer this is the head-only (lm_head ∘ norm) path.
+# `activations_dir` is used only for normalisation stats.
+#
+# Prereq: norm-stats activations cached via
+#   python geosep/extract_activations.py --config geosep/configs/qwen_last_extract.yaml
+#
+#   python geosep/e2e/train_e2e_stream.py \
+#     --config geosep/e2e/configs/general/Qwen3.5-9B/layer31/kl_gelu.yaml \
+#     --n_clusters 2000 --no_sinkhorn --accum 8
+
+extraction:
+  model_name: "Qwen/Qwen3.5-9B"           # REQUIRED for e2e — the LLM is in the loop
+
+data:
+  activations_dir: "activations_qwen_diverse"   # -> geosep/activations_qwen_diverse (norm stats only)
+  target_layer: 31
+  # (B, 248320) logits + backward through lm_head — keep modest. A larger batch
+  # would calm the outlier-dominated KL gradient, but risks OOM at this vocab.
+  batch_size: 256
+  val_frac: 0.05
+
+model:
+  hidden_size: 4096
+  latent_dim: 10240                 # no bottleneck
+  n_clusters: 128                  # overridden to 2000 on the CLI
+  nonlinearity: gelu
+
+loss:
+  lambda_cluster: 0.01
+  lambda_sep: 0.005
+  lambda_usage: 0.05               # unused by e2e loss; kept for config parity
+  # Normalised-space recon anchor. Qwen L31 has massive-activation outliers that
+  # dominate the head's RMSNorm; a weak MSE term (all dims weighted equally)
+  # forces faithful reconstruction of those dims and stabilises KL. 0 = KL-only.
+  lambda_mse: 0.1
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 40
+  # ~5x below the 1e-4 default, matching Qwen L31's ~5x larger activation scale
+  # (token L2 norm median ~260 vs Llama ~55) to stop the KL from oscillating up.
+  lr: 2.0e-5
+  recon_only_epochs: 5             # "KL-only" warmup (cluster/sep phase in after)
+  clustering_start_epoch: 6
+  full_loss_start_epoch: 9
+  teacher_mode: "onfly"            # ignored by the streaming trainer (always in-loop)
+  centroid_init: "kmeans++"
+  checkpoints_dir: "e2e/checkpoints/general/Qwen3.5-9B/layer31/kl_gelu_2000"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

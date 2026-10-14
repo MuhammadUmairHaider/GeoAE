@@ -1,0 +1,61 @@
+# GPT-2 small block 0: 2x GeoAE (768 -> 1536), K=2000, fixed token bypass.
+# Matched Gemma/Llama sampled struct5 losses, schedule, DPC initialization and seed 42.
+# All layers: python scripts/gpt2/submit.py; individual: sbatch --array=0 scripts/gpt2/train.sbatch
+
+data:
+  activations_dir: activations_gpt2_sampled_struct5_10M
+  batch_size: 32768
+  target_layer: 0
+  val_frac: 0.05
+extraction:
+  model_name: gpt2
+loss:
+  balance: zipf
+  balance_eta: 0.05
+  balance_rho: 0.6
+  lambda_cluster: 1.0
+  lambda_cov: 0.01
+  lambda_mse: 0.0
+  lambda_sep: 0.3
+  lambda_unif: 0.0
+  lambda_usage: 0.05
+  lambda_var: 1.0
+  sep_margin: 2.0
+  sep_mode: hinge
+  sinkhorn_iters: 3
+  tau_end: 0.1
+  tau_start: 1.0
+  zipf_alpha_end: 0.5
+  zipf_alpha_start: 0.0
+model:
+  hidden_size: 768
+  latent_dim: 1536
+  latent_norm: batch
+  metric: euclidean
+  n_clusters: 2000
+  nonlinearity: gelu
+  token_bias: e2e/checkpoints/general/gpt2/layer0/token_bias_sampled_struct5.npz
+train:
+  centroid_init: dpc
+  checkpoints_dir: checkpoints/gpt2/layer0/k2000_bnh_b32k_lam1_d1536_dpc_sampled_struct5_tokbias
+  clustering_start_epoch: 11
+  density_knn: 32
+  density_pool: 32768
+  density_power: 1.0
+  diag_every: 12
+  ema_decay: 0.9
+  ema_hard: true
+  full_loss_start_epoch: 11
+  geometry_start_epoch: 6
+  keep_checkpoints: 12
+  lr: 0.00028
+  n_epochs: 50
+  peak_min_sep_frac: 0.25
+  peak_refine_k: 8
+  peak_reinit_pool: 8192
+  recon_only_epochs: 10
+  reinit_every: 125
+  reinit_mode: peaks
+  save_every: 1
+  seed: 42
+  wandb_project: geoae-gpt2

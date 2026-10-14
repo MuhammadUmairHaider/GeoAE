@@ -1,0 +1,406 @@
+"""
+Loss functions for GeoAE.
+
+All functions accept float32 tensors (cast before calling if working in bf16/fp16).
+Shapes annotated as: B=batch, D=hidden, L=latent, K=n_clusters.
+"""
+from __future__ import annotations
+
+import math
+
+import torch
+import torch.nn.functional as F
+from torch import Tensor
+
+
+# ---------------------------------------------------------------------------
+# Distance metric helpers
+# ---------------------------------------------------------------------------
+# Two clustering geometries are supported, selected by `metric`:
+#   "euclidean" : magnitude-based — squared L2 distance on the raw latents.
+#   "cosine"    : directional     — squared L2 distance on L2-normalised latents,
+#                 which is monotone in cosine distance: ||â-ĉ||² = 2(1 - cos).
+# Cosine is therefore "spherical k-means": the exact same Euclidean machinery,
+# run on unit vectors. Keeping it this way means assignment, cluster_loss,
+# sep_loss and the baseline all stay consistent under one switch.
+
+VALID_METRICS = ("euclidean", "cosine")
+
+
+def l2_normalize(t: Tensor, eps: float = 1e-8) -> Tensor:
+    """Row-wise L2 normalisation (last dim)."""
+    return t / t.norm(dim=-1, keepdim=True).clamp(min=eps)
+
+
+def _maybe_normalize(t: Tensor, metric: str) -> Tensor:
+    return l2_normalize(t) if metric == "cosine" else t
+
+
+# ---------------------------------------------------------------------------
+# Sinkhorn-Knopp in log space (numerically stable)
+# ---------------------------------------------------------------------------
+
+def sinkhorn_log(
+    cost: Tensor,      # (B, K)  squared distances
+    tau: float,
+    n_iter: int = 3,
+) -> Tensor:
+    """
+    Returns soft assignment matrix Q of shape (B, K) where:
+      - each row sums to 1  (each latent is fully assigned)
+      - each column sums to B/K  (balanced across clusters)
+
+    Works entirely in log space to avoid exp overflow / underflow.
+    """
+    B, K = cost.shape
+    log_Q = -cost / tau  # (B, K)
+
+    log_BK = torch.log(torch.tensor(B / K, dtype=log_Q.dtype, device=log_Q.device))
+
+    for _ in range(n_iter):
+        # Row normalisation: each row sums to 1
+        log_Q = log_Q - torch.logsumexp(log_Q, dim=1, keepdim=True)
+        # Column normalisation: each column sums to B/K
+        log_Q = log_Q - torch.logsumexp(log_Q, dim=0, keepdim=True) + log_BK
+
+    # End on a row normalisation so row sums are exactly 1 at output
+    log_Q = log_Q - torch.logsumexp(log_Q, dim=1, keepdim=True)
+
+    return torch.exp(log_Q)  # (B, K)
+
+
+# ---------------------------------------------------------------------------
+# Generalised Sinkhorn: explicit duals, arbitrary target marginal
+# ---------------------------------------------------------------------------
+# `sinkhorn_log` above is left untouched — it is the exact code every shipped
+# checkpoint was trained with. The version below is a strict superset:
+#
+#   log_prior=None, rho=1.0, eta=1.0, g=None   ==  sinkhorn_log(cost, tau, n_iter)
+#   rho=0.0                                    ==  softmax(-cost/tau, dim=1)
+#
+# Every operation in the alternating solve adds only a per-row or per-column
+# constant, so Q always factors as exp(-C/tau + f + g) with f (B,) the row dual
+# and g (K,) the column dual. Naming them buys three knobs:
+#
+#   log_prior : what shape the column marginal should have (uniform or Zipf)
+#   rho       : how hard the column constraint is applied  (1 = hard, 0 = off)
+#   eta       : how much of g carries across batches       (1 = per-batch)
+
+
+def cluster_log_prior(
+    K: int,
+    alpha: float,
+    device: torch.device | None = None,
+    dtype: torch.dtype = torch.float32,
+) -> Tensor:
+    """
+    log of a power-law prior over K clusters in RANK order: p_r ∝ r^(-alpha).
+
+    alpha=0 returns log(1/K) exactly, so it is the smooth identity case and a
+    schedule can anneal from uniform into a heavy tail without branching.
+    Built in log space so a long tail cannot underflow.
+
+    Returns (K,) log-probabilities that exponentiate to sum 1, indexed by RANK
+    (entry 0 = the head). The caller decides which cluster occupies which rank.
+    """
+    r = torch.arange(1, K + 1, device=device, dtype=dtype)
+    log_p = -alpha * r.log()
+    return log_p - torch.logsumexp(log_p, dim=0)
+
+
+def sinkhorn_log_dual(
+    cost: Tensor,                    # (B, K) squared distances
+    tau: float,
+    n_iter: int = 3,
+    log_prior: Tensor | None = None, # (K,) log target marginal; None = uniform
+    rho: float = 1.0,                # column-constraint strength
+    eta: float = 1.0,                # cross-batch EMA rate on g
+    g: Tensor | None = None,         # (K,) incoming column dual; None = zeros
+) -> tuple[Tensor, Tensor]:
+    """
+    Returns (Q, g): the (B, K) assignment and the (K,) column dual to carry.
+
+    The log(B) term below cancels the batch-size dependence of the column
+    logsumexp, which keeps g comparable across batches of different length —
+    required, since the last batch of an epoch is short.
+    """
+    B, K = cost.shape
+    logits = -cost / tau
+    if log_prior is None:
+        log_col = torch.full((K,), -math.log(K), dtype=logits.dtype, device=logits.device)
+    else:
+        log_col = log_prior.to(dtype=logits.dtype, device=logits.device)
+    log_target = math.log(B) + log_col                      # (K,) target column SUM
+
+    if g is None:
+        g = torch.zeros(K, dtype=logits.dtype, device=logits.device)
+    else:
+        g = g.to(dtype=logits.dtype, device=logits.device)
+
+    for _ in range(n_iter):
+        f = -torch.logsumexp(logits + g, dim=1, keepdim=True)          # rows -> 1
+        g_full = rho * (log_target - torch.logsumexp(logits + f, dim=0))
+        g = g + eta * (g_full - g)
+    f = -torch.logsumexp(logits + g, dim=1, keepdim=True)              # end on a row norm
+
+    return torch.exp(logits + f + g), g
+
+
+# ---------------------------------------------------------------------------
+# Individual loss terms
+# ---------------------------------------------------------------------------
+
+def recon_loss(x: Tensor, x_hat: Tensor) -> tuple[Tensor, Tensor]:
+    """
+    L_recon = MSE(x_hat, x).
+    Also returns fraction of variance explained = 1 - MSE / Var(x).
+
+    Returns: (mse_scalar, fve_scalar)
+    """
+    mse = F.mse_loss(x_hat, x)
+    var_x = x.var(unbiased=False)
+    fve = 1.0 - mse / (var_x + 1e-8)
+    return mse, fve
+
+
+def cluster_loss(
+    z: Tensor,          # (B, L)
+    centroids: Tensor,  # (K, L)  — must be detached before passing in
+    Q: Tensor,          # (B, K)  soft assignment from sinkhorn_log
+    metric: str = "euclidean",
+) -> Tensor:
+    """
+    L_cluster = mean over batch of sum_k Q[b,k] * ||z[b] - c[k]||^2.
+
+    Pulls each latent toward its Sinkhorn-assigned centroid(s).
+    centroids must be detached (no gradient through centroid EMA updates).
+
+    For metric="cosine" the latents and centroids are L2-normalised first, so
+    the pull is directional and dist2 ∈ [0, 4] (no per-dim scaling needed).
+    """
+    if metric == "cosine":
+        z = l2_normalize(z)
+        centroids = l2_normalize(centroids)
+        dist2 = torch.cdist(z, centroids, p=2).pow(2)              # (B, K), O(1) scale
+    else:
+        # dist2[b, k] = ||z[b] - c[k]||^2 / latent_dim  (per-dim, comparable scale to MSE)
+        dist2 = torch.cdist(z, centroids, p=2).pow(2) / z.shape[1]  # (B, K)
+    return (Q * dist2).sum(dim=1).mean()
+
+
+#need further attention. infonce might be better
+VALID_SEP_MODES = ("median", "intra", "hinge")
+
+
+def sep_loss(z: Tensor, Q: Tensor, metric: str = "euclidean",
+             mode: str = "median", margin: float = 2.0) -> Tensor:
+    """
+    Separation between soft batch cluster means m_k = Σ_b Q[b,k] z[b] / Σ_b Q[b,k].
+
+    THE PROBLEM WITH mode="median" (the original, and still the default).
+    sigma^2 = median pairwise dist^2 is homogeneous of degree 2 in the distances,
+    so d^2/sigma^2 is scale-free and the loss is INVARIANT to pushing every
+    cluster apart. Measured on llama L27, a 240x range of lambda_sep
+    (0.005 -> 1.2) moved the converged value by 0.01, and it always lands near
+    exp(-1)=0.3679 because a pair at the median contributes exactly that by
+    construction. It measures how UNIFORM the inter-cluster distances are, not
+    how SEPARATED the clusters are, so lambda_sep is not a usable knob.
+    Multiplying sigma^2 by (1+eps) does not help: it preserves the homogeneity
+    and only relocates the fixed point to exp(-1/(1+eps)).
+
+    The two alternatives below break that invariance by taking sigma from
+    something that does NOT scale with the centroids:
+
+      mode="intra"   sigma^2 = mean INTRA-cluster spread (detached).
+                     Asks whether centroids are far apart RELATIVE TO CLUSTER
+                     SIZE — the quantity every diagnostic in this project
+                     actually reports (min_inter/mean_intra was 0.19 on
+                     balance_phased, i.e. the nearest pair overlaps 5x).
+                     Still invariant to inflating the whole latent, which is
+                     correct: that is lambda_var's job, not separation's.
+
+      mode="hinge"   relu(margin*r_intra - d)^2, r_intra detached.
+                     Targets the actual failure — pairs that overlap — instead
+                     of averaging exp() over K^2 pairs, and goes to exactly zero
+                     once every pair clears the margin, so it cannot fight
+                     lambda_var indefinitely.
+
+    sigma / r_intra are detached in both, so this term only pushes centroids
+    APART; making clusters tighter is cluster_loss's job.
+
+    For metric="cosine" the latents are L2-normalised first, so separation is
+    measured between directional cluster means.
+    """
+    if mode not in VALID_SEP_MODES:
+        raise ValueError(f"sep mode must be one of {VALID_SEP_MODES}, got {mode!r}")
+    if metric == "cosine":
+        z = l2_normalize(z)
+    weights = Q / (Q.sum(dim=0, keepdim=True) + 1e-8)  # (B, K)
+    cluster_means = weights.T @ z                        # (K, L)
+
+    K = cluster_means.shape[0]
+    dist2 = torch.cdist(cluster_means, cluster_means, p=2).pow(2)  # (K, K)
+    mask = ~torch.eye(K, dtype=torch.bool, device=cluster_means.device)
+    pair_d2 = dist2[mask]
+
+    if mode == "median":
+        with torch.no_grad():
+            sigma2 = pair_d2.median().clamp(min=1e-8)
+        return torch.exp(-pair_d2 / sigma2).mean()
+
+    # Mean squared distance from each latent to its (soft) cluster mean — the
+    # scale the inter-centroid distances are judged against.
+    with torch.no_grad():
+        assign = Q.argmax(dim=1)                                   # (B,)
+        intra2 = (z - cluster_means[assign]).pow(2).sum(1).mean().clamp(min=1e-8)
+
+    if mode == "intra":
+        return torch.exp(-pair_d2 / intra2).mean()
+
+    r = intra2.sqrt()
+    return F.relu(margin * r - pair_d2.clamp(min=1e-12).sqrt()).pow(2).mean() / (r * r)
+
+
+def variance_loss(z: Tensor, gamma: float = 1.0) -> Tensor:
+    """
+    VICReg variance term: mean_j relu(gamma - std_j(z)).
+
+    A hinge that charges for any latent dimension whose batch std falls below
+    gamma. This is the anti-contraction term: a uniform shrink of the latent
+    (which cluster_loss rewards and the adaptive-sigma sep_loss ignores) drives
+    every std down and is paid for immediately. Zero once all dims have
+    std >= gamma, so it never fights expansion.
+    """
+    std = z.var(dim=0, unbiased=False).add(1e-6).sqrt()   # (L,)
+    return F.relu(gamma - std).mean()
+
+
+def covariance_loss(z: Tensor) -> Tensor:
+    """
+    VICReg covariance term: sum of squared off-diagonal entries of Cov(z), / L.
+
+    Decorrelates latent dimensions, spreading variance across many independent
+    directions instead of a low-rank slice — the direct counter to centroid/
+    latent subspace collapse. Acts on feature dims, not cluster positions, so it
+    does not impose any particular arrangement on the clusters themselves.
+    """
+    B, L = z.shape
+    zc = z - z.mean(dim=0, keepdim=True)
+    cov = (zc.T @ zc) / max(B - 1, 1)                      # (L, L)
+    off_diag = cov.pow(2).sum() - cov.diagonal().pow(2).sum()
+    return off_diag / L
+
+
+def uniformity_loss(z: Tensor, t: float = 2.0, max_samples: int = 2048) -> Tensor:
+    """
+    Wang–Isola uniformity on the unit sphere:
+        log mean_{i<j} exp(-t * ||ẑ_i - ẑ_j||²),  ẑ = z / ||z||.
+
+    Non-saturating spread pressure for the cosine/directional geometry: unlike
+    sep_loss (adaptive sigma -> scale-invariant, plateaus once distances are
+    comparable) the fixed t keeps rewarding angular spread all the way to a
+    uniform distribution on the sphere. Subsampled to max_samples rows to keep
+    the pairwise term O(max_samples^2).
+    """
+    if z.shape[0] > max_samples:
+        idx = torch.randperm(z.shape[0], device=z.device)[:max_samples]
+        z = z[idx]
+    zn = l2_normalize(z)
+    d2 = torch.pdist(zn, p=2).pow(2)                       # (B*(B-1)/2,)
+    return torch.logsumexp(-t * d2, dim=0) - torch.log(
+        torch.tensor(float(d2.numel()), device=z.device)
+    )
+
+
+def usage_loss(Q: Tensor) -> Tensor:
+    """
+    L_usage = L1(u - 1/K) where u_k = mean over batch of Q[:, k].
+
+    Penalises deviation from uniform cluster usage.
+    """
+    K = Q.shape[1]
+    u = Q.mean(dim=0)           # (K,)
+    target = torch.full_like(u, 1.0 / K)
+    return F.l1_loss(u, target)
+
+
+# ---------------------------------------------------------------------------
+# Combined loss
+# ---------------------------------------------------------------------------
+
+def total_loss(
+    x: Tensor,
+    x_hat: Tensor,
+    z: Tensor,
+    centroids: Tensor,   # detached
+    Q: Tensor,
+    lambda_cluster: float,
+    lambda_sep: float,
+    metric: str = "euclidean",
+    lambda_var: float = 0.0,
+    lambda_cov: float = 0.0,
+    lambda_unif: float = 0.0,
+    sep_mode: str = "median",
+    sep_margin: float = 2.0,
+    var_gamma: float = 1.0,
+) -> dict[str, Tensor]:
+    """
+    L = MSE + lambda_cluster · L_cluster + lambda_sep · L_sep
+           + lambda_var · L_var + lambda_cov · L_cov + lambda_unif · L_unif
+
+    Returns a dict with 'loss' (scalar to backprop) and individual components.
+
+    usage_loss is omitted: Sinkhorn already enforces column sums = B/K, so
+    Q.mean(0) ≈ 1/K by construction and the term is always ~0.
+
+    The three geometry regularisers mirror `total_loss_e2e` exactly — same
+    functions, same conditional structure — so an MSE run and a KL run can be
+    compared under identical geometry. They matter more here than in the e2e
+    loss: with latent_dim == hidden_size and no sparsity term, reconstruction
+    alone is minimised by drifting toward identity, and L_var / L_cov are the
+    only pressure against the resulting collapse.
+
+    All three default to 0.0 and are skipped entirely when off, so configs
+    written before they existed reproduce the previous loss exactly.
+    """
+    l_recon, fve = recon_loss(x, x_hat)
+    l_cluster = cluster_loss(z, centroids, Q, metric=metric)
+    l_sep = sep_loss(z, Q, metric=metric, mode=sep_mode, margin=sep_margin)
+
+    out = {
+        "loss": l_recon + lambda_cluster * l_cluster + lambda_sep * l_sep,
+        "recon": l_recon,
+        "fve": fve,
+        "cluster": l_cluster,
+        "sep": l_sep,
+    }
+
+    if lambda_var > 0:
+        l_var = variance_loss(z, gamma=var_gamma)
+        out["loss"] = out["loss"] + lambda_var * l_var
+        out["var"] = l_var
+    if lambda_cov > 0:
+        l_cov = covariance_loss(z)
+        out["loss"] = out["loss"] + lambda_cov * l_cov
+        out["cov"] = l_cov
+    if lambda_unif > 0:
+        l_unif = uniformity_loss(z)
+        out["loss"] = out["loss"] + lambda_unif * l_unif
+        out["unif"] = l_unif
+
+    return out
+
+
+# ---------------------------------------------------------------------------
+# Sinkhorn cost matrix helper (used by model and losses)
+# ---------------------------------------------------------------------------
+
+def pairwise_sq_dist(z: Tensor, centroids: Tensor, metric: str = "euclidean") -> Tensor:
+    """Returns (B, K) squared-distance matrix.
+
+    metric="cosine" normalises both sides first, so the squared L2 distance is
+    monotone in cosine distance (directional / spherical k-means).
+    """
+    z = _maybe_normalize(z, metric)
+    centroids = _maybe_normalize(centroids, metric)
+    return torch.cdist(z, centroids, p=2).pow(2)

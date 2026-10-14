@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geoae"
+version = "0.1.0"
+description = "GeoAE concept-cluster autoencoder for LLM residual streams."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "torch", "transformers", "accelerate", "datasets", "numpy", "pyyaml",
+    "scikit-learn", "scipy", "matplotlib", "sentencepiece", "protobuf", "tqdm",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "wandb", "ruff"]
+
+[project.scripts]
+geoae-train = "geoae.train:main"
+geoae-extract = "geoae.extract:main"
+geoae-evaluate = "geoae.evaluate:main"
+geoae-pipeline = "geoae.pipeline:main"
+geoae-e2e-extract = "geoae.e2e.extract:main"
+geoae-e2e-train = "geoae.e2e.train:main"
+geoae-e2e-train-stream = "geoae.e2e.train_stream:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["geoae*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+
+[tool.ruff.lint]
+# F: pyflakes (unused imports/variables, undefined names), E7/E9: pycodestyle errors
+select = ["F", "E7", "E9"]
+# E70x: compact `a = 1; b = 2` lines are deliberate idiom in this codebase
+ignore = ["E701", "E702", "E731", "E741"]
+
+[tool.ruff.lint.per-file-ignores]
+# Tests instantiate objects for side effects and keep explanatory constants
+"tests/*" = ["F841"]

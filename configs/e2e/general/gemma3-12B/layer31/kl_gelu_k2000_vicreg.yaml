@@ -1,0 +1,108 @@
+# PREREQ: layer 31 is NOT in configs/base/gemma3-12b_extract.yaml (which dumps
+# layer 47 ONLY, at 10M tokens), so activations_gemma3_12b/layer_31.npy does not
+# exist and this run aborts at the norm-stats step. Extract it first:
+#   cp activations_gemma3_12b/meta.json activations_gemma3_12b/meta_layer47.json
+#   python -u -m geoae.extract --config configs/base/gemma3-12b_extract.yaml \
+#     --layers 31 --n_tokens 2000000        # 31 GB at float32
+# 2M is deliberate and sufficient: under train_stream this file is read ONLY for
+# per-dim norm mean/std (--norm_sample 500k) — the training corpus is re-streamed
+# through the LM in-loop — and clustering_quality / fit_baseline_kmeans sample
+# ~1M rows. Extraction also REWRITES meta.json to describe only that pass, hence
+# the cp above to keep the layer-47 provenance.
+#
+# End-to-end KL — GENERAL corpus, UNSUPERVISED. Gemma 3 12B PT, layer 31 of 48
+# (65% depth). Ported from the Llama-3.2-3B layer-27 VICReg recipe, which is
+# the best geometry run so far (fixed rank collapse 37->233, best silhouette /
+# Dunn / min-centroid-distance of any space including raw).
+#
+# BASELINE: google/gemma-scope-2-12b-pt/resid_post/layer_31_width_*_l0_* are
+# JumpReLU SAEs at exactly this hook point (`model.layers.31.output`), so this
+# run is directly comparable to them.
+#
+# TRAINER: streaming on-the-fly (geoae.e2e.train_stream). Layer 31 is NOT the
+# last layer, so there is no head-only shortcut: each step is one no-grad
+# teacher forward plus one grad student forward with the residual spliced at
+# every position, and gradient flows back through 16 frozen blocks. This is the
+# Gemma Scope 'recommended' depth with the widest SAE selection (13 resid_post
+# SAEs: 16k/65k/262k/1m x L0 small/medium/big, plus a 262k-medium second seed).
+#
+# NOTE: train_stream has NO --resume. Unlike the layer-47 run (geoae.e2e.train,
+# which does), a stop here loses everything back to zero. Do not start a long run
+# in a session you cannot leave attached.
+#
+# MEMORY: Gemma 3's vocab is 262,208. Per-doc student logits at T=256 are
+# 256 x 262208 x 4 B = 268 MB, and teacher/log-softmax temporaries multiply
+# that. On a 40 GB A100 alongside ~23.5 GB of bf16 weights, use
+# --max_doc_tokens 128 and raise --accum to keep the effective batch.
+#
+# LAMBDA_MSE = 0.45, carried over from the layer-47 result rather than the old
+# Llama default of 0.05. Sweeping it upward on layer 47 improved BOTH metrics
+# monotonically, against the expectation that MSE trades off against KL:
+#     lambda_mse   val_mse   val_kl
+#       0.05 (ep40)  0.2304   0.0365
+#       0.15 (ep46)  0.1500   0.0330
+#       0.45 (ep50)  0.0809   0.0268
+# i.e. the MSE and KL gradients are positively aligned on Gemma — the AE was
+# under-constrained on the 3839 dims that are not the massive channel, and
+# reconstructing them better also helps the logits. No knee was found at 0.45,
+# so if layer 31 behaves the same, higher is likely still better. At layer 31 the
+# splice is mid-stack rather than head-only, so this alignment is NOT guaranteed
+# to hold — watch the first few epochs before assuming it transfers.
+#
+# LR: 2e-5 is a placeholder. Do NOT apply the naive
+#   lr ~= 1e-4 * (56 / median_token_norm)
+# rule here — it was calibrated on Llama/Qwen, which have no single dominant
+# channel. Gemma 3 12B layer 47 does: dim 2339 is always-on with median |x| =
+# 153,600, i.e. 95.3% of ||x||^2, which would suggest an absurd lr ~3.6e-8.
+# train_stream z-scores the AE input per dim anyway, so the raw norm only matters
+# through the KL gradient. Whether layer 31 carries the same massive channel is
+# UNKNOWN — read the |max| and median_token_norm that extraction prints for
+# layer 31 before trusting this lr, and note fp16 may be safe here if dim 2339
+# has not yet grown (extraction reports overflow automatically).
+#
+#   python -u -m geoae.e2e.train_stream \
+#     --config configs/e2e/general/gemma3-12B/layer31/kl_gelu_k2000_vicreg.yaml \
+#     --no_sinkhorn --accum 16 --max_doc_tokens 128 --tokens_per_epoch 1000000
+
+extraction:
+  model_name: "google/gemma-3-12b-pt"    # REQUIRED for e2e — the LLM is in the loop
+
+data:
+  activations_dir: "activations_gemma3_12b"   # norm stats only under train_stream
+  target_layer: 31
+  batch_size: 512
+  val_frac: 0.05
+
+model:
+  hidden_size: 3840
+  latent_dim: 3840                 # no bottleneck (matches the Llama VICReg run)
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
+
+loss:
+  lambda_cluster: 0.05
+  lambda_sep: 0.005
+  lambda_mse: 0.45                 # from the layer-47 sweep — see header
+  lambda_var: 0.3                  # VICReg variance hinge — blocks latent contraction
+  lambda_cov: 0.001                # VICReg covariance — blocks low-rank collapse
+  lambda_unif: 0.0
+  lambda_usage: 0.05               # unused by e2e loss; config parity
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  lr: 2.0e-5
+  recon_only_epochs: 5
+  clustering_start_epoch: 6
+  full_loss_start_epoch: 9
+  ema_decay: 0.9
+  ema_hard: true                   # centroids average only the points they win
+  teacher_mode: "onfly"            # ignored by the streaming trainer (always in-loop)
+  centroid_init: "kmeans++"
+  checkpoints_dir: "e2e/checkpoints/general/gemma3-12B/layer31/kl_gelu_k2000_vicreg"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

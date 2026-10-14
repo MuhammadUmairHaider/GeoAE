@@ -1,0 +1,30 @@
+data:
+  activations_dir: "dbpedia/activations/Qwen3.5-9B/last/prompted"
+  target_layer: 22
+  batch_size: 512
+  val_frac: 0.05
+
+model:
+  hidden_size: 4096
+  latent_dim: 4096
+  n_clusters: 14
+  nonlinearity: gelu
+
+loss:
+  lambda_cluster: 0.01
+  lambda_sep: 0.005
+  lambda_usage: 0.05
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 100
+  recon_only_epochs: 20
+  clustering_start_epoch: 21
+  full_loss_start_epoch: 30
+  centroid_init: "semisup"
+  checkpoints_dir: "dbpedia/checkpoints/Qwen3.5-9B/layer22/prompted_last_semisup"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-dbpedia"

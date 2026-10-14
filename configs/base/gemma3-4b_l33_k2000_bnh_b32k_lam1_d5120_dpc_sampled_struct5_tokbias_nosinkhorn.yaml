@@ -1,0 +1,64 @@
+# Gemma 3 4B L33, K=2000, d5120, token bypass — NO SINKHORN, re-seeding on (run A, Gemma copy of the Llama ablation;
+# user 2026-10-07). ONE change from the paper's Gemma model: unbalanced assignment (nearest prototype).
+# The parent is the EVALUATED Gemma model (checkpoints/gemma3-4B/layer33/k2000_bnh_b32k_lam1_d5120_dpc_sampled_struct5_tokbias,
+# step_0014450.pt): its saved config, i.e. the repo config gemma3-4b_l33_..._tokbias.yaml with the dump and token bias
+# it was trained on (that file now points at the newer *_train10M dump). RUN WITH --no_sinkhorn (the config cannot express it):
+#   sbatch --mem=240G scripts/argo/train.sbatch <this file> --no_sinkhorn --no_wandb
+#
+extraction:
+  model_name: google/gemma-3-4b-pt
+data:
+  activations_dir: activations_gemma3_4b_sampled_struct5_10M
+  target_layer: 33
+  batch_size: 32768
+  val_frac: 0.05
+model:
+  hidden_size: 2560
+  latent_dim: 5120
+  latent_norm: batch
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
+  token_bias: e2e/checkpoints/general/gemma3-4B/layer33/token_bias_sampled_struct5.npz
+loss:
+  lambda_cluster: 1.0
+  lambda_sep: 0.3
+  sep_mode: hinge
+  sep_margin: 2.0
+  lambda_var: 1.0
+  lambda_cov: 0.01
+  lambda_unif: 0.0
+  lambda_usage: 0.05
+  lambda_mse: 0.0
+  balance: zipf
+  balance_rho: 0.6
+  balance_eta: 0.05
+  zipf_alpha_start: 0.0
+  zipf_alpha_end: 0.5
+  sinkhorn_iters: 3
+  tau_start: 1.0
+  tau_end: 0.1
+train:
+  n_epochs: 50
+  lr: 0.00028
+  recon_only_epochs: 10
+  geometry_start_epoch: 6
+  clustering_start_epoch: 11
+  full_loss_start_epoch: 11
+  ema_decay: 0.9
+  ema_hard: true
+  centroid_init: dpc
+  density_power: 1.0
+  density_pool: 32768
+  density_knn: 32
+  peak_min_sep_frac: 0.25
+  peak_refine_k: 8
+  reinit_mode: peaks
+  peak_reinit_pool: 8192
+  checkpoints_dir: checkpoints/gemma3-4B/layer33/k2000_bnh_b32k_lam1_d5120_dpc_sampled_struct5_tokbias_nosinkhorn
+  diag_every: 12
+  reinit_every: 125
+  save_every: 1
+  keep_checkpoints: 12
+  seed: 42
+  wandb_project: geoae-gemma3-4b
