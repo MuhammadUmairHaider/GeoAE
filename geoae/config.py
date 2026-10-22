@@ -62,6 +62,10 @@ class ModelConfig:
     latent_dim: int = 2048
     n_clusters: int = 128
     nonlinearity: str = "linear"   # "linear" | "relu" | "gelu" | "tanh"
+    decoder_type: str = "linear"  # "linear" | "mlp" | "residual_mlp"
+    decoder_hidden_dim: int = 0   # 0: latent_dim for MLP, max(1, hidden_size//4) for residual
+    decoder_nonlinearity: str = "gelu"  # "linear" (affine control) | "relu" | "gelu" | "tanh"
+    decoder_output_bias: bool = False  # legacy linear and residual default to bias-free output
     metric: str = "euclidean"      # "euclidean" (magnitude) | "cosine" (directional)
     latent_norm: str = "none"
     dist_scale: str = "raw"        # "raw" | "per_dim" — scale of dist2 fed to Sinkhorn.
@@ -88,7 +92,7 @@ class LossConfig:
     lambda_unif: float = 0.0  # Wang–Isola uniformity on unit-sphere latents (cosine runs, 0 = off)
     sinkhorn_iters: int = 3
     # --- generalised cluster-marginal balancing (all defaults = today's behaviour) ---
-    balance: str = "uniform"       # "uniform" | "zipf" — shape of the column target; "none" — no Sinkhorn (nearest prototype)
+    balance: str = "uniform"       # "uniform" | "zipf"  — shape of the column target
     balance_rho: float = 1.0       # column-constraint strength: 1 = hard Sinkhorn, 0 = softmax
     balance_eta: float = 1.0       # cross-batch EMA on the column dual: 1 = per-batch
     zipf_alpha_start: float = 0.0  # annealed 0 -> zipf_alpha_end over the tau window
@@ -215,6 +219,19 @@ class Config:
 
     def validate(self) -> "Config":
         """Reject out-of-range values for the enumerated train fields."""
+        for name in ("hidden_size", "latent_dim"):
+            value = getattr(self.model, name)
+            if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+                raise ValueError(f"model.{name} must be a positive integer, got {value!r}")
+        if self.model.decoder_type not in ("linear", "mlp", "residual_mlp"):
+            raise ValueError(f"Invalid model.decoder_type={self.model.decoder_type!r}")
+        width = self.model.decoder_hidden_dim
+        if isinstance(width, bool) or not isinstance(width, int) or width < 0:
+            raise ValueError("model.decoder_hidden_dim must be a nonnegative integer (0 = automatic)")
+        if self.model.decoder_nonlinearity not in ("linear", "relu", "gelu", "tanh"):
+            raise ValueError(f"Invalid model.decoder_nonlinearity={self.model.decoder_nonlinearity!r}")
+        if not isinstance(self.model.decoder_output_bias, bool):
+            raise ValueError("model.decoder_output_bias must be a boolean")
         if self.model.token_bias_mode not in ("bypass", "decoder_only"):
             raise ValueError(f"Invalid model.token_bias_mode={self.model.token_bias_mode!r}")
         if self.model.token_bias_mode == "decoder_only" and not self.model.token_bias:

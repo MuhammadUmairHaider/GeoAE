@@ -269,37 +269,6 @@ def section_mmlu(root: Path, arms: list[str], out: dict) -> None:
     row("delta (recon - base)", delta)
 
 
-def section_splice_ppl(root: Path, arms: list[str], out: dict) -> None:
-    header("WIKITEXT-2 PERPLEXITY UNDER THE AE SPLICE (seq 2048, BOS kept)")
-    cols(arms)
-    keys = ["clean_ppl", "spliced_ppl", "ppl_increase_pct", "delta_ce", "bpb_clean", "bpb_spliced",
-            "loss_recovered", "spliced_all_ppl"]
-    vals = {k: [] for k in keys}
-    for a in arms:
-        d = load(resolve(root, a, "evals", "splice_ppl.json", "eval_out"))
-        r = None
-        if d and d.get("spliced") and d.get("clean"):
-            c, s, al = d["clean"], d["spliced"], d.get("spliced_all") or {}
-            r = {"clean_ppl": c.get("ppl"), "spliced_ppl": s.get("ppl"),
-                 "ppl_increase_pct": (s["ppl_ratio"] - 1) * 100 if s.get("ppl_ratio") is not None else None,
-                 "delta_ce": s.get("delta_ce"), "delta_ce_ci95": s.get("delta_ce_ci95"),
-                 "bpb_clean": c.get("bits_per_byte"), "bpb_spliced": s.get("bits_per_byte"),
-                 "word_ppl_clean": c.get("word_ppl"), "word_ppl_spliced": s.get("word_ppl"),
-                 "loss_recovered": s.get("loss_recovered"), "kl_from_clean": s.get("kl_from_clean"),
-                 "top1_agreement": s.get("top1_agreement"), "spliced_all_ppl": al.get("ppl")}
-        out.setdefault(a, {})["splice_ppl"] = r
-        for k in keys:
-            vals[k].append((r or {}).get(k))
-    row("clean ppl", vals["clean_ppl"])
-    row("spliced ppl", vals["spliced_ppl"])
-    row("ppl increase (%)", vals["ppl_increase_pct"])
-    row("delta CE (nats/token)", vals["delta_ce"])
-    row("bits/byte clean", vals["bpb_clean"])
-    row("bits/byte spliced", vals["bpb_spliced"])
-    row("loss recovered", vals["loss_recovered"])
-    row("spliced ppl, all positions", vals["spliced_all_ppl"])
-
-
 def section_cq(root: Path, arms: list[str], out: dict) -> None:
     header("CLUSTERING QUALITY (1M rows, seed 0) — each space scored in its OWN coordinates")
     print("  All metrics are deterministic (seeded since 2026-09-21). Only scale-free ratios are shown;")
@@ -492,7 +461,6 @@ def main() -> None:
         section_token_structure(root, arms_, out)
         section_probe(root, arms_, out)
         section_mmlu(root, arms_, out)
-        section_splice_ppl(root, arms_, out)
         section_cq(root, arms_, out)
         section_range(root, arms_, "range_intervention_db14_dprime", "DB14 RANGE INTERVENTIONS", out)
         section_range(root, arms_, "range_intervention_biasbios_dprime", "BIAS_IN_BIOS RANGE INTERVENTIONS", out)

@@ -112,7 +112,6 @@ See [docs/architecture.md](docs/architecture.md) for design details.
 |-------|-------------|
 | [Architecture](docs/architecture.md) | Model, losses, data flow |
 | [Training](docs/training.md) | Base AE and e2e workflows |
-| [Middle-layer bypass runs](docs/midlayer_bypass.md) | Llama L14 / Gemma 4B L17 trainers and detailed evaluations |
 | [Configuration](docs/configuration.md) | YAML config reference |
 | [Interpretability](docs/interpretability.md) | Analysis and causal tools |
 | [Experiments](docs/experiments.md) | Running benchmark pipelines |

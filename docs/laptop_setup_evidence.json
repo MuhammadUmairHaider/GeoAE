@@ -1,0 +1,225 @@
+{
+  "recorded_utc": "2026-10-22T03:06:21.970695+00:00",
+  "workspace": "/Users/muhammadumairhaider/Work/GeoAE",
+  "machine": {
+    "architecture": "arm64",
+    "macos": "27.0.1",
+    "model": "Mac17,4",
+    "cpu": "Apple M5",
+    "memory_bytes": 17179869184
+  },
+  "local_setup": {
+    "command": "bash scripts/remote/setup_laptop.sh",
+    "exit_code": 0,
+    "cpu_tests_passed": 45,
+    "cpu_test_seconds": 3.6,
+    "python": "3.12.15",
+    "python_executable": "/Users/muhammadumairhaider/Work/GeoAE/.venv/bin/python",
+    "torch": "2.13.0",
+    "uv": "uv 0.13.5 (46776a95d 2026-10-21 aarch64-apple-darwin)",
+    "packages_compatible": 81,
+    "default_device": "cpu",
+    "lock_sha256_before": "6e6799930555d72c187184d66db4468f02d53e8c81dea0464d6f8933ab21672b",
+    "lock_sha256_after": "6e6799930555d72c187184d66db4468f02d53e8c81dea0464d6f8933ab21672b"
+  },
+  "direct_ssh": {
+    "delta": {
+      "hostname": "dt-login03.delta.ncsa.illinois.edu",
+      "user": "mhaider",
+      "archive_directory_exists": true,
+      "proxy": null
+    },
+    "argo": {
+      "hostname": "argologin1.argo.ace-net.ca",
+      "user": "dogar",
+      "runs_directory_exists": true,
+      "evaluation_directory_exists": true,
+      "proxy": null
+    },
+    "authentication": "User entered credentials and MFA in macOS Terminal; no credentials saved by setup. Temporary SSH masters persist for at most 30 minutes after last channel."
+  },
+  "local_bundle": {
+    "sha256": "f821ece2a7136c8166306c6092446786350bdd15aafa4bb747367f8b528a1609",
+    "sidecar_matches": true,
+    "delta_matches": true,
+    "regular_archive_members_checked": 6169,
+    "git_index_note": "Filesystem stat caches changed after git status; indexed paths, modes, object hashes, stages and flags identical.",
+    "research_results_context_and_git_objects_match": true
+  },
+  "current_review": {
+    "path": "runs/nonlinear_decoder_validation/deltaai/review/core_comparison.csv",
+    "sha256": "0af85b32ffc32d07ebfbe4e4ac8dba21f6d0733f698301b78c2baf660147f6cd",
+    "rows": 3,
+    "columns": 13
+  },
+  "remote_checks": {
+    "status.json": {
+      "updated_utc": "2026-10-22T02:24:29.072186+00:00",
+      "phase": "verified",
+      "scope": "selected_nonredundant_jetstream_files",
+      "source": "/home/exouser",
+      "destination": "delta:/projects/bbyl/mhaider/jetstream_migration_20261021",
+      "file_list": "selected-files.txt",
+      "skipped_inventory": "skipped-artifacts.jsonl",
+      "result": "verified",
+      "verified_utc": "2026-10-22T02:24:28.983136+00:00",
+      "selected_files": 8482,
+      "selected_logical_bytes": 141589826905,
+      "selected_unique_regular_bytes": 139077473175,
+      "method": "Completed full-content rsync checksum comparison: no content differences. Final whole-second metadata/hardlink dry-run: no differences. No file contents transferred during metadata normalization.",
+      "content_proof": "completed-content-verification.json",
+      "timestamp_policy": "Target project filesystem rounds timestamps to whole seconds. Original nanosecond timestamps are retained in selected-original-metadata.jsonl; timestamp-policy.json records the filesystem probe.",
+      "note": "Argo data remain authoritative on Argo; existing Delta replicas are referenced. Packed caches and work context have separate SHA256 verification. This verdict covers the selected set, not every preliminary broad-copy file."
+    },
+    "verification.json": {
+      "result": "verified",
+      "verified_utc": "2026-10-22T02:24:28.983136+00:00",
+      "scope": "selected_nonredundant_jetstream_files",
+      "selected_files": 8482,
+      "selected_logical_bytes": 141589826905,
+      "selected_unique_regular_bytes": 139077473175,
+      "method": "Completed full-content rsync checksum comparison: no content differences. Final whole-second metadata/hardlink dry-run: no differences. No file contents transferred during metadata normalization.",
+      "content_proof": "completed-content-verification.json",
+      "file_list": "selected-files.txt",
+      "skipped_inventory": "skipped-artifacts.jsonl",
+      "timestamp_policy": "Target project filesystem rounds timestamps to whole seconds. Original nanosecond timestamps are retained in selected-original-metadata.jsonl; timestamp-policy.json records the filesystem probe.",
+      "note": "Argo data remain authoritative on Argo; existing Delta replicas are referenced. Packed caches and work context have separate SHA256 verification. This verdict covers the selected set, not every preliminary broad-copy file.",
+      "post_verification_updates": [
+        {
+          "path": "home/GeoAE/docs/LAPTOP_HANDOFF.md",
+          "sha256": "093f20d8280636e2aefd941dc5c891f1bf0b21a7509b6845103ef32ef1b59bff",
+          "size_bytes": 12927,
+          "verified_utc": "2026-10-22T02:50:03.561229+00:00",
+          "method": "SHA256 matches the current source after updating the Mac workspace instructions to $HOME/work."
+        }
+      ],
+      "post_verification_update_report": "chat-package-update.json"
+    },
+    "paid-cache-verification.json": {
+      "result": "verified",
+      "method": "GNU tar -d compared every packed entry to source; remote SHA256 check passed",
+      "archive": "packed/geoae-llm-judge-cache.tar.gz",
+      "size_bytes": 84435537,
+      "sha256": "15e8951a2beb233d1881430abb44979d79bdfc41bf1e3f28c03210a98282dc47"
+    },
+    "tmp-verification.json": {
+      "result": "verified",
+      "method": "rsync -aHrcn --itemize-changes returned 0 with empty change list",
+      "entries_staged": 46,
+      "source": "selected user-owned research artifacts from /tmp, frozen under /home/exouser/.local/state/geoae_handoff_20261021/tmp_research",
+      "destination": "delta:/projects/bbyl/mhaider/jetstream_migration_20261021/tmp_research"
+    },
+    "skipped_inventory": {
+      "entries": 160,
+      "reasons": {
+        "nonportable_environment_or_cache": 33,
+        "packedarchivecanonical": 1,
+        "regenerable_feature_cache": 9,
+        "regenerable_token_cache": 1,
+        "nonportable_dependency": 1,
+        "redundant_model_weights": 16,
+        "confirmed_argo_replica": 8,
+        "shared_dataset_authority": 2,
+        "confirmed_delta_replica": 1,
+        "session_confirmed_local_duplicate": 1,
+        "argo_transfer_replica": 1,
+        "known_delta_activation_dump": 4,
+        "existing_delta_canonical": 81,
+        "existing_argo_canonical": 1
+      }
+    },
+    "chat_package": {
+      "result": "verified",
+      "verified_utc": "2026-10-22T02:50:03.561229+00:00",
+      "remote": {
+        "archive_sha256": "f821ece2a7136c8166306c6092446786350bdd15aafa4bb747367f8b528a1609",
+        "sidecar_matches": true,
+        "archive_size_bytes": 540435853,
+        "guide_sha256": "093f20d8280636e2aefd941dc5c891f1bf0b21a7509b6845103ef32ef1b59bff",
+        "saved_chats_included": true
+      },
+      "chat_snapshot": {
+        "codex_sessions_files": 47,
+        "codex_sessions_records": 1757,
+        "incomplete_or_invalid_records_omitted": 0,
+        "claude_projects_files": 10,
+        "claude_projects_records": 503,
+        "project_memory_notes": 193
+      },
+      "account_credentials_and_runtime_state_excluded": true
+    },
+    "recovery_runtime": {
+      "state/llama_residual_mlp.json": {
+        "exists": false
+      },
+      "state/gemma_mlp.json": {
+        "exists": false
+      },
+      "state/gemma_residual_mlp.json": {
+        "task": "gemma_residual_mlp",
+        "job_id": "3428747",
+        "state": "running",
+        "started_utc": "2026-10-22T00:02:30.049205+00:00",
+        "stage": "evaluations",
+        "stages": {
+          "gpu_preflight": "complete",
+          "training": "complete",
+          "evaluations": "running"
+        }
+      },
+      "llama/evaluation/state/residual_mlp.json": {
+        "arm": "residual_mlp",
+        "state": "failed",
+        "started_utc": "2026-10-21T03:30:17.973573+00:00",
+        "updated_utc": "2026-10-21T05:46:19.502835+00:00",
+        "control_summary_error": "FileNotFoundError: [Errno 2] No such file or directory: '/projects/bbyl/mhaider/GeoAE/nonlinear_other_models_20261019_deltaai/llama/evaluation/results/residual_mlp/interventions/range_intervention_atlas_s5_dprime_hz_tp2.json'",
+        "finished_utc": "2026-10-21T05:46:20.058556+00:00",
+        "steps": {
+          "cq_std": "complete",
+          "token_structure": "complete",
+          "mmlu": "complete",
+          "splice_ppl": "complete",
+          "probe_alignment": "complete",
+          "probe_jigsaw": "complete",
+          "atlas_assign": "complete",
+          "atlas_pair10": "complete",
+          "atlas_pair10_linear": "complete",
+          "atlas_pair10_all": "complete",
+          "control_db14": "complete",
+          "control_biasbios": "complete",
+          "control_ag_news": "complete",
+          "control_news20": "complete",
+          "control_atlas_s5": "failed",
+          "range_structure": "complete"
+        },
+        "failed_steps": [
+          "control_atlas_s5",
+          "control_summary"
+        ]
+      },
+      "gemma/evaluation/state/mlp.json": {
+        "exists": false
+      },
+      "gemma/evaluation/state/residual_mlp.json": {
+        "arm": "residual_mlp",
+        "state": "running",
+        "started_utc": "2026-10-22T02:50:43.845086+00:00",
+        "updated_utc": "2026-10-22T03:05:18.059368+00:00",
+        "steps": {
+          "cq_std": "complete",
+          "token_structure": "complete",
+          "mmlu": "complete",
+          "splice_ppl": "complete",
+          "probe_alignment": "running"
+        }
+      }
+    }
+  },
+  "paid_cache_current_sha256_check": {
+    "command": "cd packed && sha256sum -c geoae-llm-judge-cache.tar.gz.sha256",
+    "result": "geoae-llm-judge-cache.tar.gz: OK"
+  },
+  "experiments_submitted_or_restarted": false,
+  "cloud_vm_shelved_by_this_session": false,
+  "shelving_readiness": "All laptop handoff gates passed; user can shelve the existing VM."
+}

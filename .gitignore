@@ -1,11 +1,64 @@
+# Python
 __pycache__/
-*.pyc
-.pytest_cache/
-logs/
-results/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Experiment artifacts and caches
+phase_a/
+*.log
+# training/eval logs are evidence: track them. SLURM stdout duplicates the tee'd log.
+!logs/*.log
+logs/slurm-*
+activations/
+activations_*
+corpus/
+checkpoints/
 runs/
+# Slashless twins for the names scripts/delta/link_data.sh turns into SYMLINKS
+# into /work/hdd. git treats a symlink as a file, so a "dir/" pattern does not
+# match it and `git add -A` would commit the dangling link.
+/checkpoints
+/corpus
+/cache
+/cache_ids
+/cache_l14
+/e2e
+/dbpedia/activations
+/biasbios/activations
+/dbpedia/checkpoints
+# results/: small JSONs are the evidence for docs/notes, so track by default and
+# ignore only the big regenerable families. (A blanket results/ ignore plus
+# force-adds silently dropped every NEW result file.)
+results/ct_*
+results/closest_tokens_*
+plots/
+figures/
+sweeps/
 *.pt
 *.npy
 *.npz
+results_*.json
+results.txt
+clustering_quality_*.json
+clustering_quality_comparison.json
+concept_probe_*.json
+lambda_balance_*.json
+dbpedia/steering_*.json
+
 wandb/
+.pytest_cache/
 .venv/
+
+_migrate.py
+_fix_imports.py
+
+# Secrets — never commit credentials
+hf_tokken.txt
+hf_token.txt
+.env
+
+# Interp caches (concept/benchmark npz + LLM judge response cache)
+cache/
+cache_*/

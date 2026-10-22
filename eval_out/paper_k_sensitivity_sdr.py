@@ -1,8 +1,7 @@
-"""K2000 vs K4000 same-direction removal (default d6144; or pass label=path ...): matched-damage sibling/random dNLL, sibling/target ratio
+"""K2000 vs K4000 same-direction removal (d6144): matched-damage sibling/random dNLL, sibling/target ratio
 (median over cases of sibling dNLL / L, as in paper_atlas_sibling_removal.sparing_ratio), inner/outer split.
 Matched level L per case = 0.5 x min over arms of max target dNLL (same as paper_same_direction_removal)."""
 import json
-import sys
 import numpy as np
 
 ARMS = ["dir_range_z", "dir_all_z", "dir_range_h", "nl_h", "nl_hb", "nl_z"]
@@ -34,10 +33,8 @@ def load(path):
 
 
 res = {}
-RUNS = [a.split("=", 1) for a in sys.argv[1:]] or [
-    ("K2000", "results/delta/d6144/evals/same_direction_removal.json"),
-    ("K4000", "results/delta/d6144k4000/evals/same_direction_removal.json")]
-for K, p in RUNS:
+for K, p in (("K2000", "results/delta/d6144/evals/same_direction_removal.json"),
+             ("K4000", "results/delta/d6144k4000/evals/same_direction_removal.json")):
     rows = load(p)
     rows = [r for r in rows if r["L"] > 0]
     print(f"\n== {K}: n={len(rows)} L median {np.median([r['L'] for r in rows]):.3f}")

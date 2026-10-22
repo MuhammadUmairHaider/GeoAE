@@ -6,8 +6,8 @@ Dataset: LabHC/bias_in_bios  (De-Arteaga et al. 2019)
   - Text field: hard_text (biography, still contains gendered pronouns)
 
 Saves dual label arrays (profession + gender) alongside activations:
-  activations/{model}/{pooling}/layer_{L}.npy         (N_train, D) float16/float32
-  activations/{model}/{pooling}/layer_{L}_test.npy    (N_test,  D) float16/float32
+  activations/{model}/{pooling}/layer_{L}.npy         (N_train, D) float16
+  activations/{model}/{pooling}/layer_{L}_test.npy    (N_test,  D) float16
   activations/{model}/{pooling}/labels_profession_train.npy
   activations/{model}/{pooling}/labels_profession_test.npy
   activations/{model}/{pooling}/labels_gender_train.npy
@@ -67,20 +67,7 @@ def register_hook(model, layer: int) -> tuple[list, object]:
 # Extraction
 # ---------------------------------------------------------------------------
 
-def output_dtype(model, dtype="auto") -> np.dtype:
-    """Gemma residuals can exceed FP16 range; preserve them without clipping."""
-    if dtype == "auto":
-        config = getattr(model, "config", None)
-        model_type = str(getattr(config, "model_type", "")).lower()
-        is_gemma = "gemma" in model_type or "gemma" in type(model).__name__.lower()
-        dtype = "float32" if is_gemma else "float16"
-    resolved = np.dtype(dtype)
-    if resolved not in (np.dtype("float16"), np.dtype("float32")):
-        raise ValueError("activation dtype must be auto, float16, or float32")
-    return resolved
-
-
-def pool(hs: torch.Tensor, pooling: str, dtype=np.float16) -> np.ndarray:
+def pool(hs: torch.Tensor, pooling: str) -> np.ndarray:
     """Reduce a (T, D) sequence to a single (D,) document vector."""
     if pooling == "last":
         vec = hs[-1]
@@ -88,15 +75,7 @@ def pool(hs: torch.Tensor, pooling: str, dtype=np.float16) -> np.ndarray:
         vec = hs.float().mean(dim=0)
     else:
         raise ValueError(f"unknown pooling {pooling!r}")
-    values = vec.float().numpy()
-    if not np.isfinite(values).all():
-        raise ValueError(f"Non-finite model activations in {pooling} pooling")
-    with np.errstate(over="ignore", invalid="ignore"):
-        stored = values.astype(dtype)
-    if not np.isfinite(stored).all():
-        raise ValueError(f"Activation overflow storing {pooling} pooling as {np.dtype(dtype)}; "
-                         "use --dtype float32")
-    return stored
+    return vec.float().numpy().astype(np.float16)
 
 
 def extract_split(
@@ -109,12 +88,10 @@ def extract_split(
     out_dirs: dict[str, Path],
     split: str,
     log_every: int = 100,
-    dtype="auto",
 ) -> np.ndarray:
     N = len(examples)
     D = lm_hidden_size(model)   # text decoder width (model.config is multimodal on Gemma 3)
-    dtype = output_dtype(model, dtype)
-    acts = {p: np.zeros((N, D), dtype=dtype) for p in poolings}
+    acts = {p: np.zeros((N, D), dtype=np.float16) for p in poolings}
     labels_prof = np.zeros(N, dtype=np.int32)
     labels_gender = np.zeros(N, dtype=np.int32)
     last_tok = np.zeros(N, dtype=np.int64)   # id of the final (pooled, for 'last') token
@@ -143,11 +120,7 @@ def extract_split(
 
         hs = captured[0][0]            # (T, D)
         for p in poolings:
-            try:
-                acts[p][i] = pool(hs, p, dtype=dtype)
-            except ValueError as exc:
-                handle.remove()
-                raise ValueError(f"[{split}] example {i}, layer {layer}: {exc}") from exc
+            acts[p][i] = pool(hs, p)
         labels_prof[i] = ex["profession"]
         labels_gender[i] = ex["gender"]
 
@@ -193,8 +166,6 @@ def main():
                         choices=["last", "mean", "both"])
     parser.add_argument("--out_base",   default="biasbios/activations")
     parser.add_argument("--seed",       type=int, default=42)
-    parser.add_argument("--dtype", default="auto", choices=["auto", "float16", "float32"],
-                        help="Activation storage: auto uses float32 for Gemma, float16 otherwise")
     parser.add_argument("--dir_suffix", default="",
                         help="appended to the pooling directory name (e.g. _ids -> .../last_ids)")
     args = parser.parse_args()
@@ -214,8 +185,6 @@ def main():
         tokenizer.pad_token = tokenizer.eos_token
     from geoae.checkpoint import load_lm
     model = load_lm(args.model_name, device_map="auto")
-    dtype = output_dtype(model, args.dtype)
-    print(f"[extract] Activation storage dtype: {dtype}")
 
     model_short = args.model_name.split("/")[-1]
     model_short = model_short.replace("Llama-", "llama")
@@ -228,7 +197,7 @@ def main():
         print(f"\n[extract] {split}  ({len(data):,} examples)")
         src_hashes[split] = extract_split(model, tokenizer, data, args.layer,
                       args.max_length, poolings=poolings,
-                      out_dirs=out_dirs, split=split, dtype=dtype)
+                      out_dirs=out_dirs, split=split)
 
     for p in poolings:
         np.savez(out_dirs[p] / "source_hashes.npz", train=src_hashes["train"], test=src_hashes["test"])
@@ -236,7 +205,6 @@ def main():
             "pooling": p,
             "model": args.model_name,
             "layer": args.layer,
-            "dtype": dtype.name,
             "n_train": len(train),
             "n_test": len(test),
             "max_length": args.max_length,

@@ -87,10 +87,6 @@ def main():
     ap.add_argument("--arms", default="base,plain,base_tokmean,plain_tokmean,bypass")
     ap.add_argument("--ref", default="bypass", help="differences are ref - arm")
     ap.add_argument("--min_rows", type=int, default=6, help="kept clusters hold >= this many scored rows (6 = more than 5)")
-    ap.add_argument("--per_space", action="store_true",
-                    help="the original probe filter (min10 of probe_dense_subsets.py): each codebook keeps ITS OWN rows whose "
-                         "cluster holds >= --min_rows of the set's scored rows (no intersection, no iteration); the bootstrap "
-                         "resamples the same documents for every codebook")
     ap.add_argument("--n_boot", type=int, default=300)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--out", required=True)
@@ -107,29 +103,17 @@ def main():
     sets = {f"atlas14_s{d['seed']}": [c["ids"] for c in d["classes"]] for d in draws["draws"]}
     sets["doctype"] = [[int(i)] for i, t in zip(meta["concept_id"], meta["concept_type"]) if t == "document"]
 
-    filt = ("per codebook: row kept iff its cluster holds >= min_rows of the set's scored rows in THAT codebook (no "
-            "intersection); no chance correction" if args.per_space else
-            "row kept iff its cluster holds >= min_rows kept rows in every arm (fixed point); no chance correction")
-    res = {"meta": dict(vars(args), filter=filt), "sets": {}}
+    res = {"meta": dict(vars(args), filter="row kept iff its cluster holds >= min_rows kept rows in every arm "
+                                           "(fixed point); no chance correction"), "sets": {}}
     for name, units in sets.items():
         chunks, y_all = exclusive(z["label_ptr"], z["label_ids"], units)
         labels = {a: A[a][chunks].astype(np.int64) for a in arms}
-        if args.per_space:
-            own = {}
-            for a, v in labels.items():
-                inv = np.unique(v, return_inverse=True)[1]
-                own[a] = np.bincount(inv)[inv] >= args.min_rows
-            keep, rounds = np.logical_or.reduce(list(own.values())), 0     # union: the rows any codebook scores
-        else:
-            keep, rounds = filter_rows(labels, args.min_rows)
-            own = {a: keep for a in arms}
+        keep, rounds = filter_rows(labels, args.min_rows)
         y, doc = y_all[keep], doc_all[chunks][keep]
         lab = {a: v[keep] for a, v in labels.items()}
-        mine = {a: own[a][keep] for a in arms}                               # each codebook's scored rows
-        point = {a: score(y[mine[a]], lab[a][mine[a]]) for a in arms}
+        point = {a: score(y, lab[a]) for a in arms}
         for a in arms:
-            point[a]["clusters"] = int(len(np.unique(lab[a][mine[a]])))
-            point[a]["kept_share"] = float(mine[a].sum() / len(chunks))
+            point[a]["clusters"] = int(len(np.unique(lab[a])))
         udoc, dinv = np.unique(doc, return_inverse=True)
         rows_of = np.split(np.argsort(dinv, kind="stable"), np.cumsum(np.bincount(dinv))[:-1])
         rng = np.random.default_rng(args.seed)
@@ -138,8 +122,7 @@ def main():
             pick = rng.integers(0, len(udoc), len(udoc))
             idx = np.concatenate([rows_of[d] for d in pick])
             for a in arms:
-                ia = idx[mine[a][idx]]
-                s = score(y[ia], lab[a][ia])
+                s = score(y[idx], lab[a][idx])
                 for m in METRICS:
                     boot[a][m].append(s[m])
         ci = {a: {m: [float(x) for x in np.quantile(boot[a][m], [0.025, 0.975])] for m in METRICS} for a in arms}

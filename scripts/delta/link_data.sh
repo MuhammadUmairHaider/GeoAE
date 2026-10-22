@@ -33,7 +33,6 @@ declare -a LINKS=(
   "activations_sampled_10M:activations/activations_sampled_10M"
   "activations_sampled_struct5_10M:activations/activations_sampled_struct5_10M"
   "activations_gemma3_1b_sampled_struct5_10M:activations/activations_gemma3_1b_sampled_struct5_10M"
-  "activations_gemma3_4b_sampled_struct5_10M:activations/activations_gemma3_4b_sampled_struct5_10M"
   "checkpoints:checkpoints"
   "e2e:e2e"
   "corpus:corpus"

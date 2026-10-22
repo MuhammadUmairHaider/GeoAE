@@ -35,6 +35,8 @@ from geoae.losses import (sinkhorn_log, sinkhorn_log_dual, cluster_log_prior,
 # "none": no balanced assignment at all — each latent goes to its nearest prototype (softmax of -dist2/tau,
 # as --no_sinkhorn), and the usage target that re-seeding compares against is flat 1/K.
 VALID_BALANCES = ("uniform", "zipf", "none")
+VALID_DECODER_TYPES = ("linear", "mlp", "residual_mlp")
+VALID_DECODER_NONLINEARITIES = ("linear", "relu", "gelu", "tanh")
 
 
 class AEOutput(NamedTuple):
@@ -51,6 +53,26 @@ _NONLINEARITIES = {
     "gelu":    nn.GELU(),
     "tanh":    nn.Tanh(),
 }
+
+
+def _decoder_activation(name: str) -> nn.Module:
+    return {"linear": nn.Identity, "relu": nn.ReLU,
+            "gelu": nn.GELU, "tanh": nn.Tanh}[name]()
+
+
+class ResidualMLPDecoder(nn.Module):
+    """Linear skip plus a nonlinear correction, initially identically zero."""
+
+    def __init__(self, latent_dim: int, hidden_dim: int, output_dim: int,
+                 nonlinearity: str, skip: nn.Linear):
+        super().__init__()
+        self.skip = skip
+        self.hidden = nn.Linear(latent_dim, hidden_dim, bias=True)
+        self.activation = _decoder_activation(nonlinearity)
+        self.output = nn.Linear(hidden_dim, output_dim, bias=False)
+
+    def forward(self, z: Tensor) -> Tensor:
+        return self.skip(z) + self.output(self.activation(self.hidden(z)))
 
 
 class GeoAE(nn.Module):
@@ -74,8 +96,30 @@ class GeoAE(nn.Module):
         token_bias_rows: int = 0,
         vocab_size: int = 0,
         token_bias_mode: str = "bypass",
+        decoder_type: str = "linear",
+        decoder_hidden_dim: int = 0,
+        decoder_nonlinearity: str = "gelu",
+        decoder_output_bias: bool = False,
     ):
         super().__init__()
+        for name, size in (("hidden_size", hidden_size), ("latent_dim", latent_dim)):
+            if isinstance(size, bool) or not isinstance(size, int) or size <= 0:
+                raise ValueError(f"{name} must be a positive integer, got {size!r}")
+        if decoder_type not in VALID_DECODER_TYPES:
+            raise ValueError(f"decoder_type must be one of {VALID_DECODER_TYPES}, got {decoder_type!r}")
+        if (isinstance(decoder_hidden_dim, bool) or not isinstance(decoder_hidden_dim, int)
+                or decoder_hidden_dim < 0):
+            raise ValueError("decoder_hidden_dim must be a nonnegative integer (0 = automatic)")
+        if decoder_nonlinearity not in VALID_DECODER_NONLINEARITIES:
+            raise ValueError(f"decoder_nonlinearity must be one of {VALID_DECODER_NONLINEARITIES}, "
+                             f"got {decoder_nonlinearity!r}")
+        if not isinstance(decoder_output_bias, bool):
+            raise ValueError("decoder_output_bias must be a boolean")
+        self.decoder_type = decoder_type
+        self.decoder_nonlinearity = decoder_nonlinearity
+        self.decoder_output_bias = decoder_output_bias
+        self.decoder_hidden_dim = decoder_hidden_dim or (
+            latent_dim if decoder_type == "mlp" else max(1, hidden_size // 4))
         if token_bias_mode not in ("bypass", "decoder_only"):
             raise ValueError(f"Unknown token_bias_mode: {token_bias_mode!r}")
         if token_bias_mode == "decoder_only" and token_bias_rows <= 0:
@@ -143,8 +187,30 @@ class GeoAE(nn.Module):
             layers.append(act)
         self.encoder = layers[0] if len(layers) == 1 else nn.Sequential(*layers)
 
-        # Decoder: no bias; columns renormalised to unit norm after each step
-        self.decoder = nn.Linear(latent_dim, hidden_size, bias=False)
+        # Keep the legacy module and parameter names exactly for old checkpoints.
+        # Only a linear decoder (or residual skip) has unit-normalised columns:
+        # normalising MLP factors would change their composed map arbitrarily.
+        # Consume exactly the original decoder-construction RNG draws in every
+        # arm. New parameters use an isolated RNG stream, so matched seeds give
+        # identical encoders and identical linear/residual skips.
+        linear_decoder = nn.Linear(latent_dim, hidden_size, bias=False)
+        if decoder_output_bias:
+            linear_decoder.bias = nn.Parameter(torch.zeros(hidden_size))
+        if decoder_type == "linear":
+            self.decoder = linear_decoder
+        else:
+            with torch.random.fork_rng(devices=[]):
+                if decoder_type == "mlp":
+                    output = linear_decoder if self.decoder_hidden_dim == latent_dim else nn.Linear(
+                        self.decoder_hidden_dim, hidden_size, bias=decoder_output_bias)
+                    self.decoder = nn.Sequential(
+                        nn.Linear(latent_dim, self.decoder_hidden_dim, bias=True),
+                        _decoder_activation(decoder_nonlinearity), output,
+                    )
+                else:
+                    self.decoder = ResidualMLPDecoder(
+                        latent_dim, self.decoder_hidden_dim, hidden_size,
+                        decoder_nonlinearity, linear_decoder)
 
         # Centroids stored as a buffer (not a parameter — updated by EMA only)
         self.register_buffer("centroids", torch.zeros(n_clusters, latent_dim))
@@ -173,22 +239,40 @@ class GeoAE(nn.Module):
             self.register_buffer("tb_table", torch.zeros(token_bias_rows, hidden_size,
                                                           dtype=torch.float16))
 
-        self._init_weights()
+        self._init_weights(linear_decoder)
 
-    def _init_weights(self) -> None:
+    def _init_weights(self, linear_decoder: nn.Linear) -> None:
         # For Sequential encoder the Linear is always the first child
         enc_linear = self.encoder[0] if isinstance(self.encoder, nn.Sequential) else self.encoder
         nn.init.xavier_uniform_(enc_linear.weight)
         nn.init.zeros_(enc_linear.bias)
-        # Decoder columns initialised to unit norm
-        nn.init.xavier_uniform_(self.decoder.weight)
+        # Legacy linear decoder initialization and RNG sequence are unchanged.
+        nn.init.xavier_uniform_(linear_decoder.weight)
+        if linear_decoder.bias is not None:
+            nn.init.zeros_(linear_decoder.bias)
         self._renorm_decoder()
+        if self.decoder_type != "linear":
+            with torch.random.fork_rng(devices=[]):
+                if self.decoder_type == "mlp":
+                    nn.init.xavier_uniform_(self.decoder[0].weight)
+                    nn.init.zeros_(self.decoder[0].bias)
+                    if self.decoder[2] is not linear_decoder:
+                        nn.init.xavier_uniform_(self.decoder[2].weight)
+                        if self.decoder[2].bias is not None:
+                            nn.init.zeros_(self.decoder[2].bias)
+                else:
+                    nn.init.xavier_uniform_(self.decoder.hidden.weight)
+                    nn.init.zeros_(self.decoder.hidden.bias)
+                    nn.init.zeros_(self.decoder.output.weight)
 
     def _renorm_decoder(self) -> None:
-        """Renormalise decoder weight columns to unit norm (standard SAE practice)."""
+        """Unit-normalise linear decoder / residual skip columns; MLP is unconstrained."""
+        if self.decoder_type == "mlp":
+            return
+        linear = self.decoder if self.decoder_type == "linear" else self.decoder.skip
         with torch.no_grad():
-            norms = self.decoder.weight.norm(dim=0, keepdim=True).clamp(min=1e-8)
-            self.decoder.weight.div_(norms)
+            norms = linear.weight.norm(dim=0, keepdim=True).clamp(min=1e-8)
+            linear.weight.div_(norms)
 
     @torch.no_grad()
     def _renorm_centroids(self) -> None:
@@ -348,6 +432,28 @@ class GeoAE(nn.Module):
         x_hat = self.decoder(z)
         return x_hat if b is None else x_hat + b
 
+    def decoded_delta(self, z: Tensor, delta: Tensor, tok: Tensor | None = None) -> Tensor:
+        """Exact normalized residual change for a latent edit at the current state.
+
+        For nonlinear decoders this depends on z; decoding delta alone is wrong.
+        Both evaluations use the same token, so its fixed bypass cancels.
+        """
+        if self.decoder_type == "linear" and not self.decoder_output_bias:
+            # Preserve the legacy direction calculation without subtraction
+            # roundoff. Fixed token means cancel, so no token lookup is needed.
+            return self.decoder(torch.broadcast_tensors(z, delta)[1])
+        return self.decode(z + delta, tok) - self.decode(z, tok)
+
+    def require_linear_decoder(self, context: str = "This operation") -> None:
+        """Guard tools that decode a fixed direction rather than a stateful edit."""
+        decoder_type = getattr(self, "decoder_type", "linear")
+        output_bias = getattr(self, "decoder_output_bias", getattr(self.decoder, "bias", None) is not None)
+        if decoder_type != "linear" or output_bias:
+            raise ValueError(
+                f"{context} requires a bias-free linear decoder; this model uses "
+                f"decoder_type={decoder_type!r}, decoder_output_bias={output_bias}. "
+                "Use decoded_delta(z, delta, tok) at each current latent state instead.")
+
     def forward(self, x: Tensor, tok: Tensor | None = None) -> AEOutput:
         """
         x: (B, D)  normalised activation
@@ -457,5 +563,5 @@ class GeoAE(nn.Module):
         self._renorm_centroids()
 
     def post_step(self) -> None:
-        """Call after optimizer.step(): renormalise decoder columns."""
+        """After optimizer.step(): renormalise linear / residual skip columns only."""
         self._renorm_decoder()

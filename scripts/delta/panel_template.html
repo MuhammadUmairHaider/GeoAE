@@ -180,7 +180,7 @@ code { font-family: var(--mono); font-size: .92em; }
   </section>
 
   <section>
-    <div class="sec-head"><h2>Timeline</h2><p>Sat 26 Sep – Fri 9 Oct, CDT.</p></div>
+    <div class="sec-head"><h2>Timeline</h2><p>Sat 26 – Sun 27 Sep, CDT.</p></div>
     <div class="timeline" id="timeline"></div>
   </section>
 </div>
@@ -348,12 +348,8 @@ code { font-family: var(--mono); font-size: .92em; }
   runs.filter(r => r.state === "queued" && r.epochs_done > 0).forEach(r => watch.push(`${r.label} is waiting for a node with ${r.epochs_done} epochs saved. When it starts it should resume at epoch ${r.epochs_done + 1}, as d3072 and d6144 did.`));
   const starved = runs.filter(r => r.usage && r.usage.zero > 0);
   watch.push(starved.length ? `${starved.map(r => r.label).join(", ")} has clusters with zero hard assignments. Check before evals.` : `Cluster usage is healthy in every run: no cluster is empty, and “clusters in use” (usage perplexity from the checkpoint’s hard-assignment counts) is ${Math.min(...runs.filter(r => r.usage).map(r => Math.round(100 * r.usage.perp_frac)))}–${Math.max(...runs.filter(r => r.usage).map(r => Math.round(100 * r.usage.perp_frac)))}% of K. The log’s “dying” count is balancing telemetry, not a collapse signal.`);
-  watch.push(`<b>OpenRouter key is out of credit</b>: the Qwen judges job (Argo 293330) and the midlast judges job 293328 both get 403 “Key limit exceeded (total limit)” on every call (checked Fri 13:20 CDT). Cluster and named-concept steering for Qwen need those judge scores. Top up the key or cancel the two jobs.`);
-  watch.push(`<b>85%-depth bypass AEs</b> (Argo argo73, run <code>p85_bypass_20261009</code>, one H100 per model, bypass only; Fri 13:20 CDT): Llama L24 (293439) training, epoch 46 of 50; Gemma 4B L29 (293440) trained, evals 3 of 26; Qwen L31 (293441) trained, evals 13 of 26. Qwen L31 so far: MMLU 65.1 → 65.4 (L35: 64.6), loss recovered 0.996 (L35: 0.992), Calinski–Harabasz 165 → 767. Results: <code>results/p85_bypass_20261009/&lt;family&gt;/layer&lt;L&gt;/bypass/</code> on Argo.`);
-  watch.push(`<b>Qwen2.5-3B layer 35 bypass AE</b> (Argo; GPU evals finished Fri 03:39 CDT). Sequence table, token-removed k-means → bypass AE (homogeneity / completeness / NMI): probe mean .473/.275/.327 → .544/.271/.343; FineWeb-Atlas 14 topics .188/.128/.152 → .366/.216/.270, the largest gain of the three models. MMLU under the splice −0.5 points (Llama −1.2, Gemma −2.6). Files: <code>results/qwen25_3b_l35_2x_k2000_20261008/qwen2.5-3B/layer35/</code>.`);
-  watch.push(`Box jobs (A100, <code>ssh geoae-box</code>) and Argo jobs are invisible to this snapshot, which reads Delta only.`);
-  watch.push(`<b>Control in confidence units — done for three models</b> (Llama L27, Gemma L33, Qwen2.5-3B L35 bypass; DBpedia, Bias in Bios, AG News = 45 concepts): <code>results/delta/control_conf_{small_tables,small_matched,tables_trim10_rel_compact,matched_trim10}.md</code>.`);
-  watch.push(`<b>Small edits (α 0.1–0.5)</b>: at the same α the GeoAE edit removes more of the target with little extra collateral on every model (range steering α 0.3: Llama +5.1, Gemma +12.8, Qwen +7.1 points; 37–44 of 45 concepts). At the same amount removed, the two spaces tie on all three models.`);
+  watch.push(`Evals read the final checkpoint <code>step_0014450.pt</code> (50 epochs × 289 steps). All four logs confirm 9,500,000 training rows, so that name is right.`);
+  watch.push(`Before evals: <code>run_tokbias.sh</code> still needs the parent-AE decision, and d768/d3072 have no eval sheets yet.`);
   $("#watch").innerHTML = watch.map(w => `<p><span>${w}</span></p>`).join("");
   const ev = [
     ["Sat 17:03", "ok", "<b>Corpus built</b> on beto CPU in 7 min: 204,353 documents, the same per-source counts as the old box."],
@@ -371,32 +367,6 @@ code { font-family: var(--mono); font-size: .92em; }
     ["Sun 09:32", "ok", "<b>d3072 finished</b> (4.1 h on its A40 after resuming)."],
     ["Sun 10:29", "ok", "<b>d6144 finished</b>, the main arm: final checkpoint step_0014450.pt."],
     ["Sun 08:10", "ok", "<b>Single GPUs from here on</b>: K = 4,000 resumed at epoch 6 on gpub014, d12288 resumed at epoch 12 on gpub056 (both A40, bbyl). Requests cut to 8 CPUs / 48 GB, preempt partitions allowed."],
-    ["Tue 09-29", "fix", "<b>Sixth arm d12288 at K = 4,000</b> added; geometry figures and probe-removal evals added as eval groups."],
-    ["Wed 09:06", "ok", "<b>Gemma 3 1B dump done</b> (layers 13 and 25, fp32). Six bypass arms submitted: l13/l25 × d1152/d2304/d4608."],
-    ["Thu 07:02", "ok", "<b>All six Gemma arms trained</b> to 50/50 epochs (first done 04:01, last 07:02)."],
-    ["Thu 08:44", "fix", "<b>Delta now for training only</b>: interp, evals and judges move to the A100 box."],
-    ["Thu 20:43", "ok", "<b>Gemma interp GPU pass done</b> on the box for all six arms (closest tokens, word sense)."],
-    ["Thu 21:10", "bad", "<b>Gemma LLM judges stopped</b>: OpenRouter key hit its total limit at 125 of 1,870 clusters."],
-    ["Thu 22:34", "ok", "<b>Gemma probe activations done</b>; non-judge evals start on the box in two chains, d2304 first."],
-    ["Thu 22:59", "fix", "<b>Offline-mode failure fixed</b>: steer / range_db14 / range_bios rerun with the network on (tmux gem_fix)."],
-    ["Fri 11:27", "ok", "<b>Gemma eval chains finished</b> on the box; the duplicate Delta eval jobs are gone from the queue."],
-    ["Fri 11:28", "fix", "<b>OOM leftovers rerun serially</b>: four chains on one A100 had run out of memory on a few steps."],
-    ["Thu 10-08 20:14", "ok", "<b>AG News control runs</b> on the box, both models (Llama 11 min, Gemma 20 min): the third control dataset."],
-    ["Thu 10-08 21:34", "ok", "<b>Four new control corpora</b> built and smoke-tested on the box; Atlas draw s2 fetched from Argo."],
-    ["Thu 10-08 21:46", "fix", "<b>Per-document confidence reruns</b> of DBpedia, Bias in Bios and AG News start on the box (another session)."],
-    ["Thu 10-08 22:50", "bad", "<b>Emotion and TREC prompts fail</b> few-shot classification on one or both models; prompt fix before the full job."],
-    ["Fri 10-09 00:15", "ok", "<b>Qwen2.5-3B L35 bypass AE trained</b> on Argo (50 epochs, d4096, K = 2,000); its eval pipeline starts."],
-    ["Fri 10-09 00:41", "ok", "<b>Confidence reruns done</b> for Llama and Gemma (DBpedia, Bias in Bios, AG News; per-document confidence stored)."],
-    ["Fri 10-09 00:47", "ok", "<b>Extra control datasets finished</b> on the box (Emotion, 20 Newsgroups, TREC, Jigsaw)."],
-    ["Fri 10-09 01:01", "fix", "<b>Delta back in use for evals</b> next to the box and Argo: one dataset per GPU, A100 or A40."],
-    ["Fri 10-09 01:02", "ok", "<b>Qwen sequence table done</b> (Argo 293332, L40, 35 min): the bypass AE has higher homogeneity than token-removed k-means on all 5 probes and on FineWeb-Atlas (.366 vs .188)."],
-    ["Fri 10-09 01:05", "ok", "<b>Qwen2.5-3B L35 bypass AE</b> (epoch 50) added to the control runs: box + Delta, with an Argo L40 replicate."],
-    ["Fri 10-09 01:35", "ok", "<b>Qwen core evals</b>: loss recovered 0.992, MMLU −0.5 points, Calinski–Harabasz 153 → 664, number edits in z beat h by +.111."],
-    ["Fri 10-09 02:54", "ok", "<b>Small-edit grid α 0.1–0.5 done</b> for all three models (9 runs on Delta A40s and the box): GeoAE removes more per unit of edit strength; ties at equal removal."],
-    ["Fri 10-09 04:08", "ok", "<b>Qwen bypass and plain jobs finished</b> every GPU eval step (bypass 03:39, plain 04:08)."],
-    ["Fri 10-09 04:10", "bad", "<b>Qwen judges blocked</b>: the OpenRouter key hit its total limit (403 on every call)."],
-    ["Fri 10-09 06:00", "ok", "<b>85%-depth bypass AEs launched</b> on Argo, one H100 per model: Llama L24, Gemma 4B L29, Qwen L31 (extraction, token table, 50 epochs, GPU evals in one job)."],
-    ["Fri 10-09 13:20", "ok", "<b>85% runs</b>: Qwen L31 and Gemma L29 trained and evaluating; Llama L24 at epoch 46 of 50. Qwen L31: MMLU 65.1 → 65.4, loss recovered 0.996."],
   ];
   $("#timeline").innerHTML = ev.map(([tm, k, txt]) => `<div class="ev ${k}"><time>${tm}</time><span class="dot"></span><p>${txt}</p></div>`).join("");
 })();

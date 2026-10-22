@@ -76,6 +76,7 @@ class AEEnc:
         return self.ae.encoder((h - self.mean) / self.std)
 
     def to_raw_dir(self, v):
+        self.ae.require_linear_decoder("faithfulness ablation with fixed concept directions")
         return self.ae.decoder(v) * self.std
 
 
@@ -115,6 +116,8 @@ def main():
     dev = "cuda" if torch.cuda.is_available() else "cpu"
     ref = AEEnc(args.checkpoint, dev)
     enc = KMeansEnc(args.baseline_kmeans, dev) if args.baseline_kmeans else ref
+    if not args.baseline_kmeans:
+        ref.ae.require_linear_decoder("faithfulness ablation with fixed concept directions")
     layer = args.layer if args.layer is not None else ref.layer
     print(f"[faith] {ref.model_name} layer {layer} | "
           f"{'kmeans baseline' if args.baseline_kmeans else 'AE'} K={enc.n_clusters}")

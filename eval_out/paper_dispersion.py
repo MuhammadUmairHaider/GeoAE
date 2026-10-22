@@ -1,290 +1,161 @@
-"""Paper-inspired dispersion on a document-disjoint sampled-dump tail.
+"""Representation dispersion (Li et al., 2026, "On the Predictive Power of Representation Dispersion in
+Language Models"): the mean pairwise cosine distance among hidden vectors, for the base residual stream
+and the GeoAE latent, on the held-out 5% of the Llama-3.2-3B L27 sampled dump.
 
-Within = row-to-empirical-centroid cosine distance (equal cluster weights);
-between = pairwise empirical-centroid cosine distance. Learned codebooks assign
-groups only. Centred variants are supplementary. Fold ranges describe grouped
-variability, not confidence intervals. Document proxies use each selected doc's
-latest AVAILABLE sampled row, not its true last token/text representation.
-Two streaming passes avoid a full hidden matrix and full cosine pair matrix.
+Closed form, no pairwise matrix: for unit vectors u_i, sum_{i != j} u_i . u_j = ||sum_i u_i||^2 - n, so
+    dispersion = 1 - (||S||^2 - n) / (n (n - 1)),  S = sum_i u_i.
+Their Sec. 2.3 splits distances into within-cluster and between-cluster pairs; with per-cluster sums S_c
+    within  = 1 - sum_c (||S_c||^2 - n_c) / sum_c n_c (n_c - 1)
+    between = 1 - [(||S||^2 - n) - sum_c (||S_c||^2 - n_c)] / [n (n - 1) - sum_c n_c (n_c - 1)].
+Each space uses its own codebook: balanced k-means on the residual, balanced k-means after token
+centring, GeoAE's prototypes on its latent. Every number is reported raw (the paper's metric) and
+mean-centred, since the GELU latent is mostly positive and a shared offset alone shrinks raw cosines.
+Uncertainty: five document-disjoint folds (doc id mod 5); intervals are the fold range.
 
-    scripts/delta/py eval_out/paper_dispersion.py --device cpu --max_rows 4096 --folds 2
+    scripts/delta/py eval_out/paper_dispersion.py [--out results/delta/d6144/evals/dispersion.json]
 """
 from __future__ import annotations
 
 import argparse
 import json
-import math
 import time
 from pathlib import Path
 
 import numpy as np
 import torch
 
-from geoae.interp.representation_dispersion import ClusterStatistics, vendi_score
+from geoae.checkpoint import load_ae_checkpoint
+from geoae.interp.closest_tokens import load_baseline_kmeans
+from geoae.losses import pairwise_sq_dist
+from geoae.token_bias import TokenBiasLookup
 
-METRICS = ("dispersion", "within", "within_sample_weighted", "between", "between_over_within",
-           "pairwise_within", "pairwise_between", "pairwise_between_over_within")
+ap = argparse.ArgumentParser()
+ap.add_argument("--dump", default="activations_sampled_10M")
+ap.add_argument("--layer", type=int, default=27)
+ap.add_argument("--ckpt", default="checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_dpc_sampled_tokbias/step_0014450.pt")
+ap.add_argument("--km", default="e2e/checkpoints/general/llama3.2-3B/layer27/delta/balanced_kmeans_k2000_dpc_sampled.npz")
+ap.add_argument("--km_tok", default="e2e/checkpoints/general/llama3.2-3B/layer27/delta/balanced_kmeans_k2000_dpc_sampled_tokmean.npz")
+ap.add_argument("--val_frac", type=float, default=0.05)
+ap.add_argument("--batch", type=int, default=16384)
+ap.add_argument("--folds", type=int, default=5)
+ap.add_argument("--out", default="results/delta/d6144/evals/dispersion.json")
+args = ap.parse_args()
+
+t0 = time.time()
+dev = torch.device("cuda")
+torch.set_grad_enabled(False)
+d = Path(args.dump)
+A = np.load(d / f"layer_{args.layer}.npy", mmap_mode="r")
+N = A.shape[0]
+v0 = int(N * (1.0 - args.val_frac))
+H = np.asarray(A[v0:], dtype=np.float16)                      # held-out rows only
+tok = np.asarray(np.load(d / "rows_tok.npy", mmap_mode="r")[v0:], dtype=np.int64)
+doc = np.asarray(np.load(d / "rows_doc.npy", mmap_mode="r")[v0:], dtype=np.int64)
+pos = np.asarray(np.load(d / "rows_pos.npy", mmap_mode="r")[v0:], dtype=np.int64)
+n = len(H)
+fold = doc % args.folds
+print(f"[disp] {n:,} held-out rows from {len(np.unique(doc)):,} docs (rows {v0:,}..{N:,}), read {time.time()-t0:.0f}s")
+
+C, m_b, s_b, K, _, _ = load_baseline_kmeans(Path(args.km), dev)
+C2, m_t, s_t, K2, _, _ = load_baseline_kmeans(Path(args.km_tok), dev, allow_token_bias=True)
+tb = TokenBiasLookup(str(np.load(args.km_tok, allow_pickle=True)["token_bias"]), dev)
+ae, m_a, s_a, _ = load_ae_checkpoint(args.ckpt, dev, allow_token_bias=True)
+ae.eval()
 
 
-def parse_args(argv=None):
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dump", default="activations_sampled_10M")
-    parser.add_argument("--layer", type=int, default=27)
-    parser.add_argument("--ckpt", default="checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_dpc_sampled_tokbias/step_0014450.pt")
-    parser.add_argument("--km", default="e2e/checkpoints/general/llama3.2-3B/layer27/delta/balanced_kmeans_k2000_dpc_sampled.npz")
-    parser.add_argument("--km_tok", default=None, help="optional token-centred k-means control")
-    parser.add_argument("--val_frac", type=float, default=0.05, help="must match the checkpoint's training split")
-    parser.add_argument("--batch", type=int, default=4096)
-    parser.add_argument("--folds", type=int, default=5)
-    parser.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
-    parser.add_argument("--max_rows", type=int, default=0, help="0 = all eligible rows; otherwise uniform sampling")
-    parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--vendi_rows", type=int, default=0, help="optional Vendi subset, 0 disables; maximum 2048")
-    parser.add_argument("--out", default="results/delta/d6144/evals/dispersion_v2.json")
-    args = parser.parse_args(argv)
-    if not 0 < args.val_frac < 1:
-        parser.error("--val_frac must be strictly between 0 and 1")
-    if args.batch < 1 or args.folds < 1:
-        parser.error("--batch and --folds must be positive")
-    if args.max_rows < 0 or not 0 <= args.vendi_rows <= 2048:
-        parser.error("--max_rows must be nonnegative; --vendi_rows must be in [0, 2048]")
-    if args.seed < 0:
-        parser.error("--seed must be nonnegative")
-    return args
-
-
-def select_rows(doc_ids, val_start, max_rows, seed):
-    """Exclude train-overlapping documents before seeded uniform row sampling."""
-    tail_docs = np.asarray(doc_ids[val_start:])
-    overlap = np.isin(tail_docs, np.unique(doc_ids[:val_start]))
-    rows = np.flatnonzero(~overlap).astype(np.int64) + val_start
-    eligible = len(rows)
-    if max_rows and max_rows < eligible:
-        rows = np.sort(np.random.default_rng(seed).choice(rows, size=max_rows, replace=False))
-    return rows, {
-        "held_out_tail_rows": len(tail_docs), "eligible_held_out_rows": eligible,
-        "excluded_train_overlap_rows": int(overlap.sum()),
-        "excluded_train_overlap_documents": int(len(np.unique(tail_docs[overlap]))),
-        "selected_rows": len(rows), "seed": seed,
-        "sampling": "seeded uniform without replacement" if len(rows) < eligible else "all eligible rows",
+def spaces(h, t):
+    """{name: (vectors, cluster ids)} for one batch."""
+    x = (h - m_b) / s_b
+    xt = (h - m_t) / s_t - tb(t)
+    z = ae.encode((h - m_a) / s_a, t)
+    lab_b = pairwise_sq_dist(x, C, metric="euclidean").argmin(1)
+    return {
+        "residual_raw": (h, lab_b),            # the paper's object: un-normalised final-layer states
+        "residual": (x, lab_b),                # normalised residual, where balanced k-means clusters
+        "token_centred": (xt, pairwise_sq_dist(xt, C2, metric="euclidean").argmin(1)),
+        "geoae": (z, pairwise_sq_dist(z, ae.centroids, metric=ae.metric).argmin(1)),
     }
 
 
-def latest_sampled_rows(doc_ids, positions):
-    if not len(doc_ids):
-        return np.empty(0, dtype=np.int64)
-    order = np.lexsort((np.arange(len(doc_ids)), positions, doc_ids))
-    ends = np.r_[np.flatnonzero(np.diff(doc_ids[order])), len(order) - 1]
-    return np.sort(order[ends])
+def batches():
+    for i in range(0, n, args.batch):
+        h = torch.from_numpy(H[i:i + args.batch]).to(dev).float()
+        t = torch.from_numpy(tok[i:i + args.batch]).to(dev)
+        f = torch.from_numpy(fold[i:i + args.batch]).to(dev)
+        yield i, h, t, f
 
 
-def summarized(stat, variant, centre=None):
-    result = stat.metrics(variant, centre=centre)
-    folds = [stat.metrics(variant, fold=i, centre=centre) for i in range(stat.n_folds)]
-    result["fold_range"], result["fold_defined_counts"] = {}, {}
-    for name in METRICS:
-        values = [f[name] for f in folds if f[name] is not None]
-        result["fold_range"][name] = [min(values), max(values)] if values else None
-        result["fold_defined_counts"][name] = len(values)
-    result["fold_rows"] = [f["rows"] for f in folds]
-    result["fold_zero_centroid_clusters"] = [f["zero_centroid_clusters"] for f in folds]
-    return result
+# pass 1: per-space means (for the centred variant)
+mean = {}
+for _, h, t, _ in batches():
+    for k, (v, _) in spaces(h, t).items():
+        mean[k] = mean.get(k, 0) + v.double().sum(0)
+mean = {k: (v / n).float() for k, v in mean.items()}
+
+# pass 2: per-fold, per-cluster sums of unit vectors
+F = args.folds
+acc = {}
+for _, h, t, f in batches():
+    for k, (v, lab) in spaces(h, t).items():
+        kk = K if k != "geoae" else ae.n_clusters
+        for var, w in (("raw", v), ("centred", v - mean[k])):
+            u = torch.nn.functional.normalize(w, dim=1).double()
+            a = acc.setdefault((k, var), {"S": torch.zeros(F, kk, u.shape[1], dtype=torch.float64, device=dev),
+                                          "n": torch.zeros(F, kk, dtype=torch.float64, device=dev)})
+            idx = f * kk + lab
+            a["S"].view(F * kk, -1).index_add_(0, idx, u)
+            a["n"].view(-1).index_add_(0, idx, torch.ones_like(idx, dtype=torch.float64))
+print(f"[disp] encoded and accumulated in {time.time()-t0:.0f}s")
 
 
-def validate_norm(mean, std, dimension, label):
-    if mean.shape != (dimension,) or std.shape != (dimension,):
-        raise ValueError(f"{label}: normalization dimension differs from activation dump")
-    if not bool(torch.isfinite(mean).all()) or not bool(torch.isfinite(std).all()) or bool((std <= 0).any()):
-        raise ValueError(f"{label}: normalization needs finite mean and positive finite std")
+def stats(S, cnt):
+    """S (K, d), cnt (K,) -> dispersion, within, between, within/between pair shares."""
+    n_ = cnt.sum()
+    tot = (S.sum(0) ** 2).sum() - n_                 # sum_{i != j} u_i.u_j
+    w = ((S ** 2).sum(1) - cnt).sum()
+    wp = (cnt * (cnt - 1)).sum()
+    tp = n_ * (n_ - 1)
+    disp = 1 - tot / tp
+    within = 1 - w / wp
+    between = 1 - (tot - w) / (tp - wp)
+    return {"dispersion": disp.item(), "within": within.item(), "between": between.item(),
+            "between_over_within": (between / within).item()}
 
 
-def validate_checkpoint_data(checkpoint, layer, val_frac):
-    data = checkpoint.get("config", {}).get("data", {})
-    if data.get("target_layer") is not None and int(data["target_layer"]) != layer:
-        raise ValueError("GeoAE checkpoint layer differs from requested layer")
-    if data.get("val_frac") is not None and not math.isclose(float(data["val_frac"]), val_frac):
-        raise ValueError("--val_frac must match the checkpoint's training split; otherwise rows may be trained on")
+res = {"meta": {"paper": "Li et al. 2026, arXiv 2506.24106", "rows": n, "dump": str(d), "val_start": v0,
+                "checkpoint": args.ckpt, "km": args.km, "km_tok": args.km_tok, "folds": F,
+                "metric": "mean pairwise cosine distance; within/between use each space's own codebook"},
+       "token_level": {}, "doc_level": {}}
+for (k, var), a in acc.items():
+    full = stats(a["S"].sum(0), a["n"].sum(0))
+    per = [stats(a["S"][i], a["n"][i]) for i in range(F)]
+    full["fold_range"] = {m: [min(p[m] for p in per), max(p[m] for p in per)] for m in full}
+    res["token_level"].setdefault(k, {})[var] = full
 
+# document level, as in the paper: one vector per text (here the latest sampled position of each doc)
+order = np.lexsort((pos, doc))
+last = order[np.r_[np.flatnonzero(np.diff(doc[order])), len(order) - 1]]
+hd = torch.from_numpy(H[last]).to(dev).float()
+td = torch.from_numpy(tok[last]).to(dev)
+fd = fold[last]
+for k, (v, _) in spaces(hd, td).items():
+    for var, w in (("raw", v), ("centred", v - v.mean(0))):
+        u = torch.nn.functional.normalize(w, dim=1).double()
 
-@torch.inference_mode()
-def run(args):
-    from geoae.checkpoint import load_ae_checkpoint
-    from geoae.interp.closest_tokens import load_baseline_kmeans
-    from geoae.losses import pairwise_sq_dist
-    from geoae.token_bias import TokenBiasLookup
+        def disp(uu):
+            m_ = len(uu)
+            return (1 - ((uu.sum(0) ** 2).sum() - m_) / (m_ * (m_ - 1))).item()
+        per = [disp(u[torch.from_numpy(fd == i).to(dev)]) for i in range(F)]
+        res["doc_level"].setdefault(k, {})[var] = {"dispersion": disp(u), "fold_range": [min(per), max(per)],
+                                                   "n_docs": int(len(last))}
 
-    start = time.time()
-    device = torch.device(("cuda" if torch.cuda.is_available() else "cpu") if args.device == "auto" else args.device)
-    if device.type == "cuda" and not torch.cuda.is_available():
-        raise ValueError("--device cuda requested but CUDA is unavailable")
-    dump = Path(args.dump)
-    activations = np.load(dump / f"layer_{args.layer}.npy", mmap_mode="r")
-    if activations.ndim != 2:
-        raise ValueError("activation dump must have shape (N, D)")
-    n_total, dimension = activations.shape
-    tokens = np.load(dump / "rows_tok.npy", mmap_mode="r")
-    documents = np.load(dump / "rows_doc.npy", mmap_mode="r")
-    positions = np.load(dump / "rows_pos.npy", mmap_mode="r")
-    if any(a.shape != (n_total,) for a in (tokens, documents, positions)):
-        raise ValueError("rows_tok, rows_doc, rows_pos must match activation row count")
-    val_start = int(n_total * (1.0 - args.val_frac))
-    rows, selection = select_rows(documents, val_start, args.max_rows, args.seed)
-    if not len(rows):
-        raise ValueError("no eligible held-out rows after excluding train-overlapping documents")
-    tok, doc, pos = (np.asarray(a[rows], dtype=np.int64) for a in (tokens, documents, positions))
-    fold = doc % args.folds
-    proxy_mask = np.zeros(len(rows), dtype=bool)
-    proxy_mask[latest_sampled_rows(doc, pos)] = True
-    vendi_n = min(args.vendi_rows, len(rows))
-    vendi_mask = np.zeros(len(rows), dtype=bool)
-    if vendi_n:
-        vendi_mask[np.random.default_rng(args.seed).choice(len(rows), size=vendi_n, replace=False)] = True
-    print(f"[disp] {len(rows):,} selected rows, {proxy_mask.sum():,} document proxies, device={device}; "
-          f"excluded {selection['excluded_train_overlap_rows']:,} train-overlap rows", flush=True)
-
-    c_base, m_base, s_base, k_base, layer, _ = load_baseline_kmeans(Path(args.km), device)
-    if layer != args.layer:
-        raise ValueError("base k-means layer differs from requested layer")
-    validate_norm(m_base, s_base, dimension, "base k-means")
-    ae, m_ae, s_ae, checkpoint = load_ae_checkpoint(args.ckpt, device, allow_token_bias=True)
-    validate_checkpoint_data(checkpoint, args.layer, args.val_frac)
-    del checkpoint
-    if ae.hidden_size != dimension:
-        raise ValueError("--ckpt must be a GeoAE matching the activation dimension")
-    if ae.has_token_bias and ae.token_bias_mode != "bypass":
-        raise ValueError("--ckpt must be a plain or token-bypass GeoAE")
-    validate_norm(m_ae, s_ae, dimension, "GeoAE")
-    control = None
-    if args.km_tok:
-        c, m, s, k, layer, _ = load_baseline_kmeans(Path(args.km_tok), device, allow_token_bias=True)
-        if layer != args.layer:
-            raise ValueError("token-centred k-means layer differs from requested layer")
-        validate_norm(m, s, dimension, "token-centred k-means")
-        with np.load(args.km_tok, allow_pickle=True) as archive:
-            if "token_bias" not in archive.files:
-                raise ValueError("--km_tok needs a codebook referencing its token_bias table")
-            bias = TokenBiasLookup(str(archive["token_bias"]), device)
-        if not (np.allclose(bias.norm_mean, m.cpu().numpy()) and
-                np.allclose(bias.norm_std, s.cpu().numpy())):
-            raise ValueError("token-centred k-means and its token_bias table use different norm stats")
-        control = c, m, s, k, bias
-
-    def spaces(h, t):
-        x = (h - m_base) / s_base
-        labels = pairwise_sq_dist(x, c_base, metric="euclidean").argmin(1)
-        z = ae.encode((h - m_ae) / s_ae, t if ae.has_token_bias else None)
-        ae_labels = pairwise_sq_dist(z, ae.centroids, metric=ae.metric).argmin(1)
-        result = {"residual_raw": (h, labels, k_base), "residual": (x, labels, k_base),
-                  "geoae": (z, ae_labels, ae.n_clusters), "geoae_base_partition": (z, labels, k_base)}
-        if control:
-            c, m, s, k, bias = control
-            xt = (h - m) / s - bias(t)
-            result["token_centred"] = (xt, pairwise_sq_dist(xt, c, metric="euclidean").argmin(1), k)
-        return result
-
-    def batches():
-        for i in range(0, len(rows), args.batch):
-            end = min(i + args.batch, len(rows))
-            h = torch.from_numpy(np.array(activations[rows[i:end]], dtype=np.float32)).to(device)
-            t, f = (torch.from_numpy(a[i:end]).to(device) for a in (tok, fold))
-            proxy, vendi = (torch.from_numpy(a[i:end]).to(device) for a in (proxy_mask, vendi_mask))
-            yield i, h, t, f, proxy, vendi
-
-    stats, doc_stats = {}, {}
-    for i, h, t, f, proxy, _ in batches():
-        for name, (v, labels, k) in spaces(h, t).items():
-            if name not in stats:
-                stats[name] = ClusterStatistics(k, v.shape[1], args.folds, device)
-                doc_stats[name] = ClusterStatistics(1, v.shape[1], args.folds, device)
-            try:
-                stats[name].add_vectors(v, labels, f)
-                doc_stats[name].add_vectors(v[proxy], torch.zeros_like(labels[proxy]), f[proxy])
-            except ValueError as error:
-                raise ValueError(f"{name}, batch selected rows {i}..{i + len(h)}: {error}") from error
-    means = {name: s.mean() for name, s in stats.items()}
-    doc_means = {name: s.mean() for name, s in doc_stats.items()}
-    print(f"[disp] first pass complete in {time.time() - start:.1f}s", flush=True)
-    vendi_parts = {}
-    for i, h, t, f, proxy, vendi in batches():
-        for name, (v, labels, _) in spaces(h, t).items():
-            v = v.double()
-            try:
-                for variant, w in (("raw", v), ("centred", v - means[name])):
-                    stats[name].add_units(w, labels, f, variant)
-                for variant, w in (("raw", v[proxy]), ("centred", v[proxy] - doc_means[name])):
-                    doc_stats[name].add_units(w, torch.zeros_like(labels[proxy]), f[proxy], variant)
-            except ValueError as error:
-                raise ValueError(f"{name}, batch selected rows {i}..{i + len(h)}: {error}") from error
-            if vendi_n and name != "geoae_base_partition":
-                vendi_parts.setdefault(name, []).append(v[vendi].cpu())
-    print(f"[disp] second pass complete in {time.time() - start:.1f}s", flush=True)
-
-    result = {"meta": {
-        "paper": "On the Predictive Power of Representation Dispersion in Language Models",
-        "paper_url": "https://arxiv.org/abs/2506.24106v2", "metric_version": 2,
-        "within": "equal-occupied-cluster mean of row-to-empirical-centroid cosine distances",
-        "within_sample_weighted": "row-weighted mean of row-to-empirical-centroid cosine distances",
-        "between": "mean pairwise cosine distance among occupied empirical centroids",
-        "centroid_convention": "arithmetic original-vector means, then normalize; paper's averaging convention unspecified",
-        "dispersion": "mean pairwise cosine distance among distinct rows",
-        "pairwise_metrics": "supplementary row-pair metrics, distinct from paper centroid metrics",
-        "zero_vector_policy": "reject rows with undefined cosine distance",
-        "zero_centroid_policy": "all centroid metrics null if any occupied centroid is zero",
-        "folds": args.folds, "fold_assignment": "document id modulo folds",
-        "fold_interpretation": "document-grouped fold range is variability, not confidence interval",
-        "centring": "separate global selected-token and selected-document-proxy means, fixed across folds",
-        "adaptations": ["learned clusters instead of repeated continuations sharing a context",
-                        "arbitrary sampled-token residuals instead of true last-token text representations",
-                        "default L27 dump is pre-final-RMSNorm residual, unlike author's final post-norm hidden state",
-                        "centred variants are supplementary diagnostics",
-                        "does not test dispersion-perplexity correlation or predictive power"],
-        "partition_comparison": "geoae native groups; geoae_base_partition uses identical base groups",
-        "document_proxy": "one latest AVAILABLE row within selected sample per doc; not true last-token/text representation",
-        "dump": str(dump), "layer": args.layer, "val_start": val_start,
-        "checkpoint": args.ckpt, "km": args.km, "km_tok": args.km_tok,
-        "ae_mode": "bypass" if ae.has_token_bias else "plain",
-        "token_bias": bool(ae.has_token_bias),
-        "token_bias_mode": ae.token_bias_mode if ae.has_token_bias else None,
-        "device": str(device), "batch": args.batch, "selection": selection,
-        "space_clusters": {name: s.n_clusters for name, s in stats.items()},
-        "vendi": {"rows": vendi_n, "seed": args.seed, "sampling": "uniform subset of selected token rows",
-                  "kernel": "cosine Gram U @ U.T; eigvalsh / N; eigenvalues > 1e-10",
-                  "centred": "supplementary, uses full selected-token global mean"},
-    }, "token_level": {}, "doc_level": {}}
-    for name, s in stats.items():
-        result["token_level"][name], result["doc_level"][name] = {}, {}
-        for variant in ("raw", "centred"):
-            result["token_level"][name][variant] = summarized(s, variant, means[name] if variant == "centred" else None)
-            d = summarized(doc_stats[name], variant, doc_means[name] if variant == "centred" else None)
-            result["doc_level"][name][variant] = {"dispersion": d["dispersion"], "n_docs": d["rows"],
-                "fold_range": d["fold_range"]["dispersion"], "fold_rows": d["fold_rows"],
-                "fold_defined_count": d["fold_defined_counts"]["dispersion"]}
-    for name, parts in vendi_parts.items():
-        v = torch.cat(parts)
-        for variant in ("raw", "centred"):
-            w = v - means[name].cpu() if variant == "centred" else v
-            result["token_level"][name][variant].update(vendi_score=vendi_score(w), vendi_rows=vendi_n)
-    result["meta"]["elapsed_seconds"] = time.time() - start
-    output = Path(args.out)
-    output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
-    print(f"[disp] wrote {output} ({time.time() - start:.1f}s)", flush=True)
-    print(f"{'space':18s} {'variant':8s} {'disp(tok)':>10s} {'within':>10s} {'between':>10s} {'b/w':>10s} {'disp(proxy)':>12s}")
-    for name in ("residual_raw", "residual", "geoae", "token_centred"):
-        if name not in result["token_level"]:
-            continue
-        for variant in ("raw", "centred"):
-            r = result["token_level"][name][variant]
-            values = [r[key] for key in ("dispersion", "within", "between", "between_over_within")]
-            values.append(result["doc_level"][name][variant]["dispersion"])
-            rendered = ["null" if v is None else f"{v:.5f}" for v in values]
-            print(f"{name:18s} {variant:8s} " + " ".join(f"{v:>10s}" for v in rendered))
-    return result
-
-
-def main(argv=None):
-    run(parse_args(argv))
-
-
-if __name__ == "__main__":
-    main()
+out = Path(args.out)
+out.parent.mkdir(parents=True, exist_ok=True)
+out.write_text(json.dumps(res, indent=1))
+print(f"[disp] wrote {out} ({time.time()-t0:.0f}s)\n")
+print(f"{'space':15s} {'variant':8s} {'disp(tok)':>10s} {'within':>8s} {'between':>8s} {'b/w':>6s} {'disp(doc)':>10s}")
+for k in res["token_level"]:
+    for var in ("raw", "centred"):
+        r, dd = res["token_level"][k][var], res["doc_level"][k][var]
+        print(f"{k:15s} {var:8s} {r['dispersion']:10.4f} {r['within']:8.4f} {r['between']:8.4f} "
+              f"{r['between_over_within']:6.3f} {dd['dispersion']:10.4f}   folds b/w {r['fold_range']['between_over_within'][0]:.3f}-{r['fold_range']['between_over_within'][1]:.3f}")

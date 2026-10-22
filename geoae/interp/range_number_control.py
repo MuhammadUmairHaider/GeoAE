@@ -417,10 +417,10 @@ def main():
                         delta = edit(a_eval) - a_eval
                         if rotation is not None:
                             delta = rotation.inverse(delta)
-                        # decoder only: a latent DIFFERENCE decodes without the token
-                        # bias (it cancels in decode(z + d, t) - decode(z, t)).
+                        # Evaluate the decoded change at each original latent. The
+                        # token bias cancels; nonlinear decoder changes depend on z.
                         raw_delta = (delta if raw else delta * std if is_hb
-                                     else ae.decoder(delta) * std)
+                                     else ae.decoded_delta(z_eval, delta, ids(ids_eval)) * std)
                     all_summary = summarize(values, test_labels, source, np.ones(n_test, dtype=bool))
                     paired = summarize(values, test_labels, source, joint)
                     result["arms"][key] = {

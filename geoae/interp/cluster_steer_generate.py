@@ -9,16 +9,9 @@ AE's clusters), at EVERY position during generation:
 
 m_k = mean normalised residual of cluster k's members (held-out reference rows), s(pos) =
 the position's own cluster under that codebook, t = the target. Both codebooks use this
-same form, so the ONLY difference between them is the partition. Each step's edit runs
-through every remaining decoder block before the next-token choice; steering compounds
-through the generated text. --mode latent instead edits the bypass AE's latent,
-z + a (c_t - c_s).
-
-Signatures at intermediate layers are measured by full forwards on sampled positions
-of frozen corpus-tail documents, disjoint from the extraction dump. The chosen-block
-residual supplies the cluster assignment and the final residual supplies the actual
-next-token distribution. --signature_mode context also uses this reference population
-at final layers; auto retains the dump/head path for final layers only.
+same form, so the ONLY difference between them is the partition. (L27 is the last block,
+so each step's edit acts on that step's next-token choice; steering compounds through the
+generated text.) --mode latent instead edits the bypass AE's latent, z + a (c_t - c_s).
 
 Targets: --n_targets random CONTENT clusters per codebook, one rule for both: not a hub,
 >= --min_members reference members drawn from >= --min_docs documents, and most of the tokens
@@ -62,9 +55,6 @@ from transformers import AutoTokenizer
 
 from geoae.checkpoint import load_lm
 from geoae.hooks import SplicingHook, TokenIdTap
-from geoae.interp._context_logits import (
-    context_signature_batches, final_residual_logits, prepare_final_readout, validate_layer,
-)
 from geoae.interp.cluster_steering import Arm
 
 PROMPTS = [
@@ -88,39 +78,6 @@ def word_like(s: str, start_only: bool = True) -> bool:
 
 
 @torch.no_grad()
-def collect_signature_statistics(arms, batches, mean, std, vocab_size):
-    """Fit both codebooks' means and signatures on the same aligned reference rows."""
-    device, width = mean.device, mean.numel()
-    accum = {}
-    for name, arm in arms.items():
-        k = len(arm.C)
-        accum[name] = dict(M=torch.zeros(k, width, device=device),
-                           Q=torch.zeros(k, width, device=device),
-                           P=torch.zeros(k, vocab_size, device=device), labels=[])
-    pbar = torch.zeros(vocab_size, device=device)
-    tokens, documents, source_rows = [], [], {}
-    for raw, tok, doc, probabilities, domain in batches:
-        x = (raw.float() - mean) / std
-        pbar += probabilities.sum(0)
-        tokens.append(tok)
-        documents.append(doc)
-        source_rows[domain] = source_rows.get(domain, 0) + len(raw)
-        for name, arm in arms.items():
-            values = accum[name]
-            labels = arm.assign(x, tok)
-            values["labels"].append(labels)
-            values["M"].index_add_(0, labels, x)
-            values["Q"].index_add_(0, labels, x * x)
-            values["P"].index_add_(0, labels, probabilities)
-    if not documents:
-        raise ValueError("no reference rows available for cluster signatures")
-    doc_ref = np.concatenate(documents)
-    for values in accum.values():
-        values["labels"] = torch.cat(values["labels"])
-    return accum, pbar / len(doc_ref), torch.cat(tokens), doc_ref, source_rows
-
-
-@torch.no_grad()
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--base", required=True, help="base codebook: balanced k-means .npz on the plain residual")
@@ -134,17 +91,8 @@ def main():
                          "interventions — a convention, not a tuned value")
     ap.add_argument("--activations_dir", default="activations_sampled_10M")
     ap.add_argument("--layer", type=int, default=27)
-    ap.add_argument("--signature_mode", choices=["auto", "head", "context"], default="auto",
-                    help="auto uses true full-context signatures at middle blocks and the exact "
-                         "dump/head shortcut at the final block; head requires the final block")
-    ap.add_argument("--corpus_dir", default=None,
-                    help="frozen corpus override for context signatures (default: dump meta.json)")
-    ap.add_argument("--signature_batch_docs", type=int, default=2,
-                    help="documents per full forward when collecting context signatures")
-    ap.add_argument("--val_frac", type=float, default=0.05,
-                    help="validation tail fraction for dump/head signatures")
-    ap.add_argument("--n_eval", type=int, default=500_000,
-                    help="held-out dump rows; context mode collects half this budget as reference rows")
+    ap.add_argument("--val_frac", type=float, default=0.05)
+    ap.add_argument("--n_eval", type=int, default=500_000)
     ap.add_argument("--n_targets", type=int, default=40)
     ap.add_argument("--min_members", type=int, default=50)
     ap.add_argument("--min_docs", type=int, default=20, help="members must come from >= this many documents")
@@ -167,18 +115,24 @@ def main():
     tk = AutoTokenizer.from_pretrained(meta["model"])
     tk.pad_token, tk.padding_side = tk.eos_token, "left"
     lm = load_lm(meta["model"], device=dev)
-    downstream_blocks = validate_layer(lm, args.layer)
-    signature_mode = args.signature_mode
-    if signature_mode == "auto":
-        signature_mode = "context" if downstream_blocks else "head"
-    if signature_mode == "head" and downstream_blocks:
-        raise SystemExit("--signature_mode head requires the last block; use context for a middle layer")
-    if args.n_targets < 4:
-        raise SystemExit("--n_targets must be at least 4 for three forced-choice distractors")
-    head = lm.get_output_embeddings()
+    from geoae.lm_arch import decoder_layers
+    if args.layer != len(decoder_layers(lm)) - 1:
+        raise SystemExit("--layer must be the last block (the signatures are next-token distributions)")
+    from geoae.lm_arch import locate_lm_parts
+    head, fnorm = lm.get_output_embeddings(), locate_lm_parts(lm)[2]   # final norm, any architecture
     V = head.weight.shape[0]
     dec = [tk.decode([i]) for i in range(V)]
     wl = torch.tensor([word_like(s, args.word_filter == "start") for s in dec], device=dev)
+
+    X = np.load(str(act / f"layer_{args.layer}.npy"), mmap_mode="r")
+    N = len(X)
+    ev = np.arange(int(N * (1 - args.val_frac)), N)[: args.n_eval]
+    doc = np.load(act / "rows_doc.npy")[ev]
+    ref = ev[doc % 2 == 0]                                   # same reference half as cluster_steering
+    doc_ref = doc[doc % 2 == 0]
+    H = torch.from_numpy(np.array(X[ref])).to(dev)
+    tok_ref = torch.from_numpy(np.load(act / "rows_tok.npy")[ref].astype(np.int64)).to(dev)
+    print(f"[gen] {len(ref):,} reference rows (even docs of the held-out tail)")
 
     arms = {"base": Arm("base", args.base, dev), "bypass": Arm("bypass", args.bypass, dev)}
     if arms["base"].kind != "km" or arms["bypass"].kind != "ae":
@@ -187,53 +141,28 @@ def main():
     if not (torch.allclose(arms["bypass"].mean, mean) and torch.allclose(arms["bypass"].std, std)):
         raise SystemExit("base and bypass use different norm stats")
 
+    def probs(h_raw):
+        return torch.softmax(head(fnorm(h_raw.to(head.weight.dtype))).float(), -1)
+
     # ---- reference statistics per codebook: member means, signatures, target choice --------
-    if signature_mode == "context":
-        from geoae.interp.closest_tokens import sampled_sources, stream_sampled_docs
-        context_meta, sources = sampled_sources(act, Path(args.corpus_dir) if args.corpus_dir else None)
-        n_ref = max(1, args.n_eval // 2)
-        stream = stream_sampled_docs(sources, context_meta, n_ref, tk,
-                                     context_meta.get("min_doc_len", 10), args.seed)
-        batches = context_signature_batches(lm, args.layer, stream, dev, tk.pad_token_id,
-                                            batch_docs=args.signature_batch_docs, chunk=args.chunk)
-        reference_meta = {"population": "frozen_corpus_tail", "training_document_overlap": 0,
-                          "corpus_dir": str(Path(args.corpus_dir or context_meta["corpus_dir"])),
-                          "source_offsets": {s["domain"]: s["offset"] for s in sources},
-                          "context_len": context_meta["context_len"],
-                          "positions_per_doc": context_meta["positions_per_doc"]}
-    else:
-        check_ids = tk(PROMPTS[0], return_tensors="pt")["input_ids"].to(dev)
-        prepare_final_readout(lm, check_ids)
-        X = np.load(str(act / f"layer_{args.layer}.npy"), mmap_mode="r")
-        ev = np.arange(int(len(X) * (1 - args.val_frac)), len(X))[: args.n_eval]
-        docs = np.load(act / "rows_doc.npy", mmap_mode="r")
-        ref = ev[docs[ev] % 2 == 0]
-        tokens = np.load(act / "rows_tok.npy", mmap_mode="r")
-
-        def dump_batches():
-            for i in range(0, len(ref), args.chunk):
-                rows = ref[i:i + args.chunk]
-                raw = torch.from_numpy(np.array(X[rows])).to(dev)
-                tok = torch.from_numpy(np.array(tokens[rows], dtype=np.int64)).to(dev)
-                probabilities = torch.softmax(final_residual_logits(lm, raw).float(), -1)
-                yield raw, tok, np.asarray(docs[rows]), probabilities, "dump"
-
-        n_ref, batches = len(ref), dump_batches()
-        reference_meta = {"population": "even_documents_of_dump_validation_tail"}
-    sums, Pbar, tok_ref, doc_ref, source_rows = collect_signature_statistics(arms, batches, mean, std, V)
-    if len(doc_ref) != n_ref:
-        raise SystemExit(f"reference corpus supplied {len(doc_ref):,} of {n_ref:,} requested rows")
-    reference_meta.update(n_rows=len(doc_ref), n_docs=len(np.unique(doc_ref)), source_rows=source_rows)
-    reference_meta["native_readout"] = lm._geoae_signature_readout
-    print(f"[gen] {len(doc_ref):,} reference rows; {signature_mode} signatures; "
-          f"{downstream_blocks} downstream blocks")
-    D = mean.numel()
+    Pbar = torch.zeros(V, device=dev)
+    for i in range(0, len(ref), args.chunk):
+        Pbar += probs(H[i:i + args.chunk]).sum(0)
+    Pbar /= len(ref)
     stats = {}
     for name, arm in arms.items():
         K = arm.C.shape[0]
-        values = sums.pop(name)
-        lab, M, Q, P = (values[key] for key in ("labels", "M", "Q", "P"))
-        del values
+        lab = torch.empty(len(ref), dtype=torch.long, device=dev)
+        M = torch.zeros(K, H.shape[1], device=dev)
+        Q = torch.zeros(K, H.shape[1], device=dev)             # per-cluster sum of squares (gating)
+        P = torch.zeros(K, V, device=dev)
+        for i in range(0, len(ref), args.chunk):
+            x = (H[i:i + args.chunk].float() - mean) / std
+            l = arm.assign(x, tok_ref[i:i + args.chunk])
+            lab[i:i + len(l)] = l
+            M.index_add_(0, l, x)
+            Q.index_add_(0, l, x * x)
+            P.index_add_(0, l, probs(H[i:i + args.chunk]))
         cnt = torch.bincount(lab, minlength=K).float()
         n_tot = cnt.sum()
         tot_s, tot_q = M.sum(0), Q.sum(0)
@@ -245,7 +174,7 @@ def main():
         mu_r = (tot_s[None] - M * cnt[:, None]) / rest_n
         sd_r = ((tot_q[None] - Q) / rest_n - mu_r * mu_r).clamp_min(1e-8).sqrt()
         dprime = (M - mu_r).abs() / (0.5 * (SD * SD + sd_r * sd_r)).sqrt()
-        n_sal = max(1, int(round(args.percent * D)))
+        n_sal = max(1, int(round(args.percent * H.shape[1])))
         SAL = torch.zeros_like(M, dtype=torch.bool)
         SAL.scatter_(1, dprime.topk(n_sal, dim=1).indices, True)
         del Q, mu_r, sd_r, dprime
@@ -277,7 +206,7 @@ def main():
               + " | ".join(", ".join(profiles[int(t)]["raises_next"][:5]) for t in targets[:3]))
         del P, lift
         torch.cuda.empty_cache()
-    del sums, tok_ref
+    del H
 
     # ---- generation --------------------------------------------------------------------------
     hook, tap = SplicingHook(lm, args.layer), TokenIdTap(lm)
@@ -350,10 +279,7 @@ def main():
 
     if args.gate != "none" and args.mode != "partition":
         raise SystemExit("--gate is defined for --mode partition")
-    res = {"meta": {**vars(args), "prompts": PROMPTS, "signature_mode_resolved": signature_mode,
-                    "signature_reference": reference_meta, "downstream_blocks": downstream_blocks,
-                    "intervention_forward": "complete_lm_at_selected_block"},
-           "arms": {}, "generations": gens}
+    res = {"meta": {**vars(args), "prompts": PROMPTS}, "arms": {}, "generations": gens}
     for name in arms:
         st = stats[name]
         nt, npr = len(st["targets"]), len(PROMPTS)

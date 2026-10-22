@@ -89,6 +89,40 @@ def test_below_chance_is_not_called_information_erasure():
     assert not bp.select_operating_points(curve, curve)["near_chance"]["reached_on_validation"]
 
 
+@pytest.mark.parametrize("decoder_type", ["mlp", "residual_mlp"])
+def test_geoae_probe_encoding_accepts_nonlinear_decoder_checkpoints(tmp_path, decoder_type):
+    """Probe latents depend on the encoder, regardless of decoder module layout."""
+    from geoae.config import Config
+    from geoae.model import GeoAE
+
+    cfg = Config()
+    cfg.extraction.model_name = "tiny-qwen"
+    cfg.data.target_layer = 35
+    cfg.model.hidden_size = 8
+    cfg.model.latent_dim = 16
+    cfg.model.n_clusters = 4
+    cfg.model.nonlinearity = "gelu"
+    cfg.model.latent_norm = "batch"
+    cfg.model.decoder_type = decoder_type
+    cfg.model.decoder_hidden_dim = 6
+    cfg.model.token_bias = "table-stored-in-checkpoint.npz"
+    ae = GeoAE(hidden_size=8, latent_dim=16, n_clusters=4,
+               nonlinearity="gelu", latent_norm="batch", decoder_type=decoder_type,
+               decoder_hidden_dim=6, token_bias_rows=2, vocab_size=4).eval()
+    ae.load_token_bias(torch.tensor([1, 3]), torch.randn(2, 8))
+    x = np.random.default_rng(17).normal(size=(7, 8)).astype(np.float32)
+    token_ids = np.array([1, 3, 0, 1, 3, 0, 1], dtype=np.int64)
+    expected = ae.encode(torch.from_numpy(x), torch.from_numpy(token_ids)).detach().numpy()
+    path = tmp_path / "nonlinear.pt"
+    torch.save({"model_state": ae.state_dict(), "config": cfg.to_dict(),
+                "norm_mean": np.zeros(8, dtype=np.float32),
+                "norm_std": np.ones(8, dtype=np.float32)}, path)
+    encoded, info = bp.encode_geoae([x], path, "cpu", {"model": "tiny-qwen"},
+                                    35, batch_size=3, tokens=[token_ids])
+    np.testing.assert_allclose(encoded[0], expected, atol=1e-6)
+    assert info["token_bypass"]
+
+
 def test_full_raw_cli_with_noncontiguous_profession_labels(tmp_path, monkeypatch):
     rng = np.random.RandomState(7)
     for split, n in [("train", 160), ("test", 40)]:

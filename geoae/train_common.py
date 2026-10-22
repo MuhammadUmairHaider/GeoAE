@@ -9,6 +9,7 @@ pipelines can't drift apart.
 """
 from __future__ import annotations
 
+import argparse
 import os
 import shutil
 import zipfile
@@ -127,6 +128,10 @@ def build_model(cfg: Config, device: torch.device, no_sinkhorn: bool = False) ->
         metric=cfg.model.metric,
         ema_hard=cfg.train.ema_hard,
         latent_norm=getattr(cfg.model, "latent_norm", "none"),
+        decoder_type=cfg.model.decoder_type,
+        decoder_hidden_dim=cfg.model.decoder_hidden_dim,
+        decoder_nonlinearity=cfg.model.decoder_nonlinearity,
+        decoder_output_bias=cfg.model.decoder_output_bias,
         token_bias_rows=0 if tb is None else len(tb["token_ids"]),
         vocab_size=0 if tb is None else int(tb["vocab_size"]),
         token_bias_mode=getattr(cfg.model, "token_bias_mode", "bypass"),
@@ -178,13 +183,22 @@ def add_override_args(ap) -> None:
     ap.add_argument("--latent_dim", type=int, default=None, help="Override model.latent_dim")
     ap.add_argument("--nonlinearity", default=None, choices=["linear", "relu", "gelu", "tanh"],
                     help="Override encoder nonlinearity")
+    ap.add_argument("--decoder_type", default=None, choices=["linear", "mlp", "residual_mlp"],
+                    help="Override decoder architecture")
+    ap.add_argument("--decoder_hidden_dim", type=int, default=None,
+                    help="Override decoder hidden width (0 = automatic)")
+    ap.add_argument("--decoder_nonlinearity", default=None,
+                    choices=["linear", "relu", "gelu", "tanh"],
+                    help="Override decoder activation (linear gives an affine control)")
+    ap.add_argument("--decoder_output_bias", action=argparse.BooleanOptionalAction,
+                    default=None, help="Enable/disable learned decoder output bias")
     ap.add_argument("--checkpoints_dir", default=None, help="Override train.checkpoints_dir")
     ap.add_argument("--no_cluster", action="store_true",
                     help="Disable cluster loss (set lambda_cluster=0)")
     ap.add_argument("--no_sep", action="store_true",
                     help="Disable separation loss (set lambda_sep=0)")
     ap.add_argument("--lambda_sep", type=float, default=None, help="Override lambda_sep")
-    ap.add_argument("--balance", default=None, choices=["uniform", "zipf", "none"],
+    ap.add_argument("--balance", default=None, choices=["uniform", "zipf"],
                     help="Override loss.balance (column-marginal target shape)")
     ap.add_argument("--balance_rho", type=float, default=None,
                     help="Override loss.balance_rho (1=hard Sinkhorn, 0=softmax)")
@@ -218,6 +232,9 @@ def apply_overrides(cfg: Config, args) -> None:
         cfg.model.latent_dim = args.latent_dim
     if opt("nonlinearity") is not None:
         cfg.model.nonlinearity = args.nonlinearity
+    for name in ("decoder_type", "decoder_hidden_dim", "decoder_nonlinearity", "decoder_output_bias"):
+        if opt(name) is not None:
+            setattr(cfg.model, name, opt(name))
     if opt("metric") is not None:
         cfg.model.metric = args.metric
     if opt("batch_size") is not None:
@@ -405,10 +422,19 @@ def load_resume(path, model, opt, norm_mean, norm_std, device, *, metadata_out: 
     ckpt = torch.load(str(path), map_location=device, weights_only=False)
     if metadata_out is not None:
         metadata_out["dataset_provenance"] = ckpt.get("dataset_provenance")
-    saved_mode = ckpt.get("config", {}).get("model", {}).get("token_bias_mode", "bypass")
+    saved_model = ckpt.get("config", {}).get("model", {})
+    saved_mode = saved_model.get("token_bias_mode", "bypass")
     if saved_mode != model.token_bias_mode:
         raise ValueError(f"[resume] token_bias_mode mismatch: checkpoint {saved_mode!r}, "
                          f"current model {model.token_bias_mode!r}; refusing to resume")
+    for name, default in (("decoder_type", "linear"), ("decoder_output_bias", False),
+                          ("decoder_nonlinearity", "gelu")):
+        if name == "decoder_nonlinearity" and model.decoder_type == "linear":
+            continue
+        saved, current = saved_model.get(name, default), getattr(model, name)
+        if saved != current:
+            raise ValueError(f"[resume] {name} mismatch: checkpoint {saved!r}, "
+                             f"current model {current!r}; refusing to resume")
     model.load_state_dict(ckpt["model_state"])
     if "opt_state" in ckpt:
         opt.load_state_dict(ckpt["opt_state"])

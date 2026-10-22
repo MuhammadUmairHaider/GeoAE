@@ -92,27 +92,6 @@ def test_uniform_target_usage_is_flat():
     assert torch.allclose(m.target_usage(), torch.full((7,), 1 / 7), atol=1e-6)
 
 
-def test_balance_none_is_nearest_prototype_with_flat_target():
-    # balance="none": no Sinkhorn; Q is the softmax of -dist2/tau and the usage target is 1/K even when a
-    # Zipf exponent is set (the exponent only shapes a Sinkhorn column prior).
-    m = GeoAE(hidden_size=6, latent_dim=4, n_clusters=5, balance="none", zipf_alpha=0.5, tau=0.7)
-    assert m.use_sinkhorn is False
-    out = m(torch.randn(12, 6))
-    assert torch.allclose(out.Q, torch.softmax(-out.dist2 / 0.7, dim=1), atol=1e-6)
-    assert torch.allclose(m.target_usage(), torch.full((5,), 0.2), atol=1e-6)
-
-
-def test_reinit_threshold_is_a_fraction_of_the_flat_share():
-    from geoae.train_common import reinit_dead_clusters
-    torch.manual_seed(0)
-    m = GeoAE(hidden_size=6, latent_dim=4, n_clusters=4, balance="none")
-    x = torch.randn(64, 6); out = m(x)
-    # shares 0.03 / 0.02 / 0.475 / 0.475; flat share 0.25 -> 5% floor 0.0125 (none dead), 10% floor 0.025 (one dead)
-    m.ema_cluster_size.copy_(torch.tensor([3.0, 2.0, 47.5, 47.5]))
-    assert reinit_dead_clusters(m, out.z.detach(), x, out.x_hat.detach(), threshold_factor=0.05) == 0
-    assert reinit_dead_clusters(m, out.z.detach(), x, out.x_hat.detach(), threshold_factor=0.1) == 1
-
-
 # --- schedules --------------------------------------------------------------
 
 def test_geometry_schedule_defaults_to_always_on():

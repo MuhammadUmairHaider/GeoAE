@@ -18,14 +18,6 @@ Metrics computed:
     assignment_entropy  softness of cluster assignments (0=hard, log(K)=uniform)
     effective_k         clusters with usage > 0.1/K
     effective_rank      effective rank of centroid matrix (exp of singular value entropy)
-    silhouette_full     exact silhouette of 20k rows against ALL rows — higher better
-    silhouette_full_se  standard error of silhouette_full over the scored rows
-    within_var_share    within-cluster share of total variance (W/T) — lower better
-    between_var_share   between-cluster share of total variance (B/T) — higher better
-    separability_radii  mean centroid dist / pooled RMS row-to-centroid dist — higher better
-    inter_centroid_dist_rel  mean centroid dist / RMS dist of two random rows — higher better
-  The last six are width- and scale-neutral, so they compare spaces of different width
-  (the keys above them are kept for old result files but are not comparable across widths).
 
   Functional (from ablation results, if results.json available):
     gini_mean           mean Gini of per-token CE changes — higher = more selective
@@ -185,118 +177,6 @@ def intra_cluster_variance(z: np.ndarray, labels: np.ndarray) -> float:
         if len(pts) > 1:
             vars_.append(pts.var(axis=0).mean())
     return float(np.mean(vars_)) if vars_ else float("nan")
-
-
-def silhouette_full(z: np.ndarray, labels: np.ndarray, n_score: int = 20_000,
-                    seed: int = 0, device=None, score_chunk: int = 4096,
-                    ref_chunk: int = 32768) -> tuple[float, float]:
-    """
-    Exact Euclidean silhouette of `n_score` seeded rows against ALL rows of `z`.
-
-    `silhouette` scores 5,000 rows against each other: at K=2000 that is ~2.5 rows
-    per cluster, so the per-cluster mean distances are noise and every singleton
-    scores 0. It is kept for old result files but should not be used at K=2000.
-    Here each scored row's mean distance to every cluster is taken over the full
-    reference set, so the per-row values are exact for the sample; only their
-    average is estimated, from `n_score` rows. Returns (mean, standard error).
-
-    `z` is never copied whole or moved whole to the device: the scored rows go
-    over once, the reference rows one `ref_chunk` at a time. The column mean is
-    subtracted on the device (distances are translation-invariant) so float32
-    cdist stays accurate for a latent with a large common offset.
-    """
-    uniq, inv, counts = np.unique(labels, return_inverse=True, return_counts=True)
-    k, n = len(uniq), len(z)
-    if k < 2:
-        return float("nan"), float("nan")
-    dev = torch.device(device) if device is not None else \
-        torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    idx = np.sort(np.random.default_rng(seed).choice(n, min(n_score, n), replace=False))
-    m = len(idx)
-    mu = torch.from_numpy(z.mean(axis=0, dtype=np.float64).astype(np.float32)).to(dev)
-    zs = torch.from_numpy(np.ascontiguousarray(z[idx])).to(dev) - mu
-    idx_t = torch.from_numpy(idx).to(dev)
-    inv_t = torch.from_numpy(inv.reshape(-1).astype(np.int64)).to(dev)
-    acc = torch.zeros(m, k, dtype=torch.float64, device=dev)   # sum of distances per cluster
-    with torch.no_grad():
-        for rs in range(0, n, ref_chunk):
-            re = min(rs + ref_chunk, n)
-            r = torch.from_numpy(np.ascontiguousarray(z[rs:re])).to(dev) - mu
-            inv_r = inv_t[rs:re]
-            for qs in range(0, m, score_chunk):
-                qe = min(qs + score_chunk, m)
-                d = torch.cdist(zs[qs:qe], r)
-                # A scored row's distance to itself is exactly 0; the mm-based
-                # cdist leaves a small positive residue, so write the 0 in.
-                own = (idx_t[qs:qe] >= rs) & (idx_t[qs:qe] < re)
-                rows = own.nonzero(as_tuple=True)[0]
-                d[rows, idx_t[qs:qe][rows] - rs] = 0.0
-                tmp = torch.zeros(qe - qs, k, dtype=torch.float32, device=dev)
-                tmp.index_add_(1, inv_r, d)
-                acc[qs:qe] += tmp.double()
-        cnt = torch.from_numpy(counts.astype(np.float64)).to(dev)
-        own_c = inv_t[idx_t]
-        ar = torch.arange(m, device=dev)
-        n_own = cnt[own_c]
-        a = acc[ar, own_c] / (n_own - 1).clamp(min=1)    # self is in the sum at distance 0
-        mean_d = acc / cnt[None, :]
-        mean_d[ar, own_c] = float("inf")
-        b = mean_d.min(dim=1).values
-        denom = torch.maximum(a, b)
-        s = torch.where(denom > 0, (b - a) / denom.clamp(min=1e-300), torch.zeros_like(a))
-        s = torch.where(n_own > 1, s, torch.zeros_like(s))   # sklearn: singleton scores 0
-    s = s.cpu().numpy()
-    se = float(s.std(ddof=1) / math.sqrt(m)) if m > 1 else float("nan")
-    return float(s.mean()), se
-
-
-def standardized_spread(z: np.ndarray, labels: np.ndarray) -> dict:
-    """
-    Width- and scale-neutral cluster spread, from one float64 pass per cluster.
-
-    With W the pooled within-cluster sum of squares, B = sum_k n_k ||m_k - m||^2
-    and T = W + B:
-      within_var_share        W/T  — share of variance left inside clusters (lower
-                              better); the standardized `intra_cluster_var`.
-      between_var_share       B/T  — share explained by cluster membership (higher).
-      separability_radii      mean pairwise centroid distance / sqrt(W/n): centroid
-                              spacing in units of the RMS row-to-own-centroid
-                              distance. Numerator and denominator are both full-space
-                              lengths, so unlike `separability_ratio` (a full-space
-                              distance over a per-dimension std) it does not grow
-                              with sqrt(width).
-      inter_centroid_dist_rel mean pairwise centroid distance / sqrt(2T/n): relative
-                              to the RMS distance between two random rows.
-    These use the empirical cluster means (as `separability_ratio` and `dunn_index`
-    do), not the stored centroid matrix. All four are functions of the same B/W
-    ratio Calinski-Harabasz reports (CH = (B/(k-1)) / (W/(n-k))), in interpretable
-    units. Fewer than 2 clusters or T == 0 gives NaNs.
-    """
-    nan = float("nan")
-    out = {"within_var_share": nan, "between_var_share": nan,
-           "separability_radii": nan, "inter_centroid_dist_rel": nan}
-    uniq, inv, counts = np.unique(labels, return_inverse=True, return_counts=True)
-    k, n = len(uniq), len(z)
-    if k < 2:
-        return out
-    mean = z.mean(axis=0, dtype=np.float64)
-    order = np.argsort(inv, kind="stable")
-    means = np.empty((k, z.shape[1]), dtype=np.float64)
-    W = B = 0.0
-    for i, idx in enumerate(np.split(order, np.cumsum(counts)[:-1])):
-        ck = z[idx].astype(np.float64)
-        means[i] = ck.mean(axis=0)
-        B += len(ck) * float(((means[i] - mean) ** 2).sum())
-        W += float(((ck - means[i]) ** 2).sum())
-    T = W + B
-    if T == 0.0:
-        return out
-    mean_pair = inter_centroid_dist(means)[0]
-    out["within_var_share"] = W / T
-    out["between_var_share"] = B / T
-    out["separability_radii"] = float("inf") if W == 0.0 else mean_pair / math.sqrt(W / n)
-    out["inter_centroid_dist_rel"] = mean_pair / math.sqrt(2.0 * T / n)
-    return out
 
 
 def cluster_balance_entropy(labels: np.ndarray) -> tuple[float, float]:
@@ -553,14 +433,6 @@ def compute_metrics(
     eff_k = effective_k(labels, K)
     eff_r = effective_rank(live_centroids)
 
-    print("    silhouette (full) …", end=" ", flush=True)
-    sil_full, sil_full_se = silhouette_full(z, labels, seed=seed)
-    print(f"{sil_full:.4f} ± {sil_full_se:.4f}")
-
-    print("    standardized spread …", end=" ", flush=True)
-    spread = standardized_spread(z, labels)
-    print(f"within {spread['within_var_share']:.4f}  radii {spread['separability_radii']:.4f}")
-
     metrics = {
         "silhouette":        sil,
         "davies_bouldin":    db,
@@ -574,12 +446,6 @@ def compute_metrics(
         "n_empty_clusters":  n_empty,
         "effective_k":       eff_k,
         "effective_rank":    eff_r,
-        "silhouette_full":    sil_full,
-        "silhouette_full_se": sil_full_se,
-        "within_var_share":   spread["within_var_share"],
-        "between_var_share":  spread["between_var_share"],
-        "separability_radii": spread["separability_radii"],
-        "inter_centroid_dist_rel": spread["inter_centroid_dist_rel"],
     }
     if Q is not None:
         metrics["assignment_entropy"] = assignment_entropy(Q)
@@ -608,12 +474,6 @@ METRIC_ROWS = [
     ("n_empty_clusters",        "Empty Clusters ↓",      "down", "d"),
     ("effective_k",             "Effective K ↑",         "up",   "d"),
     ("effective_rank",          "Effective Rank ↑",      "up",   ".2f"),
-    ("silhouette_full",         "Silhouette (full) ↑",   "up",   ".4f"),
-    ("silhouette_full_se",      "Silhouette (full) SE",  None,   ".4f"),
-    ("within_var_share",        "Within-var Share ↓",    "down", ".4f"),
-    ("between_var_share",       "Between-var Share ↑",   "up",   ".4f"),
-    ("separability_radii",      "Separability Radii ↑",  "up",   ".4f"),
-    ("inter_centroid_dist_rel", "Inter-centroid Rel ↑",  "up",   ".4f"),
     ("assignment_entropy",      "Assignment Entropy",     None,   ".4f"),
     ("gini_mean",               "Gini Mean ↑",           "up",   ".4f"),
     ("gini_gt_06",              "Gini>0.6 Frac ↑",       "up",   ".3f"),

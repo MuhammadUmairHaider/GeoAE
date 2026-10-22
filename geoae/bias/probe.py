@@ -288,7 +288,7 @@ def encode_geoae(arrays, path, device, metadata, layer, batch_size, tokens=None)
     cfg = ck["config"]
     if cfg["data"]["target_layer"] != layer or cfg["extraction"]["model_name"] != metadata["model"]:
         raise ValueError("AE checkpoint layer/model does not match activation metadata")
-    if arrays[0].shape[1] != ae.decoder.out_features or not torch.isfinite(std).all() or not (std > 0).all():
+    if arrays[0].shape[1] != ae.hidden_size or not torch.isfinite(std).all() or not (std > 0).all():
         raise ValueError("invalid AE input dimension or normalization statistics")
     bypass = ae.has_token_bias
     if bypass:

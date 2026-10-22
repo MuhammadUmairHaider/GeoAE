@@ -8,16 +8,13 @@
 #   scripts/delta/submit_delta_evals.sh g1b_prep             # Gemma 3 1B: run_delta_prep.sh g1b_km g1b_cache (staged, both layers)
 #   scripts/delta/submit_delta_evals.sh g1b_probe_acts       # Gemma 3 1B probe activations, both layers (plain)
 #   scripts/delta/submit_delta_evals.sh g1b_l25_d2304 [groups...]   # a Gemma arm, same groups as the Llama arms
-#   scripts/delta/submit_delta_evals.sh g4b_prep             # Gemma 3 4B: run_delta_prep.sh g4b_km g4b_cache (staged, layer 33)
-#   scripts/delta/submit_delta_evals.sh g4b_probe_acts       # Gemma 3 4B probe activations, layer 33 (plain)
-#   scripts/delta/submit_delta_evals.sh g4b_l33_d5120 [groups...]   # the Gemma 3 4B arm (layer 33 = LAST of 34 blocks -> all groups)
 #
 #   scripts/delta/submit_delta_evals.sh d6144
 #   scripts/delta/submit_delta_evals.sh d6144 evals steering
 #   DEP=afterok:12345 scripts/delta/submit_delta_evals.sh d6144 interventions
 #   DRY=1 scripts/delta/submit_delta_evals.sh d6144            # print sbatch lines only
 #
-# arm: d768 | d3072 | d6144 | d12288 | d6144k4000 | d12288k4000 | g1b_l{13,25}_d{1152,2304,4608} | g4b_l33_d5120
+# arm: d768 | d3072 | d6144 | d12288 | d6144k4000 | d12288k4000 | g1b_l{13,25}_d{1152,2304,4608}
 # Gemma arms (google/gemma-3-1b-pt): staged jobs export ACT_NAME=activations_gemma3_1b_sampled_struct5_10M and
 # STAGE_LAYERS=<the arm's layer>, so only that layer's 46 GB file (plus the sidecars) is copied to node-local /tmp.
 # Layer-13 arms get NO steering/concept jobs: every step in those groups needs the last block (layer 25) and is
@@ -110,7 +107,6 @@ if [ "$ARM" = "km" ]; then
 fi
 
 G1B_DUMP=activations_gemma3_1b_sampled_struct5_10M
-G4B_DUMP=activations_gemma3_4b_sampled_struct5_10M
 # g1b_prep: Gemma 3 1B base arms (balanced k-means, both layers) + probe caches (both layers), one staged
 # job. Both layers are staged (no STAGE_LAYERS) because g1b_km fits layers 13 AND 25.
 if [ "$ARM" = "g1b_prep" ]; then
@@ -123,18 +119,6 @@ if [ "$ARM" = "g1b_probe_acts" ]; then
     exit 0
 fi
 
-# g4b_prep: Gemma 3 4B base arms (balanced k-means, layer 33) + probe caches. Only layer 33 exists in the dump (102 GB), so
-# staging copies exactly that file (STAGE_LAYERS=33) + sidecars. Time: 4B live forwards in g4b_cache are ~3-4x the 1B's.
-if [ "$ARM" = "g4b_prep" ]; then
-    EXPORT="ACT_NAME=$G4B_DUMP,STAGE_LAYERS=33" submit "ev-g4b-prep" "8:00:00" "" scripts/delta/sheet_staged.sbatch -- eval_out/run_delta_prep.sh g4b_km g4b_cache
-    exit 0
-fi
-# g4b_probe_acts: live LM forward for the Gemma 4B probes group; reads no dump -> plain (the 1B equivalent hit a 3h TIMEOUT once).
-if [ "$ARM" = "g4b_probe_acts" ]; then
-    submit "ev-g4b-probe-acts" "6:00:00" "" scripts/delta/sheet.sbatch -- eval_out/run_delta_prep.sh g4b_probe_acts
-    exit 0
-fi
-
 # probe_acts: extraction for the probes group (GPU live LM forward; reads no dump -> plain).
 if [ "$ARM" = "probe_acts" ]; then
     submit "ev-probe-acts" "3:00:00" "" scripts/delta/sheet.sbatch -- eval_out/run_delta_prep.sh probe_acts
@@ -144,9 +128,8 @@ fi
 case "$ARM" in
     d768|d3072|d6144|d12288|d6144k4000|d12288k4000) ;;
     g1b_l13_d1152|g1b_l13_d2304|g1b_l13_d4608|g1b_l25_d1152|g1b_l25_d2304|g1b_l25_d4608) ;;
-    g4b_l33_d5120) ;;
     *)
-        echo "usage: $0 <d768|d3072|d6144|d12288|d6144k4000|d12288k4000|g1b_l{13,25}_d{1152,2304,4608}|g4b_l33_d5120|prep|km|probe_acts|g1b_prep|g1b_probe_acts|g4b_prep|g4b_probe_acts> [groups...]" >&2
+        echo "usage: $0 <d768|d3072|d6144|d12288|d6144k4000|d12288k4000|g1b_l{13,25}_d{1152,2304,4608}|prep|km|probe_acts|g1b_prep|g1b_probe_acts> [groups...]" >&2
         echo "  groups: evals interventions steering concept geometry probes  (default: first four, not judge/geometry/probes)" >&2
         exit 2
         ;;
@@ -171,9 +154,6 @@ for g in "${SEL_GROUPS[@]}"; do
                 echo "[skip] $ARM $g — needs the last block (layer 25)"; continue
             fi
             [ "${SHEET_FOR[$g]}" = staged ] && export_env="ACT_NAME=$G1B_DUMP,STAGE_LAYERS=$gl"
-            ;;
-        g4b_l*)   # layer 33 is the last block of 34: every group applies; only layer_33.npy (102 GB) is staged
-            [ "${SHEET_FOR[$g]}" = staged ] && export_env="ACT_NAME=$G4B_DUMP,STAGE_LAYERS=33"
             ;;
     esac
     EXPORT="$export_env" submit "ev-$ARM-$g" "$t" "$mem" "$sbatch_script" -- eval_out/run_delta_evals.sh "$ARM" "$g"

@@ -155,13 +155,7 @@ def per_class_latent_means(
 
 def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
           max_train_rows: int | None = None,
-          no_sinkhorn: bool = False, resume: str | None = None,
-          campaign_dpc: bool = False) -> None:
-    if campaign_dpc:
-        from geoae.campaign_config import CampaignConfig
-        if not isinstance(cfg, CampaignConfig):
-            raise ValueError("Campaign DPC training requires its isolated configuration schema")
-        cfg.validate()
+          no_sinkhorn: bool = False, resume: str | None = None) -> None:
     seed_everything(cfg.train.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"[train] Device: {device}")
@@ -441,11 +435,8 @@ def train(cfg: Config, use_wandb: bool = True, no_renorm: bool = False,
             if not no_renorm:
                 model.post_step()
             if bool(model.centroids_initialized.item()):
-                if campaign_dpc:
-                    model.update_centroids_ema(out.z.detach(), out.Q.detach())
-                else:
-                    model.update_centroids_ema(out.z.detach(), out.Q.detach(),
-                                               move=not cfg.train.freeze_centroids)
+                model.update_centroids_ema(out.z.detach(), out.Q.detach(),
+                                           move=not cfg.train.freeze_centroids)
 
             # Track Q history for usage diagnostics
             # Store only this batch's column MEANS (K,), not the full
@@ -556,8 +547,6 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default=None)
     parser.add_argument("--no_wandb", action="store_true")
-    parser.add_argument("--campaign_dpc", action="store_true",
-                        help="Use the original DPC campaign schema and centroid updates")
     parser.add_argument("--metric", default=None, choices=["euclidean", "cosine"],
                         help="Clustering geometry: euclidean (magnitude) or cosine (directional)")
     parser.add_argument("--batch_size", type=int, default=None, help="Override batch_size")
@@ -581,23 +570,19 @@ def main():
     add_override_args(parser)
     args = parser.parse_args()
 
-    config_type = Config
-    if args.campaign_dpc:
-        from geoae.campaign_config import CampaignConfig
-        config_type = CampaignConfig
     if args.config:
-        cfg = config_type.from_yaml(args.config)
+        cfg = Config.from_yaml(args.config)
     else:
         from geoae.paths import default_config
         default = default_config()
-        cfg = config_type.from_yaml(default) if default.exists() else config_type()
+        cfg = Config.from_yaml(default) if default.exists() else Config()
 
     apply_overrides(cfg, args)
     cfg.validate()
 
     train(cfg, use_wandb=not args.no_wandb, no_renorm=args.no_renorm,
           no_sinkhorn=args.no_sinkhorn, max_train_rows=args.max_train_rows,
-          resume=args.resume, campaign_dpc=args.campaign_dpc)
+          resume=args.resume)
 
 
 if __name__ == "__main__":

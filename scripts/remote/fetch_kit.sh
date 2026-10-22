@@ -30,5 +30,5 @@ while read -r sum path; do
   mkdir -p "$(dirname "$path")"
   cp "$KIT/$path" "$path"
 done < "$KIT/MANIFEST.sha256"
+[ -n "$TMP" ] && rm -rf "$TMP"
 echo "[fetch] kit in place: $(awk '{print $2}' "$KIT/MANIFEST.sha256" | cut -d/ -f1 | sort -u | tr '\n' ' ')"
-if [ -n "$TMP" ]; then rm -rf "$TMP"; fi

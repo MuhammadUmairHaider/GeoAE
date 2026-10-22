@@ -137,33 +137,3 @@ if __name__ == "__main__":
                 traceback.print_exc()
                 failed += 1
     print(f"\n{passed} passed, {failed} failed")
-
-
-def test_batched_fetch_matches_row_by_row(tmp_path):
-    """ShuffledActivationLoader fetches a whole batch in one call; the values must equal the per-row path."""
-    import numpy as np
-    import torch
-    from geoae.data import ActivationBuffer, ShuffledActivationLoader
-
-    rng = np.random.default_rng(0)
-    N, D = 400, 6
-    np.save(tmp_path / "layer_3.npy", rng.normal(size=(N, D)).astype(np.float16))
-    np.save(tmp_path / "rows_tok.npy", rng.integers(0, 50, size=N).astype(np.int32))
-    for tokens in (False, True):
-        buf = ActivationBuffer(tmp_path, 3, val_frac=0.1, split="train", return_tokens=tokens)
-        idx = [17, 3, 250, 99, 3]
-        got = buf[idx]
-        rows = [buf[i] for i in sorted(idx)]
-        if tokens:
-            assert torch.equal(got[0], torch.stack([r[0] for r in rows]))
-            assert got[1].dtype == torch.int64 and got[1].tolist() == [r[1] for r in rows]
-        else:
-            assert torch.equal(got, torch.stack(rows))
-        loader = ShuffledActivationLoader(buf, batch_size=64, num_workers=0, pin_memory=False)
-        batches = list(loader)
-        assert len(loader) == len(batches) == len(buf) // 64          # drop_last
-        x0 = batches[0][0] if tokens else batches[0]
-        assert x0.shape == (64, D) and x0.dtype == torch.float32
-        # one epoch visits distinct rows: no row is drawn twice
-        seen = torch.cat([(b[0] if tokens else b) for b in batches])
-        assert len(torch.unique(seen, dim=0)) == len(seen)

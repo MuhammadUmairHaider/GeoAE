@@ -236,26 +236,6 @@ def make_z_edit(edit, ae, mean: Tensor, std: Tensor, device, tap=None) -> "calla
     return fn
 
 
-def make_s_edit(edit, sae, device, tap=None, bos_id=None) -> "callable":
-    """SAE substrate: raw h -> codes (sae_space.SAESpace.encode_raw) -> edit(codes) -> decode_raw, spliced at every position.
-    edit=None is the pure SAE-reconstruction splice, the baseline every SAE edit is read against. With `tap` and `bos_id`
-    the BOS position keeps its original activation (Gemma Scope was not trained on BOS)."""
-
-    @torch.no_grad()
-    def fn(hs: Tensor) -> Tensor:
-        B, T, D = hs.shape
-        x = hs.reshape(B * T, D).float().to(device)
-        codes = sae.encode_raw(x, None)
-        if edit is not None:
-            codes = edit(codes)
-        out = sae.decode_raw(codes, None)
-        if tap is not None and bos_id is not None:
-            keep = tap.ids_for(hs).to(device) == bos_id
-            out[keep] = x[keep]
-        return out.reshape(B, T, D).to(hs.device).to(hs.dtype)
-    return fn
-
-
 def make_hb_edit(edit, tb, mean: Tensor, std: Tensor, device, tap) -> "callable":
     """MATCHED BASE for a token-bypass AE: the same edit, with no encoder.
 

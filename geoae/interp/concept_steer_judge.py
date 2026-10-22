@@ -43,14 +43,11 @@ from geoae.interp.llm_judge import LLM, agreement_counts, fluency_prompt, parse_
 
 LETTERS = "ABCD"
 FLUENT_THRESHOLD = 0.6
-DISPLAY_ORDER = ("label", "label_z", "base", "bypass", "base_dir", "bypass_dir",
-                 "nobypass_dir", "sae_km_dir", "sae_f1_dir", "sae_dir")      # the last four: concept_steer_extra.py
+DISPLAY_ORDER = ("label", "label_z", "base", "bypass", "base_dir", "bypass_dir")
 PAIR_CANDIDATES = (
     ("label_z", "label"), ("label_z", "bypass"), ("bypass", "base"), ("bypass", "label"), ("base", "label"),
     ("bypass_dir", "base_dir"), ("bypass_dir", "label"), ("base_dir", "label"),
     ("bypass_dir", "bypass"), ("base_dir", "base"),
-    ("bypass_dir", "sae_dir"), ("bypass_dir", "sae_f1_dir"), ("bypass_dir", "sae_km_dir"), ("bypass_dir", "nobypass_dir"),
-    ("sae_dir", "label"), ("sae_dir", "base_dir"), ("sae_dir", "sae_km_dir"), ("nobypass_dir", "sae_dir"),
 )
 
 

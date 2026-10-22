@@ -177,21 +177,19 @@ def cache_seq_source(enc, out, name, texts, labels, bs=16, max_len=192, bos=Fals
 
     bos=True prepends the tokenizer's BOS, as the training dumps do (extract_sampled tokenises with the
     default add_special_tokens=True); the mean then skips the BOS position. The older rungs were cached
-    without BOS. A tokenizer without a BOS token (Qwen2.5) adds none, exactly as in its training dump.
-    `extra` arrays are stored alongside, one entry per text."""
+    without BOS. `extra` arrays are stored alongside, one entry per text."""
     LAST, MEAN, LAST_ID = [], [], []
-    has_bos = bos and enc.tok.bos_token_id is not None
     for s in tqdm(range(0, len(texts), bs), desc=f"[suite] {name}", leave=False):
         chunk = [enc.tok.encode(t, add_special_tokens=bos)[:max_len] or [enc.tok.eos_token_id]
                  for t in texts[s : s + bs]]
-        if has_bos:
+        if bos:
             assert all(ids[0] == enc.tok.bos_token_id for ids in chunk), "tokenizer did not prepend BOS"
         hs = enc.run(chunk)
         for i, ids in enumerate(chunk):
             n = len(ids)
             LAST.append(hs[i, n - 1].float().cpu().numpy())
             LAST_ID.append(ids[-1])
-            lo = 1 if has_bos and n > 1 else 0
+            lo = 1 if bos and n > 1 else 0
             MEAN.append(hs[i, lo:n].float().mean(0).cpu().numpy())
     write(out, name, H_last=np.stack(LAST).astype(np.float32),
           H_mean=np.stack(MEAN).astype(np.float32),

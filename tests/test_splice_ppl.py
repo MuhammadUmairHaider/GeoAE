@@ -41,11 +41,3 @@ def test_keep_bos():
     assert torch.equal(out[:, 0], hs[:, 0]) and (out[:, 1:] == 7).all()
     z = zero_non_bos(hs)
     assert torch.equal(z[:, 0], hs[:, 0]) and (z[:, 1:] == 0).all()
-
-
-def test_make_chunks_without_bos_scores_every_token_after_the_first_once():
-    ids = list(range(100, 123))
-    ch = make_chunks(ids, None, 8)
-    assert all(len(c) <= 8 for c in ch) and ch[0][0] == ids[0]
-    assert [t for c in ch for t in c[1:]] == ids[1:]                      # scored tokens: all but the very first
-    assert all(ch[i][0] == ch[i - 1][-1] for i in range(1, len(ch)))      # each prefix = the text token before the slice

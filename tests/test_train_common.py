@@ -214,11 +214,3 @@ def test_resolve_path_relative_anchors_to_package_root():
 
 def test_resolve_path_absolute_passthrough(tmp_path):
     assert resolve_path(tmp_path) == tmp_path
-
-
-def test_rotation_keeps_every_nth_epoch(tmp_path):
-    from geoae.train_common import rotate_checkpoints
-    for s in range(10, 101, 10):                       # 10 steps per epoch, epochs 1..10
-        (tmp_path / f"step_{s:07d}.pt").write_bytes(b"x")
-    rotate_checkpoints(tmp_path, keep=2, protected=set(), keep_every_steps=50)   # every 5th epoch
-    assert sorted(p.name for p in tmp_path.glob("step_*.pt")) == ["step_0000050.pt", "step_0000090.pt", "step_0000100.pt"]

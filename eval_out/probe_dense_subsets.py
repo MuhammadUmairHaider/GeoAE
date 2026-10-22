@@ -69,14 +69,11 @@ ap.add_argument("--out", required=True)
 args = ap.parse_args()
 if args.arms:
     ARMS = [(n, *spec.split(":", 1)) for n, spec in (a.split("=", 1) for a in args.arms.split(","))]
-dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")      # CPU fallback (12 Oct: probes while every GPU trains)
+dev = torch.device("cuda")
 
 arms = {}
 for name, kind, path in ARMS:
-    if kind == "saekm":     # name=saekm:<sae spec>@<code-space codebook.npz> (eval_out/sae_plain_kmeans_fit.py)
-        from geoae.interp.sae_space import load_sae_kmeans
-        arms[name] = ("saekm", load_sae_kmeans(path, dev, name))
-    elif kind == "aekm":
+    if kind == "aekm":
         ck, cb = path.split("+", 1)
         ae, mu, sd, _ = load_ae_checkpoint(ck, dev, allow_token_bias=True)
         ae.eval()
@@ -91,12 +88,6 @@ for name, kind, path in ARMS:
         meta = np.load(path, allow_pickle=True)
         tbl = TokenBiasLookup(str(meta["token_bias"]), dev) if "token_bias" in meta.files else None
         arms[name] = ("km", (C, m, s, None, tbl))
-
-
-def sae_assign(H, km, chunk=16384):
-    """Nearest code-space centroid of each row's SAE codes (raw residual in; sae_space.CodeKMeans)."""
-    return np.concatenate([km.assign_labels(torch.from_numpy(np.asarray(H[i:i + chunk])).to(dev).float()).cpu().numpy()
-                           for i in range(0, len(H), chunk)])
 
 
 def enc(v):
@@ -194,7 +185,7 @@ for rung, fname, key, grain, _ in CP.LADDER:
         H, y = H[sub], y[sub]
         ids = None if ids is None else ids[sub]
     y = enc(np.asarray(y).astype(str))
-    labs = {n: enc(sae_assign(H, a[1]) if a[0] == "saekm" else CP.assign(H, a, dev, ids=ids)) for n, a in arms.items()}
+    labs = {n: enc(CP.assign(H, a, dev, ids=ids)) for n, a in arms.items()}
     masks = {n: {s: keep_mask(c, s) for s in SUBSETS if not s.startswith("common")} for n, c in labs.items()}
     common = {f"common_{t}": np.logical_and.reduce([masks[n][t] for n in labs]) for t in ("min5", "min10")}
     if args.fp_min:

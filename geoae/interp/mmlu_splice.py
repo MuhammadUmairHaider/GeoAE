@@ -11,10 +11,6 @@ TokenIdTap on the input embedding. For a plain AE it reproduces the existing
 numbers (check: d6144_new recon_acc 0.5390 at n=2000, seed 42).
 
     scripts/delta/py -u -m geoae.interp.mmlu_splice --checkpoint <ckpt> --out eval_out/mmlu_<tag>.json
-
-With BOTH --checkpoint and --sae the two splices are scored in ONE run on the same questions against one shared base
-pass (same GPU, same batches), and the output holds both plus their paired comparison (schema: meta.splices.{ae,sae},
-meta.paired, preds.{base,ae,sae,gold}). With one of them the output is unchanged.
 """
 from __future__ import annotations
 
@@ -56,19 +52,16 @@ def main():
 
     seed_everything(args.seed)
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    if not (args.checkpoint or args.sae):
-        ap.error("give --checkpoint and/or --sae")
-    both = bool(args.checkpoint) and bool(args.sae)
+    if bool(args.checkpoint) == bool(args.sae):
+        ap.error("give exactly one of --checkpoint / --sae")
     if args.sae:
         from geoae.interp.sae_space import load_sae_space
         sae = load_sae_space(args.sae, dev)
         model_name, layer, bypass = args.model, args.layer, sae.needs_tokens
         print(f"[mmlu] {model_name} layer {layer}  SAE {args.sae} ({sae.n_features} features)  token bypass: {bypass}")
-    if args.checkpoint:
+    else:
         ae, mean, std, ck = load_ae_checkpoint(args.checkpoint, dev, allow_token_bias=True)
         ae.eval()
-        if both and (ck["config"]["extraction"]["model_name"], ck["config"]["data"]["target_layer"]) != (args.model, args.layer):
-            ap.error("--checkpoint and --sae must splice the same model and layer (--model / --layer)")
         model_name, layer = ck["config"]["extraction"]["model_name"], ck["config"]["data"]["target_layer"]
         bypass = ae.has_token_bias
         print(f"[mmlu] {model_name} layer {layer}  token bypass: {bypass}")
@@ -77,17 +70,15 @@ def main():
     tok.padding_side = "left"
     lm = load_lm(model_name, device_map="auto")
     hook, tap = SplicingHook(lm, layer), TokenIdTap(lm)
-    recons = {}
-    if args.checkpoint:
-        recons["ae"] = nl.make_z_gate(np.zeros(1), np.zeros(1), np.zeros(1), ae, mean, std, dev,
-                                      gate=False, tap=tap)
     if args.sae:
         @torch.no_grad()
-        def recon_sae(hs):   # full SAE reconstruction at every position (chunked: 262k-wide codes)
+        def recon(hs):   # full SAE reconstruction at every position (chunked: 262k-wide codes)
             B, T, D = hs.shape
             tk = tap.ids_for(hs) if sae.needs_tokens else None
             return sae.reconstruct_raw(hs.reshape(B * T, D).float(), tk).reshape(B, T, D).to(hs.device, hs.dtype)
-        recons["sae"] = recon_sae
+    else:
+        recon = nl.make_z_gate(np.zeros(1), np.zeros(1), np.zeros(1), ae, mean, std, dev,
+                               gate=False, tap=tap)
 
     mm = load_dataset("cais/mmlu", "all", split="test").shuffle(seed=args.seed)
     mm = mm.select(range(min(args.n, len(mm))))
@@ -109,15 +100,10 @@ def main():
         return preds
 
     base_p = run()
-    preds = {}
-    for name, fn in recons.items():
-        hook.activate(fn)
-        preds[name] = run()
-        hook.deactivate()
+    hook.activate(recon)
+    recon_p = run()
+    hook.deactivate()
     tap.remove()
-    if both:
-        return write_both(args, base_p, preds, golds, subjects)
-    recon_p = next(iter(preds.values()))
 
     ba = float(np.mean([p == g for p, g in zip(base_p, golds)]))
     ra = float(np.mean([p == g for p, g in zip(recon_p, golds)]))
@@ -137,45 +123,6 @@ def main():
     json.dump(out, open(args.out, "w"), indent=1)
     print(f"[mmlu] base={ba:.4f}  AE-recon={ra:.4f}  delta={ra - ba:+.4f}  "
           f"(base-only correct {flips['base_only']}, recon-only {flips['recon_only']}) -> {args.out}")
-
-
-def write_both(args, base_p, preds, golds, subjects):
-    """One shared base pass, AE and SAE splices on the same questions: accuracies, flips and the paired AE - SAE test."""
-    from scipy.stats import binomtest
-    g = np.array(golds)
-    ok = {k: np.array(v) == g for k, v in {"base": base_p, **preds}.items()}
-    rng = np.random.default_rng(0)
-    idx = rng.integers(0, len(g), (10000, len(g)))
-
-    def ci(d):
-        return [float(x) for x in np.quantile(d[idx].mean(1), [0.025, 0.975])]
-
-    splices = {}
-    for k in preds:
-        d = ok[k].astype(float) - ok["base"].astype(float)
-        splices[k] = {"recon_acc": round(float(ok[k].mean()), 4), "delta": round(float(d.mean()), 4), "delta_ci": ci(d),
-                      "flips": {"base_only": int((ok["base"] & ~ok[k]).sum()), "recon_only": int((~ok["base"] & ok[k]).sum())},
-                      "answers_changed": int((np.array(preds[k]) != np.array(base_p)).sum())}
-    d = ok["ae"].astype(float) - ok["sae"].astype(float)
-    a_only, s_only = int((ok["ae"] & ~ok["sae"]).sum()), int((~ok["ae"] & ok["sae"]).sum())
-    paired = {"ae_minus_sae": round(float(d.mean()), 4), "ci": ci(d), "ae_only_correct": a_only, "sae_only_correct": s_only,
-              "mcnemar_exact_p": float(binomtest(a_only, a_only + s_only, 0.5).pvalue) if a_only + s_only else 1.0}
-    subj = {}
-    for i, sub in enumerate(subjects):
-        v = subj.setdefault(sub, {"n": 0, "base": 0, "ae": 0, "sae": 0})
-        v["n"] += 1
-        for k in ("base", "ae", "sae"):
-            v[k] += int(ok[k][i])
-    out = {"meta": {"n": len(g), "base_acc": round(float(ok["base"].mean()), 4), "splices": splices, "paired": paired,
-                    "checkpoint": str(args.checkpoint), "sae": str(args.sae), "seed": args.seed},
-           "per_subject": {s: {"n": v["n"], **{f"{k}_acc": round(v[k] / v["n"], 4) for k in ("base", "ae", "sae")}}
-                           for s, v in subj.items()},
-           "preds": {"base": base_p, **preds, "gold": golds}}
-    Path(args.out).parent.mkdir(parents=True, exist_ok=True)
-    json.dump(out, open(args.out, "w"), indent=1)
-    print(f"[mmlu] base={out['meta']['base_acc']:.4f}  " + "  ".join(
-        f"{k}={v['recon_acc']:.4f} ({v['delta']:+.4f}, flips {v['flips']['base_only']}/{v['flips']['recon_only']})"
-        for k, v in splices.items()) + f"  AE-SAE={paired['ae_minus_sae']:+.4f} p={paired['mcnemar_exact_p']:.3g} -> {args.out}")
 
 
 if __name__ == "__main__":

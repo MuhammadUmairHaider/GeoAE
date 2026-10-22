@@ -77,7 +77,6 @@ from transformers import AutoTokenizer
 
 from geoae.checkpoint import load_lm
 from geoae.hooks import SplicingHook, TokenIdTap
-from geoae.interp._context_logits import validate_layer
 from geoae.interp._shared import DATASET_CONFIGS
 from geoae.interp.cluster_steer_generate import PROMPTS
 from geoae.interp.cluster_steering import Arm
@@ -178,15 +177,13 @@ def label_delta(v_c: torch.Tensor, R_c: float, alpha: float) -> torch.Tensor:
 
 def decode_direction(ae, v_z: torch.Tensor) -> torch.Tensor:
     """Map a latent DIRECTION (not an actual latent -- a difference of two class means) to
-    normalised residual space using the decoder WEIGHT only: u = ae.decoder(v_z).
+    normalised residual space using a linear decoder: u = ae.decoder(v_z).
 
-    geoae/model.py builds `self.decoder = nn.Linear(latent_dim, hidden_size, bias=False)`,
-    so calling it directly is exactly W_dec @ v_z with no decoder bias to worry about. The
-    token-bypass table (ae.token_bias) is added by ae.decode(z, tok) for an actual
-    encode/decode ROUND TRIP; it is irrelevant here because it depends only on the current
-    token, not on z, so it would cancel in any difference of two decode() calls at the same
-    token anyway -- see tests/test_concept_steer.py for that equivalence. A bare direction
-    therefore never needs token ids."""
+    This fixed global direction has no state-independent nonlinear analogue. Nonlinear
+    latent interventions must instead use ae.decoded_delta(z, delta) at the current z.
+    For a linear decoder, the token-bypass table cancels between the two decodes at the
+    same current token, so this bare direction needs no token ids."""
+    ae.require_linear_decoder("label_z fixed global steering direction")
     return ae.decoder(v_z)
 
 
@@ -595,14 +592,18 @@ def main():
 
     act = Path(args.activations_dir)
     meta = json.load(open(act / "meta.json"))
-    tk = AutoTokenizer.from_pretrained(meta["model"])
-    tk.pad_token, tk.padding_side = tk.eos_token, "left"
-    lm = load_lm(meta["model"], device=dev)
-    downstream_blocks = validate_layer(lm, args.layer)
-
     arms = {"base": Arm("base", args.base, dev), "bypass": Arm("bypass", args.bypass, dev)}
     if arms["base"].kind != "km" or arms["bypass"].kind != "ae":
         raise SystemExit("--base must be a k-means .npz and --bypass an AE checkpoint")
+    if "label_z" in args.handles:
+        arms["bypass"].ae.require_linear_decoder("label_z fixed global steering direction")
+    tk = AutoTokenizer.from_pretrained(meta["model"])
+    tk.pad_token, tk.padding_side = tk.eos_token, "left"
+    lm = load_lm(meta["model"], device=dev)
+    from geoae.lm_arch import decoder_layers
+    if args.layer != len(decoder_layers(lm)) - 1:
+        raise SystemExit("--layer must be the last block (edits act on the next-token choice)")
+
     mean, std = arms["base"].mean, arms["base"].std
     if not (torch.allclose(arms["bypass"].mean, mean) and torch.allclose(arms["bypass"].std, std)):
         raise SystemExit("base and bypass use different norm stats")
@@ -740,8 +741,6 @@ def main():
 
     res_out = {
         "meta": {**vars(args), "prompts": prompts_used,
-                 "downstream_blocks": downstream_blocks,
-                 "intervention_forward": "complete_lm_at_selected_block",
                  "concept_descriptions": {ds: {n: concept_description(ds, n) for n in DATASET_CONFIGS[ds]["classes"]}
                                           for ds in ds_names}},
         "handles": {ds: r["handles"] for ds, r in dataset_results.items()},

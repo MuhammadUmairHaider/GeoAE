@@ -53,9 +53,9 @@ Splice, h substrate: x' = x + g*(edit(x) - x) -- the edit fn is wrapped so it se
 x, not the raw residual (neuronlens.make_h_edit itself has no normalisation baked in); g is
 the 0/1 position gate (all-1s under --pos_gate none).
 Splice, z substrate, --z_mode delta (default): z = ae.encode(x, tok); x' = x +
-g*ae.decoder(edit(z) - z). The decoder is linear and bias-free, and the token-bypass table
-only depends on the token, not on z -- see concept_steer_generate.decode_direction / this
-file's own tests for the cancellation -- so an IDENTITY edit (or g=0 throughout) leaves
+g*[ae.decode(edit(z), tok) - ae.decode(z, tok)]. The token-bypass table only depends
+on the token, not on z, so it cancels in this difference for linear and nonlinear
+decoders alike. An IDENTITY edit (or g=0 throughout) leaves
 x' == x exactly: the unedited text is byte-identical to the h substrate's, and the AE's
 reconstruction error never enters except through the edit itself. --z_mode splice instead
 uses z' = where(g, edit(z), z), x' = ae.decode(z', tok) (neuronlens.make_z_edit's own round
@@ -175,7 +175,8 @@ def make_edit_splice(substrate: str, z_mode: str, edit_fn, lo: np.ndarray, hi: n
     gate fire-rate diagnostic logged below; it does not affect the edit itself.
 
     h            x' = x + g*(edit_fn(x) - x)
-    z (delta)    x' = x + g*ae.decoder(edit_fn(z) - z)          (identity edit or g=0 -> x'==x)
+    z (delta)    x' = x + g*[decode(edit_fn(z), tok) - decode(z, tok)]
+                 (identity edit or g=0 -> x'==x, including nonlinear decoders)
     z (splice)   z' = where(g, edit_fn(z), z); x' = ae.decode(z', tok)  (neuronlens.make_z_edit's
                  own round trip, gated; edit_fn=None there is the z baseline, generated separately)
     """
@@ -206,7 +207,7 @@ def make_edit_splice(substrate: str, z_mode: str, edit_fn, lo: np.ndarray, hi: n
         if substrate == "h":
             x2 = x + g[:, None] * (edit_fn(a) - a)
         elif z_mode == "delta":
-            x2 = x + g[:, None] * ae.decoder(edit_fn(a) - a)
+            x2 = x + g[:, None] * ae.decoded_delta(a, edit_fn(a) - a, tok)
         else:                                              # splice
             a2 = a + g[:, None] * (edit_fn(a) - a)
             x2 = ae.decode(a2, tok)
@@ -352,7 +353,6 @@ def main():
         args.n_fit, args.n_target, args.alphas = 30, 3, [1.0]
         n_comp_classes = 3
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    rng = np.random.default_rng(args.seed)
 
     arm = Arm("bypass", args.bypass, dev)
     if arm.kind != "ae":

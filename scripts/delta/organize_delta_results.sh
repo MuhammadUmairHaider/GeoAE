@@ -39,8 +39,7 @@ DRY=0
 cd "$ROOT" || { echo "[abort] no such ROOT: $ROOT" >&2; exit 1; }
 
 ARMS=(d768 d3072 d6144 d12288 d6144k4000 d12288k4000
-      g1b_l13_d1152 g1b_l13_d2304 g1b_l13_d4608 g1b_l25_d1152 g1b_l25_d2304 g1b_l25_d4608
-      g4b_l33_d5120)   # g1b_*/g4b_*: born in the new layout, listed so reruns stay harmless
+      g1b_l13_d1152 g1b_l13_d2304 g1b_l13_d4608 g1b_l25_d1152 g1b_l25_d2304 g1b_l25_d4608)   # g1b_*: born in the new layout, listed so reruns stay harmless
 NOW=$(date +%s)
 FRESH_SECS=600   # 10 minutes
 

@@ -28,17 +28,11 @@ import numpy as np
 
 # ---------------------------------------------------------------- pure helpers
 
-def make_chunks(ids: list[int], bos: int | None, seq_len: int, max_chunks: int | None = None) -> list[list[int]]:
-    """Non-overlapping slices of seq_len-1 text tokens, each prefixed with BOS (partial tail kept).
-
-    A tokenizer without a BOS token (bos=None, e.g. Qwen2.5) gets the text token before the slice as the prefix instead:
-    the prefix is unscored context in both cases, and every text token after the very first is scored exactly once."""
+def make_chunks(ids: list[int], bos: int, seq_len: int, max_chunks: int | None = None) -> list[list[int]]:
+    """Non-overlapping slices of seq_len-1 text tokens, each prefixed with BOS (partial tail kept)."""
     step = seq_len - 1
     assert step >= 1
-    if bos is None:
-        chunks = [list(ids[s - 1:s + step]) for s in range(1, len(ids), step)]
-    else:
-        chunks = [[bos] + list(ids[s:s + step]) for s in range(0, len(ids), step)]
+    chunks = [[bos] + list(ids[s:s + step]) for s in range(0, len(ids), step)]
     return chunks[:max_chunks] if max_chunks else chunks
 
 
@@ -156,7 +150,8 @@ def main():
         ap.error("--model and --layer are required when there is no --ae item")
 
     tok = AutoTokenizer.from_pretrained(model_name)
-    bos = tok.bos_token_id      # None (Qwen2.5): each chunk is prefixed with the preceding text token, see make_chunks
+    bos = tok.bos_token_id
+    assert bos is not None, f"{model_name} tokenizer has no BOS id"
     ds = load_dataset("Salesforce/wikitext", "wikitext-2-raw-v1", split="test")
     text = "\n\n".join(ds["text"])
     ids = tok(text, add_special_tokens=False)["input_ids"]
@@ -166,7 +161,7 @@ def main():
         scored = [t for c in chunks for t in c[1:]]
         scored_text = tok.decode(scored)
     else:
-        scored_text = text if bos is not None else tok.decode(ids[1:])      # without BOS the first text token is context only
+        scored_text = text
     n_bytes = len(scored_text.encode("utf-8"))
     n_words = len(re.split(r"\s+", scored_text))
     print(f"[ppl] {model_name} layer {layer}: {len(chunks)} chunks, {n_tokens} tokens, {n_bytes} bytes, {n_words} words")
@@ -189,11 +184,8 @@ def main():
 
     def meta_common(spec, kind, bypass):
         return {"dataset": "wikitext-2-raw-v1 test (Salesforce/wikitext)",
-                "protocol": ("non-overlapping chunks of seq_len-1 text tokens, each prefixed with BOS; "
-                             "every text token scored once; splice at the layer output" if bos is not None else
-                             "no BOS token: non-overlapping chunks of seq_len-1 text tokens, each prefixed with the text "
-                             "token before it (unscored context, kept unspliced in `spliced`); every text token after "
-                             "the first scored once; splice at the layer output"),
+                "protocol": "non-overlapping chunks of seq_len-1 text tokens, each prefixed with BOS; "
+                            "every text token scored once; splice at the layer output",
                 "seq_len": args.seq_len, "n_chunks": len(chunks), "n_tokens": n_tokens, "n_bytes": n_bytes,
                 "n_words": n_words, "model": model_name, "layer": layer, "spec": spec, "kind": kind,
                 "token_bias": bool(bypass), "max_chunks": args.max_chunks}

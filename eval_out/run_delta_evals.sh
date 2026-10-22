@@ -30,11 +30,10 @@
 # dump at all — see the per-tool sweep in this session's report — so they ignore
 # ACT_DIR entirely and are unaffected either way.
 #
-# Steps: tokstruct probe mmlu cq cq_std | number steer range_db14 range_bios number_hb |
+# Steps: tokstruct probe mmlu cq | number steer range_db14 range_bios number_hb |
 #        csteer cgen cjudge | cgen_concept cjudge_concept | geometry | biasprobe tpp | guard
 # Group aliases: evals interventions steering concept judge geometry probes all
 #   evals          = tokstruct probe mmlu cq                     -> results/delta/<arm>/evals/
-#   (cq_std = cq with the width-neutral metrics -> evals/cq_std.json; in no group, name it explicitly)
 #   interventions  = number steer range_db14 range_bios number_hb -> results/delta/<arm>/interventions/
 #   steering       = csteer cgen                  (GPU only — no judge) -> results/delta/<arm>/steering/
 #   concept        = cgen_concept                 (GPU only — no judge) -> results/delta/<arm>/concept/
@@ -98,7 +97,7 @@ case "$ARM" in
         CKDIR=k2000_bnh_b32k_lam1_d${DIM}_dpc_sampled_struct5_tokbias ;;
     *)
         echo "usage: $0 <d768|d3072|d6144|d12288|d6144k4000|d12288k4000|g1b_l{13,25}_d{1152,2304,4608}|g4b_l33_d5120> <steps|groups...>" >&2
-        echo "  steps: tokstruct probe mmlu cq cq_std number steer range_db14 range_bios number_hb csteer cgen cjudge cgen_concept cjudge_concept geometry biasprobe tpp guard" >&2
+        echo "  steps: tokstruct probe mmlu cq number steer range_db14 range_bios number_hb csteer cgen cjudge cgen_concept cjudge_concept geometry biasprobe tpp guard" >&2
         echo "  groups: evals interventions steering concept judge geometry probes all" >&2
         exit 2
         ;;
@@ -158,7 +157,7 @@ fi
 # --------------------------------------------------------------------------------- #
 # Steps and aliases
 # --------------------------------------------------------------------------------- #
-ATOMIC=(tokstruct probe mmlu cq cq_std number steer range_db14 range_bios number_hb csteer cgen cjudge cgen_concept cjudge_concept geometry biasprobe tpp guard)
+ATOMIC=(tokstruct probe mmlu cq number steer range_db14 range_bios number_hb csteer cgen cjudge cgen_concept cjudge_concept geometry biasprobe tpp guard)
 EVALS=(tokstruct probe mmlu cq)
 INTERVENTIONS=(number steer range_db14 range_bios number_hb)
 STEERING=(csteer cgen)
@@ -166,7 +165,7 @@ CONCEPT=(cgen_concept)
 JUDGE=(cjudge cjudge_concept)
 GEOMETRY=(geometry)
 PROBES=(biasprobe tpp)
-GUARD_STEPS=(tokstruct probe mmlu cq cq_std number steer range_db14 range_bios number_hb csteer cgen cjudge cgen_concept cjudge_concept geometry biasprobe tpp)
+GUARD_STEPS=(tokstruct probe mmlu cq number steer range_db14 range_bios number_hb csteer cgen cjudge cgen_concept cjudge_concept geometry biasprobe tpp)
 
 expand() {
     local out=()
@@ -330,20 +329,6 @@ cq() {
         --names base bypass \
         --activations_dir "$ACT" --layer "$LAYER" --n_sample 1000000 --seed 0 \
         --out "$EVALSD/cq.json"
-}
-# Same run as cq, written to its own file: the code now also emits the width-neutral
-# metrics (silhouette_full, *_share, separability_radii, inter_centroid_dist_rel).
-cq_std() {
-    require_km || return 1
-    local avail
-    avail=$(awk '/MemAvailable/{printf "%d", $2/1048576}' /proc/meminfo 2>/dev/null || echo 0)
-    echo "[cq_std] MemAvailable ${avail} GB; d${DIM} latents need ~$((DIM * 4 / 1000)) GB per 1M rows fp32"
-    [ "$avail" -lt 60 ] && echo "[cq_std] WARNING: under 60 GB free — stop other jobs or drop --n_sample to 500000"
-    X "$LOGD/evals/cq_std.log" -- \
-        "$PY" -u -m geoae.interp.clustering_quality --baseline "$KM" --checkpoints "$TB" \
-        --names base bypass \
-        --activations_dir "$ACT" --layer "$LAYER" --n_sample 1000000 --seed 0 \
-        --out "$EVALSD/cq_std.json"
 }
 
 # --------------------------------------------------------------------------------- #
@@ -576,7 +561,6 @@ step "tokstruct"      "[ -f $EVALSD/token_structure.json ]"                     
 step "probe"          "[ -f $EVALSD/probe.json ]"                                            probe
 step "mmlu"           "[ -f $EVALSD/mmlu.json ]"                                              mmlu
 step "cq"             "[ -f $EVALSD/cq.json ]"                                                cq
-step "cq_std"         "[ -f $EVALSD/cq_std.json ]"                                            cq_std
 step "number"         "grep -qs '\"status\": \"complete\"' $INTERVD/range_number_dprime.json && [ -f $INTERVD/number_review.json ]" number
 step "steer"          "grep -qs '\"concepts\"' $INTERVD/steer_db14.json"                      steer
 step "range_db14"     "grep -qs '\"summary\"' $INTERVD/range_intervention_db14_dprime.json"   range_db14

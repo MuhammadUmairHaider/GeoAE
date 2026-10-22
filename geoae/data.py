@@ -168,9 +168,7 @@ class ActivationBuffer(Dataset):
     def __getitem__(self, i):
         if not isinstance(i, (int, np.integer)):
             # A whole batch of positions at once (ShuffledActivationLoader): one sorted gather from the mapping
-            # and one vectorised normalisation, instead of batch_size single-row reads collated one by one
-            # (which, not the GPU, set the training speed). Same rows, same values; only the order within the
-            # batch differs, which no caller depends on.
+            # and one vectorised normalisation, instead of batch_size single-row reads collated one by one.
             j = self._indices[np.sort(np.asarray(i, dtype=np.int64))]
             raw = self._mmap[j].astype(np.float32)
             normed = torch.from_numpy((raw - self.mean) / self.std)
@@ -209,8 +207,6 @@ class ShuffledActivationLoader:
     ):
         self.buffer = buffer
         self.batch_size = batch_size
-        # batch_size=None + a batch sampler: each worker receives a list of positions and the buffer returns the
-        # finished batch (ActivationBuffer.__getitem__), so there is no per-row fetch and no collation.
         self._loader = DataLoader(
             buffer,
             batch_size=None,

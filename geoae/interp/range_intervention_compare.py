@@ -52,7 +52,6 @@ Usage (smoke, then full):
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import sys
 from pathlib import Path
@@ -105,42 +104,10 @@ def main():
     ap.add_argument("--jc_batch_size", type=int, default=16)
     ap.add_argument("--smoke", action="store_true")
     ap.add_argument("--max_try", type=int, default=None,
-                    help="docs tried per (class, split) when building the joint-correct pool; on a dataset without fit/test "
-                         "tags, the first max_try docs of each class (a class the splices rarely get right would otherwise "
-                         "scan its whole split)")
-    ap.add_argument("--extra_split", default="", help="Hub datasets: a second split appended after the configured one "
-                                                      "(AG News train: the test split has too few documents every model gets right)")
-    ap.add_argument("--extra_max", type=int, default=20000)
-    ap.add_argument("--edit_ppl", type=int, default=1, help="0 skips the perplexity pass of every edited run (ppl fields = NaN)")
+                    help="datasets with fit/test splits only: docs tried per (class, split) when building the joint-correct pool")
     ap.add_argument("--hb_table", default="",
                     help="token_bias .npz: enables substrate hb, the MATCHED BASE for a token-bypass AE "
                          "(edit (h-mean)/std - b[tok], add b[tok] back; h's saliency settings)")
-    ap.add_argument("--sae", default="",
-                    help="SAE spec of geoae/interp/sae_space.py (e.g. scope:16k): enables substrate s, edits on the SAE's "
-                         "codes with the SAE reconstruction spliced in (BOS kept); h's saliency settings")
-    ap.add_argument("--proj", default="",
-                    help="direction-projection test: remove ONE assigned concept direction per method from the UNEDITED base "
-                         "model's residual by orthogonal projection, h - (h.d)d (records h_pj_<name>; h_pjc_<name> = centred on "
-                         "the class-balanced fit mean). Every method starts from the same model and documents. Comma list of: "
-                         "label (class mean - other-class mean, supervised reference); km / kmt (plain k-means on the residual / "
-                         "token-removed residual, --km_plain / --km_tok); geoae (the --checkpoint AE's codebook); any name in "
-                         "--proj_ae; sae_km (k-means on the SAE codes, --sae_kmeans); sae_f1 / sae_f5 (the SAE's top-1 / top-5 "
-                         "features by d-prime among features more active on the concept; decoder rows); h_n1 / h_n5 (top residual "
-                         "dimensions by d-prime); <ae>_z1 / <ae>_z5 for geoae and every --proj_ae name (top latent dimensions "
-                         "by d-prime; decoder columns). Cluster methods: the "
-                         "concept's unit is the cluster holding most of its fit docs (answer position), its direction the "
-                         "unit's centroid minus the mean of the assigned centroids of all classes, mapped to the residual by "
-                         "the method's own (linear) decoder. Needs h in --substrates.")
-    ap.add_argument("--km_plain", default="", help="--proj km: plain residual k-means .npz")
-    ap.add_argument("--km_tok", default="", help="--proj kmt: plain token-removed k-means .npz (with token_bias)")
-    ap.add_argument("--sae_kmeans", default="", help="--proj sae_km: k-means centroids on the SAE codes (.npz, centroids)")
-    ap.add_argument("--proj_ae", default="", help="--proj <name>: extra AE codebooks, name=checkpoint,... (e.g. the no-bypass AE)")
-    ap.add_argument("--tp_all", action="store_true",
-                    help="documents must be TRUE POSITIVES in all three unedited models: base, AE splice AND SAE splice "
-                         "(needs --sae). The pool is built with the SAE splice as an extra filter "
-                         "(_shared.build_joint_correct_set extra_recons; give it its own --correct_json) and the "
-                         "evaluation re-filter also requires the SAE splice to be correct.")
-    ap.add_argument("--min_eval", type=int, default=1, help="a concept with fewer evaluation documents is skipped")
     ap.add_argument("--substrates", default="h,z",
                     help="comma list of h, z, hb (hb needs --hb_table). Skipping z pairs hb with an "
                          "existing z file on the same doc set.")
@@ -193,21 +160,9 @@ def main():
     # Token-bypass AE: splices read each position's current-token id off the input
     # embedding, and every fit-time encode uses the id captured with the activation.
     substrates = [x for x in args.substrates.split(",") if x]
-    # s<k> (s1, s5, ...): SAE codes with only the k features of largest d-prime among those MORE active on the concept
-    # edited (range steering: their in-range values; plain steering: all their values); reference = the SAE splice
-    topk = {x: int(x[1:]) for x in substrates if len(x) > 1 and x[0] == "s" and x[1:].isdigit()}
-    if (not set(substrates) - set(topk) <= {"h", "z", "hb", "s"} or ("hb" in substrates and not args.hb_table)
-            or (("s" in substrates or topk) and not args.sae)):
-        sys.exit(f"[range] --substrates must be from h,z,hb,s,s<k> (hb needs --hb_table, s and s<k> need --sae); got {args.substrates}")
-    tap = TokenIdTap(lm) if (ae.has_token_bias or args.hb_table or args.sae) else None
-    sae = None
-    if args.sae:
-        from geoae.interp.sae_space import load_sae_space
-        sae = load_sae_space(args.sae, device, "sae")
-
-    def encode_s(h: np.ndarray) -> np.ndarray:
-        with torch.no_grad():
-            return sae.encode_raw(torch.from_numpy(h).to(device).float(), None).cpu().numpy()
+    if not set(substrates) <= {"h", "z", "hb"} or ("hb" in substrates and not args.hb_table):
+        sys.exit(f"[range] --substrates must be from h,z,hb (hb needs --hb_table); got {args.substrates}")
+    tap = TokenIdTap(lm) if (ae.has_token_bias or args.hb_table) else None
     tb = None
     if args.hb_table:
         from geoae.token_bias import TokenBiasLookup
@@ -239,8 +194,6 @@ def main():
     wiki_mean = {"h": h_w.mean(0), "z": encode(h_w, ids_w).mean(0)}
     if tb is not None:
         wiki_mean["hb"] = to_hb(h_w, ids_w).mean(0)
-    if sae is not None:
-        wiki_mean["s"] = encode_s(h_w).mean(0)
     ppl_txt = wtxt[:args.n_ppl]
     z_recon = nl.make_z_edit(None, ae, mean_t, std_t, device, tap=tap)
 
@@ -249,35 +202,14 @@ def main():
         ds = load_dataset("parquet", data_files=dataset_cfg["local_parquet"], split="train")
     else:
         ds = load_dataset(dataset_cfg["dataset_name"], split=dataset_cfg["dataset_split"]).shuffle(seed=args.seed)
-        if args.extra_split:
-            from datasets import concatenate_datasets
-            ds2 = load_dataset(dataset_cfg["dataset_name"], split=args.extra_split).shuffle(seed=args.seed)
-            ds = concatenate_datasets([ds, ds2.select(range(min(len(ds2), args.extra_max)))])
     need = args.n_fit + args.n_eval
     split_kw = ({"need_by_split": {"fit": args.n_fit, "test": args.n_eval}, "max_try": args.max_try}
                 if dataset_cfg.get("split_column") else {})
-    cap = args.max_try if args.max_try and not split_kw else None
-    if cap:
-        seen, rows = {}, []
-        for i, lab in enumerate(ds[dataset_cfg.get("label_column", "label")]):
-            if seen.get(int(lab), 0) < cap:
-                seen[int(lab)] = seen.get(int(lab), 0) + 1
-                rows.append(i)
-        ds = ds.select(rows)
-        print(f"[range] --max_try {cap}: {len(rows)} documents kept ({min(seen.values())}-{max(seen.values())} per class)")
-    if args.tp_all and sae is None:
-        sys.exit("[range] --tp_all needs --sae")
-    s_recon = nl.make_s_edit(None, sae, device, tap, tokenizer.bos_token_id) if sae is not None else None
-    # the pool cache is keyed on everything that changes which documents can enter it
-    xk = (([f"tp3|sae={args.sae}"] if args.tp_all else [])
-          + ([f"extra_split={args.extra_split}:{args.extra_max}"] if args.extra_split else [])
-          + ([f"max_try={cap}"] if cap else []))
-    tp_kw = {**({"extra_recons": {"sae": s_recon}} if args.tp_all else {}), **({"extra_key": "|".join(xk)} if xk else {})}
     correct = shared.build_joint_correct_set(
         ds, dataset_cfg, tokenizer, lm, device, hook, z_recon, Path(args.correct_json), need,
         args.dataset, model_name=model_name,
         ae_sha=shared.ae_fingerprint(ae), batch_size=args.jc_batch_size, tag="range",
-        classes=concepts, **split_kw, **tp_kw,
+        classes=concepts, **split_kw,
     )
 
     # Same fit/eval split as steering_concept_compare, so st_global reproduces it.
@@ -306,77 +238,10 @@ def main():
     acts_fit = {"h": h_fit, "z": encode(h_fit, ids_fit)}
     if tb is not None:
         acts_fit["hb"] = to_hb(h_fit, ids_fit)
-    if sae is not None:
-        acts_fit["s"] = encode_s(h_fit)
     # Ranges, saliency, r and the comp mean come from docs the base model still gets
     # right at fit time (the NeuronLens reference fits on correct-only activations).
     fit_ok = np.array(shared.predict(lm, tokenizer, fit_txt, fit_lab, device)["correct"])
     print(f"[range] Fit pass: {int(fit_ok.sum())}/{len(fit_ok)} still predicted correctly")
-
-    # ---- direction-projection test: every method's units at the answer position of the fit docs
-    proj = _csv(args.proj)
-    proj_ae = dict(x.split("=", 1) for x in _csv(args.proj_ae))
-    punits, pdir, pinfo, pclasses, pcenter, pz = {}, {}, {}, [], None, {}
-    if proj:
-        if "h" not in substrates:
-            sys.exit("[range] --proj needs h in --substrates (the unedited base reference)")
-        from geoae.interp.closest_tokens import load_baseline_kmeans
-        Hf, tokf = torch.from_numpy(h_fit).to(device).float(), torch.from_numpy(ids_fit).to(device)
-
-        def km_unit(path, token_removed):          # -> (cluster of every fit doc, centroids as RAW residual displacements)
-            C, m, sd, *_ = load_baseline_kmeans(Path(path), device, allow_token_bias=True)
-            x = (Hf - m) / sd
-            if token_removed:
-                from geoae.token_bias import TokenBiasLookup
-                x = x - TokenBiasLookup(str(np.load(path, allow_pickle=True)["token_bias"]), device)(tokf)
-            return torch.cdist(x, C.float()).argmin(1).cpu().numpy(), C.float() * sd
-
-        def ae_unit(name, a, m, sd):               # decoder is linear without bias: centroid differences decode exactly
-            z = a.encode((Hf - m) / sd, tokf if a.has_token_bias else None)
-            pz[name] = (z.cpu().numpy(), (a.decoder.weight.float() * sd[:, None]).clone())   # latents, RAW decoder columns (D, L)
-            return torch.cdist(z, a.centroids.float()).argmin(1).cpu().numpy(), a.decoder(a.centroids.float()) * sd
-
-        with torch.no_grad():
-            if "km" in proj:
-                punits["km"] = km_unit(args.km_plain, False)
-            if "kmt" in proj:
-                punits["kmt"] = km_unit(args.km_tok, True)
-            want = lambda n: bool({n, f"{n}_z1", f"{n}_z5"} & set(proj))
-            if want("geoae"):
-                u = ae_unit("geoae", ae, mean_t, std_t)
-                if "geoae" in proj:
-                    punits["geoae"] = u
-            for name, path in proj_ae.items():
-                if want(name):
-                    a2, n2, _ = load_ae_from_checkpoint(Path(path), device, allow_token_bias=True)
-                    u = ae_unit(name, a2.eval(), n2["mean"], n2["std"])
-                    if name in proj:
-                        punits[name] = u
-                    del a2
-            if "sae_km" in proj:
-                Cs = torch.as_tensor(np.load(args.sae_kmeans)["centroids"], dtype=torch.float32, device=device)
-                punits["sae_km"] = (torch.cdist(sae.encode_raw(Hf, None), Cs).argmin(1).cpu().numpy(),
-                                    Cs @ sae.decoder_directions.float())
-        unknown = (set(proj) - set(punits) - {"label", "sae_f1", "sae_f5", "h_n1", "h_n5"}
-                   - {f"{n}_z{k}" for n in pz for k in (1, 5)})
-        if unknown or (not sae and {"sae_km", "sae_f1", "sae_f5"} & set(proj)):
-            sys.exit(f"[range] --proj: unknown or unconfigured handle(s) {sorted(unknown)} (SAE handles need --sae)")
-        pclasses = [c for c in range(len(shared.CLASSES)) if (fit_ok & (fit_lab == c)).sum() >= 2]
-        pcenter = torch.from_numpy(np.stack([h_fit[fit_ok & (fit_lab == c)].mean(0) for c in pclasses]).mean(0)).to(device).float()
-        for name, (lab, vec) in punits.items():
-            unit, pinfo[name] = {}, {}
-            for c in pclasses:
-                cnt = np.bincount(lab[fit_ok & (fit_lab == c)], minlength=vec.shape[0])
-                k = int(cnt.argmax())
-                unit[c] = k
-                pinfo[name][c] = {"unit": k, "coverage": round(float(cnt[k] / cnt.sum()), 4),
-                                  "purity": round(float(cnt[k] / max(int((lab[fit_ok] == k).sum()), 1)), 4)}
-            mean_vec = torch.stack([vec[unit[c]] for c in pclasses]).mean(0)
-            pdir[name] = {c: vec[unit[c]] - mean_vec for c in pclasses}
-            print(f"[range] proj {name}: {len(set(unit.values()))} distinct units for {len(pclasses)} classes; mean coverage "
-                  f"{np.mean([v['coverage'] for v in pinfo[name].values()]):.2f}, mean purity "
-                  f"{np.mean([v['purity'] for v in pinfo[name].values()]):.2f}")
-        del Hf
 
     print(f"[range] Clean + AE-recon eval over {len(eval_txt)} docs …")
     base = shared.predict(lm, tokenizer, eval_txt, eval_lab, device)
@@ -386,14 +251,8 @@ def main():
     zbase_ppl = shared.perplexity(lm, tokenizer, ppl_txt, device)
     hook.deactivate()
     keep = [i for i in range(len(eval_txt)) if base["correct"][i] and zbase["correct"][i]]
-    if args.tp_all:          # also a true positive under the unedited SAE splice
-        hook.activate(s_recon)
-        s_pre = shared.predict(lm, tokenizer, eval_txt, eval_lab, device)
-        hook.deactivate()
-        keep = [i for i in keep if s_pre["correct"][i]]
     if len(keep) < len(eval_txt):
-        print(f"[range] Re-filtered eval: {len(eval_txt)} -> {len(keep)} jointly-correct docs"
-              + (" (base, AE splice and SAE splice)" if args.tp_all else ""))
+        print(f"[range] Re-filtered eval: {len(eval_txt)} -> {len(keep)} jointly-correct docs")
         eval_txt = [eval_txt[i] for i in keep]
         eval_lab = np.array([eval_lab[i] for i in keep])
         base = {k: [v[i] for i in keep] for k, v in base.items()}
@@ -406,22 +265,14 @@ def main():
         acts_eval["hb"] = to_hb(h_ev, ids_ev)
     idx_by_class = {c: np.where(eval_lab == c)[0] for c in range(len(shared.CLASSES))}
     own = {"h": (base, base_ppl), "z": (zbase, zbase_ppl), "hb": (base, base_ppl)}   # hb unedited == identity
-    if sae is not None:      # SAE-reconstruction splice on the final (jointly-correct) eval docs
-        acts_eval["s"] = encode_s(h_ev)
-        hook.activate(nl.make_s_edit(None, sae, device, tap, tokenizer.bos_token_id))
-        sbase = shared.predict(lm, tokenizer, eval_txt, eval_lab, device)
-        sbase_ppl = shared.perplexity(lm, tokenizer, ppl_txt, device)
-        hook.deactivate()
-        own["s"] = (sbase, sbase_ppl)
-        print(f"[range] SAE-recon acc={np.mean(sbase['correct']):.3f} conf={np.mean(sbase['gold_conf']):.3f} ppl={sbase_ppl:.2f}")
 
-    def run(fn, c, comp_idx, ppl=True):
+    def run(fn, c, comp_idx):
         idx = np.concatenate([idx_by_class[c], comp_idx])
         sub_txt = [eval_txt[i] for i in idx]
         sub_lab = [int(eval_lab[i]) for i in idx]
         hook.activate(fn)
         r = shared.predict(lm, tokenizer, sub_txt, sub_lab, device)
-        pp = shared.perplexity(lm, tokenizer, ppl_txt, device) if ppl else float("nan")
+        pp = shared.perplexity(lm, tokenizer, ppl_txt, device)
         hook.deactivate()
         tgt = float(np.mean([r["correct"][k] for k, lab in enumerate(sub_lab) if lab == c]))
         comp = float(np.mean([r["correct"][k] for k, lab in enumerate(sub_lab) if lab != c]))
@@ -439,18 +290,13 @@ def main():
             "base_acc": round(float(np.mean(base["correct"])), 4), "base_ppl": round(base_ppl, 3),
             "zrecon_acc": round(float(np.mean(zbase["correct"])), 4), "zrecon_ppl": round(zbase_ppl, 3),
             "selectivity_sign": "tgt_drop - comp_drop; higher is better",
-            "substrates": substrates, "hb_table": args.hb_table, "tp_all": bool(args.tp_all), "extra_split": args.extra_split, "max_try": args.max_try,
-            "proj": proj, "proj_files": {"km_plain": args.km_plain, "km_tok": args.km_tok, "sae_kmeans": args.sae_kmeans,
-                                         "proj_ae": proj_ae},
+            "substrates": substrates, "hb_table": args.hb_table,
             # additive bookkeeping
             "classes": list(shared.CLASSES),
             "n_fit_by_class": {str(c): int((fit_lab == c).sum()) for c in range(len(shared.CLASSES))},
             "n_eval_by_class": {str(c): int((eval_lab == c).sum()) for c in range(len(shared.CLASSES))},
-            "eval_sha": hashlib.sha1("\x1f".join(f"{l}|{t}" for t, l in zip(eval_txt, eval_lab)).encode()).hexdigest()[:16],
             "base_conf": round(float(np.mean(base["gold_conf"])), 4),
             "zrecon_conf": round(float(np.mean(zbase["gold_conf"])), 4),
-            **({"sae": args.sae, "srecon_acc": round(float(np.mean(sbase["correct"])), 4),
-                "srecon_conf": round(float(np.mean(sbase["gold_conf"])), 4), "srecon_ppl": round(sbase_ppl, 3)} if sae is not None else {}),
             "confidence_def": "softmax probability of the gold label's first token at the first generated position (shared.predict gold_conf)",
         },
         "concepts": {},
@@ -459,9 +305,6 @@ def main():
           f"AE-recon acc={results['meta']['zrecon_acc']:.3f} ppl={zbase_ppl:.2f}")
 
     for c in concepts:
-        if len(idx_by_class[c]) < max(1, args.min_eval):
-            print(f"\n=== concept {c} ({shared.CLASSES[c]}) skipped: {len(idx_by_class[c])} evaluation documents ===")
-            continue
         comp_pool = np.where(eval_lab != c)[0]
         comp_idx = rng.choice(comp_pool, min(args.n_comp, len(comp_pool)), replace=False)
         print(f"\n=== concept {c} ({shared.CLASSES[c]})  n_tgt={len(idx_by_class[c])} n_comp={len(comp_idx)} ===")
@@ -469,8 +312,7 @@ def main():
         rec["eval_idx"] = {"tgt": [int(i) for i in idx_by_class[c]], "comp": [int(i) for i in comp_idx]}
         rec["ref"] = {}      # unedited per-doc reference (NOT h_/z_-prefixed: summarize() would read it as an intervention)
         for s in substrates:
-            sb = "s" if s in topk else s          # where the activations and the unedited reference come from
-            A = acts_fit[sb][fit_ok]
+            A = acts_fit[s][fit_ok]
             is_c = fit_lab[fit_ok] == c
             if is_c.sum() < 2 or (~is_c).sum() < 2:
                 print(f"[range] WARNING: too few correct fit docs for concept {c} in {s}; skipping")
@@ -479,12 +321,7 @@ def main():
             a_c, a_o = A[is_c], A[~is_c]
             mu_c, sd_c, mu_o, sd_o = a_c.mean(0), a_c.std(0), a_o.mean(0), a_o.std(0)
             score = np.abs(a_c).mean(0) if args.saliency == "abs" else nl.dprime_saliency(A, is_c)
-            if s in topk:
-                sc_k = score.copy()
-                sc_k[mu_c <= mu_o] = -1.0
-                sal = np.zeros(D, dtype=bool)
-                sal[np.argsort(-sc_k)[:topk[s]]] = True
-            elif s in ("h", "hb", "s"):
+            if s in ("h", "hb"):
                 sal = nl.select_top(score, **(dict(q=args.q) if args.q is not None else dict(p=args.percent)))
             else:
                 ae_q = args.ae_q if args.ae_q is not None else args.q
@@ -494,18 +331,13 @@ def main():
             lo_sal, hi_sal, _, _ = nl.fit_ranges(a_c, sal, np.inf)
             inf = np.full(D, np.inf, dtype=np.float32)
             r = mu_c - mu_o
-            rep = {"zero": np.zeros(D, dtype=np.float32), "comp": mu_o, "wiki": wiki_mean[sb]}
+            rep = {"zero": np.zeros(D, dtype=np.float32), "comp": mu_o, "wiki": wiki_mean[s]}
 
             # Diagnostic: does the range gate fire more on this concept than on others?
-            E = acts_eval[sb][:, sal]
+            E = acts_eval[s][:, sal]
             inside = (E >= lo_rng[sal]) & (E <= hi_rng[sal])
             f_t, f_o = float(inside[idx_by_class[c]].mean()), float(inside[comp_idx].mean())
             rec["fire"][s] = {"tgt": round(f_t, 4), "comp": round(f_o, 4), "n_salient": int(sal.sum())}
-            if s in topk:
-                ids_k = np.where(sal)[0]
-                rec["fire"][s].update(features=[int(i) for i in ids_k], dprime=[round(float(score[i]), 3) for i in ids_k],
-                                      mean_tgt=[round(float(mu_c[i]), 3) for i in ids_k],
-                                      mean_other=[round(float(mu_o[i]), 3) for i in ids_k])
             print(f"  [{s}] {int(sal.sum())} salient dims; range fires on target {f_t:.3f} vs others {f_o:.3f}")
 
             edits = {}
@@ -516,8 +348,8 @@ def main():
             for alpha in args.alphas:
                 a_tag = str(float(alpha))
                 for m in steer_modes:
-                    if m == "global":      # a top-k arm shifts every value of its k features, nothing else
-                        e = nl.shift_edit(r, *((lo_sal, hi_sal) if s in topk else (-inf, inf)), alpha, device)
+                    if m == "global":
+                        e = nl.shift_edit(r, -inf, inf, alpha, device)
                     elif m == "salient":
                         e = nl.shift_edit(r, lo_sal, hi_sal, alpha, device)
                     elif m == "range":
@@ -526,7 +358,7 @@ def main():
                         e = nl.transport_edit(mu_c, sd_c, mu_o, sd_o, lo_rng, hi_rng, alpha, device)
                     edits[f"st_{m}_a{a_tag}"] = e
 
-            ref, ref_ppl = own[sb]
+            ref, ref_ppl = own[s]
             b_tgt = float(np.mean([ref["correct"][i] for i in idx_by_class[c]]))
             b_comp = float(np.mean([ref["correct"][i] for i in comp_idx]))
             b_tgt_conf = float(np.mean([ref["gold_conf"][i] for i in idx_by_class[c]]))
@@ -540,9 +372,8 @@ def main():
             for key, e in edits.items():
                 fn = (nl.make_h_edit(e, device) if s == "h"
                       else nl.make_hb_edit(e, tb, mean_t, std_t, device, tap) if s == "hb"
-                      else nl.make_s_edit(e, sae, device, tap, tokenizer.bos_token_id) if sb == "s"
                       else nl.make_z_edit(e, ae, mean_t, std_t, device, tap=tap))
-                tgt, comp, pp, corr, conf, pred = run(fn, c, comp_idx, ppl=bool(args.edit_ppl))
+                tgt, comp, pp, corr, conf, pred = run(fn, c, comp_idx)
                 td, cd = b_tgt - tgt, b_comp - comp
                 nt = len(idx_by_class[c])      # run() evaluates [target docs, complement docs] in that order
                 tc, cc = float(np.mean(conf[:nt])), float(np.mean(conf[nt:]))
@@ -563,81 +394,11 @@ def main():
                 }
                 print(f"  {s} {key:<20} tgt {tgt:.2f} comp {comp:.2f}  sel {td - cd:+.3f}  "
                       f"ppl {pp:.2f} ({pp - ref_ppl:+.2f})  conf-sel {tcd - ccd:+.3f}")
-        if proj and "h" in rec["ref"]:
-            ref, ref_ppl = own["h"]
-            nt = len(idx_by_class[c])
-            b_tgt = float(np.mean([ref["correct"][i] for i in idx_by_class[c]]))
-            b_comp = float(np.mean([ref["correct"][i] for i in comp_idx]))
-            b_tc = float(np.mean([ref["gold_conf"][i] for i in idx_by_class[c]]))
-            b_cc = float(np.mean([ref["gold_conf"][i] for i in comp_idx]))
-            Ah, is_c = acts_fit["h"][fit_ok], fit_lab[fit_ok] == c
-            r_lab = torch.from_numpy(Ah[is_c].mean(0) - Ah[~is_c].mean(0)).to(device).float()
-            dirs, rec["proj"] = {}, {}
-            if "label" in proj:
-                dirs["label"] = r_lab[:, None]
-                rec["proj"]["label"] = {}
-            for name in punits:
-                if c in pdir[name]:
-                    dirs[name] = pdir[name][c][:, None]
-                    rec["proj"][name] = dict(pinfo[name][c])
-            if sae is not None and {"sae_f1", "sae_f5"} & set(proj):
-                As = acts_fit["s"][fit_ok]
-                sc = nl.dprime_saliency(As, is_c)
-                sc[As[is_c].mean(0) <= As[~is_c].mean(0)] = -1.0       # only features MORE active on the concept
-                top = np.argsort(-sc)[:5]
-                for name, ids in (("sae_f1", top[:1]), ("sae_f5", top)):
-                    if name in proj:
-                        dirs[name] = sae.decoder_directions.float()[torch.as_tensor(ids, device=device)].T
-                        rec["proj"][name] = {"features": [int(i) for i in ids], "dprime": [round(float(sc[i]), 3) for i in ids],
-                                             "active_on_concept": [round(float((As[is_c][:, i] > 0).mean()), 3) for i in ids],
-                                             "active_on_others": [round(float((As[~is_c][:, i] > 0).mean()), 3) for i in ids]}
-            coord = {}                                # coordinate units: top-k by d-prime (the control tables' saliency)
-            if {"h_n1", "h_n5"} & set(proj):
-                coord["h_n"] = (nl.dprime_saliency(Ah, is_c), None)
-            for name, (Zf, Wraw) in pz.items():
-                if {f"{name}_z1", f"{name}_z5"} & set(proj):
-                    coord[f"{name}_z"] = (nl.dprime_saliency(Zf[fit_ok], is_c), Wraw)
-            for base_name, (sc, Wraw) in coord.items():
-                top = np.argsort(-sc)[:5]
-                for k in (1, 5):
-                    name = f"{base_name}{k}"
-                    if name not in proj:
-                        continue
-                    ids = torch.as_tensor(top[:k].copy(), device=device)
-                    dirs[name] = (torch.nn.functional.one_hot(ids, Ah.shape[1]).float().T if Wraw is None else Wraw[:, ids])
-                    rec["proj"][name] = {"dims": [int(i) for i in top[:k]], "dprime": [round(float(sc[i]), 3) for i in top[:k]]}
-            for name, Dm in dirs.items():
-                if float(Dm.norm()) < 1e-8:          # every class assigned the same unit: the method has no direction
-                    rec["proj"][name]["degenerate"] = True
-                    print(f"  pj {name:<10} no direction (all classes share one unit)")
-                    continue
-                Q = torch.linalg.qr(Dm).Q             # (D, r) orthonormal basis of the direction(s)
-                if Dm.shape[1] == 1:
-                    rec["proj"][name]["cos_label"] = round(float(torch.nn.functional.cosine_similarity(Dm[:, 0], r_lab, dim=0)), 4)
-                    rec["proj"][name]["coef_tgt_minus_comp_sd"] = round(float(
-                        ((Ah[is_c] @ Q[:, 0].cpu().numpy()).mean() - (Ah[~is_c] @ Q[:, 0].cpu().numpy()).mean())
-                        / (Ah @ Q[:, 0].cpu().numpy()).std()), 3)
-                for tag, cen in (("pj", None), ("pjc", pcenter)):
-                    e = (lambda a, Q=Q, cen=cen: a - ((a if cen is None else a - cen) @ Q) @ Q.T)
-                    tgt, comp, pp, corr, conf, pred = run(nl.make_h_edit(e, device), c, comp_idx, ppl=False)
-                    tc, cc = float(np.mean(conf[:nt])), float(np.mean(conf[nt:]))
-                    rec[f"h_{tag}_{name}"] = {
-                        "tgt_acc": round(tgt, 4), "comp_acc": round(comp, 4),
-                        "tgt_drop": round(b_tgt - tgt, 4), "comp_drop": round(b_comp - comp, 4),
-                        "selectivity": round((b_tgt - tgt) - (b_comp - comp), 4),
-                        "tgt_conf": round(tc, 4), "comp_conf": round(cc, 4),
-                        "tgt_conf_drop": round(b_tc - tc, 4), "comp_conf_drop": round(b_cc - cc, 4),
-                        "conf_selectivity": round((b_tc - tc) - (b_cc - cc), 4),
-                        "doc_conf": [round(float(x), 4) for x in conf], "doc_correct": [int(bool(x)) for x in corr],
-                        "doc_pred": list(pred),
-                    }
-                    print(f"  {tag:<3} {name:<12} tgt conf {b_tc:.2f}->{tc:.2f}  other conf {b_cc:.2f}->{cc:.2f}  "
-                          f"acc {tgt:.2f}/{comp:.2f}")
         results["concepts"][str(c)] = rec
         Path(args.out).parent.mkdir(parents=True, exist_ok=True)
         json.dump(results, open(args.out, "w"), indent=2)      # checkpoint after every concept
 
-    results["summary"] = summarize(results, [c for c in concepts if str(c) in results["concepts"]])   # --min_eval skips
+    results["summary"] = summarize(results, concepts)
     json.dump(results, open(args.out, "w"), indent=2)
     print(f"\n[range] Saved -> {args.out}")
 

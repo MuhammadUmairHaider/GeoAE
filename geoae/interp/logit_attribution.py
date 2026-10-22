@@ -61,6 +61,7 @@ from geoae.model import GeoAE
 def load_ae_and_norm(ckpt_path: Path, device: torch.device) -> tuple[GeoAE, Tensor, Tensor, dict]:
     print(f"[dla] Loading AE checkpoint: {ckpt_path}")
     ae, norm_mean, norm_std, ckpt = load_ae_checkpoint(ckpt_path, device)
+    ae.require_linear_decoder("direct logit attribution with fixed centroid directions")
     return ae, norm_mean, norm_std, ckpt["config"]
 
 
@@ -107,7 +108,11 @@ def compute_dla(
     """
     Returns centred logit-attribution matrix (K, V): row k = cluster k's effect on
     each vocab logit, centred so 0 = the cluster's average effect over the vocab.
+    Requires a linear decoder: a nonlinear centroid contribution depends on the
+    current latent and cannot be attributed globally from weights alone.
     """
+    # KMeansShim intentionally supplies an identity decoder and no GeoAE methods.
+    GeoAE.require_linear_decoder(ae, "direct logit attribution with fixed centroid directions")
     device = W_U.device
     centroids = ae.centroids.detach().float().to(device)          # (K, L)
 

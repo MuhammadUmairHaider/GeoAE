@@ -19,28 +19,18 @@ CLASSES: list[str] = []
 PROMPT_HEAD: str = ""
 MAX_NEW: int = 6          # generated tokens per prediction; a config may raise it ("max_new") for long class names
 
-# FineWeb-Atlas class corpora (atlas_s<N>): 14 random Atlas content concepts used like db14 classes.
+# FineWeb-Atlas class corpora (atlas_s0 / atlas_s1 / atlas_s2): 14 random Atlas content concepts used like db14 classes.
 # Their classes, prompt and local parquet are frozen by eval_out/atlas_classes_{draw,prep}.py into
 # <ATLAS_CLASSES_DIR>/s<N>/cfg.json and loaded lazily by set_dataset (nothing to import for db14/biasbios).
-# atlas_s0 / atlas_s1 / atlas_s2 are the three original draws; every later draw that has been prepared
-# (scripts/argo/atlas_new_draws.sh) is found on disk.
+ATLAS_CLASS_DATASETS = ("atlas_s0", "atlas_s1", "atlas_s2")
+
+
 def atlas_classes_dir():
     import os
     from pathlib import Path
     d = os.environ.get("GEOAE_ATLAS_CLASSES_DIR", "results/delta/d6144/interventions/atlas_classes")
     p = Path(d)
     return p if p.is_absolute() else Path(__file__).resolve().parents[2] / p
-
-
-def _atlas_class_datasets():
-    seeds = {0, 1, 2}
-    for f in atlas_classes_dir().glob("s*/cfg.json"):
-        if f.parent.name[1:].isdigit():
-            seeds.add(int(f.parent.name[1:]))
-    return tuple(f"atlas_s{s}" for s in sorted(seeds))
-
-
-ATLAS_CLASS_DATASETS = _atlas_class_datasets()
 
 
 def _load_atlas_cfg(name: str) -> dict:
@@ -56,24 +46,15 @@ def _load_atlas_cfg(name: str) -> dict:
 
 # Frozen control corpora (emotion6 / news20 / trec6 / jigsaw2), written by eval_out/control_datasets_prep.py to
 # <CONTROL_DATASETS_DIR>/<name>/{cfg.json,data.parquet} and loaded lazily by set_dataset like the atlas draws.
-# <name>_s<N> is a document redraw of <name> (same classes and prompt, eval_out/control_datasets_redraw.py), found on disk.
+CONTROL_DATASETS = ("emotion6", "news20", "trec6", "jigsaw2")
+
+
 def control_datasets_dir():
     import os
     from pathlib import Path
     d = os.environ.get("GEOAE_CONTROL_DATASETS_DIR", "results/delta/control_datasets")
     p = Path(d)
     return p if p.is_absolute() else Path(__file__).resolve().parents[2] / p
-
-
-def _control_datasets():
-    import re
-    base = ("emotion6", "news20", "trec6", "jigsaw2")
-    more = sorted(f.parent.name for f in control_datasets_dir().glob("*_s*/cfg.json")
-                  if re.fullmatch("(" + "|".join(base) + r")_s\d+", f.parent.name))
-    return base + tuple(more)
-
-
-CONTROL_DATASETS = _control_datasets()
 
 
 def _load_control_cfg(name: str) -> dict:
@@ -316,15 +297,9 @@ def build_joint_correct_set(
     classes: list[int] | None = None,
     need_by_split: dict | None = None,
     max_try: int | None = None,
-    extra_recons: dict | None = None,
-    extra_key: str | None = None,
 ):
     """
     Documents that BOTH the base LM and the AE-recon splice classify correctly.
-
-    `extra_recons` ({name: replacement fn}, e.g. an SAE-reconstruction splice) adds further splices a document must also
-    survive; `extra_key` describes them (and any extra data source) and is stored in / checked against the cache, so a
-    pool built without them is never reused for a run that asks for them. Both default to None = the original behaviour.
 
     This is the evaluation population for the steering / causal-concept
     comparisons, so it is specific to (prompt, dataset, MODEL, AE checkpoint) —
@@ -372,7 +347,6 @@ def build_joint_correct_set(
                 and cached_model is not None and cached_model == model_name
                 and cached_ae is not None and cached_ae == ae_sha
                 and cached_ds == dataset_name
-                and cached.get("extra") == extra_key
                 and (not limited_context or
                      (cached.get("prompt_max_length") == prompt_max_length
                       and cached.get("max_new_tokens") == MAX_NEW))
@@ -405,8 +379,6 @@ def build_joint_correct_set(
                 why = f"built on a DIFFERENT AE checkpoint ({cached_ae!r} != {ae_sha!r})"
             elif cached_ds != dataset_name:
                 why = f"built on a DIFFERENT dataset ({cached_ds!r} != {dataset_name!r})"
-            elif cached.get("extra") != extra_key:
-                why = f"built with DIFFERENT extra filters ({cached.get('extra')!r} != {extra_key!r})"
             elif limited_context and (cached.get("prompt_max_length") != prompt_max_length
                                       or cached.get("max_new_tokens") != MAX_NEW):
                 why = "built under a DIFFERENT generation context budget"
@@ -428,7 +400,6 @@ def build_joint_correct_set(
         by_class[int(ex[label_col])].append(ex[dataset_cfg["text_column"]].strip())
 
     stats = {}
-    tried, xstat = {}, {}
 
     def _both_correct(texts, c, st=None):
         bs = len(texts)
@@ -436,26 +407,13 @@ def build_joint_correct_set(
         hook.activate(z_recon)
         r_recon = predict(lm, tokenizer, texts, [c] * bs, device=device, batch_size=bs)
         hook.deactivate()
-        # extra splices are tried only on the documents that survived so far (a document failing the base model or
-        # an earlier splice cannot enter the pool, so the later forward passes would be wasted on it)
-        alive = [i for i in range(bs) if r_base["correct"][i] and r_recon["correct"][i]]
-        for name, fn in (extra_recons or {}).items():
-            st_x = xstat.setdefault(name, {}).setdefault(c, [0, 0])          # [entered, survived]
-            st_x[0] += len(alive)
-            if not alive:
-                continue
-            hook.activate(fn)
-            r_x = predict(lm, tokenizer, [texts[i] for i in alive], [c] * len(alive), device=device, batch_size=len(alive))
-            hook.deactivate()
-            alive = [i for i, ok in zip(alive, r_x["correct"]) if ok]
-            st_x[1] += len(alive)
-        tried[c] = tried.get(c, 0) + bs
         if st is not None:
             st["n_tried"] += bs
             st["base_correct"] += int(sum(r_base["correct"]))
             st["recon_correct"] += int(sum(r_recon["correct"]))
             st["both_correct"] += int(sum(b and r for b, r in zip(r_base["correct"], r_recon["correct"])))
-        return [texts[i] for i in alive]
+        return [t for i, t in enumerate(texts)
+                if r_base["correct"][i] and r_recon["correct"][i]]
 
     correct = []
     if need_by_split:
@@ -499,9 +457,6 @@ def build_joint_correct_set(
                "model_name": model_name, "ae_sha": ae_sha,
                "prompt_max_length": prompt_max_length, "max_new_tokens": MAX_NEW,
                "classes": CLASSES, "classes_built": build, "docs": correct,
-               **({"extra": extra_key, "tried_by_class": {str(c): n for c, n in tried.items()},
-                   "extra_stats": {n: {str(c): {"entered": v[0], "survived": v[1]} for c, v in d.items()}
-                                   for n, d in xstat.items()}} if extra_key is not None else {}),
                **({"stats": stats, "need_by_split": need_by_split, "max_try": max_try} if need_by_split else {})},
               open(corr_path, "w"))
     cnt = Counter(d["label"] for d in correct)

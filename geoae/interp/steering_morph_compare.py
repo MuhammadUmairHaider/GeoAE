@@ -654,6 +654,7 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     ae, norm, cfg = load_ae_from_checkpoint(Path(args.checkpoint), device)
+    ae.require_linear_decoder("morph steering comparison with a fixed decoded-direction cosine")
     mean_t, std_t = norm["mean"].float(), norm["std"].float()
     model_name = cfg["extraction"]["model_name"]
     ckpt_layer = cfg["data"]["target_layer"]

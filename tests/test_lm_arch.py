@@ -5,12 +5,11 @@ the module layouts that geoae.extract / SplicingHook / e2e logits depend on:
 Llama and Qwen3 expose `lm.model.layers`, while Gemma 3 4b/12b/27b load as
 Gemma3ForConditionalGeneration, whose `lm.model` has NO `.layers` and NO
 `.norm` — the decoder lives at `lm.model.language_model`.
-GPT-2 uses `lm.transformer.h` and `lm.transformer.ln_f`.
 """
 import pytest
 import torch
 
-from geoae.hooks import SplicingHook, install_padding_position_hook
+from geoae.hooks import SplicingHook
 from geoae.lm_arch import decoder_layers, describe, hidden_size, locate_lm_parts
 
 TEXT = dict(vocab_size=64, hidden_size=32, intermediate_size=64, num_hidden_layers=3,
@@ -25,15 +24,6 @@ def make_llama():
 def make_qwen3():
     from transformers import Qwen3Config, Qwen3ForCausalLM
     return Qwen3ForCausalLM(Qwen3Config(**TEXT))
-
-
-def make_gpt2():
-    from transformers import GPT2Config, GPT2LMHeadModel
-    return GPT2LMHeadModel(GPT2Config(
-        vocab_size=TEXT["vocab_size"], n_embd=TEXT["hidden_size"],
-        n_layer=TEXT["num_hidden_layers"], n_head=TEXT["num_attention_heads"],
-        n_positions=32, bos_token_id=0, eos_token_id=1,
-    ))
 
 
 def make_gemma3_multimodal():
@@ -54,8 +44,8 @@ def make_gemma3_text():
     return Gemma3ForCausalLM(Gemma3TextConfig(**TEXT, sliding_window=8))
 
 
-BUILDERS = [make_llama, make_qwen3, make_gemma3_multimodal, make_gemma3_text, make_gpt2]
-IDS = ["llama", "qwen3", "gemma3-multimodal", "gemma3-text", "gpt2"]
+BUILDERS = [make_llama, make_qwen3, make_gemma3_multimodal, make_gemma3_text]
+IDS = ["llama", "qwen3", "gemma3-multimodal", "gemma3-text"]
 
 
 @pytest.fixture(params=BUILDERS, ids=IDS)
@@ -68,7 +58,7 @@ def lm(request):
 def test_locate_parts(lm):
     decoder, layers, final_norm, lm_head = locate_lm_parts(lm)
     assert len(layers) == TEXT["num_hidden_layers"]
-    assert layers is decoder_layers(lm)
+    assert layers is decoder.layers
     assert lm_head.weight.shape[0] == TEXT["vocab_size"]
     assert hidden_size(lm) == TEXT["hidden_size"]
     assert callable(final_norm)
@@ -81,16 +71,6 @@ def test_gemma3_decoder_is_not_lm_model():
     assert not hasattr(lm.model, "layers")
     assert not hasattr(lm.model, "norm")
     assert decoder_layers(lm) is lm.model.language_model.layers
-
-
-def test_gpt2_decoder_parts():
-    lm = make_gpt2()
-    decoder, layers, final_norm, head = locate_lm_parts(lm)
-    assert decoder is lm.transformer
-    assert layers is lm.transformer.h
-    assert final_norm is lm.transformer.ln_f
-    assert head is lm.lm_head
-    assert not hasattr(decoder, "layers")
 
 
 def test_capture_hook_sees_residual(lm):
@@ -153,89 +133,3 @@ def test_head_only_path_matches_full_forward(lm):
     with torch.no_grad():
         head = lc.head_logits(cap[0][:, -1, :])
     assert torch.allclose(ref.float(), head.float(), atol=1e-4)
-
-
-def test_intermediate_logits_preserve_values_and_reconstruction_gradient(lm):
-    """Full-pipeline KL/steering paths must support intermediate GPT-2 blocks."""
-    from geoae.e2e.logits import LogitsComputer
-
-    lm.requires_grad_(False)
-    ids = torch.randint(0, TEXT["vocab_size"], (1, 7))
-    mask = torch.ones_like(ids)
-    captured = []
-    hook = SplicingHook(lm, 1)
-    hook.activate(lambda hs: (captured.append(hs[:, -1].detach().clone()) or hs))
-    with torch.no_grad():
-        reference = lm(input_ids=ids, attention_mask=mask).logits[:, -1]
-    hook.deactivate()
-
-    reconstruction = captured[0].requires_grad_(True)
-    lc = LogitsComputer(lm, 1)
-    assert lc.needs_input_ids and not lc.is_last
-    spliced = lc.student_logits(reconstruction, ids, mask)
-    assert torch.allclose(reference, spliced, atol=1e-4)
-    spliced.square().sum().backward()
-    assert reconstruction.grad is not None
-    assert torch.isfinite(reconstruction.grad).all()
-    assert reconstruction.grad.abs().sum() > 0
-
-
-@pytest.mark.parametrize("side", ["left", "right"])
-@torch.no_grad()
-def test_gpt2_padded_capture_and_splice_match_individual_documents(side):
-    lm = make_gpt2().eval()
-    positions = install_padding_position_hook(lm)
-    docs = [torch.tensor([[3, 4, 5]]), torch.tensor([[6, 7, 8, 9, 10]])]
-    reference = [lm(input_ids=ids).logits[0, -1] for ids in docs]
-    if side == "left":
-        ids = torch.tensor([[0, 0, 3, 4, 5], [6, 7, 8, 9, 10]])
-        mask = torch.tensor([[0, 0, 1, 1, 1], [1, 1, 1, 1, 1]])
-        last = [4, 4]
-    else:
-        ids = torch.tensor([[3, 4, 5, 0, 0], [6, 7, 8, 9, 10]])
-        mask = torch.tensor([[1, 1, 1, 0, 0], [1, 1, 1, 1, 1]])
-        last = [2, 4]
-    # The same hook used by causal AE splices must preserve padded forwards.
-    hook = SplicingHook(lm, 1)
-    hook.activate(lambda hs: hs)
-    batched = lm(input_ids=ids, attention_mask=mask).logits
-    hook.deactivate()
-    for row, index in enumerate(last):
-        torch.testing.assert_close(batched[row, index], reference[row], atol=1e-5, rtol=1e-5)
-    # NeuronLens's last-real-token capture must also agree across batch shapes.
-    from geoae.interp.neuronlens import capture_post_layer
-    together = capture_post_layer(lm, {"input_ids": ids, "attention_mask": mask}, 1)
-    for row, doc in enumerate(docs):
-        alone = capture_post_layer(lm, {"input_ids": doc, "attention_mask": torch.ones_like(doc)}, 1)
-        torch.testing.assert_close(torch.from_numpy(together[row]), torch.from_numpy(alone[0]),
-                                   atol=1e-5, rtol=1e-5)
-    positions.remove()
-
-
-@torch.no_grad()
-def test_gpt2_cached_padding_positions_match_individual_document():
-    lm = make_gpt2().eval()
-    positions = install_padding_position_hook(lm)
-    batch = lm(input_ids=torch.tensor([[0, 0, 3, 4]]),
-               attention_mask=torch.tensor([[0, 0, 1, 1]]), use_cache=True)
-    single = lm(input_ids=torch.tensor([[3, 4]]), use_cache=True)
-    padded_next = lm(input_ids=torch.tensor([[5]]), attention_mask=torch.tensor([[0, 0, 1, 1, 1]]),
-                     past_key_values=batch.past_key_values, use_cache=True).logits
-    single_next = lm(input_ids=torch.tensor([[5]]), attention_mask=torch.ones(1, 3, dtype=torch.long),
-                     past_key_values=single.past_key_values, use_cache=True).logits
-    torch.testing.assert_close(padded_next, single_next, atol=1e-5, rtol=1e-5)
-    positions.remove()
-
-
-@torch.no_grad()
-def test_gpt2_padding_hook_preserves_explicit_positions():
-    lm = make_gpt2().eval()
-    ids = torch.tensor([[0, 0, 3, 4]])
-    mask = torch.tensor([[0, 0, 1, 1]])
-    explicit = torch.tensor([[2, 3, 4, 5]])
-    reference = lm(ids, None, mask, None, explicit).logits
-    positions = install_padding_position_hook(lm)
-    torch.testing.assert_close(lm(ids, None, mask, None, explicit).logits, reference)
-    torch.testing.assert_close(lm(input_ids=ids, attention_mask=mask, position_ids=explicit).logits,
-                               reference)
-    positions.remove()

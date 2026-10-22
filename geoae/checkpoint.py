@@ -7,6 +7,8 @@ in exactly one place.
 """
 from __future__ import annotations
 
+import json
+import os
 from pathlib import Path
 
 import torch
@@ -88,6 +90,10 @@ def load_ae_checkpoint(
         nonlinearity=mc.get("nonlinearity", "linear"),
         metric=mc.get("metric", "euclidean"),
         latent_norm=mc.get("latent_norm", "none"),
+        decoder_type=mc.get("decoder_type", "linear"),
+        decoder_hidden_dim=mc.get("decoder_hidden_dim", 0),
+        decoder_nonlinearity=mc.get("decoder_nonlinearity", "gelu"),
+        decoder_output_bias=mc.get("decoder_output_bias", False),
         dist_scale=mc.get("dist_scale", "raw"),
         # --- assignment rule, restored from the checkpoint ---
         sinkhorn_iters=lc.get("sinkhorn_iters", 3),
@@ -121,8 +127,12 @@ def ae_label(ckpt: dict) -> str:
     """Short human-readable description of a loaded checkpoint's architecture."""
     mc = ckpt["config"]["model"]
     nl = mc.get("nonlinearity", "linear")
+    decoder = mc.get("decoder_type", "linear")
+    extra = "" if decoder == "linear" else (
+        f", decoder={decoder}/{mc.get('decoder_nonlinearity', 'gelu')}"
+        f"/h{mc.get('decoder_hidden_dim', 0) or ('auto')}")
     return (f"AE {mc['hidden_size']}→{mc['latent_dim']}→{mc['hidden_size']} "
-            f"({nl}, K={mc['n_clusters']})")
+            f"({nl}{extra}, K={mc['n_clusters']})")
 
 
 GATED_HINT = """\
@@ -144,17 +154,52 @@ def _drop_vision_tower(lm) -> bool:
     Every GeoAE path feeds text `input_ids` only, and the wrapper's forward
     touches the tower solely when `pixel_values` is passed — so the tower is
     ~0.9 GB of bf16 weights that can never run. Returns True if anything was
-    dropped.
+    dropped. Remove modules from their owning object: newer Transformers
+    wrappers expose read-only properties forwarding to ``lm.model``.
     """
     dropped = False
     for owner in (lm, getattr(lm, "model", None)):
         if owner is None:
             continue
         for attr in ("vision_tower", "multi_modal_projector"):
+            # A property on the outer wrapper is an alias, not the module's
+            # owner. Assigning that property fails on Gemma3 in Transformers
+            # 4.57. Remove the registered child on `model` instead, while
+            # retaining support for older wrappers with direct attributes.
+            if attr not in vars(owner) and attr not in getattr(owner, "_modules", {}):
+                continue
             if getattr(owner, attr, None) is not None:
                 setattr(owner, attr, None)
                 dropped = True
     return dropped
+
+
+def _local_lm_snapshot(model_name: str) -> str | None:
+    """Resolve an explicitly supplied offline snapshot, preserving model IDs.
+
+    Recovery jobs may stage a verified snapshot on their compute node rather
+    than reread shared-cache shards. Validate every entry before using the
+    optional environment mapping so a bad override cannot silently fall back
+    to a different model or to downloading weights.
+    """
+    raw = os.environ.get("GEOAE_LM_SNAPSHOTS_JSON")
+    if raw is None:
+        return None
+    try:
+        snapshots = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise ValueError("GEOAE_LM_SNAPSHOTS_JSON must contain a JSON object") from exc
+    if not isinstance(snapshots, dict):
+        raise ValueError("GEOAE_LM_SNAPSHOTS_JSON must contain a JSON object")
+    for name, directory in snapshots.items():
+        if not isinstance(name, str) or not name or not isinstance(directory, str):
+            raise ValueError("GEOAE_LM_SNAPSHOTS_JSON entries must map model IDs to directory strings")
+        path = Path(directory)
+        if not path.is_absolute() or not path.is_dir():
+            raise ValueError(
+                f"GEOAE_LM_SNAPSHOTS_JSON entry for {name!r} must be an absolute existing directory: "
+                f"{directory!r}")
+    return snapshots.get(model_name)
 
 
 def load_lm(
@@ -172,17 +217,23 @@ def load_lm(
 
     `text_only` drops the vision encoder of multimodal checkpoints (Gemma 3);
     set it False if a caller ever needs image inputs.
+
+    `GEOAE_LM_SNAPSHOTS_JSON` optionally maps model IDs to absolute local
+    snapshot directories; matching entries load with `local_files_only=True`.
     """
     from transformers import AutoModelForCausalLM
 
+    snapshot = _local_lm_snapshot(model_name)
     from geoae.hf_auth import ensure_hf_login
     ensure_hf_login()   # exports HF_TOKEN; no-op if already set. Gated repos need it.
 
     kwargs = {"dtype": torch.bfloat16}
+    if snapshot is not None:
+        kwargs["local_files_only"] = True
     if device_map is not None:
         kwargs["device_map"] = device_map
     try:
-        lm = AutoModelForCausalLM.from_pretrained(model_name, **kwargs)
+        lm = AutoModelForCausalLM.from_pretrained(snapshot or model_name, **kwargs)
     except Exception as e:
         msg = str(e)
         if ("GatedRepo" in type(e).__name__ or "gated" in msg.lower()
