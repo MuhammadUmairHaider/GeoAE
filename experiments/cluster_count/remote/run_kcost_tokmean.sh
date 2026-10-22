@@ -1,0 +1,4 @@
+export GEOAE_ROOT="${GEOAE_ROOT:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)}}"
+cd "$GEOAE_ROOT"
+cd "$GEOAE_ROOT"; source configs/sites/local.sh >/dev/null 2>&1; export PYTHONUNBUFFERED=1 PYTHONPATH=.
+for k in 4000 8000; do echo "[$(date +%H:%M:%S)] start $k"; .venv/bin/python -u experiments/paper/analysis/paper_plain_kmeans_grid.py --activations_dir activations_gemma3_4b_sampled_struct5_10M --layer 33 --km e2e/checkpoints/general/gemma3-4B/layer33/delta/balanced_kmeans_k2000_dpc_sampled_struct5.npz --kmt e2e/checkpoints/general/gemma3-4B/layer33/delta/balanced_kmeans_k2000_dpc_sampled_struct5_tokmean.npz --k $k --spaces tokmean --out results/delta/g4b_l33_d5120/evals/kcost/plain_kmeans_tokmean_k$k.json > results/delta/g4b_l33_d5120/evals/kcost/plain_tokmean_k$k.log 2>&1; echo "[$(date +%H:%M:%S)] done $k rc=$?"; done; echo TOKMEAN_DONE

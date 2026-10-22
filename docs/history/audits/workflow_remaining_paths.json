@@ -1,0 +1,1680 @@
+{
+  "schema_version": 1,
+  "paths": {
+    "scripts/argo/README.md": "configs/sites/argo_notes.md",
+    "scripts/argo/atlas_classes.sbatch": "experiments/paper/argo/atlas_classes.sbatch",
+    "scripts/argo/atlas_draw_g4b.sbatch": "experiments/paper/argo/atlas_draw_g4b.sbatch",
+    "scripts/argo/atlas_draw_prep.sbatch": "experiments/paper/argo/atlas_draw_prep.sbatch",
+    "scripts/argo/atlas_knn_graph.sbatch": "experiments/paper/argo/atlas_knn_graph.sbatch",
+    "scripts/argo/atlas_lastword.sbatch": "experiments/paper/argo/atlas_lastword.sbatch",
+    "scripts/argo/atlas_lastword_ablations.sbatch": "experiments/paper/argo/atlas_lastword_ablations.sbatch",
+    "scripts/argo/atlas_lastword_fourway.sbatch": "experiments/paper/argo/atlas_lastword_fourway.sbatch",
+    "scripts/argo/atlas_lastword_gs16k.sbatch": "experiments/paper/argo/atlas_lastword_gs16k.sbatch",
+    "scripts/argo/atlas_lastword_gs16k_plain.sbatch": "experiments/paper/argo/atlas_lastword_gs16k_plain.sbatch",
+    "scripts/argo/atlas_lastword_gs16k_plain_kscale.sbatch": "experiments/cluster_count/argo/atlas_lastword_gs16k_plain_kscale.sbatch",
+    "scripts/argo/atlas_lastword_k4000.sbatch": "experiments/cluster_count/argo/atlas_lastword_k4000.sbatch",
+    "scripts/argo/atlas_lastword_knn.sbatch": "experiments/paper/argo/atlas_lastword_knn.sbatch",
+    "scripts/argo/atlas_latent_plain_kmeans.sbatch": "experiments/paper/argo/atlas_latent_plain_kmeans.sbatch",
+    "scripts/argo/atlas_new_draws.sh": "experiments/paper/argo/atlas_new_draws.sh",
+    "scripts/argo/atlas_nmi.sbatch": "experiments/paper/argo/atlas_nmi.sbatch",
+    "scripts/argo/atlas_siblings.sbatch": "experiments/paper/argo/atlas_siblings.sbatch",
+    "scripts/argo/atlas_symmetric_kmeans.sbatch": "experiments/paper/argo/atlas_symmetric_kmeans.sbatch",
+    "scripts/argo/atlas_token_detail.sbatch": "experiments/paper/argo/atlas_token_detail.sbatch",
+    "scripts/argo/chain_control.sbatch": "experiments/paper/argo/chain_control.sbatch",
+    "scripts/argo/concept_steer_extra.sbatch": "experiments/concept_steering/argo/concept_steer_extra.sbatch",
+    "scripts/argo/concept_steer_supervised_subset.sbatch": "experiments/concept_steering/argo/concept_steer_supervised_subset.sbatch",
+    "scripts/argo/control_conf_qwen.sbatch": "experiments/model_transfer/argo/control_conf_qwen.sbatch",
+    "scripts/argo/control_extra.sbatch": "experiments/paper/argo/control_extra.sbatch",
+    "scripts/argo/control_new_draws.sh": "experiments/paper/argo/control_new_draws.sh",
+    "scripts/argo/control_proj.sbatch": "experiments/paper/argo/control_proj.sbatch",
+    "scripts/argo/control_redraw_g4b.sbatch": "experiments/paper/argo/control_redraw_g4b.sbatch",
+    "scripts/argo/control_redraw_prep.sbatch": "experiments/paper/argo/control_redraw_prep.sbatch",
+    "scripts/argo/control_sae.sbatch": "experiments/paper/argo/control_sae.sbatch",
+    "scripts/argo/control_three_way.sbatch": "experiments/paper/argo/control_three_way.sbatch",
+    "scripts/argo/control_tokrm_base.sbatch": "experiments/paper/argo/control_tokrm_base.sbatch",
+    "scripts/argo/control_tp2_plain.sbatch": "experiments/paper/argo/control_tp2_plain.sbatch",
+    "scripts/argo/controls_g4b_k.sbatch": "experiments/cluster_count/argo/controls_g4b_k.sbatch",
+    "scripts/argo/cq_std.sbatch": "experiments/paper/argo/cq_std.sbatch",
+    "scripts/argo/dump_structure.sbatch": "experiments/paper/argo/dump_structure.sbatch",
+    "scripts/argo/env.sh": "configs/sites/argo.sh",
+    "scripts/argo/evals_g4b.sbatch": "experiments/paper/argo/evals_g4b.sbatch",
+    "scripts/argo/gemma_scope.sbatch": "experiments/sae_comparison/argo/gemma_scope.sbatch",
+    "scripts/argo/link_data.sh": "scripts/slurm/link_argo_data.sh",
+    "scripts/argo/llama_plain_k4000.sbatch": "experiments/cluster_count/argo/llama_plain_k4000.sbatch",
+    "scripts/argo/matched_topk.sbatch": "experiments/matched_topk/argo/matched_topk.sbatch",
+    "scripts/argo/matched_topk_finish.sbatch": "experiments/matched_topk/argo/matched_topk_finish.sbatch",
+    "scripts/argo/matched_topk_k100.sbatch": "experiments/matched_topk/argo/matched_topk_k100.sbatch",
+    "scripts/argo/matched_topk_multi.sbatch": "experiments/matched_topk/argo/matched_topk_multi.sbatch",
+    "scripts/argo/midlayer_judges.sbatch": "experiments/depth/argo/midlayer_judges.sbatch",
+    "scripts/argo/midlayer_lane.sbatch": "experiments/depth/argo/midlayer_lane.sbatch",
+    "scripts/argo/midlayer_latent_plain.sbatch": "experiments/depth/argo/midlayer_latent_plain.sbatch",
+    "scripts/argo/midlayer_probes.sbatch": "experiments/depth/argo/midlayer_probes.sbatch",
+    "scripts/argo/midlayer_probes_final.sbatch": "experiments/depth/argo/midlayer_probes_final.sbatch",
+    "scripts/argo/ne100_evals.sbatch": "experiments/balancing/argo/ne100_evals.sbatch",
+    "scripts/argo/ne100_kcost.sbatch": "experiments/balancing/argo/ne100_kcost.sbatch",
+    "scripts/argo/ne100_keeper.sbatch": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/scripts/argo/ne100_keeper.sbatch",
+    "scripts/argo/ns100_evals.sbatch": "experiments/balancing/argo/ns100_evals.sbatch",
+    "scripts/argo/ns100_kcost.sbatch": "experiments/balancing/argo/ns100_kcost.sbatch",
+    "scripts/argo/ns50_evals.sbatch": "experiments/balancing/argo/ns50_evals.sbatch",
+    "scripts/argo/ns50_kcost.sbatch": "experiments/balancing/argo/ns50_kcost.sbatch",
+    "scripts/argo/ns50_probe_bypass_pair.sbatch": "experiments/balancing/argo/ns50_probe_bypass_pair.sbatch",
+    "scripts/argo/p85_seq_table.sbatch": "experiments/concept_steering/argo/p85_seq_table.sbatch",
+    "scripts/argo/plain_single_token.sbatch": "experiments/concept_steering/argo/plain_single_token.sbatch",
+    "scripts/argo/preview_g4b.sbatch": "experiments/paper/argo/preview_g4b.sbatch",
+    "scripts/argo/qwen_full_table.sbatch": "experiments/model_transfer/argo/qwen_full_table.sbatch",
+    "scripts/argo/qwen_run.sbatch": "experiments/model_transfer/argo/qwen_run.sbatch",
+    "scripts/argo/qwen_seq_table.sbatch": "experiments/model_transfer/argo/qwen_seq_table.sbatch",
+    "scripts/argo/sae_controls.sbatch": "experiments/sae_comparison/argo/sae_controls.sbatch",
+    "scripts/argo/sae_geometry.sbatch": "experiments/sae_comparison/argo/sae_geometry.sbatch",
+    "scripts/argo/sae_probes.sbatch": "experiments/sae_comparison/argo/sae_probes.sbatch",
+    "scripts/argo/sae_probes_toxicity.sbatch": "experiments/sae_comparison/argo/sae_probes_toxicity.sbatch",
+    "scripts/argo/sae_suite.sbatch": "experiments/sae_comparison/argo/sae_suite.sbatch",
+    "scripts/argo/setup.sbatch": "scripts/slurm/argo_setup.sbatch",
+    "scripts/argo/smoke.sbatch": "scripts/slurm/argo_smoke.sbatch",
+    "scripts/argo/splice_cost_g4b.sbatch": "experiments/paper/argo/splice_cost_g4b.sbatch",
+    "scripts/argo/splice_ppl_g4b.sbatch": "experiments/paper/argo/splice_ppl_g4b.sbatch",
+    "scripts/argo/splice_ppl_qwen.sbatch": "experiments/model_transfer/argo/splice_ppl_qwen.sbatch",
+    "scripts/argo/ssl_concept_prep.sh": "experiments/supervised/argo/ssl_concept_prep.sh",
+    "scripts/argo/submit_chain_control.sh": "experiments/paper/argo/submit_chain_control.sh",
+    "scripts/argo/train.sbatch": "scripts/slurm/argo_train.sbatch",
+    "scripts/argo/watch_jobs.py": "experiments/balancing/argo/watch_jobs.py",
+    "scripts/delta/atlas_draws_table.sh": "experiments/paper/delta/atlas_draws_table.sh",
+    "scripts/delta/build_panel.sh": "experiments/width/status/build_panel.sh",
+    "scripts/delta/clean_slate.sh": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/scripts/delta/clean_slate.sh",
+    "scripts/delta/control_conf_one.sbatch": "experiments/paper/delta/control_conf_one.sbatch",
+    "scripts/delta/control_extra.sbatch": "experiments/paper/delta/control_extra.sbatch",
+    "scripts/delta/control_tokrm_base.sbatch": "experiments/paper/delta/control_tokrm_base.sbatch",
+    "scripts/delta/corpus.sbatch": "scripts/slurm/delta_corpus.sbatch",
+    "scripts/delta/env.sh": "scripts/env.sh",
+    "scripts/delta/eval.sbatch": "scripts/slurm/delta_eval.sbatch",
+    "scripts/delta/extract.sbatch": "scripts/slurm/delta_extract.sbatch",
+    "scripts/delta/extract_gemma1b.sbatch": "experiments/gemma_1b/delta/extract_gemma1b.sbatch",
+    "scripts/delta/extract_gemma4b.sbatch": "experiments/paper/delta/extract_gemma4b.sbatch",
+    "scripts/delta/extract_sampled.sbatch": "scripts/slurm/delta_extract_sampled.sbatch",
+    "scripts/delta/link_data.sh": "scripts/link_data.sh",
+    "scripts/delta/organize_delta_results.sh": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/scripts/delta/organize_delta_results.sh",
+    "scripts/delta/panel_data.py": "experiments/width/status/panel_data.py",
+    "scripts/delta/panel_template.html": "experiments/width/status/panel_template.html",
+    "scripts/delta/panel_usage.py": "experiments/width/status/panel_usage.py",
+    "scripts/delta/py": "scripts/py",
+    "scripts/delta/report/build_report.py": "experiments/width/analysis/build_report.py",
+    "scripts/delta/report/extract_report.py": "experiments/width/analysis/extract_report.py",
+    "scripts/delta/setup.sh": "scripts/setup_cluster.sh",
+    "scripts/delta/sheet.sbatch": "scripts/slurm/delta_sheet.sbatch",
+    "scripts/delta/sheet_staged.sbatch": "scripts/slurm/delta_sheet_staged.sbatch",
+    "scripts/delta/site.sh": "configs/sites/delta.sh",
+    "scripts/delta/ssl_concepts.sbatch": "experiments/supervised/delta/ssl_concepts.sbatch",
+    "scripts/delta/ssl_concepts_error_preserved.sbatch": "experiments/supervised/delta/ssl_concepts_error_preserved.sbatch",
+    "scripts/delta/submit_delta_evals.sh": "experiments/paper/delta/submit_delta_evals.sh",
+    "scripts/delta/sugarcrepe_gemma_k8000.sbatch": "experiments/compositionality/delta/sugarcrepe_gemma_k8000.sbatch",
+    "scripts/delta/sugarcrepe_geometry.sbatch": "experiments/compositionality/delta/sugarcrepe_geometry.sbatch",
+    "scripts/delta/train.sbatch": "scripts/slurm/delta_train.sbatch",
+    "scripts/delta/train_halfbias.sbatch": "experiments/token_bypass/delta/train_halfbias.sbatch",
+    "scripts/delta/verify.sbatch": "scripts/slurm/delta_verify.sbatch",
+    "scripts/gpt2/argo.sbatch": "experiments/gpt2/argo.sbatch",
+    "scripts/gpt2/argo_env.sh": "experiments/gpt2/argo_env.sh",
+    "scripts/gpt2/concurrency.py": "experiments/gpt2/concurrency.py",
+    "scripts/gpt2/corpus.sbatch": "experiments/gpt2/corpus.sbatch",
+    "scripts/gpt2/env.sh": "experiments/gpt2/env.sh",
+    "scripts/gpt2/evaluate.py": "experiments/gpt2/evaluate.py",
+    "scripts/gpt2/evaluate.sh": "experiments/gpt2/evaluate.sh",
+    "scripts/gpt2/extract.sbatch": "experiments/gpt2/extract.sbatch",
+    "scripts/gpt2/lifecycle.py": "experiments/gpt2/lifecycle.py",
+    "scripts/gpt2/recover_evals.py": "experiments/gpt2/recover_evals.py",
+    "scripts/gpt2/recover_evals.sbatch": "experiments/gpt2/recover_evals.sbatch",
+    "scripts/gpt2/run_gpt_run.py": "experiments/gpt2/run_gpt_run.py",
+    "scripts/gpt2/smoke_gpu.py": "experiments/gpt2/smoke_gpu.py",
+    "scripts/gpt2/status.py": "experiments/gpt2/status.py",
+    "scripts/gpt2/submit.py": "experiments/gpt2/submit.py",
+    "scripts/gpt2/submit_argo.py": "experiments/gpt2/submit_argo.py",
+    "scripts/gpt2/train.sbatch": "experiments/gpt2/train.sbatch",
+    "scripts/gpt2/watch_remote.py": "experiments/gpt2/watch_remote.py",
+    "scripts/make_seed_config.py": "geoae/workflow/seed_config.py",
+    "scripts/midlayer/campaign.py": "experiments/depth/campaign.py",
+    "scripts/midlayer/dataset.py": "experiments/depth/dataset.py",
+    "scripts/midlayer/evaluate.py": "experiments/depth/evaluate.py",
+    "scripts/midlayer/report.py": "experiments/depth/report.py",
+    "scripts/midlayer/run.py": "experiments/depth/run.py",
+    "scripts/midlayer/run.sbatch": "experiments/depth/run.sbatch",
+    "scripts/midlayer/train_gemma4b.sh": "experiments/depth/train_gemma4b.sh",
+    "scripts/midlayer/train_llama.sh": "experiments/depth/train_llama.sh",
+    "scripts/qwen/submit.py": "experiments/model_transfer/qwen/submit.py",
+    "scripts/remote/__pycache__/import_project_chats.cpython-312.pyc": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/scripts/remote/__pycache__/import_project_chats.cpython-312.pyc",
+    "scripts/remote/control_conf_one.sh": "experiments/paper/remote/control_conf_one.sh",
+    "scripts/remote/env.sh": "configs/sites/local.sh",
+    "scripts/remote/fetch_kit.sh": "experiments/token_bypass/portable/fetch_kit.sh",
+    "scripts/remote/import_project_chats.py": "tools/provenance/import_project_chats.py",
+    "scripts/remote/pack_kit.sh": "experiments/token_bypass/portable/pack_kit.sh",
+    "scripts/remote/qwen_control_one.sh": "experiments/paper/remote/qwen_control_one.sh",
+    "scripts/remote/run_agnews_control.sh": "experiments/paper/remote/run_agnews_control.sh",
+    "scripts/remote/run_control_conf.sh": "experiments/paper/remote/run_control_conf.sh",
+    "scripts/remote/run_control_extra.sh": "experiments/paper/remote/run_control_extra.sh",
+    "scripts/remote/run_gemma4b.sh": "experiments/paper/remote/run_gemma4b.sh",
+    "scripts/remote/run_splice_ppl_box.sh": "experiments/paper/remote/run_splice_ppl_box.sh",
+    "scripts/remote/setup.sh": "experiments/token_bypass/portable/setup_legacy.sh",
+    "scripts/remote/setup_laptop.sh": "scripts/setup_laptop.sh",
+    "scripts/remote/train_decoderonly.sh": "experiments/token_bypass/remote/train_decoderonly.sh",
+    "scripts/repair_gemma_concept_cache.py": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/scripts/repair_gemma_concept_cache.py",
+    "scripts/run_sampled_ae.sh": "experiments/data_sampling/scripts/run_sampled_ae.sh",
+    "scripts/scale_token_bias.py": "geoae/extraction/token_bias_scale.py",
+    "scripts/status/refresh_status.sh": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/scripts/status/refresh_status.sh",
+    "scripts/status/status_loop.sh": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/scripts/status/status_loop.sh",
+    "logs/dense_summary.py": "experiments/balancing/analysis/dense_summary.py",
+    "logs/g4b_final_config_from_ckpt.yaml": "experiments/paper/configs/recovered/g4b_final_config_from_ckpt.yaml",
+    "logs/g4b_rest.sh": "experiments/paper/remote/g4b_rest.sh",
+    "logs/gemma_evals.sh": "experiments/gemma_1b/remote/gemma_evals.sh",
+    "logs/gemma_fix2.sh": "experiments/gemma_1b/remote/gemma_fix2.sh",
+    "logs/gemma_fix_interventions.sh": "experiments/gemma_1b/remote/gemma_fix_interventions.sh",
+    "logs/gemma_run.sh": "experiments/gemma_1b/remote/gemma_run.sh",
+    "logs/k4000_more.sh": "experiments/cluster_count/remote/k4000_more.sh",
+    "logs/ne100_keeper.sh": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/logs/ne100_keeper.sh",
+    "logs/nmi_anatomy.py": "experiments/balancing/analysis/nmi_anatomy.py",
+    "logs/patch_keep10_20261012.py": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/logs/patch_keep10_20261012.py",
+    "logs/patch_nobal_20261012.py": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/logs/patch_nobal_20261012.py",
+    "logs/purity_check.py": "experiments/paper/analysis/purity_check.py",
+    "logs/run_abl_g4b.sh": "experiments/regularization/remote/run_abl_g4b.sh",
+    "logs/run_biasbios_probe.sh": "experiments/paper/remote/run_biasbios_probe.sh",
+    "logs/run_csteer_k.sh": "experiments/cluster_count/remote/run_csteer_k.sh",
+    "logs/run_csteer_llama_plain.sh": "experiments/concept_steering/remote/run_csteer_llama_plain.sh",
+    "logs/run_fourway_fp6.sh": "experiments/paper/remote/run_fourway_fp6.sh",
+    "logs/run_g4b_grid.sh": "experiments/paper/remote/run_g4b_grid.sh",
+    "logs/run_g4b_nobypass_evals.sh": "experiments/token_bypass/remote/run_g4b_nobypass_evals.sh",
+    "logs/run_jigsaw_bypass.sh": "experiments/paper/remote/run_jigsaw_bypass.sh",
+    "logs/run_kcost_g4b.sh": "experiments/cluster_count/remote/run_kcost_g4b.sh",
+    "logs/run_kcost_g4b_k256.sh": "experiments/cluster_count/remote/run_kcost_g4b_k256.sh",
+    "logs/run_kcost_hc.sh": "experiments/cluster_count/remote/run_kcost_hc.sh",
+    "logs/run_kcost_tokmean.sh": "experiments/cluster_count/remote/run_kcost_tokmean.sh",
+    "logs/run_lloyd_ep10.sh": "experiments/balancing/remote/run_lloyd_ep10.sh",
+    "logs/run_ne100_llama_nobypass.sh": "experiments/balancing/remote/run_ne100_llama_nobypass.sh",
+    "logs/run_nobypass_evals.sh": "experiments/token_bypass/remote/run_nobypass_evals.sh",
+    "logs/run_nosk_evals.sh": "experiments/balancing/remote/run_nosk_evals.sh",
+    "logs/run_nosk_frozen.sh": "experiments/balancing/remote/run_nosk_frozen.sh",
+    "logs/run_ns100_llama_nobypass.sh": "experiments/balancing/remote/run_ns100_llama_nobypass.sh",
+    "logs/run_ns50_llama_nobypass.sh": "experiments/balancing/remote/run_ns50_llama_nobypass.sh",
+    "logs/run_pair_probes.sh": "experiments/paper/remote/run_pair_probes.sh",
+    "logs/run_pair_probes_g4b.sh": "experiments/paper/remote/run_pair_probes_g4b.sh",
+    "logs/run_pair_probes_llama.sh": "experiments/paper/remote/run_pair_probes_llama.sh",
+    "logs/run_plain_cq.sh": "experiments/paper/remote/run_plain_cq.sh",
+    "logs/run_plain_dpc_evals.sh": "experiments/paper/remote/run_plain_dpc_evals.sh",
+    "logs/run_plain_tokmean.sh": "experiments/paper/remote/run_plain_tokmean.sh",
+    "logs/run_seed42.sh": "experiments/paper/remote/run_seed42.sh",
+    "logs/run_toxicity_probes.sh": "experiments/paper/remote/run_toxicity_probes.sh",
+    "tests/test_gemma_cache_repair.py": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/tests/test_gemma_cache_repair.py",
+    "scripts/gpt2": "experiments/gpt2",
+    "scripts/midlayer": "experiments/depth",
+    "scripts/qwen": "experiments/model_transfer/qwen"
+  },
+  "modules": {
+    "scripts.argo.watch_jobs": "experiments.balancing.argo.watch_jobs",
+    "scripts.delta.panel_data": "experiments.width.status.panel_data",
+    "scripts.delta.panel_usage": "experiments.width.status.panel_usage",
+    "scripts.delta.report.build_report": "experiments.width.analysis.build_report",
+    "scripts.delta.report.extract_report": "experiments.width.analysis.extract_report",
+    "scripts.gpt2.concurrency": "experiments.gpt2.concurrency",
+    "scripts.gpt2.evaluate": "experiments.gpt2.evaluate",
+    "scripts.gpt2.lifecycle": "experiments.gpt2.lifecycle",
+    "scripts.gpt2.recover_evals": "experiments.gpt2.recover_evals",
+    "scripts.gpt2.run_gpt_run": "experiments.gpt2.run_gpt_run",
+    "scripts.gpt2.smoke_gpu": "experiments.gpt2.smoke_gpu",
+    "scripts.gpt2.status": "experiments.gpt2.status",
+    "scripts.gpt2.submit": "experiments.gpt2.submit",
+    "scripts.gpt2.submit_argo": "experiments.gpt2.submit_argo",
+    "scripts.gpt2.watch_remote": "experiments.gpt2.watch_remote",
+    "scripts.make_seed_config": "geoae.workflow.seed_config",
+    "scripts.midlayer.campaign": "experiments.depth.campaign",
+    "scripts.midlayer.dataset": "experiments.depth.dataset",
+    "scripts.midlayer.evaluate": "experiments.depth.evaluate",
+    "scripts.midlayer.report": "experiments.depth.report",
+    "scripts.midlayer.run": "experiments.depth.run",
+    "scripts.qwen.submit": "experiments.model_transfer.qwen.submit",
+    "scripts.remote.import_project_chats": "tools.provenance.import_project_chats",
+    "scripts.scale_token_bias": "geoae.extraction.token_bias_scale",
+    "logs.dense_summary": "experiments.balancing.analysis.dense_summary",
+    "logs.nmi_anatomy": "experiments.balancing.analysis.nmi_anatomy",
+    "logs.purity_check": "experiments.paper.analysis.purity_check",
+    "scripts.gpt2": "experiments.gpt2",
+    "scripts.midlayer": "experiments.depth",
+    "scripts.qwen": "experiments.model_transfer.qwen"
+  },
+  "entries": [
+    {
+      "source": "scripts/argo/README.md",
+      "destination": "configs/sites/argo_notes.md",
+      "action": "move",
+      "source_sha256": "fa9758f278362bce482c41696573cfe7a4ce683f93eae71daa14ebaa2e595cee",
+      "destination_sha256": "fa9758f278362bce482c41696573cfe7a4ce683f93eae71daa14ebaa2e595cee"
+    },
+    {
+      "source": "scripts/argo/atlas_classes.sbatch",
+      "destination": "experiments/paper/argo/atlas_classes.sbatch",
+      "action": "move",
+      "source_sha256": "aabd73bd70b162a2d96d48a66cab224ef2b969225408c648965d781eeedf4d5c",
+      "destination_sha256": "b7a80716aaa93d0abd9117ea2140a34f5963530888a30bd59e9a48ef89a15fca"
+    },
+    {
+      "source": "scripts/argo/atlas_draw_g4b.sbatch",
+      "destination": "experiments/paper/argo/atlas_draw_g4b.sbatch",
+      "action": "move",
+      "source_sha256": "413411ad5d7f6f739a249b87a963146dac71e44448ea00d71db555cc40db8450",
+      "destination_sha256": "153ea1720a78fb760023dbd4f5003c70641ec794e6b249d382bb98d9a2b76c98"
+    },
+    {
+      "source": "scripts/argo/atlas_draw_prep.sbatch",
+      "destination": "experiments/paper/argo/atlas_draw_prep.sbatch",
+      "action": "move",
+      "source_sha256": "5c2a462bf87a63f8cf952be6fdf8a1299e45ff1ff02786046322035712ca562f",
+      "destination_sha256": "fd412ead508d2adb3a950ec761a9cf70b261bf3b0f85e1b7bb9f4d061a2aa5ef"
+    },
+    {
+      "source": "scripts/argo/atlas_knn_graph.sbatch",
+      "destination": "experiments/paper/argo/atlas_knn_graph.sbatch",
+      "action": "move",
+      "source_sha256": "531b6eee111593223057c4df4651ec74e7b829e9dc0fc63618f858d1fdb5ce87",
+      "destination_sha256": "6bd8192e1343ebe1b68b71d1fe8fcf4a5f219c817e6e9a0b4753d652712e2c1e"
+    },
+    {
+      "source": "scripts/argo/atlas_lastword.sbatch",
+      "destination": "experiments/paper/argo/atlas_lastword.sbatch",
+      "action": "move",
+      "source_sha256": "c6ae51802cc78e6f653850058679ecea4a6f15f1927b91af8a249694d28e5abf",
+      "destination_sha256": "66f0d42205acb0f0a216cd96c982191094c107e367508992587b46ba9f7f2fd7"
+    },
+    {
+      "source": "scripts/argo/atlas_lastword_ablations.sbatch",
+      "destination": "experiments/paper/argo/atlas_lastword_ablations.sbatch",
+      "action": "move",
+      "source_sha256": "1aac71b9013c05f6413d1e3ca88a34a70c4fb186a97d9805fa9e0118efd7c601",
+      "destination_sha256": "4b6cf5f91f15ad44651278353639134ed686a3df4e32687cd56105e75564cf62"
+    },
+    {
+      "source": "scripts/argo/atlas_lastword_fourway.sbatch",
+      "destination": "experiments/paper/argo/atlas_lastword_fourway.sbatch",
+      "action": "move",
+      "source_sha256": "2961a961e8209c709ccaf61ca441de4ad50ecfba72554de2746713b6f716a42d",
+      "destination_sha256": "ec99714f00031cd84dcd7d07880bf05a7b7661d6b1dae6f245045ba980c2effb"
+    },
+    {
+      "source": "scripts/argo/atlas_lastword_gs16k.sbatch",
+      "destination": "experiments/paper/argo/atlas_lastword_gs16k.sbatch",
+      "action": "move",
+      "source_sha256": "15bea11ce2db297bebb65eb554d44417bfebf3774e4723dc3458c6af4b49d87e",
+      "destination_sha256": "3a83c983b21e2f100f7a2f9038b8d770b4fc257381e9384eda47c0d3e6f0aa08"
+    },
+    {
+      "source": "scripts/argo/atlas_lastword_gs16k_plain.sbatch",
+      "destination": "experiments/paper/argo/atlas_lastword_gs16k_plain.sbatch",
+      "action": "move",
+      "source_sha256": "591370da6b6610e0bba0ce0c04feb451caffa7724693a342974881ce255ab00e",
+      "destination_sha256": "642bb1a9521d4dff4593bad2a7d23ad488cbc7c0e173e67d77e4bc8394251261"
+    },
+    {
+      "source": "scripts/argo/atlas_lastword_gs16k_plain_kscale.sbatch",
+      "destination": "experiments/cluster_count/argo/atlas_lastword_gs16k_plain_kscale.sbatch",
+      "action": "move",
+      "source_sha256": "7e01c7f2c83a74c73ac03fe69fe839a040cb514d4f060a2d624642f9d1623b34",
+      "destination_sha256": "9e081edfec9b0a230f113fd3b47e7244e6ddada2bcc22e8fa0ca1a2c159ba6ee"
+    },
+    {
+      "source": "scripts/argo/atlas_lastword_k4000.sbatch",
+      "destination": "experiments/cluster_count/argo/atlas_lastword_k4000.sbatch",
+      "action": "move",
+      "source_sha256": "aed71316797e8a0eadeb54748afc3faf77cb0bb32a8075e85c5ca712ad2e1bdf",
+      "destination_sha256": "4d9e3f7a3b69e0eaa262a92aaa28f85af3787683c606248fa5a6ba261f7cf80e"
+    },
+    {
+      "source": "scripts/argo/atlas_lastword_knn.sbatch",
+      "destination": "experiments/paper/argo/atlas_lastword_knn.sbatch",
+      "action": "move",
+      "source_sha256": "e3f6728cdc1d46a0161f9053f169d053cc9ac0b78c448fe8736bb46556ebb028",
+      "destination_sha256": "ba5f50496ca1002b8e0f5198c328744770f8386c745511b1073530d6ad2a3b3e"
+    },
+    {
+      "source": "scripts/argo/atlas_latent_plain_kmeans.sbatch",
+      "destination": "experiments/paper/argo/atlas_latent_plain_kmeans.sbatch",
+      "action": "move",
+      "source_sha256": "7c54809d3ba18c23fffa1531b3bf2e4eb31c83b23f50febb451b3de4857b5622",
+      "destination_sha256": "879832ded72d9853d78e90b9d84d0c897eee582dbc66c7f0b772623ac6ecb94b"
+    },
+    {
+      "source": "scripts/argo/atlas_new_draws.sh",
+      "destination": "experiments/paper/argo/atlas_new_draws.sh",
+      "action": "move",
+      "source_sha256": "d33c279deb97403bd7628bd13cb487a4af1097ad3e7e2a76d5f2be445ae7a0ca",
+      "destination_sha256": "7ef7ab4d46cc9e8f2d8691cc5d14860a9b14d88717935ad016e3a7a67ee5315b"
+    },
+    {
+      "source": "scripts/argo/atlas_nmi.sbatch",
+      "destination": "experiments/paper/argo/atlas_nmi.sbatch",
+      "action": "move",
+      "source_sha256": "a44bbf8b1292fd3b70638e7fa1fb88105fa071b2351d12403a6d59e25e451f08",
+      "destination_sha256": "b6fc3baa4ba01e7eff0324e779d9f16a437cd523acf18de085e574c961ab0f5c"
+    },
+    {
+      "source": "scripts/argo/atlas_siblings.sbatch",
+      "destination": "experiments/paper/argo/atlas_siblings.sbatch",
+      "action": "move",
+      "source_sha256": "fb3e898a27274faeb2c9e95606aae0b681f7d2b30efdd919d824bec192fb268f",
+      "destination_sha256": "ea569044866fb64e154b30d133ac2169d10aa7f1781120ef0407ef4e650cfe85"
+    },
+    {
+      "source": "scripts/argo/atlas_symmetric_kmeans.sbatch",
+      "destination": "experiments/paper/argo/atlas_symmetric_kmeans.sbatch",
+      "action": "move",
+      "source_sha256": "6f9ad70a4a55d6acd21c278ef3fde8417fdc4d7f3b0aa82e338c7787161e5770",
+      "destination_sha256": "59a00cf641e06254c4534a21860f924c700c1f667b7a818ae97c7a4facf2083c"
+    },
+    {
+      "source": "scripts/argo/atlas_token_detail.sbatch",
+      "destination": "experiments/paper/argo/atlas_token_detail.sbatch",
+      "action": "move",
+      "source_sha256": "b1627f88453b5e0cea1097280ae437dbc551e824071fa053d5530353b22985ca",
+      "destination_sha256": "c0cb35cc80308fd8cf70a4df0ac31bcd8e7b8d7918c81fd3d53259c5a854d536"
+    },
+    {
+      "source": "scripts/argo/chain_control.sbatch",
+      "destination": "experiments/paper/argo/chain_control.sbatch",
+      "action": "move",
+      "source_sha256": "3d13236f5acfeb924313a8652a8747bd33b1c4cdc8989f952062a67132ba1402",
+      "destination_sha256": "62e1706d12019085947e13653aed337cd4cbb4471dc91b801d024118524a063e"
+    },
+    {
+      "source": "scripts/argo/concept_steer_extra.sbatch",
+      "destination": "experiments/concept_steering/argo/concept_steer_extra.sbatch",
+      "action": "move",
+      "source_sha256": "f4a0c8e78f85d09ede38e3d0116a4e72303d47d65f09ab2f96958834642847cc",
+      "destination_sha256": "e6ce1808e80bf6b3c318a73f769b1b5501ff6bfaf6ac66da6a717f53150d444c"
+    },
+    {
+      "source": "scripts/argo/concept_steer_supervised_subset.sbatch",
+      "destination": "experiments/concept_steering/argo/concept_steer_supervised_subset.sbatch",
+      "action": "move",
+      "source_sha256": "fe2dce2b411157d4e079f5b04429eae88520db2f3811a132542c7920dc394710",
+      "destination_sha256": "dbd32cfe897aa1506cad44ea79b65e1aa59f04af910414861de946eeb539c60a"
+    },
+    {
+      "source": "scripts/argo/control_conf_qwen.sbatch",
+      "destination": "experiments/model_transfer/argo/control_conf_qwen.sbatch",
+      "action": "move",
+      "source_sha256": "ab51ddcf1ae639aba9d44ad4335e242f0031d8ae68f1703dd94a0fcdd8a52762",
+      "destination_sha256": "f95a3b8871ea06e2593f965fdb4a029610077a74cbd461592fabd315a14d8552"
+    },
+    {
+      "source": "scripts/argo/control_extra.sbatch",
+      "destination": "experiments/paper/argo/control_extra.sbatch",
+      "action": "move",
+      "source_sha256": "b06c424d47c2a9d1f262a5bef4c57a98822797d9d64d53e5ad9db4d9473351b9",
+      "destination_sha256": "aa7ce11abee582877c02431e6ee2aa7ab034c66a9827d909172b65b3df354398"
+    },
+    {
+      "source": "scripts/argo/control_new_draws.sh",
+      "destination": "experiments/paper/argo/control_new_draws.sh",
+      "action": "move",
+      "source_sha256": "d45919e738a7251e4fa733a09baaefb226cedffc5f6bc227b34c7139aed382df",
+      "destination_sha256": "dc6bda603b9f06bbe7d7ff6880db4a03895574876fbbe3c17a86a5db3f880db7"
+    },
+    {
+      "source": "scripts/argo/control_proj.sbatch",
+      "destination": "experiments/paper/argo/control_proj.sbatch",
+      "action": "move",
+      "source_sha256": "a9c4f732a13efa4a5b06181335cb4ef9692601be6e90492ad3518af777385e86",
+      "destination_sha256": "8c02168b728340df3c4464905be562a5d1d942c1b289d11e472fa3097ceacb71"
+    },
+    {
+      "source": "scripts/argo/control_redraw_g4b.sbatch",
+      "destination": "experiments/paper/argo/control_redraw_g4b.sbatch",
+      "action": "move",
+      "source_sha256": "371b1c3f85d234ae22e193f82a5e8969ab18ad492591c4a2ed939be60215d871",
+      "destination_sha256": "5b5d9530494698cd0b963fa204da4f289f6db0645d5de7b5b00bc9f84db8b382"
+    },
+    {
+      "source": "scripts/argo/control_redraw_prep.sbatch",
+      "destination": "experiments/paper/argo/control_redraw_prep.sbatch",
+      "action": "move",
+      "source_sha256": "3d7f2c91a87a59b03cf59e64ebed57cb96c2d3979eeec290d0d2a3783d1ed05e",
+      "destination_sha256": "e4203d8e18c25f2fd4eb0014e532367cde10ea70e6676f3c82d545778acfcadf"
+    },
+    {
+      "source": "scripts/argo/control_sae.sbatch",
+      "destination": "experiments/paper/argo/control_sae.sbatch",
+      "action": "move",
+      "source_sha256": "74b33b03077fa331b906f83a2a455a87334ff4e5d75e26aa7554fd9735282613",
+      "destination_sha256": "682f97bc98350cd8ab60c2bb05b0e47bef9d99260d101a20cdf1eaf7fcc519ba"
+    },
+    {
+      "source": "scripts/argo/control_three_way.sbatch",
+      "destination": "experiments/paper/argo/control_three_way.sbatch",
+      "action": "move",
+      "source_sha256": "f6ebdd1791618f54db8167561d8480a89d2e1f5bf7f94bb3007f19979734cdb8",
+      "destination_sha256": "fd86315c9a2549e4cf95772b4e38bef2e9a2d5a6a32fe2eb7e2337bdeef158a4"
+    },
+    {
+      "source": "scripts/argo/control_tokrm_base.sbatch",
+      "destination": "experiments/paper/argo/control_tokrm_base.sbatch",
+      "action": "move",
+      "source_sha256": "ac336f864f4550bf98d096f9a8230c675204c00835396ca1847cf3e02ba6861c",
+      "destination_sha256": "e785e398a2e43a744708449df3a0bc021370f94031c42cb2a669bf0260270336"
+    },
+    {
+      "source": "scripts/argo/control_tp2_plain.sbatch",
+      "destination": "experiments/paper/argo/control_tp2_plain.sbatch",
+      "action": "move",
+      "source_sha256": "03f82ba2f2f4e1f2cc8eed5506476d1cca4eece789edc0bb684f0f8e1e4c060e",
+      "destination_sha256": "d0a87bce022de8ddebeffd0ee78347e95c8a501b9b068088069e213c91c57410"
+    },
+    {
+      "source": "scripts/argo/controls_g4b_k.sbatch",
+      "destination": "experiments/cluster_count/argo/controls_g4b_k.sbatch",
+      "action": "move",
+      "source_sha256": "09727f11fe80e5a3f169b830a6b0ebafacadd01aa151b9ae99ab5cd61a7a0b94",
+      "destination_sha256": "6791f7dccca4d2899ebc237cb3a6a34e85751a5ed5048d41a965d4a6fa86eb27"
+    },
+    {
+      "source": "scripts/argo/cq_std.sbatch",
+      "destination": "experiments/paper/argo/cq_std.sbatch",
+      "action": "move",
+      "source_sha256": "cf3522e869ff34cda4f9fc8a45c75d69968bff60edbbf04988232de7095cdaef",
+      "destination_sha256": "a1e864b2e0bc79ad24012f62f8456c500d5f10cbc765aedadce438405286d151"
+    },
+    {
+      "source": "scripts/argo/dump_structure.sbatch",
+      "destination": "experiments/paper/argo/dump_structure.sbatch",
+      "action": "move",
+      "source_sha256": "765e2b1145d20be7f1c50ec73ba2df6971f28a51a10b85cd343ac72dabae7869",
+      "destination_sha256": "29a733fe6f37dc8f1d53ddf4ee104a964e7374d909ed5d01ac804e3d07c15254"
+    },
+    {
+      "source": "scripts/argo/env.sh",
+      "destination": "configs/sites/argo.sh",
+      "action": "move",
+      "source_sha256": "698009d7d12f997229a20de29566404171096252a3378846173bcb102cc56dbb",
+      "destination_sha256": "92748c9a643b4cd9bce8f90b4e07f732d5edff0f14ec23992ae50d0699ba20df"
+    },
+    {
+      "source": "scripts/argo/evals_g4b.sbatch",
+      "destination": "experiments/paper/argo/evals_g4b.sbatch",
+      "action": "move",
+      "source_sha256": "4c1a7762702233bab8733cebe08667364489e928efbdf0e88c41370bf066b69a",
+      "destination_sha256": "198308a63afccc1025f5a7141d72415f53a47ca50748c809f46c9d280fd4736f"
+    },
+    {
+      "source": "scripts/argo/gemma_scope.sbatch",
+      "destination": "experiments/sae_comparison/argo/gemma_scope.sbatch",
+      "action": "move",
+      "source_sha256": "d941c4c5e47e9c1345cd13dc86fabdbe92ca445040359ac742dd1ffc4c82d478",
+      "destination_sha256": "9b9372534ebf7de985895c34c9bf44973c0a13936199f7cf4662536d53effbbe"
+    },
+    {
+      "source": "scripts/argo/link_data.sh",
+      "destination": "scripts/slurm/link_argo_data.sh",
+      "action": "move",
+      "source_sha256": "c5092b3fce9b4c1ecd5897c7249573d6fb64fd50f881414c64bb51b98749d1f8",
+      "destination_sha256": "a81c65a6057d35d30f78d42b0dee2160f097c6224730a2fa97f1196a70b8c37c"
+    },
+    {
+      "source": "scripts/argo/llama_plain_k4000.sbatch",
+      "destination": "experiments/cluster_count/argo/llama_plain_k4000.sbatch",
+      "action": "move",
+      "source_sha256": "b64cfffb824f778e1e4286727032f74515dd5972e3cf3d931265c7d5478eec5b",
+      "destination_sha256": "bad4b5678ef220533c3f3d7754bacfdf5793a1c954f34d1a5cd2f0f2847755bf"
+    },
+    {
+      "source": "scripts/argo/matched_topk.sbatch",
+      "destination": "experiments/matched_topk/argo/matched_topk.sbatch",
+      "action": "move",
+      "source_sha256": "0d2246c7f2120227885d2a7c435063a32a7735578c1f90c5f62dd54f0ec5a06b",
+      "destination_sha256": "78b97d76275b9d64dad76979f5dbca0b8cd435652d5f56413f49a8ebd788c873"
+    },
+    {
+      "source": "scripts/argo/matched_topk_finish.sbatch",
+      "destination": "experiments/matched_topk/argo/matched_topk_finish.sbatch",
+      "action": "move",
+      "source_sha256": "98172de7ef142ec4fb7f814306d9fda42b886391dfd1740f2cf70580326d584e",
+      "destination_sha256": "547aff437eba242872d3cd239261fae3ffbd6bc862d0cc500f05957d4e9bb33b"
+    },
+    {
+      "source": "scripts/argo/matched_topk_k100.sbatch",
+      "destination": "experiments/matched_topk/argo/matched_topk_k100.sbatch",
+      "action": "move",
+      "source_sha256": "95c2fca8c52c55e26c52e78cc9a6c2845a1c8879de7cffc05ddb153a306b1a78",
+      "destination_sha256": "aca9199aa1d4fb9b6bac3111169d4bc1c1f005b92c731c502d5e5276755617e2"
+    },
+    {
+      "source": "scripts/argo/matched_topk_multi.sbatch",
+      "destination": "experiments/matched_topk/argo/matched_topk_multi.sbatch",
+      "action": "move",
+      "source_sha256": "2eac213693be939db46861198a4546df8fa6f3a698eda253fa2074bc9075339a",
+      "destination_sha256": "a468269aa70ef75ca2fc914894817209f30a13a25f7e088f895d2180b46180b7"
+    },
+    {
+      "source": "scripts/argo/midlayer_judges.sbatch",
+      "destination": "experiments/depth/argo/midlayer_judges.sbatch",
+      "action": "move",
+      "source_sha256": "00b82a46601b893927f1986ae7e5909fba20657b04165cdec583b03b92746799",
+      "destination_sha256": "4bf24e335908a62d3addd7889e2fd74e62f4535898e470b3f9f016b755f1ba47"
+    },
+    {
+      "source": "scripts/argo/midlayer_lane.sbatch",
+      "destination": "experiments/depth/argo/midlayer_lane.sbatch",
+      "action": "move",
+      "source_sha256": "e525b58da9b145c98c30d81c2b47799ad8bbd427da3f71c2d1be960c991129cd",
+      "destination_sha256": "e9e97f595374209889530302f75055d6750c67c410f631e4e7ee56880ac2ae8f"
+    },
+    {
+      "source": "scripts/argo/midlayer_latent_plain.sbatch",
+      "destination": "experiments/depth/argo/midlayer_latent_plain.sbatch",
+      "action": "move",
+      "source_sha256": "944629d7ab56b602c5ca1793e6ca2a7fd68752825624ca683eb6844cb42a2ed7",
+      "destination_sha256": "20e9e40dc1ed1d199afd2b2219ce633d49e26b1d24a8cd35609917a4023ad8bd"
+    },
+    {
+      "source": "scripts/argo/midlayer_probes.sbatch",
+      "destination": "experiments/depth/argo/midlayer_probes.sbatch",
+      "action": "move",
+      "source_sha256": "8571fcb3bd343aa8bf313207e01d665fed1aa828c15bc8078c3f64e77ce49e1d",
+      "destination_sha256": "e21cc10d4688418d32dcef6eabc511c329694c032964405e52bbc4c4a6d4614f"
+    },
+    {
+      "source": "scripts/argo/midlayer_probes_final.sbatch",
+      "destination": "experiments/depth/argo/midlayer_probes_final.sbatch",
+      "action": "move",
+      "source_sha256": "5d4e95d5a57eadb83e5232b951959ee19eb863aa88ece063560211599d2f5dc9",
+      "destination_sha256": "396d798bd415478c2af5266311e98d3d6ef096ac6be2ade583997e2e6d10335d"
+    },
+    {
+      "source": "scripts/argo/ne100_evals.sbatch",
+      "destination": "experiments/balancing/argo/ne100_evals.sbatch",
+      "action": "move",
+      "source_sha256": "a713a3b570540feba0cccf397cabe9055aa634bfa9a3248529337f66ea5d5daf",
+      "destination_sha256": "e7348b0118e4c1d1ee4fe6a1a9958412f07264a3c92fa604e80a16e370ddb0c3"
+    },
+    {
+      "source": "scripts/argo/ne100_kcost.sbatch",
+      "destination": "experiments/balancing/argo/ne100_kcost.sbatch",
+      "action": "move",
+      "source_sha256": "dd506cb5d794e5be6b2ba7b7032aa53a5aa238450d7af56bc23af3670d1fb9d6",
+      "destination_sha256": "8a92391fb6d908a3c6965f90568ef35135141422afc683b5c7680a54425a84c5"
+    },
+    {
+      "source": "scripts/argo/ne100_keeper.sbatch",
+      "destination": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/scripts/argo/ne100_keeper.sbatch",
+      "action": "archive",
+      "source_sha256": "4b6aac31530bff2adbffe64b89485c7cdeccf90a9a467c2fe8722764198820ee",
+      "destination_sha256": "4b6aac31530bff2adbffe64b89485c7cdeccf90a9a467c2fe8722764198820ee"
+    },
+    {
+      "source": "scripts/argo/ns100_evals.sbatch",
+      "destination": "experiments/balancing/argo/ns100_evals.sbatch",
+      "action": "move",
+      "source_sha256": "d4ceecde24426dfae0ee7b2e5e8da26d029e770606abb42cd84a7ca30e90819c",
+      "destination_sha256": "c8717a1464f604a512814a9b60b5c2a91657572ffa937029fc35777b6bcfca0c"
+    },
+    {
+      "source": "scripts/argo/ns100_kcost.sbatch",
+      "destination": "experiments/balancing/argo/ns100_kcost.sbatch",
+      "action": "move",
+      "source_sha256": "b16a7c16bf98124c7be10273a240a684fa1749d156bd7248d9944c86e8a31ea1",
+      "destination_sha256": "61056e8fd22dd3cabc5778528287ee7146f077393758f29d984904dc9345aa69"
+    },
+    {
+      "source": "scripts/argo/ns50_evals.sbatch",
+      "destination": "experiments/balancing/argo/ns50_evals.sbatch",
+      "action": "move",
+      "source_sha256": "a4c9c01b5c7d4a2909d716d394068f15e2781fa7c466d4e484c718e991e9aeed",
+      "destination_sha256": "d8af280d791187dc7a4a2de14bdc8ee6ebef57c116b986110c49dd242651bca8"
+    },
+    {
+      "source": "scripts/argo/ns50_kcost.sbatch",
+      "destination": "experiments/balancing/argo/ns50_kcost.sbatch",
+      "action": "move",
+      "source_sha256": "b9856e97a7c0ec475c439daf01809012b87eb0694b028f49794fa0566b042aa9",
+      "destination_sha256": "b57efe80e5a4f85477cc47598ed3d648ef60d73e86a6d99149bfeb5b93479d33"
+    },
+    {
+      "source": "scripts/argo/ns50_probe_bypass_pair.sbatch",
+      "destination": "experiments/balancing/argo/ns50_probe_bypass_pair.sbatch",
+      "action": "move",
+      "source_sha256": "0643934ff5d8106cf24e2589b1928278acefaff491983cba07024b1b9e92b714",
+      "destination_sha256": "8778a381579ba35bc9cc868651b25db091c536e7e39a30923b128e04e1603685"
+    },
+    {
+      "source": "scripts/argo/p85_seq_table.sbatch",
+      "destination": "experiments/concept_steering/argo/p85_seq_table.sbatch",
+      "action": "move",
+      "source_sha256": "1ebafa26fd7203efa8ff31e5394f5129d890da5c8767239697957c471fd61493",
+      "destination_sha256": "2394753a42f805a74df8b74e800d1c9fafbe4c40f0f0892128d57aacaedf9d85"
+    },
+    {
+      "source": "scripts/argo/plain_single_token.sbatch",
+      "destination": "experiments/concept_steering/argo/plain_single_token.sbatch",
+      "action": "move",
+      "source_sha256": "217fa2ac0c382b02c6a8957e4a59b5bb518c3d4d275aece3a09c1e10ea0e2b9c",
+      "destination_sha256": "3a11f05dfbe3b52c3b0bc0f7d0f27704c01f823e6b611716387864ca7eaf522c"
+    },
+    {
+      "source": "scripts/argo/preview_g4b.sbatch",
+      "destination": "experiments/paper/argo/preview_g4b.sbatch",
+      "action": "move",
+      "source_sha256": "03cff4d4d544f84d0094a31b587aff9765c2a224776810d728aab3c82be46d3d",
+      "destination_sha256": "5d9c03d6f4c85ff7b81daef0d6e7153d7bd3565b5753624db6f3b72a3772890c"
+    },
+    {
+      "source": "scripts/argo/qwen_full_table.sbatch",
+      "destination": "experiments/model_transfer/argo/qwen_full_table.sbatch",
+      "action": "move",
+      "source_sha256": "636caa1996b9785e1a1e73256d9985c6f9c8c5c92b875e9a40b6186c0ba52bd6",
+      "destination_sha256": "06f88d77d6f3f9865aa3d9cda4bc1b82cfe71a58f638f9b7f3b8ca420fb8dd63"
+    },
+    {
+      "source": "scripts/argo/qwen_run.sbatch",
+      "destination": "experiments/model_transfer/argo/qwen_run.sbatch",
+      "action": "move",
+      "source_sha256": "e22b8fcb34c3101370ad3c2b9562f855ad004543a93bb3cba43dbf2ecbfd7118",
+      "destination_sha256": "7678e621520b81c05be559b60d964672a6c091ba6c4b3fd2bd3fa53f7b22fdb3"
+    },
+    {
+      "source": "scripts/argo/qwen_seq_table.sbatch",
+      "destination": "experiments/model_transfer/argo/qwen_seq_table.sbatch",
+      "action": "move",
+      "source_sha256": "ff52130168684ba33cc601c0d65b1321d142a46e1f85b55c93356e381d0fd5e5",
+      "destination_sha256": "3830ecbcf27a8a1324cb7a7ee0ca597743b117ae07cf652daef0661a3f23e88b"
+    },
+    {
+      "source": "scripts/argo/sae_controls.sbatch",
+      "destination": "experiments/sae_comparison/argo/sae_controls.sbatch",
+      "action": "move",
+      "source_sha256": "97bb0e6db172ff5371528396008a6a5c5f753095d7e572afcc20062d6197bfcc",
+      "destination_sha256": "98bfeeff07942fcdecd20e10a24daeb814d5d207238afa6c194009015e082146"
+    },
+    {
+      "source": "scripts/argo/sae_geometry.sbatch",
+      "destination": "experiments/sae_comparison/argo/sae_geometry.sbatch",
+      "action": "move",
+      "source_sha256": "79ad43daaf3ccfde0e300c3f5519f750958c9c621b4f9bac23e2fea360ac27ca",
+      "destination_sha256": "d7e434371d3909ad50dd861bd319605832172972fa5351c63fca0b2cc84c607e"
+    },
+    {
+      "source": "scripts/argo/sae_probes.sbatch",
+      "destination": "experiments/sae_comparison/argo/sae_probes.sbatch",
+      "action": "move",
+      "source_sha256": "eb3450bba3a6c89f2d03b81ed16390b0ab150cd7d6c3bbf9a4beb6eaab344349",
+      "destination_sha256": "424b2bc6f97abf387a3f8d9d491bebc79ac1f6e6c464758a6d72936ae32c63a4"
+    },
+    {
+      "source": "scripts/argo/sae_probes_toxicity.sbatch",
+      "destination": "experiments/sae_comparison/argo/sae_probes_toxicity.sbatch",
+      "action": "move",
+      "source_sha256": "3f8fff110dfdd0cfda59f8f93f6f4314144bcc1c4b97cec895f241b7f76bc671",
+      "destination_sha256": "f01fb4562682a7b34c51ef3f8de89110f2dfd6035aa7822676ee28fb1ecd44bb"
+    },
+    {
+      "source": "scripts/argo/sae_suite.sbatch",
+      "destination": "experiments/sae_comparison/argo/sae_suite.sbatch",
+      "action": "move",
+      "source_sha256": "ca5c0b0a474a4b92ed20d290255f00ca14466c23a55b3c8950874721456d5d5a",
+      "destination_sha256": "ed63ad7523f1e08b98ad48736bd24324a423ce8ad99089f3c3eaf4e1b34213e0"
+    },
+    {
+      "source": "scripts/argo/setup.sbatch",
+      "destination": "scripts/slurm/argo_setup.sbatch",
+      "action": "move",
+      "source_sha256": "a55b47958f614cab4696b1f02148dedbccc3db9cc69e5296c02e42969f1011c2",
+      "destination_sha256": "232d088dfffbe977c45d2dd760a9e63689461153844bb16af62966784732e592"
+    },
+    {
+      "source": "scripts/argo/smoke.sbatch",
+      "destination": "scripts/slurm/argo_smoke.sbatch",
+      "action": "move",
+      "source_sha256": "2d4813b9bd378bab64dd390ae1375ae82c0fe13390c849e0a734bfb756378152",
+      "destination_sha256": "e6db62735e406a7d0e1e47d31c127aa4203b4a706eb6e33494b8695e58b87333"
+    },
+    {
+      "source": "scripts/argo/splice_cost_g4b.sbatch",
+      "destination": "experiments/paper/argo/splice_cost_g4b.sbatch",
+      "action": "move",
+      "source_sha256": "1fae4f2e791458e3dcba6965cbb9f66ec0584c9a6997521df95b7123eb0edaba",
+      "destination_sha256": "00432b6f4595a1518fd5882631ff84d6c6d7780fa486c679c26e8e7fda155209"
+    },
+    {
+      "source": "scripts/argo/splice_ppl_g4b.sbatch",
+      "destination": "experiments/paper/argo/splice_ppl_g4b.sbatch",
+      "action": "move",
+      "source_sha256": "1914de719670b683189d7d55520a4d02f1c0ab6c3ee5cad869fca2b431eec3ae",
+      "destination_sha256": "795f19601597e5a1a3a593c5ce5a5dc741a53a92b9eda279353ebffdc364aa46"
+    },
+    {
+      "source": "scripts/argo/splice_ppl_qwen.sbatch",
+      "destination": "experiments/model_transfer/argo/splice_ppl_qwen.sbatch",
+      "action": "move",
+      "source_sha256": "eee9a91c573f4f460cfd114b6a2edc7a6ee43ecad6b55ed88e51fd77b2acd15b",
+      "destination_sha256": "c658d3da4c3c7817835e82dd6194f76056fb5e56d880bf2999c70314f494b977"
+    },
+    {
+      "source": "scripts/argo/ssl_concept_prep.sh",
+      "destination": "experiments/supervised/argo/ssl_concept_prep.sh",
+      "action": "move",
+      "source_sha256": "5775de90438bbdaff40efd74f7f21c0a70ac5842c4d66ae5227b0c8030becd52",
+      "destination_sha256": "724f46d01ea3637a1ec50506aa768024d283de81017b96fca0b7d6dec678effe"
+    },
+    {
+      "source": "scripts/argo/submit_chain_control.sh",
+      "destination": "experiments/paper/argo/submit_chain_control.sh",
+      "action": "move",
+      "source_sha256": "092098243904a405adbe5fe12e52fa62a84024be04f7f161d43cab2c381f51a5",
+      "destination_sha256": "e7a38ea9a156b2120884b38e0ee8d556e314558c839ae0fbfa1037ecdc2ee052"
+    },
+    {
+      "source": "scripts/argo/train.sbatch",
+      "destination": "scripts/slurm/argo_train.sbatch",
+      "action": "move",
+      "source_sha256": "06dfdbe24d71562a29534a0fe656dbd3347c7f0861630c297f775a2e0bef9b8a",
+      "destination_sha256": "b1ea65bf6e16d3cb04fcc4b37e350b4ca4c32da276bab4b198481e64ab034d08"
+    },
+    {
+      "source": "scripts/argo/watch_jobs.py",
+      "destination": "experiments/balancing/argo/watch_jobs.py",
+      "action": "move",
+      "source_sha256": "a82aa0d47f7899f6acfc9dae7601eda84e26956e99763e2d0443b7e5af39a78f",
+      "destination_sha256": "e301f8be123695a89caa8c8335adf0d1a96fa450bc7e562f0e339fe4a07e8552"
+    },
+    {
+      "source": "scripts/delta/atlas_draws_table.sh",
+      "destination": "experiments/paper/delta/atlas_draws_table.sh",
+      "action": "move",
+      "source_sha256": "8740b9f0f8ba9860929ea1074651b4ddef18c50de36971203a685589e467035e",
+      "destination_sha256": "14aa44b0f6b48c852a1ef387db6a4957393ddeddd0b4186ec9a2c6699601470d"
+    },
+    {
+      "source": "scripts/delta/build_panel.sh",
+      "destination": "experiments/width/status/build_panel.sh",
+      "action": "move",
+      "source_sha256": "38b1b9df6201674cef5c7eaebc40dde7c87bd333c17552838370ea583ae7d6b2",
+      "destination_sha256": "b37a7a57e84d2eeb0424db265ea42417bf4a495fc80151823d2a87e6ef20c5e3"
+    },
+    {
+      "source": "scripts/delta/clean_slate.sh",
+      "destination": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/scripts/delta/clean_slate.sh",
+      "action": "archive",
+      "source_sha256": "4f185a294a744e7386dc7507dd7c364274ad117c41e2fb1455004453fccff47c",
+      "destination_sha256": "4f185a294a744e7386dc7507dd7c364274ad117c41e2fb1455004453fccff47c"
+    },
+    {
+      "source": "scripts/delta/control_conf_one.sbatch",
+      "destination": "experiments/paper/delta/control_conf_one.sbatch",
+      "action": "move",
+      "source_sha256": "b41fe26a267fa8e52ce30f138fa877cd5e3f9ab6b1a34e148a59ea4a4dd1ca88",
+      "destination_sha256": "5d82bd908bc6ad91dc82044f986a3d0ea76b83c4c56a34ecd37d7df766f755c0"
+    },
+    {
+      "source": "scripts/delta/control_extra.sbatch",
+      "destination": "experiments/paper/delta/control_extra.sbatch",
+      "action": "move",
+      "source_sha256": "0b32ee08ee68fb4872843a0b99825f138ea29cbdfd274a7f382abaccbe1f4e4e",
+      "destination_sha256": "8ac554ae3b1e40c5377c6b8bd4db3256cd866c27e55acce7de919931198caeda"
+    },
+    {
+      "source": "scripts/delta/control_tokrm_base.sbatch",
+      "destination": "experiments/paper/delta/control_tokrm_base.sbatch",
+      "action": "move",
+      "source_sha256": "8993226f23df751d6ce8052ce897e319ee4b94095ce412db89f96b86184e92fa",
+      "destination_sha256": "ddcb0123edc5fabdc49523d8e5ed1961c62a8994adeab7bc3c3ee51fd0be7891"
+    },
+    {
+      "source": "scripts/delta/corpus.sbatch",
+      "destination": "scripts/slurm/delta_corpus.sbatch",
+      "action": "move",
+      "source_sha256": "d78756e511bdc20037b6c5ec16c0e7e7ad10e0e974c511b3334b7069d7e9e7aa",
+      "destination_sha256": "9b7c0783c416709e270fcf496224a0a398719a562bc3652989609ed913ac9b68"
+    },
+    {
+      "source": "scripts/delta/env.sh",
+      "destination": "scripts/env.sh",
+      "action": "refactor_environment",
+      "source_sha256": "db0ac3cd2c09350a3345e83ee437eeccc15882001dc88f108e830d6335e0dcd4",
+      "destination_sha256": "695dad3eb11a58c951b54738e4a289b39c9abf9ff9f2e33f6f15d9f2da43db0b"
+    },
+    {
+      "source": "scripts/delta/eval.sbatch",
+      "destination": "scripts/slurm/delta_eval.sbatch",
+      "action": "move",
+      "source_sha256": "ec522d7dffb62086be67adb3a38d1a5901ef5408bc0a8115543e21f0bac60f38",
+      "destination_sha256": "5dc72e13fd5251c84744b066b0a2adde6ccad0cd07d7fe4484d7e0f3a65b89ec"
+    },
+    {
+      "source": "scripts/delta/extract.sbatch",
+      "destination": "scripts/slurm/delta_extract.sbatch",
+      "action": "move",
+      "source_sha256": "bedee5344c4c819a0374360511967e8038da195edd90b5f61635d53506bd5235",
+      "destination_sha256": "357d57f262cc41a08139483981c580b5d6d19d7e14cd24df8f4be80a950a5812"
+    },
+    {
+      "source": "scripts/delta/extract_gemma1b.sbatch",
+      "destination": "experiments/gemma_1b/delta/extract_gemma1b.sbatch",
+      "action": "move",
+      "source_sha256": "6843ff3527379b1046658c3e887e5e8b174582e0b26eb01c0ea87996a58a93b4",
+      "destination_sha256": "b1b0b28f67225f1f8295c377955e78f736b6b19978cf0981477a0e26d0978fcb"
+    },
+    {
+      "source": "scripts/delta/extract_gemma4b.sbatch",
+      "destination": "experiments/paper/delta/extract_gemma4b.sbatch",
+      "action": "move",
+      "source_sha256": "368327415e0d329e63f84c8e74b7fdc789171d3f3b7739d8b9b0658138d32f80",
+      "destination_sha256": "3dfd0b65ffbbc1c304b5f74bb6d9ff73ec86e83165ad0a73f3932ac0735af051"
+    },
+    {
+      "source": "scripts/delta/extract_sampled.sbatch",
+      "destination": "scripts/slurm/delta_extract_sampled.sbatch",
+      "action": "move",
+      "source_sha256": "ae59632bcd6921d790899a4c9c32a92443b3455d52d234122aa8d6af3ee51a84",
+      "destination_sha256": "d005a2a39a104b7dd733c4c0ee6478e154c27b3369131872b478094bb6bb6ffb"
+    },
+    {
+      "source": "scripts/delta/link_data.sh",
+      "destination": "scripts/link_data.sh",
+      "action": "move",
+      "source_sha256": "174f1de8268fc8b0a2c2ec9a87aa220616c588f86bb45767f1a423199803dfb2",
+      "destination_sha256": "2c3c1e271c6885a62bb11d4eaaf519e67ac39d6db38978267c63ddd76312c0e7"
+    },
+    {
+      "source": "scripts/delta/organize_delta_results.sh",
+      "destination": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/scripts/delta/organize_delta_results.sh",
+      "action": "archive",
+      "source_sha256": "46581289a18e61aec0bffb8fa1b7b91ab85254a34dc0cf7f5f0a56941d3d4a14",
+      "destination_sha256": "46581289a18e61aec0bffb8fa1b7b91ab85254a34dc0cf7f5f0a56941d3d4a14"
+    },
+    {
+      "source": "scripts/delta/panel_data.py",
+      "destination": "experiments/width/status/panel_data.py",
+      "action": "move",
+      "source_sha256": "efae8e1ede85e2702342ff9047aab4d190c13ddc8824ff622515f45b71257708",
+      "destination_sha256": "b05735930ccbfd0a284309ed0f75ff56f26a4a547c9f47c06ff86f03a02bb4df"
+    },
+    {
+      "source": "scripts/delta/panel_template.html",
+      "destination": "experiments/width/status/panel_template.html",
+      "action": "move",
+      "source_sha256": "fac0ecc901bf9c8e7da43bb992660f1e987e3bf51bd3512c3408631d4d95c986",
+      "destination_sha256": "fac0ecc901bf9c8e7da43bb992660f1e987e3bf51bd3512c3408631d4d95c986"
+    },
+    {
+      "source": "scripts/delta/panel_usage.py",
+      "destination": "experiments/width/status/panel_usage.py",
+      "action": "move",
+      "source_sha256": "b5d369cd480c341696fc325df43e915321e9cc4da9b6d65a32eb8082096a5201",
+      "destination_sha256": "22f8f660eafb4f52c6df4c72df690bba9c012ed762df7c6e0b9034d17b8323c5"
+    },
+    {
+      "source": "scripts/delta/py",
+      "destination": "scripts/py",
+      "action": "move",
+      "source_sha256": "1a5c931d5c3074b87d7aae192b41e92fd97baae027cda15fdf53ae43f21004fd",
+      "destination_sha256": "800fa135cf019839c5f03cdb1287b81e636d0afef0e076a271e268aaa11b4ee9"
+    },
+    {
+      "source": "scripts/delta/report/build_report.py",
+      "destination": "experiments/width/analysis/build_report.py",
+      "action": "move",
+      "source_sha256": "a81e0889f1c8eb7e6634e5c0ee1208e46dc11e898fd1f528b52710e828f4429a",
+      "destination_sha256": "9585bce4c30c39b95fe47817ac77debd0f3ed9880e142ce4057d260515b53b31"
+    },
+    {
+      "source": "scripts/delta/report/extract_report.py",
+      "destination": "experiments/width/analysis/extract_report.py",
+      "action": "move",
+      "source_sha256": "d26bdf87703fa215831532ae47a85d771353b52d964e29db0fb451942e326aae",
+      "destination_sha256": "6f406ba5815ce9028b3e5b8b3ab7a3711d45cf7574a325c8cb7df4907a22e3e4"
+    },
+    {
+      "source": "scripts/delta/setup.sh",
+      "destination": "scripts/setup_cluster.sh",
+      "action": "move",
+      "source_sha256": "72c881e533086e8e713935d1f7d58fb016b518e3a469e9817764124acd5d8c7f",
+      "destination_sha256": "5e083b724631fc8cf5744fa3a411cf1771857aae0fbe910d1f3f86555e8ed471"
+    },
+    {
+      "source": "scripts/delta/sheet.sbatch",
+      "destination": "scripts/slurm/delta_sheet.sbatch",
+      "action": "move",
+      "source_sha256": "2c483329e7f56f6777d55a008da399f4e754d9b228ff66f067eea823160638ae",
+      "destination_sha256": "a3162deec1f06e5a32b91449ae275e594ca442fb99449e332ee12c96fa5cfa77"
+    },
+    {
+      "source": "scripts/delta/sheet_staged.sbatch",
+      "destination": "scripts/slurm/delta_sheet_staged.sbatch",
+      "action": "move",
+      "source_sha256": "e92d0784bad48686a8ebf2721f90fea6b0831f63bdf23167cfd7c291c3662efb",
+      "destination_sha256": "1eb4c973ede197574c575c09e38cbb5a5cd93cd3630438156c9b0934061afaef"
+    },
+    {
+      "source": "scripts/delta/site.sh",
+      "destination": "configs/sites/delta.sh",
+      "action": "refactor_environment",
+      "source_sha256": "5cef5160da1e6242e7797cb71e5bbdfa5048853a9b565624f8b8cf0711ec0301",
+      "destination_sha256": "c3bef3025234c414a6fe5128f0b7e93ccf3ffa97224cc98879a14549c2b48781"
+    },
+    {
+      "source": "scripts/delta/ssl_concepts.sbatch",
+      "destination": "experiments/supervised/delta/ssl_concepts.sbatch",
+      "action": "move",
+      "source_sha256": "3391b3912614ea88fdebb9c79598b3f4eb234118477db7b8640d84b48580318a",
+      "destination_sha256": "423db5aed31ed17c592ad92fa5022c52379803cee276e8b5045c197f92eb3dfb"
+    },
+    {
+      "source": "scripts/delta/ssl_concepts_error_preserved.sbatch",
+      "destination": "experiments/supervised/delta/ssl_concepts_error_preserved.sbatch",
+      "action": "move",
+      "source_sha256": "4b6c4f97f1c7a983aadfb2b45e3de5a373871b4e37a963d6add4ae3515515b79",
+      "destination_sha256": "3375adc3d313b677e8f01911244fb47707e1c5cd419993ed38c537a4c2d3ed51"
+    },
+    {
+      "source": "scripts/delta/submit_delta_evals.sh",
+      "destination": "experiments/paper/delta/submit_delta_evals.sh",
+      "action": "move",
+      "source_sha256": "c9ee87efc2e8c009a58eb769cacad04616bfce49157b2d5eb9560c33aa8626f0",
+      "destination_sha256": "e9ae14aa31c02f033581f9f1ca11276ca8ceec417ab87d2d7796b0f6bd9ce590"
+    },
+    {
+      "source": "scripts/delta/sugarcrepe_gemma_k8000.sbatch",
+      "destination": "experiments/compositionality/delta/sugarcrepe_gemma_k8000.sbatch",
+      "action": "move",
+      "source_sha256": "ae36ddd4334f330bf012e3f03edd107ce58e0209b6dffc67d6c10afab0732d7d",
+      "destination_sha256": "6822178d3f3c139598d421fc026e6caaf7ff518b80382ff5651f03d174abfbc2"
+    },
+    {
+      "source": "scripts/delta/sugarcrepe_geometry.sbatch",
+      "destination": "experiments/compositionality/delta/sugarcrepe_geometry.sbatch",
+      "action": "move",
+      "source_sha256": "b6aa1a19cb7fe638a1dd480106f76a88ce0f0413fe44ba52386b1e85c0002d4d",
+      "destination_sha256": "53d111129dc4763c162edaefd7dd237b98d760c91102b0416febbea287c748eb"
+    },
+    {
+      "source": "scripts/delta/train.sbatch",
+      "destination": "scripts/slurm/delta_train.sbatch",
+      "action": "move",
+      "source_sha256": "28d8335fbea0d68299173ab8ed8f5d35ba7632db72fa184f213555d8cfe34142",
+      "destination_sha256": "430cc41829994dc88cabb3c6925f5b9e7e3c6713d9f1d15fbd9784de28bdccfa"
+    },
+    {
+      "source": "scripts/delta/train_halfbias.sbatch",
+      "destination": "experiments/token_bypass/delta/train_halfbias.sbatch",
+      "action": "move",
+      "source_sha256": "6a112b26402a2b1cf2297aea285300e7cbdc8bb4264aea499b196f2191f2ee0a",
+      "destination_sha256": "ea8ba3856ecf6ccb2c2f240cee31f1ccf6d24b4832bba0b1ec9b90d3878d5e91"
+    },
+    {
+      "source": "scripts/delta/verify.sbatch",
+      "destination": "scripts/slurm/delta_verify.sbatch",
+      "action": "move",
+      "source_sha256": "030d7b38a44036fc892b28ce0602de98ee838b05d0dca5d6a10032981620f8c8",
+      "destination_sha256": "1c1113ee0171034bf2f3a2dd0dac22ec769d509a7c933e129ebc9bdaf87d1d22"
+    },
+    {
+      "source": "scripts/gpt2/argo.sbatch",
+      "destination": "experiments/gpt2/argo.sbatch",
+      "action": "move",
+      "source_sha256": "373d06fbe8d924df525c80f252621860faac939088883d3d22ce23d35be3a4b2",
+      "destination_sha256": "8895f6d961783202b686ce0de727b7b114935b1d214523cb61190b653a2e869a"
+    },
+    {
+      "source": "scripts/gpt2/argo_env.sh",
+      "destination": "experiments/gpt2/argo_env.sh",
+      "action": "move",
+      "source_sha256": "e426657e13a1fe6ebf97ae1c89671a28e600290886ca4b43f4b9287d1e1af091",
+      "destination_sha256": "fa8662607f9ba3b2a601f31cf0f28a1b9605c2643f49480dc4528ec7d9596fbc"
+    },
+    {
+      "source": "scripts/gpt2/concurrency.py",
+      "destination": "experiments/gpt2/concurrency.py",
+      "action": "move",
+      "source_sha256": "f12ba7c4679007c62d3565b87ac1af740ef47520db964a22853fda2dbc8af36c",
+      "destination_sha256": "a221e54b8efb1d53438549b66e3b9505cf304a2498ce88695e00b6e6c754fe06"
+    },
+    {
+      "source": "scripts/gpt2/corpus.sbatch",
+      "destination": "experiments/gpt2/corpus.sbatch",
+      "action": "move",
+      "source_sha256": "a2d8cfb6be52b9d4e0110e7e05af1d33f2295232fd61db471409625e46c185b0",
+      "destination_sha256": "d1a5b716472bd32223ef8403a76e5283dc67016806a06136b6d89977072d8da6"
+    },
+    {
+      "source": "scripts/gpt2/env.sh",
+      "destination": "experiments/gpt2/env.sh",
+      "action": "move",
+      "source_sha256": "4a641816985bf45a971cf0ea85bb809f853b40020d2e03debc61dbf15435a388",
+      "destination_sha256": "9fef69fbac126bdc3a027495649fa493d9113d4c7c1e2664fc242a056c4c83bf"
+    },
+    {
+      "source": "scripts/gpt2/evaluate.py",
+      "destination": "experiments/gpt2/evaluate.py",
+      "action": "move",
+      "source_sha256": "f86a17a1c58376c8d784d9303b52d9c0822700abf302dbe70f6f007fcb437f36",
+      "destination_sha256": "d662c91840168e48c2a7100af04ff618f3465ad7edc4298326aaf30aa8d6b2ee"
+    },
+    {
+      "source": "scripts/gpt2/evaluate.sh",
+      "destination": "experiments/gpt2/evaluate.sh",
+      "action": "move",
+      "source_sha256": "fdb6f87b072dc84ff0be4559fbe0c69252bf9d07f4f6a716ea411af63320c176",
+      "destination_sha256": "ad58885546be7c69eea5b480b50a85a9cee93f01d05a463181566523ade03552"
+    },
+    {
+      "source": "scripts/gpt2/extract.sbatch",
+      "destination": "experiments/gpt2/extract.sbatch",
+      "action": "move",
+      "source_sha256": "779174d176bf783f3718c77f6aebb661896c1f8b8da243a8a4f8241269eb7872",
+      "destination_sha256": "85c28ce0a2f540993c84c25aa06ee8543f7086d32eb26bfef103c4266e1b400d"
+    },
+    {
+      "source": "scripts/gpt2/lifecycle.py",
+      "destination": "experiments/gpt2/lifecycle.py",
+      "action": "move",
+      "source_sha256": "e5980cbd3e839598764ad2cca47e12bac11f6e0a2d915a1d4dba22b1e4d87116",
+      "destination_sha256": "31af0c775d23b41826e2f3d4e8d752fe62caaf6ac25a68cfa45f19430224705a"
+    },
+    {
+      "source": "scripts/gpt2/recover_evals.py",
+      "destination": "experiments/gpt2/recover_evals.py",
+      "action": "move",
+      "source_sha256": "84d27231c7cae40ea113a4f360a4b7748b537e5cc8655f9a75b1245c3032632e",
+      "destination_sha256": "fb3ff9f839471d00e0e550d459141c093ce0360cf74add28d55e4d7204dc4d09"
+    },
+    {
+      "source": "scripts/gpt2/recover_evals.sbatch",
+      "destination": "experiments/gpt2/recover_evals.sbatch",
+      "action": "move",
+      "source_sha256": "1664fe0aaa93ded6fa08fd875eb617b3ec9387b095a4342027dcd8d3c36e95e9",
+      "destination_sha256": "6e2d1941edbb7267740aff5ebbae8983e21c5416309f60ae6c5182bf824ebfa0"
+    },
+    {
+      "source": "scripts/gpt2/run_gpt_run.py",
+      "destination": "experiments/gpt2/run_gpt_run.py",
+      "action": "move",
+      "source_sha256": "324e4083f2483037ca73854e70cffc199cf27adce5f5bb0ab5a347f53d776969",
+      "destination_sha256": "06c4243acb13739e4df27cd0398b58c70027106b8d09103de819e8af3667e21a"
+    },
+    {
+      "source": "scripts/gpt2/smoke_gpu.py",
+      "destination": "experiments/gpt2/smoke_gpu.py",
+      "action": "move",
+      "source_sha256": "13e239e8ded31183af7661c09fe45b2ac2205e32d8d0b23a00f13d5b56b5e6a0",
+      "destination_sha256": "13e239e8ded31183af7661c09fe45b2ac2205e32d8d0b23a00f13d5b56b5e6a0"
+    },
+    {
+      "source": "scripts/gpt2/status.py",
+      "destination": "experiments/gpt2/status.py",
+      "action": "move",
+      "source_sha256": "b4d3c1d9b393f7735e87476f2e27289a891967e3a88f3569c502ee3e62c2724c",
+      "destination_sha256": "b4d3c1d9b393f7735e87476f2e27289a891967e3a88f3569c502ee3e62c2724c"
+    },
+    {
+      "source": "scripts/gpt2/submit.py",
+      "destination": "experiments/gpt2/submit.py",
+      "action": "move",
+      "source_sha256": "ce4a95b6a6b59ef41d8e348ee142234c0bfc71aa1a1ae85b7db428b7d62417d5",
+      "destination_sha256": "db768a80cc8f3ad2cb5dd739e739080324959abbfa1a8afd61e599819321557b"
+    },
+    {
+      "source": "scripts/gpt2/submit_argo.py",
+      "destination": "experiments/gpt2/submit_argo.py",
+      "action": "move",
+      "source_sha256": "12c4964058e682c727af4a29a198f9a0d51a15c91bbe1c30de810e327135efce",
+      "destination_sha256": "c2b2c822ad41f82d2731c2584c607bbca479df4f2e313792ec2645e69292d2c8"
+    },
+    {
+      "source": "scripts/gpt2/train.sbatch",
+      "destination": "experiments/gpt2/train.sbatch",
+      "action": "move",
+      "source_sha256": "e0390a43c2cdbf4a831e360c876bc7d606e5bc6871091542a9eb9afd2cef2640",
+      "destination_sha256": "ac4a18f710b499f76cb8866ebca9013bff2b242c4c5ab02ef1f46e0a4ef028df"
+    },
+    {
+      "source": "scripts/gpt2/watch_remote.py",
+      "destination": "experiments/gpt2/watch_remote.py",
+      "action": "move",
+      "source_sha256": "6fd45581a1e53a81206de29d3dd6ba617b7d08ef72e719ccea671963561fa7f7",
+      "destination_sha256": "b638f4846c877ebc4d8cd13c7285829175ca4c28f2480ee26e1b1824a5e5ae58"
+    },
+    {
+      "source": "scripts/make_seed_config.py",
+      "destination": "geoae/workflow/seed_config.py",
+      "action": "move",
+      "source_sha256": "59eb8641c4c3c59f8b1ba7e6aa5fffa26224d220c8b3675260f075de3abb5177",
+      "destination_sha256": "9e4c0466e29625797a0cb27a75fc827cfb5b92bf58cc31e12f15cb56499d507c"
+    },
+    {
+      "source": "scripts/midlayer/campaign.py",
+      "destination": "experiments/depth/campaign.py",
+      "action": "move",
+      "source_sha256": "6fc5e9384dab752ae3964f682c196973ba0f282a06abad22b02e6c03411a9a91",
+      "destination_sha256": "7cdfd3dec759f720eafd083f43cb5613a70196bccc6014345d70e6a324c22314"
+    },
+    {
+      "source": "scripts/midlayer/dataset.py",
+      "destination": "experiments/depth/dataset.py",
+      "action": "move",
+      "source_sha256": "fb48c0c11508aa97cee45ca50d8f6077f79048f3944287cc814b2984081fad47",
+      "destination_sha256": "6abc2e47e6c5f9c597ea0eba448de8cc65a5a94983ec774c3fc6c0c26dbe70db"
+    },
+    {
+      "source": "scripts/midlayer/evaluate.py",
+      "destination": "experiments/depth/evaluate.py",
+      "action": "move",
+      "source_sha256": "9449e17bc1fefbb34562229e67f670f0eb6929dc073c04c5f6a355b19071a1dd",
+      "destination_sha256": "ccd58e4c0863b1488d571969dff55184065253e0c300c387e056d4371056cf01"
+    },
+    {
+      "source": "scripts/midlayer/report.py",
+      "destination": "experiments/depth/report.py",
+      "action": "move",
+      "source_sha256": "433f007de6bda7cefe944bd2cdcfc4dbf5537beefbaa50fb85cb802a8e320134",
+      "destination_sha256": "530557e1bd5f1e6d174882ced1aba95ea7ca18d95f1aff317c20596fcdd39f15"
+    },
+    {
+      "source": "scripts/midlayer/run.py",
+      "destination": "experiments/depth/run.py",
+      "action": "move",
+      "source_sha256": "64ebc05d99c7c6de51b8cc72d6c098301dc4413126790f8116d987415391646b",
+      "destination_sha256": "e77336cbe44ae4cd14329fee87d6524e627e7d7618fb0dc2167dc405d2c721c0"
+    },
+    {
+      "source": "scripts/midlayer/run.sbatch",
+      "destination": "experiments/depth/run.sbatch",
+      "action": "move",
+      "source_sha256": "29c72c35ff68649280369b1559a273ac648fa0e22e640ad76dd5076828648750",
+      "destination_sha256": "e0575e0ae1fe72068a1525300382a81784591207c3d7ca3c60ab97bd8f65255c"
+    },
+    {
+      "source": "scripts/midlayer/train_gemma4b.sh",
+      "destination": "experiments/depth/train_gemma4b.sh",
+      "action": "move",
+      "source_sha256": "be7c7b806d38250dcf93f2a496c483e4f459ff545cdafcdf177475acacbc6ee9",
+      "destination_sha256": "4783423a9071765dd4b5f19abd78281f40449a8706d1e5cf84fbccc222984f33"
+    },
+    {
+      "source": "scripts/midlayer/train_llama.sh",
+      "destination": "experiments/depth/train_llama.sh",
+      "action": "move",
+      "source_sha256": "adfdc4c2a81ac4efc2a453c3c4bfcfc745139391493797b98ce718943080f7d0",
+      "destination_sha256": "f9a29cfc86cfdcb35abea91976d7e60ee02bee81191250aa7fbae6a86fbad685"
+    },
+    {
+      "source": "scripts/qwen/submit.py",
+      "destination": "experiments/model_transfer/qwen/submit.py",
+      "action": "move",
+      "source_sha256": "59c5e712c4e91bcac67ce8fe2a00ebd6968d575d6634a9b20df58d09cae3019b",
+      "destination_sha256": "a0c98978fc6e7e610cfa368f6b8fc920eabe0f653ee95c49e252e62ed3ded308"
+    },
+    {
+      "source": "scripts/remote/__pycache__/import_project_chats.cpython-312.pyc",
+      "destination": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/scripts/remote/__pycache__/import_project_chats.cpython-312.pyc",
+      "action": "archive",
+      "source_sha256": "ce4897bc9f6fcd98c1ca5593d406e0d4587ef73c39c00455d92c779673e0ba6a",
+      "destination_sha256": "ce4897bc9f6fcd98c1ca5593d406e0d4587ef73c39c00455d92c779673e0ba6a"
+    },
+    {
+      "source": "scripts/remote/control_conf_one.sh",
+      "destination": "experiments/paper/remote/control_conf_one.sh",
+      "action": "move",
+      "source_sha256": "147f7f447f3a2861f23dd2a3ff7be143f9a1c47b358f0a1edce5d0f55534cc3d",
+      "destination_sha256": "698d362ac4f63f2000bf831097bdaee7f5c046208ac3241f365bfd031f061d35"
+    },
+    {
+      "source": "scripts/remote/env.sh",
+      "destination": "configs/sites/local.sh",
+      "action": "move",
+      "source_sha256": "a9a116ffdcbbe18bb9802389f8021c83fb7e6aac3fde6517ee0bc2c92de590f1",
+      "destination_sha256": "c70716c6b2711859b08ac5fe27d6314a0b25d3d0c4b9aca22b63c776729e6ce8"
+    },
+    {
+      "source": "scripts/remote/fetch_kit.sh",
+      "destination": "experiments/token_bypass/portable/fetch_kit.sh",
+      "action": "move",
+      "source_sha256": "300d57b9e750bdefc46009685a4b8e83e558d2cd924b01199379032db5305e47",
+      "destination_sha256": "2a1b5d4ea512c1b6a2ef21b6f5cc4088f27f530cfb4b194b6328610dd0c1ec23"
+    },
+    {
+      "source": "scripts/remote/import_project_chats.py",
+      "destination": "tools/provenance/import_project_chats.py",
+      "action": "move",
+      "source_sha256": "029805b343912be7b54ed1b2e8205f69f8e8010d4937d34d3dce505b13dded81",
+      "destination_sha256": "029805b343912be7b54ed1b2e8205f69f8e8010d4937d34d3dce505b13dded81"
+    },
+    {
+      "source": "scripts/remote/pack_kit.sh",
+      "destination": "experiments/token_bypass/portable/pack_kit.sh",
+      "action": "move",
+      "source_sha256": "617eb09585c463700ef8d051a09adca467844c5e7a553b46f3a271e084a63231",
+      "destination_sha256": "4ce43cacb25237eba23aaf246aa6a38f008afa769e7629f7a39610cdcdb62ddd"
+    },
+    {
+      "source": "scripts/remote/qwen_control_one.sh",
+      "destination": "experiments/paper/remote/qwen_control_one.sh",
+      "action": "move",
+      "source_sha256": "13a98d925ee7880dd0636f77fe25390ff36a97c835450693406da855c66b42ac",
+      "destination_sha256": "e8fcbd6068cd0d214e8f918697f4c9c2ca47c641877a8cd8119127d03ec89c81"
+    },
+    {
+      "source": "scripts/remote/run_agnews_control.sh",
+      "destination": "experiments/paper/remote/run_agnews_control.sh",
+      "action": "move",
+      "source_sha256": "d4fd7fabbcc066d4432353cfe2a59d423399cfe380deb3575084eecaab03f1f9",
+      "destination_sha256": "f90e495539376aa47a616217f10a5b1375a838c3ad1fd7c30f4f64d55d629b91"
+    },
+    {
+      "source": "scripts/remote/run_control_conf.sh",
+      "destination": "experiments/paper/remote/run_control_conf.sh",
+      "action": "move",
+      "source_sha256": "09783e66ae6c29c2cc4d7534c7382867cafd8adfe1b8a3fb411fcdcc2eec0764",
+      "destination_sha256": "e032be4a777c437ee1bd0a5427b53792a0a7cc6f0885e39271c762a0066f5b11"
+    },
+    {
+      "source": "scripts/remote/run_control_extra.sh",
+      "destination": "experiments/paper/remote/run_control_extra.sh",
+      "action": "move",
+      "source_sha256": "84a00387ce96fbe18aa68017c819e768ef247f01e22a1412647fb99d6c189829",
+      "destination_sha256": "b597e46e892c6730f127a878e833836804f5c6c8d306a7f7a164ba33da3b370d"
+    },
+    {
+      "source": "scripts/remote/run_gemma4b.sh",
+      "destination": "experiments/paper/remote/run_gemma4b.sh",
+      "action": "move",
+      "source_sha256": "b93e001b735c624cf14c41db4000a742bf15438718459fe30bf084389bea7f61",
+      "destination_sha256": "8509aac5cd7cf1d79e4cfc3e7fb49de2cedfd25d789c9a4340730a69c68c8c1e"
+    },
+    {
+      "source": "scripts/remote/run_splice_ppl_box.sh",
+      "destination": "experiments/paper/remote/run_splice_ppl_box.sh",
+      "action": "move",
+      "source_sha256": "3f5687237e4dbc5bf1a81c3dce1ab7fd44c446728ee195c956b3b40e090ebd67",
+      "destination_sha256": "044a99ae99a56f90acf99d04e6ee7c8dcd46b24d3414981f14333e9169c552ec"
+    },
+    {
+      "source": "scripts/remote/setup.sh",
+      "destination": "experiments/token_bypass/portable/setup_legacy.sh",
+      "action": "move",
+      "source_sha256": "fe05b89be93867ab1247b8b689f249408fc7578e843841d113189b2df934df47",
+      "destination_sha256": "7db8484312b1c988371efabc1be1e69642c2f25796ab2fdfa96476196c88b1fe"
+    },
+    {
+      "source": "scripts/remote/setup_laptop.sh",
+      "destination": "scripts/setup_laptop.sh",
+      "action": "move",
+      "source_sha256": "6728e2463efe95902ea26fbd02ca35d920fede644265d7f4e849938fe4dd0b9f",
+      "destination_sha256": "ff02088be22d17989f25558cfe04ec35d153920f67ce578e406bac94ece6129a"
+    },
+    {
+      "source": "scripts/remote/train_decoderonly.sh",
+      "destination": "experiments/token_bypass/remote/train_decoderonly.sh",
+      "action": "move",
+      "source_sha256": "d0dcb37f726d06204a3885e8d935a5bd62321175c3f0d635f860c3fb75aa61ea",
+      "destination_sha256": "3c5b32ac47540112edd729aaf3fc46cf1d6332a93c7cbd164e23cbc5ff7cfde2"
+    },
+    {
+      "source": "scripts/repair_gemma_concept_cache.py",
+      "destination": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/scripts/repair_gemma_concept_cache.py",
+      "action": "archive",
+      "source_sha256": "ebfeb8626024bc12faba9fa42fba7d99626bd15f7513074f48da629ced0332dd",
+      "destination_sha256": "ebfeb8626024bc12faba9fa42fba7d99626bd15f7513074f48da629ced0332dd"
+    },
+    {
+      "source": "scripts/run_sampled_ae.sh",
+      "destination": "experiments/data_sampling/scripts/run_sampled_ae.sh",
+      "action": "move",
+      "source_sha256": "2fbe30f141ff7efeaf62f4938fb3ac9e8fff5d7356175ec2744daaca08ce8948",
+      "destination_sha256": "488cd09af5eef186c11114bf09da43bb47ce9c249113a42ee389dbba3bbe5c07"
+    },
+    {
+      "source": "scripts/scale_token_bias.py",
+      "destination": "geoae/extraction/token_bias_scale.py",
+      "action": "move",
+      "source_sha256": "f82a3b52e5aabc348cddb2b016bdbfabe64f6916b663811f3b6640a55dedd641",
+      "destination_sha256": "f82a3b52e5aabc348cddb2b016bdbfabe64f6916b663811f3b6640a55dedd641"
+    },
+    {
+      "source": "scripts/status/refresh_status.sh",
+      "destination": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/scripts/status/refresh_status.sh",
+      "action": "archive",
+      "source_sha256": "2cc01da0c2ba49ad7bd72b6b97685896535faf5454db141ff9b001459d617397",
+      "destination_sha256": "2cc01da0c2ba49ad7bd72b6b97685896535faf5454db141ff9b001459d617397"
+    },
+    {
+      "source": "scripts/status/status_loop.sh",
+      "destination": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/scripts/status/status_loop.sh",
+      "action": "archive",
+      "source_sha256": "c93eb4a8929ebeff52ff940c4d2e4feb617da02b048edec3142aefe69fe4836b",
+      "destination_sha256": "c93eb4a8929ebeff52ff940c4d2e4feb617da02b048edec3142aefe69fe4836b"
+    },
+    {
+      "source": "logs/dense_summary.py",
+      "destination": "experiments/balancing/analysis/dense_summary.py",
+      "action": "move",
+      "source_sha256": "97c4436036e20548da020a0a653153cf4daf102b5996217af3ffdb569dbb456d",
+      "destination_sha256": "d8ce9a2052abbe25c802848908206ec89c465561efdc744cef86e19c9406c43a"
+    },
+    {
+      "source": "logs/g4b_final_config_from_ckpt.yaml",
+      "destination": "experiments/paper/configs/recovered/g4b_final_config_from_ckpt.yaml",
+      "action": "move",
+      "source_sha256": "e436d0cde36323a2efe90d37c02cea8cc1b1b1980ef67bc6a91479f62c3afa6b",
+      "destination_sha256": "e436d0cde36323a2efe90d37c02cea8cc1b1b1980ef67bc6a91479f62c3afa6b"
+    },
+    {
+      "source": "logs/g4b_rest.sh",
+      "destination": "experiments/paper/remote/g4b_rest.sh",
+      "action": "move",
+      "source_sha256": "74a156cd16f1c97ab45791a2e50aeffd89f15a7fb27839706f288f0bb99af153",
+      "destination_sha256": "2374ca7ef6215a957e40ea85e7d374fb27210828f353b528cbd92928a2d9b9f4"
+    },
+    {
+      "source": "logs/gemma_evals.sh",
+      "destination": "experiments/gemma_1b/remote/gemma_evals.sh",
+      "action": "move",
+      "source_sha256": "de853aa3cb5bda0476f18580ab66d1d8a1acb139b8aea1f1f6c0d0730d4e11ea",
+      "destination_sha256": "c22972dff91f3fc63c78a3d64124ba106b5e28770f8ab023b7ed8e17d9ec2fb7"
+    },
+    {
+      "source": "logs/gemma_fix2.sh",
+      "destination": "experiments/gemma_1b/remote/gemma_fix2.sh",
+      "action": "move",
+      "source_sha256": "720f3bc538a820314b24bbfbd1547f602cc40548401be22040c31788cdf7e488",
+      "destination_sha256": "a43942b6e41eddfd91fe312a61eec2990d3c111d46fe9e0536b8f249ad2a52c3"
+    },
+    {
+      "source": "logs/gemma_fix_interventions.sh",
+      "destination": "experiments/gemma_1b/remote/gemma_fix_interventions.sh",
+      "action": "move",
+      "source_sha256": "2e538d7fe5733987ebe77b472828e79730b29ff5766d418d2d73bd69e0ac2350",
+      "destination_sha256": "00a03d072daa02e5a4d0a0f0d31c8d82b808726e8b5f37478ef2986888cf158b"
+    },
+    {
+      "source": "logs/gemma_run.sh",
+      "destination": "experiments/gemma_1b/remote/gemma_run.sh",
+      "action": "move",
+      "source_sha256": "5111cfc7fce5e934115b23dcb8188a127483a406c662eec2d6d592fb32e3658d",
+      "destination_sha256": "1cd5f50ce9dd8cb2b6b31be9c2ce707a7f0f5d23ebbe3cb649760b75d916823e"
+    },
+    {
+      "source": "logs/k4000_more.sh",
+      "destination": "experiments/cluster_count/remote/k4000_more.sh",
+      "action": "move",
+      "source_sha256": "5e0ad1b2c52eb0c0c1281fae476956bf1624f5558d2f6a56a84b3d955be3df73",
+      "destination_sha256": "7e80663b80b2d39aeebbc30d67306bdd76fec054f91f869a6ec09915d2e8e542"
+    },
+    {
+      "source": "logs/ne100_keeper.sh",
+      "destination": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/logs/ne100_keeper.sh",
+      "action": "archive",
+      "source_sha256": "4b6aac31530bff2adbffe64b89485c7cdeccf90a9a467c2fe8722764198820ee",
+      "destination_sha256": "4b6aac31530bff2adbffe64b89485c7cdeccf90a9a467c2fe8722764198820ee"
+    },
+    {
+      "source": "logs/nmi_anatomy.py",
+      "destination": "experiments/balancing/analysis/nmi_anatomy.py",
+      "action": "move",
+      "source_sha256": "70bc9afebb4f19525093b6f05fb280e1fa1753e748fc8d0e45f6828f4813d249",
+      "destination_sha256": "c7a4d0cd7afb744add9a6f5035c328bdc82c0c824365d10e804f488dab56607b"
+    },
+    {
+      "source": "logs/patch_keep10_20261012.py",
+      "destination": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/logs/patch_keep10_20261012.py",
+      "action": "archive",
+      "source_sha256": "a0f93f2826214fc827426ef73b861e832f8dd2caf994f3f3f6681fbc5a1b2685",
+      "destination_sha256": "a0f93f2826214fc827426ef73b861e832f8dd2caf994f3f3f6681fbc5a1b2685"
+    },
+    {
+      "source": "logs/patch_nobal_20261012.py",
+      "destination": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/logs/patch_nobal_20261012.py",
+      "action": "archive",
+      "source_sha256": "583de10ffac4f18c63f99a574c75e4f2ee8ed00037f9e2f620dcfcc44021ca00",
+      "destination_sha256": "583de10ffac4f18c63f99a574c75e4f2ee8ed00037f9e2f620dcfcc44021ca00"
+    },
+    {
+      "source": "logs/purity_check.py",
+      "destination": "experiments/paper/analysis/purity_check.py",
+      "action": "move",
+      "source_sha256": "c45f29afa18c1b419aefe017e3a28a16e4a569b7a0c19ca68784295f33d8a63e",
+      "destination_sha256": "7dff0241eb86d4b27315305d13762fb1f4b8beb57ebaba1c96d8d6d65f5a65ed"
+    },
+    {
+      "source": "logs/run_abl_g4b.sh",
+      "destination": "experiments/regularization/remote/run_abl_g4b.sh",
+      "action": "move",
+      "source_sha256": "c610691e87f70b4153ab0180a9daff624b7758b5c23f0aec5f1343be869f316c",
+      "destination_sha256": "a1b2d7e58cc46446341573f700cff2c865716143f77c8f706081cdbc9bff1ef6"
+    },
+    {
+      "source": "logs/run_biasbios_probe.sh",
+      "destination": "experiments/paper/remote/run_biasbios_probe.sh",
+      "action": "move",
+      "source_sha256": "4e7ea8ca468fbbf33e2230f256ccc52d47898ced2b93b9e30d767d0865b02db3",
+      "destination_sha256": "16ba11a5961f2864a4c75a4414d91cb8353aabf16d50ca471cbc469a923d56e1"
+    },
+    {
+      "source": "logs/run_csteer_k.sh",
+      "destination": "experiments/cluster_count/remote/run_csteer_k.sh",
+      "action": "move",
+      "source_sha256": "578ca351ebcdebb4c908b770e17a4562648e9252338788cffc1fd31c1c9743dd",
+      "destination_sha256": "12d4e9203a29eedd89dd685a6145c101888710f9c78becb7463f20edcbe7c7d8"
+    },
+    {
+      "source": "logs/run_csteer_llama_plain.sh",
+      "destination": "experiments/concept_steering/remote/run_csteer_llama_plain.sh",
+      "action": "move",
+      "source_sha256": "2c7e4587c0890d421cb1feac3c6cfca9a6212b998d9638bfa146c4e0cd979269",
+      "destination_sha256": "ce59989ba880d20312207b9298227c8fa181510881820f5ba097dbd2c96d12fb"
+    },
+    {
+      "source": "logs/run_fourway_fp6.sh",
+      "destination": "experiments/paper/remote/run_fourway_fp6.sh",
+      "action": "move",
+      "source_sha256": "9ac34401791f308b7eb327ad1e18cbc0bc9c039897ad7ef728b00fdd1111d3a7",
+      "destination_sha256": "b2158b14c15e09939f410b7a1e55321e078e1f794c66210677d68c3f6d18a91e"
+    },
+    {
+      "source": "logs/run_g4b_grid.sh",
+      "destination": "experiments/paper/remote/run_g4b_grid.sh",
+      "action": "move",
+      "source_sha256": "923e1df581e3c91dd335ed353eaf22f074c0fa47bbda8ce5384c17b7b95b6efe",
+      "destination_sha256": "6e4d9c15be14f42db3fd397d2168d83b137c4c97ea74eaa9a567ee8156f1d809"
+    },
+    {
+      "source": "logs/run_g4b_nobypass_evals.sh",
+      "destination": "experiments/token_bypass/remote/run_g4b_nobypass_evals.sh",
+      "action": "move",
+      "source_sha256": "7693c50a22e74ea73dd8f7620c4cfec5c1c9141dc750b3be5d0a10d6afb7b870",
+      "destination_sha256": "e6f2bc4118eac03fe4c58d4fdb5dcb668f333313d6cb3208413a59206f2e470d"
+    },
+    {
+      "source": "logs/run_jigsaw_bypass.sh",
+      "destination": "experiments/paper/remote/run_jigsaw_bypass.sh",
+      "action": "move",
+      "source_sha256": "ab981b5a896d656252e0345ec584b8146feed7e2d65cd57c861662b878e29bf2",
+      "destination_sha256": "a26c87802ff2556d15c922ab9cb64fa755548829ee813c2a37d4a15262e1ca40"
+    },
+    {
+      "source": "logs/run_kcost_g4b.sh",
+      "destination": "experiments/cluster_count/remote/run_kcost_g4b.sh",
+      "action": "move",
+      "source_sha256": "abd9f0adfb2a99462d5a52f3413de849d92ab15ae572d8f05310965a73ec6440",
+      "destination_sha256": "a8ad6c7323c88dc9b043cc50510933db542bc68f1e14b245028717b748e37c01"
+    },
+    {
+      "source": "logs/run_kcost_g4b_k256.sh",
+      "destination": "experiments/cluster_count/remote/run_kcost_g4b_k256.sh",
+      "action": "move",
+      "source_sha256": "dbf33dd83a95f78e8ace67cdb17d8adb2aab31ac37bc450b5933e4d66eea76b1",
+      "destination_sha256": "b3eedc445bbdc77845e265f591fe3922c1d628558221940130b11c1a50d4a779"
+    },
+    {
+      "source": "logs/run_kcost_hc.sh",
+      "destination": "experiments/cluster_count/remote/run_kcost_hc.sh",
+      "action": "move",
+      "source_sha256": "88c4cd17aadcbb82248869c3ccba1d7eed3ea5f2a3b7d6190fa2d739b02210dd",
+      "destination_sha256": "0e98d64c6676fd10a460987fbf560692c8acb4b5d4bf9aa2f0320630312bce5b"
+    },
+    {
+      "source": "logs/run_kcost_tokmean.sh",
+      "destination": "experiments/cluster_count/remote/run_kcost_tokmean.sh",
+      "action": "move",
+      "source_sha256": "e414d21d41477f54def7472f53bb692dab7f2af1dffd14cfb1acbe0745db63c8",
+      "destination_sha256": "5f0d4958f86aa149c47ca4707a4fd0d208092d16e0397ef8757d486501d5b3d5"
+    },
+    {
+      "source": "logs/run_lloyd_ep10.sh",
+      "destination": "experiments/balancing/remote/run_lloyd_ep10.sh",
+      "action": "move",
+      "source_sha256": "e6c3283372eb0aeaf925339d8e2c8ca94f45a12b95d09c39db16c0565383d3cc",
+      "destination_sha256": "f38a7ec4d1e7e574d1ff1b24b1c1d52bdbea5be52291ea0f2fe37f72261ed392"
+    },
+    {
+      "source": "logs/run_ne100_llama_nobypass.sh",
+      "destination": "experiments/balancing/remote/run_ne100_llama_nobypass.sh",
+      "action": "move",
+      "source_sha256": "daf90c66a50e477d076a4a1d467ebd57876166b098f4b834c905c7cea30f7750",
+      "destination_sha256": "7b7ba63a1a2a337dd090c2d527846a5f74f60aa7aa0dda71cbe0f02580fad6c4"
+    },
+    {
+      "source": "logs/run_nobypass_evals.sh",
+      "destination": "experiments/token_bypass/remote/run_nobypass_evals.sh",
+      "action": "move",
+      "source_sha256": "fb77ae76d7577fcdf0a191f509b4b30557693023fa0d84d9ded377316be25322",
+      "destination_sha256": "675015724d3ce527476634ca1e914bbd7f7b784461e42f31d7e471bd2580350f"
+    },
+    {
+      "source": "logs/run_nosk_evals.sh",
+      "destination": "experiments/balancing/remote/run_nosk_evals.sh",
+      "action": "move",
+      "source_sha256": "342ce844ea6355bb291b8dc3cd438c18883bb8e26887bcef937d654875783c7a",
+      "destination_sha256": "45f8a8816428e832702d2b33751e0fb11261c907c2d279bf232a669ac1116b1b"
+    },
+    {
+      "source": "logs/run_nosk_frozen.sh",
+      "destination": "experiments/balancing/remote/run_nosk_frozen.sh",
+      "action": "move",
+      "source_sha256": "a23527503e19e6c5af521dbb77aa81006bd80f97fa4e0c082b5c81630dc0fb35",
+      "destination_sha256": "9510b4881e12ea4e0622b73bb64e5a0404d8eec70efc0b7b788bb39d19b7af35"
+    },
+    {
+      "source": "logs/run_ns100_llama_nobypass.sh",
+      "destination": "experiments/balancing/remote/run_ns100_llama_nobypass.sh",
+      "action": "move",
+      "source_sha256": "398cd7e4933204b65dda78684939b537a0be8adc1be4f6d906041dc10e43b7fe",
+      "destination_sha256": "1d8e08fc22a4410205cf4ab49fbc39ecfabec9439389850b119a52a4ccb87f0f"
+    },
+    {
+      "source": "logs/run_ns50_llama_nobypass.sh",
+      "destination": "experiments/balancing/remote/run_ns50_llama_nobypass.sh",
+      "action": "move",
+      "source_sha256": "6468337b62459a0918d6ac4650608bfe12bf474aec0035bb8081cad78f2e77da",
+      "destination_sha256": "f6a23220d0fbd22de1533571acaaab80d52ee9e23222ebbc46a03640c946b118"
+    },
+    {
+      "source": "logs/run_pair_probes.sh",
+      "destination": "experiments/paper/remote/run_pair_probes.sh",
+      "action": "move",
+      "source_sha256": "4574e6f665006ceac45f61076efaf439ee4b8d6117ec6843983de425735b4728",
+      "destination_sha256": "1f1b62b523eedde85d646265e2008c7aef8f2725fe94521223785f49ee0d8762"
+    },
+    {
+      "source": "logs/run_pair_probes_g4b.sh",
+      "destination": "experiments/paper/remote/run_pair_probes_g4b.sh",
+      "action": "move",
+      "source_sha256": "ca1fa3681d673c34e5909173d20adaaad14bd19d451780c864551c856a6fca1a",
+      "destination_sha256": "128e617de0ba7ef03425f707dbccdbffaf66ea2e541e66d131b1d1bde717af7f"
+    },
+    {
+      "source": "logs/run_pair_probes_llama.sh",
+      "destination": "experiments/paper/remote/run_pair_probes_llama.sh",
+      "action": "move",
+      "source_sha256": "b0906d1154c219dd9db54dc89ab25b5858da3ab4ba071c0c3031973ae183cb34",
+      "destination_sha256": "a73050c6ac036f37e9eb8145e2c51d6a60d981093c80e7f023d1ced8b77c2211"
+    },
+    {
+      "source": "logs/run_plain_cq.sh",
+      "destination": "experiments/paper/remote/run_plain_cq.sh",
+      "action": "move",
+      "source_sha256": "8179278bf896eaa20a2976d2b9953932068c6a9479940a0af0d2a514161c4e1e",
+      "destination_sha256": "60b67aec33998564f6a8b04a0518affca1535d75ba5a5663d12a0c04fecbba68"
+    },
+    {
+      "source": "logs/run_plain_dpc_evals.sh",
+      "destination": "experiments/paper/remote/run_plain_dpc_evals.sh",
+      "action": "move",
+      "source_sha256": "1e851fff4b8f1bc22027b22a336006c55699b2504ea5c21c4685efa2e430ac8b",
+      "destination_sha256": "aac88fd26245383b76e0d114bae704243c7a7775425f5fa14aa44d9fe6918976"
+    },
+    {
+      "source": "logs/run_plain_tokmean.sh",
+      "destination": "experiments/paper/remote/run_plain_tokmean.sh",
+      "action": "move",
+      "source_sha256": "fcaaa479dc506cc6902389a74b228a115ceea91788a107c095bb6ee60cb61422",
+      "destination_sha256": "58d7b8da75d51560d5c2924aabd01c506ef389ba6a6f68de91508a7d4ffd830b"
+    },
+    {
+      "source": "logs/run_seed42.sh",
+      "destination": "experiments/paper/remote/run_seed42.sh",
+      "action": "move",
+      "source_sha256": "b2a2f424f9784c1cf2a65d4dbabf8694526b549923deb638d1e037eaa1f1cc94",
+      "destination_sha256": "72f003586cfe580c99e7ec560f06d3cadd4a4255cc99867982cb5ebf58f11da5"
+    },
+    {
+      "source": "logs/run_toxicity_probes.sh",
+      "destination": "experiments/paper/remote/run_toxicity_probes.sh",
+      "action": "move",
+      "source_sha256": "cc189cc6e5fdf41513d6d57d7323d55db3e60ba3a50ed4cf61f26ffa2d8774ac",
+      "destination_sha256": "8da69f029339956fa58640c0e9ab862e0dde066195ef9c6b68eea7c27bdf6d4e"
+    },
+    {
+      "source": "tests/test_gemma_cache_repair.py",
+      "destination": "/Users/muhammadumairhaider/Work/GeoAE-artifacts/cleanup_20261022/historical_tools/tests/test_gemma_cache_repair.py",
+      "action": "archive",
+      "source_sha256": "a7ba0be60b2f8fcfb8e19f56237d717738d4aaad320567a3b43f71bd8c955b78",
+      "destination_sha256": "a7ba0be60b2f8fcfb8e19f56237d717738d4aaad320567a3b43f71bd8c955b78"
+    },
+    {
+      "source": "../code/GeoAE/configs/base/llama3.2-3b_extract_sampled_struct5.yaml",
+      "destination": "experiments/depth/configs/llama3.2-3b_l27_extract_sampled_struct5_train10M.yaml",
+      "action": "preserve_conflicting_recipe",
+      "source_sha256": "084ebcc72e12f7e9eddc564199357be2477d81f33f6b7d91a5d30e4d78ca507c",
+      "destination_sha256": "084ebcc72e12f7e9eddc564199357be2477d81f33f6b7d91a5d30e4d78ca507c"
+    },
+    {
+      "source": "../code/GeoAE/configs/base/llama3.2-3b_l27_k2000_bnh_b32k_lam1_d6144_dpc_sampled_struct5.yaml",
+      "destination": "experiments/depth/configs/llama3.2-3b_l27_k2000_bnh_b32k_lam1_d6144_dpc_sampled_struct5_train10M.yaml",
+      "action": "preserve_conflicting_recipe",
+      "source_sha256": "de308d5dc6202b3d5a532e7fe8be9a0479679391862e45a07a8139ca533dfe21",
+      "destination_sha256": "de308d5dc6202b3d5a532e7fe8be9a0479679391862e45a07a8139ca533dfe21"
+    },
+    {
+      "source": "../code/GeoAE/configs/base/llama3.2-3b_l27_k2000_bnh_b32k_lam1_d6144_dpc_sampled_struct5_tokbias.yaml",
+      "destination": "experiments/depth/configs/llama3.2-3b_l27_k2000_bnh_b32k_lam1_d6144_dpc_sampled_struct5_train10M_tokbias.yaml",
+      "action": "preserve_conflicting_recipe",
+      "source_sha256": "025784c08913c9d65ee53aa8e4f65a8db6ee08f57867650891d2c6a41b94c2d3",
+      "destination_sha256": "025784c08913c9d65ee53aa8e4f65a8db6ee08f57867650891d2c6a41b94c2d3"
+    },
+    {
+      "source": "../code/GeoAE/configs/base/gemma3-4b_extract_sampled_struct5.yaml",
+      "destination": "experiments/depth/configs/gemma3-4b_l33_extract_sampled_struct5_train10M.yaml",
+      "action": "preserve_conflicting_recipe",
+      "source_sha256": "f840b7ab18b38718c171e52ab3a9fe7c3d30425730a56cf5586c4c4a8188eb7f",
+      "destination_sha256": "f840b7ab18b38718c171e52ab3a9fe7c3d30425730a56cf5586c4c4a8188eb7f"
+    },
+    {
+      "source": "../code/GeoAE/configs/base/gemma3-4b_l33_k2000_bnh_b32k_lam1_d5120_dpc_sampled_struct5.yaml",
+      "destination": "experiments/paper/configs/gemma_no_bypass.yaml",
+      "action": "canonical_alias",
+      "source_sha256": "7396b11ee6314e2ca0c29d0d54be7fb7f781bd4727cd9be1a444ae8bf4358a7b",
+      "destination_sha256": "433320ff39fd471ebb1681476653db838fa9e8e4729ddb5162b486593bb2a2fb",
+      "intermediate_destination": "experiments/depth/configs/gemma3-4b_l33_k2000_bnh_b32k_lam1_d5120_dpc_sampled_struct5_train10M.yaml",
+      "intermediate_sha256": "7396b11ee6314e2ca0c29d0d54be7fb7f781bd4727cd9be1a444ae8bf4358a7b",
+      "effective_config_sha256": "542950de883584b29eb0b3d8daa60710d847940d16ea43b3edfe86f9c7984244"
+    },
+    {
+      "source": "../code/GeoAE/configs/base/gemma3-4b_l33_k2000_bnh_b32k_lam1_d5120_dpc_sampled_struct5_tokbias.yaml",
+      "destination": "experiments/depth/configs/gemma3-4b_l33_k2000_bnh_b32k_lam1_d5120_dpc_sampled_struct5_train10M_tokbias.yaml",
+      "action": "preserve_conflicting_recipe",
+      "source_sha256": "e383897418980f4ecf49e2bb43b854803b4d81aa02b55639a3f1f94e2439d5c5",
+      "destination_sha256": "e383897418980f4ecf49e2bb43b854803b4d81aa02b55639a3f1f94e2439d5c5"
+    }
+  ],
+  "destination_hash_scope": "Final maintained source after relocation, import/path fixes and configuration consolidation; source_sha256 always identifies the preserved original."
+}

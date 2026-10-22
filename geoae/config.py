@@ -22,7 +22,7 @@ class ExtractionConfig:
     activations_dir: str = "activations"
     log_every: int = 10           # batches between progress prints
 
-    # --- mode "sampled" (geoae/extract_sampled.py); "prefix" = legacy extract.py ----
+    # --- mode "sampled" (geoae/extraction/sampled.py); "prefix" = legacy extract.py ----
     mode: str = "prefix"          # "prefix" | "sampled"
     context_len: int = 2048       # sampled: forward each doc up to this many tokens
     positions_per_doc: int = 64   # sampled: uniform random positions kept per doc
@@ -30,7 +30,7 @@ class ExtractionConfig:
     shuffle_buffer: int = 10000   # sampled: HF streaming shuffle buffer per source
     outlier_norm_mult: float = 0.0  # sampled: drop rows with norm > mult x median (0 = keep all)
     min_doc_len: int = 10
-    corpus_dir: str = ""          # sampled: frozen corpus written by geoae.build_corpus
+    corpus_dir: str = ""          # sampled: frozen corpus written by geoae.extraction.corpus
     corpus_margin: float = 1.3    # build_corpus: stream this x each source's row quota
     # sampled: list of {domain, weight, kind: hf|structured, name, config, split,
     # field, exclude: {key, values}, shuffle_buffer}. Weights are token shares (normalised).
@@ -91,8 +91,9 @@ class LossConfig:
     lambda_cov: float = 0.0   # VICReg covariance on latents (anti low-rank collapse, 0 = off)
     lambda_unif: float = 0.0  # Wang–Isola uniformity on unit-sphere latents (cosine runs, 0 = off)
     sinkhorn_iters: int = 3
+    no_sinkhorn: bool = False  # use softmax assignment; persisted for checkpoint reloads
     # --- generalised cluster-marginal balancing (all defaults = today's behaviour) ---
-    balance: str = "uniform"       # "uniform" | "zipf"  — shape of the column target
+    balance: str = "uniform"       # "uniform" | "zipf" | "none" (softmax without balancing)
     balance_rho: float = 1.0       # column-constraint strength: 1 = hard Sinkhorn, 0 = softmax
     balance_eta: float = 1.0       # cross-batch EMA on the column dual: 1 = per-batch
     zipf_alpha_start: float = 0.0  # annealed 0 -> zipf_alpha_end over the tau window
@@ -154,7 +155,7 @@ class TrainConfig:
     peak_min_sep_frac: float = 0.25   # reject a peak within this x median pair distance of a kept one
     peak_refine_k: int = 8            # centroid = mean of this many NNs; 0 = the exact peak point
     peak_reinit_pool: int = 8192      # batch rows used by reinit_mode "peaks" (O(N^2) per cycle)
-    # --- in-batch supervision for a short fine-tune (see geoae/supervised.py) --
+    # --- in-batch supervision for a short fine-tune (see geoae/training/supervision.py) --
     # All default to off, so an ordinary run is byte-identical to before.
     sup_frac: float = 0.0             # labelled rows per step, as a fraction of batch_size.
                                       #   They are ADDED to the step, not swapped into the
@@ -203,7 +204,9 @@ class Config:
 
     @classmethod
     def from_yaml(cls, path: str | Path) -> "Config":
-        with open(path) as f:
+        from geoae.paths import config_path
+
+        with open(config_path(path)) as f:
             overrides = yaml.safe_load(f) or {}
         cfg = cls()
         for section, values in overrides.items():
@@ -219,6 +222,8 @@ class Config:
 
     def validate(self) -> "Config":
         """Reject out-of-range values for the enumerated train fields."""
+        if not isinstance(self.loss.no_sinkhorn, bool):
+            raise ValueError("loss.no_sinkhorn must be a boolean")
         for name in ("hidden_size", "latent_dim"):
             value = getattr(self.model, name)
             if isinstance(value, bool) or not isinstance(value, int) or value <= 0:

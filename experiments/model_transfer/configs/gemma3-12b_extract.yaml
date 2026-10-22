@@ -1,0 +1,25 @@
+# Activation extraction — Gemma 3 12B PT, FINAL layer only, deep token budget.
+extraction:
+  model_name: "google/gemma-3-12b-pt"
+  layers: [47]          # final decoder layer only — see WHY LAYER 47 ONLY above
+  target_layer: 47      # never read by any code; kept consistent with data.target_layer
+  hidden_size: 3840             # checked against the loaded model; mismatch = hard fail
+  n_tokens: 10000000
+  dtype: "float32"              # REQUIRED: dim 2339 overflows fp16 — see header
+  max_doc_tokens: 256
+  skip_leading: 4
+  activations_dir: "activations_gemma3_12b"
+  log_every: 200
+
+data:
+  activations_dir: "activations_gemma3_12b"
+  target_layer: 47    # read by geoae.train — must name a layer in `layers` above
+  batch_size: 2048
+  val_frac: 0.05
+
+model:
+  hidden_size: 3840
+  latent_dim: 3840
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean

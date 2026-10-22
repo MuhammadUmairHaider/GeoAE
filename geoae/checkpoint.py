@@ -108,6 +108,8 @@ def load_ae_checkpoint(
         vocab_size=tb_vocab,
         token_bias_mode=mc.get("token_bias_mode", "bypass"),
     ).to(device)
+    if lc.get("no_sinkhorn", False):
+        ae.use_sinkhorn = False
     # `sinkhorn_g` was added with the generalised balancing knobs; checkpoints
     # written before it are still loadable, but nothing else may be missing.
     missing, unexpected = ae.load_state_dict(ckpt["model_state"], strict=False)
@@ -200,6 +202,15 @@ def _local_lm_snapshot(model_name: str) -> str | None:
                 f"GEOAE_LM_SNAPSHOTS_JSON entry for {name!r} must be an absolute existing directory: "
                 f"{directory!r}")
     return snapshots.get(model_name)
+
+
+def load_tokenizer(model_name, *args, **kwargs):
+    """Resolve existing HF credentials when a tokenizer is actually requested."""
+    from geoae.hf_auth import ensure_hf_login
+    from transformers import AutoTokenizer
+
+    ensure_hf_login(verbose=False)
+    return AutoTokenizer.from_pretrained(model_name, *args, **kwargs)
 
 
 def load_lm(

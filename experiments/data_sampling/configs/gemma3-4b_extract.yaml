@@ -1,0 +1,25 @@
+# Activation extraction — Gemma 3 4B PT, FINAL layer (33) only.
+extraction:
+  model_name: "google/gemma-3-4b-pt"
+  layers: [33]                  # final decoder layer (34 layers, 0-indexed)
+  target_layer: 33              # never read by any code; kept consistent with data.target_layer
+  hidden_size: 2560             # checked against the loaded model; mismatch = hard fail
+  n_tokens: 8000000
+  dtype: "float32"              # MANDATORY — dim 443 overflows fp16, see header
+  max_doc_tokens: 256
+  skip_leading: 4
+  activations_dir: "activations_gemma3_4b"
+  log_every: 200
+
+data:
+  activations_dir: "activations_gemma3_4b"
+  target_layer: 33    # read by geoae.train — must name a layer in `layers` above
+  batch_size: 2048
+  val_frac: 0.05
+
+model:
+  hidden_size: 2560
+  latent_dim: 2560
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean

@@ -1,0 +1,41 @@
+# MSE-ONLY control run — Gemma 3 12B PT, layer 47. The question this answers:
+extraction:
+  model_name: "google/gemma-3-12b-pt"
+
+data:
+  activations_dir: "activations_gemma3_12b"   # same dump the e2e run used
+  target_layer: 47
+  batch_size: 4096          # no LM in the loop, so this can be large
+  val_frac: 0.05            # -> 9.33M train / 491k val, identical to the e2e run
+
+model:
+  hidden_size: 3840
+  latent_dim: 3840          # square, as in the e2e run — the point of the control
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
+
+loss:
+  lambda_cluster: 0.05      # identical to the e2e run
+  lambda_sep: 0.005
+  lambda_var: 0.3           # VICReg variance hinge — the anti-identity pressure
+  lambda_cov: 0.001         # VICReg covariance — anti low-rank collapse
+  lambda_unif: 0.0
+  lambda_usage: 0.05        # unused (Sinkhorn balances Q by construction)
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50              # matches the e2e run's epoch count
+  lr: 1.0e-4                # base default; MSE in z-space is well scaled
+  recon_only_epochs: 2
+  clustering_start_epoch: 3
+  full_loss_start_epoch: 6
+  ema_decay: 0.9
+  ema_hard: true
+  centroid_init: "kmeans++"
+  checkpoints_dir: "checkpoints/gemma3-12B/layer47/mse_only_k2000"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

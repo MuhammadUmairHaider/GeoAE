@@ -1,0 +1,20 @@
+# Research state and evidence
+
+The [paper source](paper/paper.tex) is the main description of GeoAE's linear-decoder method. The [nonlinear-decoder family](../experiments/nonlinear_decoders/README.md) is subsequent work comparing a full MLP and a residual MLP with the saved linear baseline. Older exploratory controls remain available by [experiment family](../experiments/README.md); they should not be pooled into the paper comparison without checking their protocols.
+
+| Work | Scope | Evidence entry point |
+| --- | --- | --- |
+| Paper | Frozen Llama, Gemma and Qwen activations; bypass/no-bypass models; residual k-means and Gemma Scope controls; geometry, faithfulness, alignment and steering | [paper source and build](paper/README.md), [paper recipes](../experiments/paper/README.md) |
+| Nonlinear decoders | Decoder architecture follow-up using the existing token-bypass setup | [Qwen comparison CSV](../../GeoAE-artifacts/research/runs/nonlinear_decoder_validation/deltaai/review/core_comparison.csv), [detailed report](../../GeoAE-artifacts/research/reports/nonlinear_decoder_20261021/detailed_report.html) |
+| Other-model follow-up | Llama/Gemma nonlinear evaluations and recovery bookkeeping | [campaign status](../../GeoAE-artifacts/research/runs/nonlinear_decoder_validation/other_models_deltaai/status.json), [recovery receipt](../../GeoAE-artifacts/research/runs/nonlinear_decoder_validation/other_models_deltaai/recovery_latest.json) |
+| Historical exploration | Width, initialization, balancing, token removal, supervised continuation, probes and generation controls | [experiment index](../experiments/README.md), [chat index](history/CHAT_HISTORY.md), [project memory](history/notes/MEMORY.md) |
+
+The stored status files and presentation/report describe their recorded timestamps. They are not a live scheduler query. The direct read-only Delta check during cleanup could not authenticate in batch mode, and no recovery jobs or new experiments were started. Read current result files before quoting metrics; chat summaries, old pending-job lists and memory can be stale.
+
+The paper source, bibliography and pinned official ACL assets can render without model weights or activation dumps. Table regeneration has a separate dependency closure. [paper/dependencies.json](paper/dependencies.json) records known result JSON and K-sweep label-array gaps in both local source copies, the recovered generators, and candidate authoritative Delta paths. A successful PDF build verifies the authoring inputs and citations, not that every scientific table was regenerated from raw evidence.
+
+Keep each comparison's data, token table, checkpoint, document pool, initialization and evaluation rules explicit. The nonlinear review has one training seed, architecture-capacity/constraint differences and independently selected control document pools. Pairwise cluster-support filtering can change the scored rows. Confidence intervals computed within one run are not independent-seed replication, and separate marginal intervals do not establish a between-decoder significance test. Use matched document pools and multiple seeds before drawing stronger architecture conclusions.
+
+Labels remain evaluation-only for unsupervised main-paper training; seeded and supervised experiments identify their extra supervision separately. Activation/latent geometry uses Euclidean distances in each representation's own coordinates. Full reconstruction faithfulness and residual-preserving control edits answer different questions; [architecture.md](architecture.md) gives both definitions.
+
+The Mac is the development home base. The authoritative large data, model checkpoints and GPU work remain on Delta/Argo at the paths recorded by [the setup status](history/migration/LAPTOP_SETUP_STATUS.md) and [handoff](history/migration/LAPTOP_HANDOFF.md). The separate migration archive is preservation storage, not a new experiment working directory. [The artifact catalog](artifacts.json) and relocation ledgers account for the local cleanup while preserving frozen snapshots and their original hashes.

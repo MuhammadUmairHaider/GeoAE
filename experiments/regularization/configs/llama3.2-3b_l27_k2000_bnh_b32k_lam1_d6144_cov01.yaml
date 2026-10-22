@@ -1,0 +1,56 @@
+# Llama-3.2-3B L27, K=2000 — BN + hinge sep, batch 32768, latent 6144.
+extraction:
+  model_name: "meta-llama/Llama-3.2-3B"   # metadata only — no LM is loaded here
+
+data:
+  activations_dir: "activations_diverse_10M"
+  target_layer: 27
+  batch_size: 32768         # B/K = 16.4
+  val_frac: 0.05            # -> 9.33M train / 491k val, same split as the parent
+
+model:
+  hidden_size: 3072
+  latent_dim: 6144
+  latent_norm: "batch"      # BatchNorm1d between encoder linear and GELU
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
+
+loss:
+  lambda_cluster: 1.0
+  lambda_sep: 0.3           # live under sep_mode: hinge; ramps 0 -> 0.3 across 11..50
+  sep_mode: "hinge"         # relu(margin*r_intra - d)^2; median mode is scale-free/inert
+  sep_margin: 2.0
+  lambda_var: 1.0           # NOT raised — see header, no dims are dead
+  lambda_cov: 0.1           # <<< THE CHANGE: 0.01 -> 0.1, cov measured 52x above floor
+  lambda_unif: 0.0
+  lambda_usage: 0.05        # unused by total_loss; config parity
+  lambda_mse: 0.0           # unused here — total_loss carries MSE at weight 1.0
+
+  balance: "zipf"
+  balance_rho: 0.6
+  balance_eta: 0.05
+  zipf_alpha_start: 0.0
+  zipf_alpha_end: 0.5
+
+  sinkhorn_iters: 3
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  lr: 2.8e-4
+  recon_only_epochs: 10
+  geometry_start_epoch: 6
+  clustering_start_epoch: 11
+  full_loss_start_epoch: 11
+  ema_decay: 0.9
+  ema_hard: true
+  centroid_init: "kmeans++"
+  checkpoints_dir: "checkpoints/llama3.2-3B/layer27/k2000_bnh_b32k_lam1_d6144_cov01"
+  diag_every: 12
+  reinit_every: 125
+  save_every: 1
+  keep_checkpoints: 40      # keeps epochs 11-50, the whole post-clustering trajectory
+  seed: 42
+  wandb_project: "geosep-general-e2e"

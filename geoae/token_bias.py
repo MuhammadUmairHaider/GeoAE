@@ -62,13 +62,13 @@ def main():
     ap.add_argument("--out", required=True)
     args = ap.parse_args()
 
-    from geoae.data import ActivationBuffer
-    from transformers import AutoTokenizer
+    from geoae.training.data import ActivationBuffer
+    from geoae.checkpoint import load_tokenizer
 
     dev = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     act_dir = Path(args.activations_dir)
     meta = json.load(open(act_dir / "meta.json"))
-    vocab = len(AutoTokenizer.from_pretrained(meta["model"]))
+    vocab = len(load_tokenizer(meta["model"]))
     # The exact mean/std training uses (the dump's cached norm params, computed on the train split).
     buf = ActivationBuffer(act_dir, args.layer, val_frac=args.val_frac, split="train")
     mean = torch.as_tensor(buf.mean, device=dev)

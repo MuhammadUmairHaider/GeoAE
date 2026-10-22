@@ -1,0 +1,76 @@
+# Exactly 10,000,000 training rows plus a separate 5% validation tail.
+extraction:
+  model_name: google/gemma-3-4b-pt
+  layers:
+  - 17
+  target_layer: 17
+  hidden_size: 2560
+  n_tokens: 10526316
+  dtype: float32
+  activations_dir: activations_gemma3_4b_l17_sampled_struct5_train10M
+  corpus_dir: corpus/gemma3_4b_sampled_struct5_v1
+  corpus_margin: 1.3
+  mode: sampled
+  context_len: 2048
+  positions_per_doc: 64
+  skip_leading: 4
+  batch_docs: 16
+  shuffle_buffer: 2000
+  outlier_norm_mult: 0.0
+  log_every: 2000
+  sources:
+  - domain: edu_web
+    weight: 35
+    name: HuggingFaceFW/fineweb-edu
+    config: sample-10BT
+    field: text
+  - domain: web
+    weight: 15
+    name: HuggingFaceFW/fineweb
+    config: sample-10BT
+    field: text
+  - domain: wiki
+    weight: 15
+    name: wikimedia/wikipedia
+    config: 20231101.en
+    field: text
+  - domain: pile
+    weight: 10
+    name: monology/pile-uncopyrighted
+    field: text
+    shuffle_buffer: 1000
+    exclude:
+      key: meta.pile_set_name
+      values:
+      - Pile-CC
+      - Github
+      - DM Mathematics
+      - Wikipedia (en)
+  - domain: code
+    weight: 8
+    name: codeparrot/codeparrot-clean
+    field: content
+  - domain: math
+    weight: 5
+    name: HuggingFaceTB/finemath
+    config: finemath-4plus
+    field: text
+  - domain: wiki_de
+    weight: 3
+    name: wikimedia/wikipedia
+    config: 20231101.de
+    field: text
+  - domain: wiki_fr
+    weight: 2
+    name: wikimedia/wikipedia
+    config: 20231101.fr
+    field: text
+  - domain: wiki_es
+    weight: 2
+    name: wikimedia/wikipedia
+    config: 20231101.es
+    field: text
+  - domain: structured
+    weight: 5
+    kind: structured
+    items_per_doc: 8

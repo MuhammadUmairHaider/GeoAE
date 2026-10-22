@@ -1,0 +1,48 @@
+# Gemma-3-4B-pt layer 33, K=2000, GELU — MSE-only, ZIPF BALANCING + EXPLICIT PHASES.
+extraction:
+  model_name: "google/gemma-3-4b-pt"
+
+data:
+  activations_dir: "activations_gemma3_4b"
+  target_layer: 33
+  batch_size: 4096          # no LM in the loop, so this can be large
+  val_frac: 0.05
+
+model:
+  hidden_size: 2560
+  latent_dim: 2560          # square, as at 12B — the point of the control
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
+
+loss:                       # identical to the 12B mse_only run
+  lambda_cluster: 0.05
+  lambda_sep: 0.005
+  lambda_var: 0.3           # VICReg variance hinge — the anti-identity pressure
+  lambda_cov: 0.001         # VICReg covariance — anti low-rank collapse
+  lambda_unif: 0.0
+  lambda_usage: 0.05        # unused (Sinkhorn balances Q by construction)
+  balance: "zipf"            # power-law column target instead of a flat one
+  balance_rho: 0.6           # apply 60% of the column correction, not all of it
+  balance_eta: 0.05          # carry the column dual across ~20 batches
+  zipf_alpha_start: 0.0      # annealed from 0 so the ranking reflects learned usage
+  zipf_alpha_end: 0.5        # measured fit on Llama L27 latents was alpha = 0.46
+
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  lr: 1.0e-4
+  recon_only_epochs: 10        # no cluster loss until epoch 11
+  geometry_start_epoch: 6      # epochs 6-10: + VICReg, clustering still off
+  clustering_start_epoch: 11   # epochs 11+: + cluster loss, kmeans++ seed
+  full_loss_start_epoch: 11    # sep ramps from 0; tau and alpha anneal from here
+  ema_decay: 0.9
+  ema_hard: true
+  centroid_init: "kmeans++"
+  checkpoints_dir: "checkpoints/gemma3-4B/layer33/k2000_zipf_phased_mse"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

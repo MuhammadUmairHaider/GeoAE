@@ -1,0 +1,41 @@
+# MSE-ONLY — Gemma 3 4B PT, layer 22 (65% depth). GELU encoder, K=2000.
+extraction:
+  model_name: "google/gemma-3-4b-pt"
+
+data:
+  activations_dir: "activations_gemma3_4b"
+  target_layer: 22
+  batch_size: 4096          # no LM in the loop, so this can be large
+  val_frac: 0.05
+
+model:
+  hidden_size: 2560
+  latent_dim: 2560
+  n_clusters: 2000
+  nonlinearity: gelu        # as at 12B/L47 and 4B/L33
+  metric: euclidean
+
+loss:
+  lambda_cluster: 0.02378
+  lambda_sep: 0.000503
+  lambda_var: 0.09873
+  lambda_cov: 0.001008
+  lambda_unif: 0.0          # cosine/uniformity geometry is a documented dead end
+  lambda_usage: 0.05        # unused (Sinkhorn balances Q by construction)
+  tau_start: 1.0
+  tau_end: 0.1
+
+train:
+  n_epochs: 50
+  lr: 1.0e-4
+  recon_only_epochs: 2
+  clustering_start_epoch: 3
+  full_loss_start_epoch: 6
+  ema_decay: 0.9
+  ema_hard: true
+  centroid_init: "kmeans++"
+  checkpoints_dir: "checkpoints/gemma3-4B/layer22/mse_only_k2000"
+  diag_every: 100
+  reinit_every: 1000
+  seed: 42
+  wandb_project: "geosep-general-e2e"

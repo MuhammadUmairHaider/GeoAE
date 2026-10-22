@@ -1,0 +1,1 @@
+"""Geoae training capabilities."""

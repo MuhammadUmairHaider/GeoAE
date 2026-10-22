@@ -16,19 +16,31 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest", "wandb", "ruff"]
+sae = ["einops==0.8.2"]
+judges = ["openai", "anthropic"]
+plots = ["umap-learn"]
 
 [project.scripts]
-geoae-train = "geoae.train:main"
-geoae-extract = "geoae.extract:main"
-geoae-evaluate = "geoae.evaluate:main"
-geoae-pipeline = "geoae.pipeline:main"
-geoae-e2e-extract = "geoae.e2e.extract:main"
-geoae-e2e-train = "geoae.e2e.train:main"
-geoae-e2e-train-stream = "geoae.e2e.train_stream:main"
+geoae = "geoae.cli:main"
+geoae-train = "geoae.training.mse:main"
+geoae-extract = "geoae.extraction.prefix:main"
+geoae-evaluate = "geoae.evaluation.faithfulness:main"
+geoae-pipeline = "geoae.workflow.pipeline:main"
+geoae-e2e-extract = "geoae.extraction.logits:main"
+geoae-e2e-train = "geoae.training.kl_cached:main"
+geoae-e2e-train-stream = "geoae.training.kl_stream:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["geoae*"]
+include = ["geoae*", "experiments*"]
+
+[tool.setuptools.package-data]
+geoae = ["baselines/matched_topk/_reference/SOURCE.json", "baselines/matched_topk/requirements.txt"]
+experiments = ["**/*.yaml", "**/*.yml", "**/*.sh", "**/*.sbatch", "**/*.html", "config_paths.json"]
+
+[tool.setuptools.data-files]
+"share/geoae/configs/examples" = ["configs/examples/*.yaml"]
+"share/geoae/configs/sites" = ["configs/sites/*.sh", "configs/sites/*.md", "configs/sites/*.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -37,6 +49,8 @@ addopts = "-q"
 [tool.ruff]
 line-length = 110
 target-version = "py310"
+# Upstream reference code is pinned byte-for-byte; lint maintained adapters instead.
+extend-exclude = ["geoae/baselines/matched_topk/_reference"]
 
 [tool.ruff.lint]
 # F: pyflakes (unused imports/variables, undefined names), E7/E9: pycodestyle errors

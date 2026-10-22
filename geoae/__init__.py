@@ -5,23 +5,7 @@ Train a geometrically separated concept dictionary on layer activations, with
 faithfulness measured by MSE reconstruction or end-to-end KL on next-token logits.
 """
 
-from geoae.config import (
-    Config,
-    DataConfig,
-    ExtractionConfig,
-    LossConfig,
-    ModelConfig,
-    TrainConfig,
-)
-from geoae.hf_auth import ensure_hf_login
-from geoae.model import AEOutput, GeoAE
-
-# Resolve an HF token once, at import, so gated checkpoints (Gemma 3, Llama)
-# work from every entry point — including the many that build an AutoTokenizer
-# before touching load_lm. Quiet and offline: it only exports HF_TOKEN from an
-# already-present env var, a git-ignored token file, or an `hf auth login`
-# credential. No token found is a no-op; load_lm still raises its GATED_HINT.
-ensure_hf_login(verbose=False)
+from importlib import import_module
 
 __version__ = "0.1.0"
 
@@ -38,5 +22,25 @@ __all__ = [
     "ensure_hf_login",
 ]
 
-# Backward-compatible alias (GeoSepAE was the research codebase name)
-GeoSepAE = GeoAE
+_EXPORTS = {
+    **{name: ("geoae.config", name) for name in (
+        "Config", "DataConfig", "ExtractionConfig", "LossConfig", "ModelConfig", "TrainConfig")},
+    "AEOutput": ("geoae.model", "AEOutput"),
+    "GeoAE": ("geoae.model", "GeoAE"),
+    "GeoSepAE": ("geoae.model", "GeoAE"),
+    "ensure_hf_login": ("geoae.hf_auth", "ensure_hf_login"),
+}
+
+
+def __getattr__(name):
+    """Load public classes on demand; importing GeoAE never resolves credentials."""
+    if name not in _EXPORTS:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    module, attribute = _EXPORTS[name]
+    value = getattr(import_module(module), attribute)
+    globals()[name] = value
+    return value
+
+
+def __dir__():
+    return sorted(set(globals()) | set(_EXPORTS))

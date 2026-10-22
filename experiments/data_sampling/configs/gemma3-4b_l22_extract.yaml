@@ -1,0 +1,25 @@
+# Activation extraction — Gemma 3 4B PT, layer 22 (65% depth).
+extraction:
+  model_name: "google/gemma-3-4b-pt"
+  layers: [22]
+  target_layer: 22              # never read by any code; kept consistent with data.target_layer
+  hidden_size: 2560             # checked against the loaded model; mismatch = hard fail
+  n_tokens: 10000000            # 10M requested; see the EXHAUSTION note in the header
+  dtype: "float32"              # MANDATORY — see header
+  max_doc_tokens: 256
+  skip_leading: 4
+  activations_dir: "activations_gemma3_4b"
+  log_every: 200
+
+data:
+  activations_dir: "activations_gemma3_4b"
+  target_layer: 22
+  batch_size: 2048
+  val_frac: 0.05
+
+model:
+  hidden_size: 2560
+  latent_dim: 2560
+  n_clusters: 2000
+  nonlinearity: gelu
+  metric: euclidean
